@@ -1,4 +1,5 @@
 fontconf
 ========
 
-Font configuration files (Infinality &amp; friends)
+Font configuration files (Infinality &amp; friends).
+
