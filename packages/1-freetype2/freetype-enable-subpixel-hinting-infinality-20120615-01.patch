@@ -1,0 +1,21 @@
+diff -Nur -x '*~' -x '*.rej' -x '*.orig' -x '*.SUP' freetype-subpixel/include/freetype/config/ftoption.h freetype-subpixel-enabled/include/freetype/config/ftoption.h
+--- freetype-subpixel/include/freetype/config/ftoption.h	2012-06-15 07:31:12.146985731 -0500
++++ freetype-subpixel-enabled/include/freetype/config/ftoption.h	2012-06-15 07:32:18.144747500 -0500
+@@ -92,7 +92,7 @@
+   /* This is done to allow FreeType clients to run unmodified, forcing     */
+   /* them to display normal gray-level anti-aliased glyphs.                */
+   /*                                                                       */
+-/* #define FT_CONFIG_OPTION_SUBPIXEL_RENDERING */
++#define FT_CONFIG_OPTION_SUBPIXEL_RENDERING
+ 
+ 
+   /*************************************************************************/
+@@ -577,7 +577,7 @@
+   /*   This option requires TT_CONFIG_OPTION_BYTECODE_INTERPRETER to be    */
+   /*   defined.                                                            */
+   /*                                                                       */
+-/* #define TT_CONFIG_OPTION_SUBPIXEL_HINTING */
++#define TT_CONFIG_OPTION_SUBPIXEL_HINTING
+ 
+ 
+   /*************************************************************************/

@@ -1,0 +1,51 @@
+# bohoomil, based on the file provided by
+# Contributor: JIN Xiao-Yong <jinxiaoyong@gmail.com>
+
+# Installation order: freetype2, fontconfig, libxft, cairo
+pkgname=freetype2
+pkgver=2.4.10
+pkgrel=1
+pkgdesc="TrueType font rendering library with infinality patch"
+arch=(i686 x86_64)
+license=('GPL')
+groups=('custom')
+url="http://freetype.sourceforge.net"
+depends=('zlib' 'bzip2' 'sh')
+conflicts=('freetype2' 'freetype2-infinality')
+provides=("freetype2=$pkgver")
+options=('!libtool')
+install='infinality.install'
+backup=('etc/profile.d/infinality-settings.sh')
+source=(http://download.savannah.gnu.org/releases/freetype/freetype-${pkgver}.tar.bz2 \
+	freetype-add-subpixel-hinting-infinality-20120616-01.patch \
+	freetype-enable-subpixel-hinting-infinality-20120615-01.patch \
+	freetype-entire-infinality-patchset-20120615-01.patch \
+	infinality.sh)
+
+md5sums=('13286702e9390a91661f980608adaff1'
+         'dd930345097a03ac8ba94b3b1f8610b7'
+         '099b93a08f79251d0a3f974545214ab7'
+         '244a032551b448c08cc73dc2e38f493d'
+         'd60f684f5622f81b7f8e877047fff48e')
+
+build() {
+  cd "${srcdir}/freetype-${pkgver}"
+	patch -Np1 -i ../freetype-add-subpixel-hinting-infinality-20120616-01.patch
+	patch -Np1 -i ../freetype-enable-subpixel-hinting-infinality-20120615-01.patch
+	patch -Np1 -i ../freetype-entire-infinality-patchset-20120615-01.patch
+  ./configure --prefix=/usr
+  make
+}
+
+check() {
+	cd "${srcdir}/freetype-${pkgver}"
+	make -k check
+}
+
+package() {
+  cd "${srcdir}/freetype-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  install -D -T "${srcdir}/infinality.sh" "${pkgdir}/etc/profile.d/infinality.sh"
+}
+
