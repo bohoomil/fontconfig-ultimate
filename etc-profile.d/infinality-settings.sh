@@ -1,5 +1,6 @@
 ###################################################################
 ### INFINALITY ENVIRONMENT VARIABLES FOR EXTRA RUN-TIME OPTIONS ###
+################### custom settings by bohoomil ###################
 ###################################################################
 
 export INFINALITY_FT_FILTER_PARAMS="11 22 38 22 11"
@@ -12,8 +13,8 @@ export INFINALITY_FT_CHROMEOS_STYLE_SHARPENING_STRENGTH=15
 export INFINALITY_FT_STEM_ALIGNMENT_STRENGTH=25
 export INFINALITY_FT_STEM_FITTING_STRENGTH=25
 export INFINALITY_FT_GAMMA_CORRECTION="0 100"
-export INFINALITY_FT_BRIGHTNESS="5"
-export INFINALITY_FT_CONTRAST="20"
+export INFINALITY_FT_BRIGHTNESS="10"
+export INFINALITY_FT_CONTRAST="30"
 export INFINALITY_FT_USE_VARIOUS_TWEAKS=true
 export INFINALITY_FT_AUTOHINT_INCREASE_GLYPH_HEIGHTS=false
 export INFINALITY_FT_AUTOHINT_SNAP_STEM_HEIGHT=50
