@@ -20,13 +20,13 @@ source=(http://download.savannah.gnu.org/releases/freetype/freetype-${pkgver}.ta
 	freetype-add-subpixel-hinting-infinality-20120616-01.patch \
 	freetype-enable-subpixel-hinting-infinality-20120615-01.patch \
 	freetype-entire-infinality-patchset-20120615-01.patch \
-	infinality.sh)
+	infinality-settings.sh)
 
 md5sums=('13286702e9390a91661f980608adaff1'
          'dd930345097a03ac8ba94b3b1f8610b7'
          '099b93a08f79251d0a3f974545214ab7'
          '244a032551b448c08cc73dc2e38f493d'
-         'd60f684f5622f81b7f8e877047fff48e')
+         '239029e403958539b0629a2001513f47')
 
 build() {
   cd "${srcdir}/freetype-${pkgver}"
@@ -46,6 +46,6 @@ package() {
   cd "${srcdir}/freetype-${pkgver}"
 
   make DESTDIR="${pkgdir}" install
-  install -D -T "${srcdir}/infinality.sh" "${pkgdir}/etc/profile.d/infinality.sh"
+  install -D -T "${srcdir}/infinality-settings.sh" "${pkgdir}/etc/profile.d/infinality-settings.sh"
 }
 
