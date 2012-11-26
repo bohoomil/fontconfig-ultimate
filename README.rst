@@ -6,12 +6,15 @@ Font configuration files (Infinality & friends).
 **Quick install instructions**
 
 1. Clone this repository.
-2. Issue ``cd freetype2 && makepkg -i``.
+2. Issue ``cd freetype2-infinality && makepkg -i``.
 3. Replace the content of your ``/etc/fonts`` with the content from ``etc-fonts`` in this repo. (**WARNING:** before doing so, make sure to backup the original content in case there are any important customizations you may still need.)
 
 **Further customization**
+
+If you have already installed ``freetype2-infinality`` from the AUR, you can skip step 2.
 
 The configuration defaults to MS core fonts, so make sure you have already installed them. (For best results use the most recent MS fonts.) In case you don't have them or don't want to use them, modify ``20-aliases-default.conf`` and replace default sans, serif and mono entries so that they meet you system's specs. If necessay, provide any further font substituions in ``41-repl-os.conf``, ``42-repl-global.conf`` and ``21-aliases-wine.conf``.
 
 If you want to force fontconfig to use a particular typeface for a specified language, you can do so in ``81-final-lang-spec.conf`` (working examples have been provided).
 
+If you are using a desktop environment (KDE, Gnome) that lets you adjust font settings on its own, you can duplicate the base values as found in ``/etc/fonts/infinality/conf.d/50-base-rendering.conf``.
