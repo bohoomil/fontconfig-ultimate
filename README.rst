@@ -1,5 +1,5 @@
-fontconf
-========
+fontconf, a.k.a. fontconfig-infinality-ultimate
+===============================================
 
 Font configuration files (Infinality & friends).
 
