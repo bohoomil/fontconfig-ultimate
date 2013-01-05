@@ -1,9 +1,9 @@
 # bohoomil <bohoomil AT gmail DOT com>, based on the file provided by
 # JIN Xiao-Yong <jinxiaoyong@gmail.com>
 
-pkgname=freetype2-infinality
-pkgver=2.4.10
-pkgrel=1
+pkgname=freetype2
+pkgver=2.4.11
+pkgrel=2
 pkgdesc="TrueType font rendering library with infinality patch"
 arch=(i686 x86_64)
 license=('GPL')
@@ -17,24 +17,21 @@ install='infinality.install'
 backup=('etc/profile.d/infinality-settings.sh')
 source=(http://download.savannah.gnu.org/releases/freetype/freetype-${pkgver}.tar.bz2 \
 	freetype-2.2.1-enable-valid.patch \
-	freetype-add-subpixel-hinting-infinality-20120616-01.patch \
-	freetype-enable-subpixel-hinting-infinality-20120615-01.patch \
-	freetype-entire-infinality-patchset-20120615-01.patch \
+  freetype-enable-subpixel-hinting-infinality-20120615-01.patch \
+  freetype-entire-infinality-patchset-20130104-01.patch \
 	infinality-settings.sh)
 
-md5sums=('13286702e9390a91661f980608adaff1'
+md5sums=('b93435488942486c8d0ca22e8f768034'
          '214119610444c9b02766ccee5e220680'
-         'dd930345097a03ac8ba94b3b1f8610b7'
          '099b93a08f79251d0a3f974545214ab7'
-         '244a032551b448c08cc73dc2e38f493d'
+         'cd2ebe01b5ad90d9f4272980fa4a46ca'
          '239029e403958539b0629a2001513f47')
 
 build() {
   cd "${srcdir}/freetype-${pkgver}"
 	patch -Np1 -i ../freetype-2.2.1-enable-valid.patch
-	patch -Np1 -i ../freetype-add-subpixel-hinting-infinality-20120616-01.patch
 	patch -Np1 -i ../freetype-enable-subpixel-hinting-infinality-20120615-01.patch
-	patch -Np1 -i ../freetype-entire-infinality-patchset-20120615-01.patch
+  patch -Np1 -i ../freetype-entire-infinality-patchset-20130104-01.patch
   ./configure --prefix=/usr
   make
 }
