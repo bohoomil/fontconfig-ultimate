@@ -7,7 +7,7 @@ Font configuration files (Infinality & friends).
 
 1. Clone this repository.
 2. Issue ``cd freetype2-infinality && makepkg -i``.
-3. Replace the content of your ``/etc/fonts`` with the content from ``etc-fonts`` in this repo. (**WARNING:** before doing so, make sure to backup the original content in case there are any important customizations you may still need.)
+3. Replace the content of your ``/etc/fonts`` with the content from ``etc-fonts`` in this repo. (**WARNING:** before doing so, make sure you have a backup of the original content in case there are any important customizations you may still need.)
 
 **Further customization and misc options**
 
