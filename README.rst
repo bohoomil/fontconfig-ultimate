@@ -21,5 +21,7 @@ If you want to force fontconfig to use a particular typeface for a specified lan
 
 If you are using a desktop environment (KDE, Gnome) that lets you adjust font settings on its own, you can duplicate the base values as found in ``/etc/fonts/infinality/conf.d/50-base-rendering.conf``.
 
+If you need good looking fonts but you aren't sure which to choose, see a brief list of my favourite specimen `here <https://github.com/bohoomil/fontconf/wiki/Free-font-recomendations>`_ (to be updated).
+
 .. _fontconfig-infinality-ultimate: https://aur.archlinux.org/packages/fontconfig-infinality-ultimate/
 
