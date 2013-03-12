@@ -27,7 +27,7 @@ If you are in need of good looking fonts but you aren't sure which to choose, se
 
 
 
-.. img:: cc.png
+.. img:: ./cc.png
 
 This work is licensed under a `Creative Commons Attribution 3.0 Unported License <http://creativecommons.org/licenses/by/3.0>`_.
 
