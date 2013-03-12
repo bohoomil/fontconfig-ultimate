@@ -26,8 +26,9 @@ If you are in need of good looking fonts but you aren't sure which to choose, se
 .. _fontconfig-infinality-ultimate: https://aur.archlinux.org/packages/fontconfig-infinality-ultimate/
 
 
-----
 
 
- | This work is licensed under a `Creative Commons Attribution 3.0 Unported License <http://creativecommons.org/licenses/by/3.0>`_.
+
+
+.. important:: This work is licensed under a `Creative Commons Attribution 3.0 Unported License <http://creativecommons.org/licenses/by/3.0>`_.
 
