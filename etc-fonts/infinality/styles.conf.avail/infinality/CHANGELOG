@@ -2,10 +2,11 @@
 2013-04-30 by bohoomil
 
 	* FreeSans rendering should be slightly better now.
-	* DejaVu family size < 11.5px, hinting = hintslight.
-	* Tweaked Arial weight > medium, size < 11.5px.
-	* Arimo bold = hintslight.
+	* DejaVu family: size < 11.5px, hinting = hintslight.
+	* Arial: weight > medium, size < 11.5px.
+	* Arimo: bold = hintslight.
 	* General config cleanup.
 
-	* Trebuchet MS, size < 14.5, hinting = slight
+	* Trebuchet MS: size < 14.5, hinting = slight.
+	* Open Sans: sizes = various, weight = bold.
 
