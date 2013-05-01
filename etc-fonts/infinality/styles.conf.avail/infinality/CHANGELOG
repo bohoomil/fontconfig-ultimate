@@ -1,0 +1,9 @@
+
+2013-04-30 by bohoomil
+
+	* FreeSans rendering should be slightly better now.
+	* DejaVu family size < 11.5px, hinting = hintslight.
+	* Tweaked Arial weight > medium, size < 11.5px.
+	* Arimo bold = hintslight.
+	* General config cleanup.
+
