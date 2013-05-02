@@ -1,12 +1,19 @@
 
+2013-05-01 by bohoomil
+
+Improved selective rendering:
+-----------------------------
+
+	* Trebuchet MS: < 14.5px, hinting = slight.
+	* Open Sans: sizes = various, >= bold.
+	* Nimbus Sans L OT: > 18px, >= bold.
+
+
 2013-04-30 by bohoomil
 
 	* FreeSans rendering should be slightly better now.
-	* DejaVu family: size < 11.5px, hinting = hintslight.
-	* Arial: weight > medium, size < 11.5px.
-	* Arimo: bold = hintslight.
+	* DejaVu family: < 11.5px, hinting = hintslight.
+	* Arial: < 11.5px, > medium
+	* Arimo: > medium = hintslight.
 	* General config cleanup.
-
-	* Trebuchet MS: size < 14.5, hinting = slight.
-	* Open Sans: sizes = various, weight = bold.
 
