@@ -1,19 +1,50 @@
 
+
+// Main conventions used:
+//   au -- autohint:                0 / 1
+//   al -- antialias:               0 / 1
+//   h  -- hintstyle: hintnone        0
+//                    hintslight      1
+//                    hintmedium      2
+//                    hintfull        3
+//   rgba:            unknown         0
+//                    rgb             1
+//                    bgr             2
+//                    vrgb            3
+//                    vbgr            4
+//                    none            5
+//   px:              pixel size
+//
+//   w -- weight:     thin, extralight, ultralight, light
+//                    book, regular, normal, medium, demibold
+//                    semibold, bold, extrabold, black, heavy
+//  For details, see
+//  http://freedesktop.org/software/fontconfig/fontconfig-user.html
+//  The following reflect changes to basic rendering settings.
+//
+
 2013-05-01 by bohoomil
 
-Improved selective rendering:
------------------------------
-
-	* Trebuchet MS: < 14.5px, hinting = slight.
-	* Open Sans: sizes = various, >= bold.
-	* Nimbus Sans L OT: > 18px, >= bold.
+	* Trebuchet MS: px < 14.5, h = 1
+	* Open Sans: px > 5.5 < 12.5, w >= medium, au = 0, h = 3
+	* Open Sans: px > 12.5 < 13.5, w >= medium, au = 1, h = 1
+	* Nimbus Sans L OT: px > 18, w >= bold
 
 
 2013-04-30 by bohoomil
 
-	* FreeSans rendering should be slightly better now.
-	* DejaVu family: < 11.5px, hinting = hintslight.
-	* Arial: < 11.5px, > medium
-	* Arimo: > medium = hintslight.
-	* General config cleanup.
+	* General config cleanup
+	* FreeSans px < 9.5, au = 1, h = 1
+	* FreeSans px > 9.5 < 11.5, au = 1, h = 2
+	* DejaVu: px < 11.5, h = 1
+	* Arial: px < 11.5, w > medium, h = 1
+	* Arimo: w > medium, h = 1
+	* Consolas: px > 12.5, w = bold, h = 1
+	* Nimbus Sans L OT: px >= 18, w =< medium, au = 1, h =1
+	* Nimbus Sans L OT: px >= 18, w >= bold, au = 0, h = 1
+	* Ubuntu: px > 12.5 < 13.5, w < medium, h = 1, au = 0
+	* Ubuntu: px > 19.5 < 20.5, w < medium, h = 1, au = 1
+	* Ubuntu: px > 23.5 < 24.5, w < medium, h = 1, au = 0
+
+
 
