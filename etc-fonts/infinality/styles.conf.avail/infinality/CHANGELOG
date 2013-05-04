@@ -1,5 +1,4 @@
 
-
 // Main conventions used:
 //   au -- autohint:                0 / 1
 //   al -- antialias:               0 / 1
@@ -20,7 +19,7 @@
 //                    semibold, bold, extrabold, black, heavy
 //  For details, see
 //  http://freedesktop.org/software/fontconfig/fontconfig-user.html
-//  The following reflect changes to basic rendering settings.
+//  The following reflects changes relative to basic rendering settings.
 //
 
 2013-05-01 by bohoomil
@@ -46,6 +45,6 @@
 	* Ubuntu: px > 19.5 < 20.5, w < medium, h = 1, au = 1
 	* Ubuntu: px > 23.5 < 24.5, w < medium, h = 1, au = 0
 	* Courier Prime: base settings by brebs
-  * Courier Prime: px > 13.5 < 15.5, w >= bold, h = 0, au = 1
+	* Courier Prime: px > 13.5 < 15.5, w >= bold, h = 0, au = 1
 
 
