@@ -1,5 +1,5 @@
-fontconfig-{infinalit}y-ultimate
-================================
+fontconfig-{infinality}-ultimate-git
+====================================
 
 Font configuration files (Infinality & friends).
 
