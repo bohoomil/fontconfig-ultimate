@@ -1,5 +1,5 @@
-fontconf, a.k.a. fontconfig-infinality-ultimate
-===============================================
+fontconfig-{infinalit}y-ultimate
+================================
 
 Font configuration files (Infinality & friends).
 
@@ -21,7 +21,7 @@ If you are an Arch Linux user, you may want to use pre-compiled packages from th
 
 Source packages, including PKGBUILD scripts, are available `here <http://bohoomil.byethost16.com/infinality-bundle/src/>`_.
 
-If you prefer going the generic way, i.e. install freetype2-infinality from the AUR and a regular fontconfig package from the [extra] repository, you can skip step 1 and install the git version of fontconfig-infinality-ultimate `fontconfig-infinality-ultimate-git`_.
+If you prefer going the generic way, i.e. install ``freetype2-infinality`` from the AUR and a regular fontconfig package from the [extra] repository, you can skip step 1 (you will only need to download `infinality-settings.sh`_ and overwrite the one that comes with ``freetype2-infinality``: it can be found in ``/etc/profile.d``) and install the git version of fontconfig-infinality-ultimate -- `fontconfig-infinality-ultimate-git`_. 
 
 **Further customization and misc options**
 
@@ -31,15 +31,18 @@ If you want to force fontconfig to use a particular typeface for a specified lan
 
 If you are using a desktop environment (KDE, Gnome) that lets you adjust font settings on its own, you can duplicate the base values as found in ``/etc/fonts/infinality/conf.d/50-base-rendering.conf``.
 
+A more comprehensive documentation is being written at the moment and once it is
+finished, it will be made public.
+
 If you are in need of good looking fonts but you aren't sure which to choose, see a brief list of my favourite free specimen `here <https://github.com/bohoomil/fontconf/wiki/Free-font-recomendations>`_ (to be updated).
 
 .. _fontconfig-infinality-ultimate-git: https://aur.archlinux.org/packages/fontconfig-infinality-ultimate-git/
 
+.. _infinality-settings.sh: https://github.com/bohoomil/fontconfig-ultimate/blob/master/etc-profile.d/infinality-settings.sh
+
 ----
 
-
 **License**
-
 
 .. meta:: `<a rel="license" href="http://creativecommons.org/licenses/by/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by/3.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/3.0/">Creative Commons Attribution 3.0 Unported License</a>.`
 
