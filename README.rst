@@ -10,8 +10,9 @@ Font configuration files (Infinality & friends).
 3. Replace the content of your ``/etc/fonts`` with the content from ``etc-fonts`` in this repo. (**WARNING:** before doing so, make sure you have a backup of the original content in case there are any important customizations you may still need.)
 
 **Installation instructions for Arch Linux users**
+**(should be suiltable for Arch Linux derivatives, too)**
 
-If you are an Arch Linux user, you may want to use pre-compiled packages from the [infinality-bundle] repository I maintain. This is a recommended approach in majority of cases as it offers the full functionality offered by Infinality patches and the ultimate configuration, without typical post-install steps. For more information, see:
+If you are an Arch Linux user, or if you are using one of the Arch Linux derivative, you may want to use pre-compiled packages from the [infinality-bundle] repository I maintain. This is a recommended approach in majority of cases as it offers the full functionality offered by Infinality patches and the ultimate configuration, without typical post-install steps. For more information, see:
 
 * `infinality-bundle user notes <http://bohoomil.github.io/ib.html>`_ (general information about infinality-bundle),
 
@@ -19,7 +20,15 @@ If you are an Arch Linux user, you may want to use pre-compiled packages from th
 
 * `Arch Linux Forums <https://bbs.archlinux.org/viewtopic.php?id=162098>`_ (a support thread).
 
-Source packages, including PKGBUILD scripts, are available `here <http://bohoomil.byethost16.com/infinality-bundle/src/>`_.
+Source packages, including PKGBUILD scripts, are available `in the src directory <http://bohoomil.byethost16.com/infinality-bundle/src/>`_.
+
+|
+| **CAUTION:** make sure your distribution has been fully updated
+|           and is using the most recent libraries as present in the 
+|           official Arch Linux repositories. Using outdated system 
+|           components with the bundle is not recommended as it may
+|           break your system.
+|
 
 If you prefer going the generic way, i.e. install ``freetype2-infinality`` from the AUR and a regular fontconfig package from the [extra] repository, you can skip step 1 (you will only need to download `infinality-settings.sh`_ and overwrite the one that comes with ``freetype2-infinality``: it can be found in ``/etc/profile.d``) and install the git version of fontconfig-infinality-ultimate -- `fontconfig-infinality-ultimate-git`_. 
 
@@ -43,9 +52,6 @@ If you are in need of good looking fonts but you aren't sure which to choose, se
 ----
 
 **License**
-
-.. meta:: `<a rel="license" href="http://creativecommons.org/licenses/by/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by/3.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/3.0/">Creative Commons Attribution 3.0 Unported License</a>.`
-
 
 This work is licensed under a `Creative Commons Attribution 3.0 Unported License <http://creativecommons.org/licenses/by/3.0>`_.
 
