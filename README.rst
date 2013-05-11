@@ -36,7 +36,7 @@ If you still prefer going the generic way, i.e. install ``freetype2-infinality``
   | set of patches needed to rebuild the stock fontconfig for your
   | distribution. This should minimize the risk of differences in font
   | rendering between machines running infinality-bundle and the ones
-  | that use generic packages. Furthermore, non-Arch Linux users would
+  | using generic packages. Furthermore, non-Arch Linux users would
   | be able to quickly port the bundle settings to their Linux
   | distributions by rebuilding their fontconfig libraries.
 
