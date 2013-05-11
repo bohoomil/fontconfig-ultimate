@@ -22,13 +22,11 @@ If you are an Arch Linux user, or if you are using one of the Arch Linux derivat
 
 Source packages, including PKGBUILD scripts, are available `in the src directory <http://bohoomil.byethost16.com/infinality-bundle/src/>`_.
 
-|
-| **CAUTION:** make sure your distribution has been fully updated
-|           and is using the most recent libraries as present in the 
-|           official Arch Linux repositories. Using outdated system 
-|           components with the bundle is not recommended as it may
-|           break your system.
-|
+  | **CAUTION**
+  | Make sure your distribution has been fully updated and is using 
+  | the most recent libraries as present in the official Arch Linux 
+  | repositories. Using outdated system components with the bundle 
+  | is not recommended as it may severely break your system.
 
 If you prefer going the generic way, i.e. install ``freetype2-infinality`` from the AUR and a regular fontconfig package from the [extra] repository, you can skip step 1 (you will only need to download `infinality-settings.sh`_ and overwrite the one that comes with ``freetype2-infinality``: it can be found in ``/etc/profile.d``) and install the git version of fontconfig-infinality-ultimate -- `fontconfig-infinality-ultimate-git`_. 
 
