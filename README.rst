@@ -12,7 +12,7 @@ Font configuration files (Infinality & friends).
 **Installation instructions for Arch Linux users**
 **(should be suiltable for Arch Linux derivatives, too)**
 
-If you are an Arch Linux user, or if you are using one of the Arch Linux derivative, you may want to use pre-compiled packages from the [infinality-bundle] repository I maintain. This is a recommended approach in majority of cases as it offers the full functionality offered by Infinality patches and the ultimate configuration, without typical post-install steps. For more information, see:
+If you are an Arch Linux user, or if you are using one of the Arch Linux derivatives, you may want to use pre-compiled packages from the [infinality-bundle] repository I maintain. This is a recommended approach in a majority of cases as it gives access to the entire functionality offered by Infinality patches and the ultimate configuration without typical post installation interventions. For more information, see:
 
 * `infinality-bundle user notes <http://bohoomil.github.io/ib.html>`_ (general information about infinality-bundle),
 
@@ -28,7 +28,17 @@ Source packages, including PKGBUILD scripts, are available `in the src directory
   | repositories. Using outdated system components with the bundle 
   | is not recommended as it may severely break your system.
 
-If you prefer going the generic way, i.e. install ``freetype2-infinality`` from the AUR and a regular fontconfig package from the [extra] repository, you can skip step 1 (you will only need to download `infinality-settings.sh`_ and overwrite the one that comes with ``freetype2-infinality``: it can be found in ``/etc/profile.d``) and install the git version of fontconfig-infinality-ultimate -- `fontconfig-infinality-ultimate-git`_. 
+If you still prefer going the generic way, i.e. install ``freetype2-infinality`` from the AUR and a regular fontconfig package from the [extra] repository, you can skip step 1 (you will only need to download `infinality-settings.sh`_ and overwrite the one that comes with ``freetype2-infinality``: it can be found in ``/etc/profile.d``) and install the git version of fontconfig-infinality-ultimate -- `fontconfig-infinality-ultimate-git`_. 
+
+  | **NOTE**
+  | Due to differences between infinality-bundle and the git package,
+  | I consider dropping it in the future and replacing it with a complete
+  | set of patches needed to rebuild the stock fontconfig for your
+  | distribution. This should minimize the risk of differences in font
+  | rendering between machines running infinality-bundle and the ones
+  | that use generic packages. Furthermore, non-Arch Linux users would
+  | be able to quickly port the bundle settings to their Linux
+  | distributions by rebuilding their fontconfig libraries.
 
 **Further customization and misc options**
 
