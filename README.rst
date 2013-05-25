@@ -4,7 +4,8 @@ fontconfig-{infinality}-ultimate-git
 Font configuration files (Infinality & friends).
 ------------------------------------------------
 
-**Quick installation instructions**
+Quick installation instructions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **I. If you are an Arch Linux user, or if you are using one of the Arch Linux derivatives,** you may want to use pre-compiled packages from the [infinality-bundle] repository I maintain. This is a recommended approach in a majority of cases as it gives access to the entire functionality offered by Infinality patches and the ultimate configuration without a typical post installation routine. For more information, see:
 
