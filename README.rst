@@ -44,7 +44,8 @@ Last but not least, don't forget to copy custom ``infinality-settings.sh`` from 
   | **NOTE**
   | You will need at least ``freetype2-infinality`` version ``2.4.11``.
 
-**Further customization and misc options**
+Further customization and misc options
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Any changes to the global ``fontconfig-ultimate`` settings should be introduced on a per-user ground in a local ``$HOME/.config/fontconfig`` directory. Please, consult ``/usr/share/doc/fontconfig-infinality-ultimate{-git}/fontconfig`` for examples and templates you will need to start tweaking.
 
@@ -60,7 +61,8 @@ If you are in need of good looking fonts but you aren't sure which to choose, se
 
 ----
 
-**License**
+License
+.......
 
 This work is licensed under a `Creative Commons Attribution 3.0 Unported License <http://creativecommons.org/licenses/by/3.0>`_.
 
