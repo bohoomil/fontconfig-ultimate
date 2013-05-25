@@ -1,0 +1,29 @@
+
+2013-05-11 by bohoomil
+
+* The entire fontconfig-infinality-ultimate structure has been reworked
+  to better fit within fontconfig configuration principles. The 'nesting'
+  style configuration model known from generic fontconfig-infinality
+  has been entirely abandoned marking mutual independence of both
+  packages.
+
+* Default Serif, Sans-Serif and Monospace faces are now set hierarchically in
+  /etc/fonts/conf.d/60-latin.conf. In order to override these settings, the
+  user is supposed to create a custom file in the local, XDG compliant 
+  fontconfig directory (a relevant example has been provided). Once
+  custom settings have been created, they will be honored by applications.
+
+* Consequently, any further user customizations should be introduced in
+  the local fontconfig files.
+
+* Templates for user customizations have been updated.
+
+* A couple of default font substitutions (this should solve recurring
+  problems with Helveticas):
+
+    - Helvetica => Arial
+    - Helvetica Neue => Open Sans
+
+* Rendering parameters for numerous fonts have been tweaked / fixed /
+  modified.
+

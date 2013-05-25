@@ -1,0 +1,301 @@
+--- a/src/Makefile.in	2013-05-12 13:08:35.676903642 +0200
++++ b/src/Makefile.in	2013-05-12 13:09:04.466904910 +0200
+@@ -283,6 +283,7 @@ SET_MAKE = @SET_MAKE@
+ SHELL = @SHELL@
+ STRIP = @STRIP@
+ TEMPLATEDIR = @TEMPLATEDIR@
++TEMPLATEINFDIR = @TEMPLATEINFDIR@
+ VERSION = @VERSION@
+ WARN_CFLAGS = @WARN_CFLAGS@
+ XMLDIR = @XMLDIR@
+@@ -342,6 +343,7 @@ srcdir = @srcdir@
+ sysconfdir = @sysconfdir@
+ target_alias = @target_alias@
+ templatedir = @templatedir@
++templateinfdir = @templateinfdir@
+ top_build_prefix = @top_build_prefix@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+--- a/test/Makefile.in	2013-03-29 08:11:53.000000000 +0100
++++ b/test/Makefile.in	2013-05-12 13:12:16.236913371 +0200
+@@ -398,6 +398,7 @@ SET_MAKE = @SET_MAKE@
+ SHELL = @SHELL@
+ STRIP = @STRIP@
+ TEMPLATEDIR = @TEMPLATEDIR@
++TEMPLATEINFDIR = @TEMPLATEINFDIR@
+ VERSION = @VERSION@
+ WARN_CFLAGS = @WARN_CFLAGS@
+ XMLDIR = @XMLDIR@
+@@ -457,6 +458,7 @@ srcdir = @srcdir@
+ sysconfdir = @sysconfdir@
+ target_alias = @target_alias@
+ templatedir = @templatedir@
++templateinfdir = @templateinfdir@
+ top_build_prefix = @top_build_prefix@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+--- a/fontconfig/Makefile.in	2013-03-29 08:11:53.000000000 +0100
++++ b/fontconfig/Makefile.in	2013-05-12 13:13:33.276916767 +0200
+@@ -213,6 +213,7 @@ SET_MAKE = @SET_MAKE@
+ SHELL = @SHELL@
+ STRIP = @STRIP@
+ TEMPLATEDIR = @TEMPLATEDIR@
++TEMPLATEINFDIR = @TEMPLATEINFDIR@
+ VERSION = @VERSION@
+ WARN_CFLAGS = @WARN_CFLAGS@
+ XMLDIR = @XMLDIR@
+@@ -272,6 +273,7 @@ srcdir = @srcdir@
+ sysconfdir = @sysconfdir@
+ target_alias = @target_alias@
+ templatedir = @templatedir@
++templateinfdir = @templateinfdir@
+ top_build_prefix = @top_build_prefix@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+--- a/fc-validate/Makefile.in	2013-03-29 08:11:53.000000000 +0100
++++ b/fc-validate/Makefile.in	2013-05-12 13:16:02.650256690 +0200
+@@ -272,6 +272,7 @@ SET_MAKE = @SET_MAKE@
+ SHELL = @SHELL@
+ STRIP = @STRIP@
+ TEMPLATEDIR = @TEMPLATEDIR@
++TEMPLATEINFDIR = @TEMPLATEINFDIR@
+ VERSION = @VERSION@
+ WARN_CFLAGS = @WARN_CFLAGS@
+ XMLDIR = @XMLDIR@
+@@ -331,6 +332,7 @@ srcdir = @srcdir@
+ sysconfdir = @sysconfdir@
+ target_alias = @target_alias@
+ templatedir = @templatedir@
++templateinfdir = @templateinfdir@
+ top_build_prefix = @top_build_prefix@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+--- a/fc-scan/Makefile.in	2013-03-29 08:11:53.000000000 +0100
++++ a/fc-scan/Makefile.in	2013-05-12 13:17:53.183594898 +0200
+@@ -270,6 +270,7 @@ SET_MAKE = @SET_MAKE@
+ SHELL = @SHELL@
+ STRIP = @STRIP@
+ TEMPLATEDIR = @TEMPLATEDIR@
++TEMPLATEINFDIR = @TEMPLATEINFDIR@
+ VERSION = @VERSION@
+ WARN_CFLAGS = @WARN_CFLAGS@
+ XMLDIR = @XMLDIR@
+@@ -329,6 +330,7 @@ srcdir = @srcdir@
+ sysconfdir = @sysconfdir@
+ target_alias = @target_alias@
+ templatedir = @templatedir@
++templateinfdir = @templateinfdir@
+ top_build_prefix = @top_build_prefix@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+--- a/fc-query/Makefile.in	2013-03-29 08:11:53.000000000 +0100
++++ b/fc-query/Makefile.in	2013-05-12 13:19:41.143599656 +0200
+@@ -270,6 +270,7 @@ SET_MAKE = @SET_MAKE@
+ SHELL = @SHELL@
+ STRIP = @STRIP@
+ TEMPLATEDIR = @TEMPLATEDIR@
++TEMPLATEINFDIR = @TEMPLATEINFDIR@
+ VERSION = @VERSION@
+ WARN_CFLAGS = @WARN_CFLAGS@
+ XMLDIR = @XMLDIR@
+@@ -329,6 +330,7 @@ srcdir = @srcdir@
+ sysconfdir = @sysconfdir@
+ target_alias = @target_alias@
+ templatedir = @templatedir@
++templateinfdir = @templateinfdir@
+ top_build_prefix = @top_build_prefix@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+--- a/fc-pattern/Makefile.in	2013-03-29 08:11:53.000000000 +0100
++++ b/fc-pattern/Makefile.in	2013-05-12 13:21:00.646936500 +0200
+@@ -270,6 +270,7 @@ SET_MAKE = @SET_MAKE@
+ SHELL = @SHELL@
+ STRIP = @STRIP@
+ TEMPLATEDIR = @TEMPLATEDIR@
++TEMPLATEINFDIR = @TEMPLATEINFDIR@
+ VERSION = @VERSION@
+ WARN_CFLAGS = @WARN_CFLAGS@
+ XMLDIR = @XMLDIR@
+@@ -329,6 +330,7 @@ srcdir = @srcdir@
+ sysconfdir = @sysconfdir@
+ target_alias = @target_alias@
+ templatedir = @templatedir@
++templateinfdir = @templateinfdir@
+ top_build_prefix = @top_build_prefix@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+--- a/fc-match/Makefile.in	2013-03-29 08:11:53.000000000 +0100
++++ b/fc-match/Makefile.in	2013-05-12 13:22:25.546940247 +0200
+@@ -270,6 +270,7 @@ SET_MAKE = @SET_MAKE@
+ SHELL = @SHELL@
+ STRIP = @STRIP@
+ TEMPLATEDIR = @TEMPLATEDIR@
++TEMPLATEINFDIR = @TEMPLATEINFDIR@
+ VERSION = @VERSION@
+ WARN_CFLAGS = @WARN_CFLAGS@
+ XMLDIR = @XMLDIR@
+@@ -329,6 +330,7 @@ srcdir = @srcdir@
+ sysconfdir = @sysconfdir@
+ target_alias = @target_alias@
+ templatedir = @templatedir@
++templateinfdir = @templateinfdir@
+ top_build_prefix = @top_build_prefix@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+--- a/fc-list/Makefile.in	2013-03-29 08:11:53.000000000 +0100
++++ b/fc-list/Makefile.in	2013-05-12 13:23:40.176943536 +0200
+@@ -270,6 +270,7 @@ SET_MAKE = @SET_MAKE@
+ SHELL = @SHELL@
+ STRIP = @STRIP@
+ TEMPLATEDIR = @TEMPLATEDIR@
++TEMPLATEINFDIR = @TEMPLATEINFDIR@
+ VERSION = @VERSION@
+ WARN_CFLAGS = @WARN_CFLAGS@
+ XMLDIR = @XMLDIR@
+@@ -329,6 +330,7 @@ srcdir = @srcdir@
+ sysconfdir = @sysconfdir@
+ target_alias = @target_alias@
+ templatedir = @templatedir@
++templateinfdir = @templateinfdir@
+ top_build_prefix = @top_build_prefix@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+--- a/fc-lang/Makefile.in	2013-03-29 08:11:53.000000000 +0100
++++ b/fc-lang/Makefile.in	2013-05-12 13:24:39.820279499 +0200
+@@ -235,6 +235,7 @@ SET_MAKE = @SET_MAKE@
+ SHELL = @SHELL@
+ STRIP = @STRIP@
+ TEMPLATEDIR = @TEMPLATEDIR@
++TEMPLATEINFDIR = @TEMPLATEINFDIR@
+ VERSION = @VERSION@
+ WARN_CFLAGS = @WARN_CFLAGS@
+ XMLDIR = @XMLDIR@
+@@ -294,6 +295,7 @@ srcdir = @srcdir@
+ sysconfdir = @sysconfdir@
+ target_alias = @target_alias@
+ templatedir = @templatedir@
++templateinfdir = @templateinfdir@
+ top_build_prefix = @top_build_prefix@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+--- a/fc-glyphname/Makefile.in	2013-03-29 08:11:53.000000000 +0100
++++ b/fc-glyphname/Makefile.in	2013-05-12 13:25:37.780282056 +0200
+@@ -235,6 +235,7 @@ SET_MAKE = @SET_MAKE@
+ SHELL = @SHELL@
+ STRIP = @STRIP@
+ TEMPLATEDIR = @TEMPLATEDIR@
++TEMPLATEINFDIR = @TEMPLATEINFDIR@
+ VERSION = @VERSION@
+ WARN_CFLAGS = @WARN_CFLAGS@
+ XMLDIR = @XMLDIR@
+@@ -294,6 +295,7 @@ srcdir = @srcdir@
+ sysconfdir = @sysconfdir@
+ target_alias = @target_alias@
+ templatedir = @templatedir@
++templateinfdir = @templateinfdir@
+ top_build_prefix = @top_build_prefix@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+--- a/fc-cat/Makefile.in	2013-03-29 08:11:53.000000000 +0100
++++ b/fc-cat/Makefile.in	2013-05-12 13:27:01.426952412 +0200
+@@ -270,6 +270,7 @@ SET_MAKE = @SET_MAKE@
+ SHELL = @SHELL@
+ STRIP = @STRIP@
+ TEMPLATEDIR = @TEMPLATEDIR@
++TEMPLATEINFDIR = @TEMPLATEINFDIR@
+ VERSION = @VERSION@
+ WARN_CFLAGS = @WARN_CFLAGS@
+ XMLDIR = @XMLDIR@
+@@ -329,6 +330,7 @@ srcdir = @srcdir@
+ sysconfdir = @sysconfdir@
+ target_alias = @target_alias@
+ templatedir = @templatedir@
++templateinfdir = @templateinfdir@
+ top_build_prefix = @top_build_prefix@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+--- a/fc-case/Makefile.in	2013-03-29 08:11:53.000000000 +0100
++++ b/fc-case/Makefile.in	2013-05-12 13:27:55.366954792 +0200
+@@ -235,6 +235,7 @@ SET_MAKE = @SET_MAKE@
+ SHELL = @SHELL@
+ STRIP = @STRIP@
+ TEMPLATEDIR = @TEMPLATEDIR@
++TEMPLATEINFDIR = @TEMPLATEINFDIR@
+ VERSION = @VERSION@
+ WARN_CFLAGS = @WARN_CFLAGS@
+ XMLDIR = @XMLDIR@
+@@ -294,6 +295,7 @@ srcdir = @srcdir@
+ sysconfdir = @sysconfdir@
+ target_alias = @target_alias@
+ templatedir = @templatedir@
++templateinfdir = @templateinfdir@
+ top_build_prefix = @top_build_prefix@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+--- a/fc-cache/Makefile.in	2013-03-29 08:11:53.000000000 +0100
++++ b/fc-cache/Makefile.in	2013-05-12 13:28:59.960290973 +0200
+@@ -270,6 +270,7 @@ SET_MAKE = @SET_MAKE@
+ SHELL = @SHELL@
+ STRIP = @STRIP@
+ TEMPLATEDIR = @TEMPLATEDIR@
++TEMPLATEINFDIR = @TEMPLATEINFDIR@
+ VERSION = @VERSION@
+ WARN_CFLAGS = @WARN_CFLAGS@
+ XMLDIR = @XMLDIR@
+@@ -329,6 +330,7 @@ srcdir = @srcdir@
+ sysconfdir = @sysconfdir@
+ target_alias = @target_alias@
+ templatedir = @templatedir@
++templateinfdir = @templateinfdir@
+ top_build_prefix = @top_build_prefix@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+--- a/doc/Makefile.in	2013-03-29 08:11:52.000000000 +0100
++++ b/doc/Makefile.in	2013-05-12 13:30:01.893627039 +0200
+@@ -448,6 +448,7 @@ SET_MAKE = @SET_MAKE@
+ SHELL = @SHELL@
+ STRIP = @STRIP@
+ TEMPLATEDIR = @TEMPLATEDIR@
++TEMPLATEINFDIR = @TEMPLATEINFDIR@
+ VERSION = @VERSION@
+ WARN_CFLAGS = @WARN_CFLAGS@
+ XMLDIR = @XMLDIR@
+@@ -507,6 +508,7 @@ srcdir = @srcdir@
+ sysconfdir = @sysconfdir@
+ target_alias = @target_alias@
+ templatedir = @templatedir@
++templateinfdir = @templateinfdir@
+ top_build_prefix = @top_build_prefix@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+--- a/Makefile.am	2013-03-29 04:43:53.000000000 +0100
++++ b/Makefile.am	2013-05-12 13:43:05.833661615 +0200
+@@ -23,7 +23,7 @@
+ 
+ SUBDIRS=fontconfig fc-case fc-lang fc-glyphname src \
+ 	fc-cache fc-cat fc-list fc-match fc-pattern fc-query fc-scan \
+-	fc-validate conf.d test
++	fc-validate conf.d conf.d.infinality test
+ if ENABLE_DOCS
+ SUBDIRS += doc
+ endif
+--- a/Makefile.in	2013-03-29 08:11:52.000000000 +0100
++++ b/Makefile.in	2013-05-12 15:25:19.213932143 +0200
+@@ -161,7 +161,7 @@ CTAGS = ctags
+ CSCOPE = cscope
+ DIST_SUBDIRS = fontconfig fc-case fc-lang fc-glyphname src fc-cache \
+ 	fc-cat fc-list fc-match fc-pattern fc-query fc-scan \
+-	fc-validate conf.d test doc
++	fc-validate conf.d conf.d.infinality test doc
+ DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
+ distdir = $(PACKAGE)-$(VERSION)
+ top_distdir = $(distdir)
+@@ -365,7 +365,7 @@ top_srcdir = @top_srcdir@
+ xmldir = $(XMLDIR)
+ SUBDIRS = fontconfig fc-case fc-lang fc-glyphname src fc-cache fc-cat \
+ 	fc-list fc-match fc-pattern fc-query fc-scan fc-validate \
+-	conf.d test $(am__append_1)
++	conf.d conf.avail.infinality test $(am__append_1)
+ ACLOCAL_AMFLAGS = -I m4
+ EXTRA_DIST = fontconfig.pc.in fonts.conf.in fonts.dtd \
+ 	fontconfig.spec.in fontconfig.spec fontconfig-zip.in \
