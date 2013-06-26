@@ -304,12 +304,10 @@ DOC_FILES = \
 CONF_LINKS = \
 	10-base-rendering.conf    \
 	31-fix-cantarell.conf   \
-	35-droid-sans-group.conf    \
-	35-droid-serif-group.conf   \
 	37-repl-global.conf   \
 	38-repl-tt-traced-bitmap.conf   \
 	39-repl-corrective.conf   \
-	40-nonlatin.conf    \
+	40-non-latin.conf    \
 	45-latin.conf   \
 	49-sansserif.conf   \
 	50-user.conf    \
@@ -338,12 +336,10 @@ config_DATA = $(DOC_FILES)
 templateinf_DATA = \
 	10-base-rendering.conf    \
 	31-fix-cantarell.conf   \
-	35-droid-sans-group.conf    \
-	35-droid-serif-group.conf   \
 	37-repl-global.conf   \
 	38-repl-tt-traced-bitmap.conf   \
 	39-repl-corrective.conf   \
-	40-nonlatin.conf    \
+	40-non-latin.conf    \
 	45-latin.conf   \
 	49-sansserif.conf   \
 	50-user.conf    \
@@ -363,12 +359,8 @@ templateinf_DATA = \
 	83-yes-postscript.conf    \
 	83-yes-ttf-as-bitmap.conf   \
 	88-forced-synthetic.conf    \
-	89-non-tt-rendering-qt.conf    \
 	90-non-tt-fonts.conf    \
-	90-non-tt-fonts-qt.conf   \
 	90-tt-fonts.conf    \
-	91-no-qt-subpixel-positioning.conf    \
-	91-tt-monospace-fonts.conf		\
 	92-selective-rendering.conf   \
 	93-final-lang-spec.conf   \
 	93-final-rendering.conf   \
