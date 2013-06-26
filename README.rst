@@ -9,13 +9,13 @@ Quick installation instructions
 
 **I. If you are an Arch Linux user, or if you are using one of the Arch Linux derivatives,** you may want to use pre-compiled packages from the [infinality-bundle] repository I maintain. This is a recommended approach in a majority of cases as it gives access to the entire functionality offered by Infinality patches and the ultimate configuration without a typical post installation routine. For more information, see:
 
-* `infinality-bundle user notes <http://bohoomil.cu.cc/ib.html>`_ (frequently updated, general information about infinality-bundle),
+* `infinality-bundle user notes <http://bohoomil.cu.cc/>`_ (frequently updated, general information about infinality-bundle),
 
 * `Font Configuration - Infinality: the easy way <https://wiki.archlinux.org/index.php/Font_Configuration#Infinality:_the_easy_way>`_ (quick install notes)
 
 * `Arch Linux Forums <https://bbs.archlinux.org/viewtopic.php?id=162098>`_ (a support thread for Arch Linux users).
 
-Source packages, including PKGBUILD scripts, are available `in the src directory <http://bohoomil.cu.cc/infinality-bundle/src/>`_.
+Source packages, including PKGBUILD scripts, are available `in the src directory <http://ibn.net63.net/infinality-bundle/src/>`_.
 
   | **CAUTION**
   | Make sure your distribution has been fully updated and is using 
