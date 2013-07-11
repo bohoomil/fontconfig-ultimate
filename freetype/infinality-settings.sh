@@ -1,5 +1,5 @@
 ### infinality environment variables for extra run-time options ###
-### custom settings by bohoomil, rev. 0.4, for freetype2 v. 2.5.x ###
+### custom settings by bohoomil, rev. 0.4.1, for freetype2 v. 2.5.x ###
 ### http://bohoomil.cu.cc ###
 
 XFT_SETTINGS="
@@ -32,7 +32,7 @@ elif [ "$USE_STYLE" = "4" ]; then
   export INFINALITY_FT_FILTER_PARAMS="14 24 38 24 14"
 fi
 export INFINALITY_FT_GRAYSCALE_FILTER_STRENGTH="0"
-export INFINALITY_FT_FRINGE_FILTER_STRENGTH="30"
+export INFINALITY_FT_FRINGE_FILTER_STRENGTH="40"
 export INFINALITY_FT_AUTOHINT_HORIZONTAL_STEM_DARKEN_STRENGTH="0"
 export INFINALITY_FT_AUTOHINT_VERTICAL_STEM_DARKEN_STRENGTH="0"
 export INFINALITY_FT_WINDOWS_STYLE_SHARPENING_STRENGTH="15"
