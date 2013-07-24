@@ -2,6 +2,27 @@
 CHANGELOG
 ---------
 
+2013-07-24 by bohoomil
+~~~~~~~~~~~~~~~~~~~~~~
+
+* changes in infinality-settings.sh:
+** Xft hintstyle    => hintslight (this should fix
+   kerning issues in a few cases)
+** fringe filter    => 50
+
+* changes to 37-repl-global.conf
+** Courier rule can be commented out if using Adobe Courier T1
+** Geneva TTF       => Noto Sans TTF
+** Inconsolata TTF  => Inconsolata-zi4 T1 (TeXLive)
+** proxima-nova TTF => Open Sans T1
+
+* changes to 66-wine-aliases.conf
+** SegoeUI          => Microsoft Sans Serif
+   (due to recent issues with SegoeUI)
+
+* minor changes to 90-non-tt-fonts.conf, 90-tt-fonts.conf,
+  92-selective-rendering.conf
+
 2013-07-11 by bohoomil
 ~~~~~~~~~~~~~~~~~~~~~~
 
