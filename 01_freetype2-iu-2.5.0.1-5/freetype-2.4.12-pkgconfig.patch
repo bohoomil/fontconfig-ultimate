@@ -1,0 +1,14 @@
+--- freetype-2.4.12/builds/unix/freetype2.in
++++ freetype-2.4.12/builds/unix/freetype2.in
+@@ -1,7 +1,7 @@
+-prefix="%prefix%"
+-exec_prefix="%exec_prefix%"
+-libdir="%libdir%"
+-includedir="%includedir%"
++prefix=%prefix%
++exec_prefix=%exec_prefix%
++libdir=%libdir%
++includedir=%includedir%
+ 
+ Name: FreeType 2
+ Description: A free, high-quality, and portable font engine.

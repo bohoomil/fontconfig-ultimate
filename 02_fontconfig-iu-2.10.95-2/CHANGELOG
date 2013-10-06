@@ -1,0 +1,111 @@
+
+CHANGELOG
+---------
+
+
+2013-08-31 by bohoomil
+~~~~~~~~~~~~~~~~~~~~~~
+
+* Upstream version upgrade: fontconfig 2.10.95.
+
+* Minor fixes & tweaks, a few font families added.
+
+2013-07-24 by bohoomil
+~~~~~~~~~~~~~~~~~~~~~~
+
+* Changes to infinality-settings.sh:
+** Xft hintstyle    => hintslight (this should fix
+   kerning issues in a few cases)
+** fringe filter    => 50
+
+* Changes to 37-repl-global.conf
+** Courier rule can be commented out if using Adobe Courier T1
+** Geneva TTF       => Noto Sans TTF
+** Inconsolata TTF  => Inconsolata-zi4 T1 (TeXLive)
+** proxima-nova TTF => Open Sans T1
+
+* Changes to 66-wine-aliases.conf
+** SegoeUI          => Microsoft Sans Serif
+   (due to recent issues with SegoeUI)
+
+* Minor changes to 90-non-tt-fonts.conf, 90-tt-fonts.conf,
+  92-selective-rendering.conf
+
+2013-07-11 by bohoomil
+~~~~~~~~~~~~~~~~~~~~~~
+
+* Changes to infinality-settings.sh:
+** increased fringe filter 30 => 40
+
+* Changes to 37-repl-global.conf:
+** Courier TTF      => Courier T1 (TeXLive)
+** Helvetica        => Liberastika
+** Inconsolata TTF  => Inconsolata-zi4 T1 (TeXLive)
+** Open Sans TTF    => Open Sans T1 (TexLive)
+** proxima-nova TTF => Open Sans T1 (TeXLive)
+
+* Changes and fixes in 90-{non)-tt-fonts.conf:
+** Cantarell OTF    => Cantarell T1 (TeXLive)
+** Inconsolata TTF  => Inconsolata-zi4 T1 (TeXLive)
+** Courier TTF      => Courier T1 (TeXLive)
+** Open Sans TTF    => Open Sans T1 (TexLive)
+** ParaType TTF     => ParaType T1 (TeXLive)
+** Liberastika      => 90-tt-fonts.conf
+** Lekton           => 90-tt-fonts.conf
+
+* Changes to 92-selective-rendering.conf:
+** Arial Regular > 28px < 33px, hintslight
+** Arial Bold > 14px, hintslight
+** TeX Gyre Heros (OTF) > 17.5px < 19.5px, autohint, hintfull
+** TeX Gyre Heros (T1) > 16.5px < 19.5px, autohint, hintfull
+** removed selective rendering for Helvetica, Open Sans, PT Sans
+
+
+2013-06-21 by bohoomil
+~~~~~~~~~~~~~~~~~~~~~~
+
+* Upstream version upgrade: fontconfig 2.10.93, freetype2 2.5.0.1.
+
+* freetype2-infinality-ultimate 2.5.0.1-2:
+** Moving to Adobe CFF as the default renderer.
+** Improved and simplified infinality setttings: most minor rendering issues
+   was reolved.
+** Added new style, Classical.
+
+* fontconfig-infinality-ultimate 2.10.93-3:
+** Code cleanup and revision results in more consistent rules.
+** Simpler yes (83-yes-foo.conf) / no (82-no-foo.conf) switches for more
+   intuitive access to global features.
+** Added support for several new font families.
+** New per-user config templates.
+
+
+2013-05-11 by bohoomil
+~~~~~~~~~~~~~~~~~~~~~~
+
+* The entire fontconfig-infinality-ultimate structure has been reworked
+  to better fit within fontconfig configuration principles. The 'nesting'
+  style configuration model known from generic fontconfig-infinality
+  has been entirely abandoned marking mutual independence of both
+  packages.
+
+* Default Serif, Sans-Serif and Monospace faces are now set hierarchically in
+  /etc/fonts/conf.d/60-latin.conf. In order to override these settings, the
+  user is supposed to create a custom file in the local, XDG compliant 
+  fontconfig directory (a relevant example has been provided). Once
+  custom settings have been created, they will be honored by applications.
+
+* Consequently, any further user customizations should be introduced in
+  the local fontconfig files.
+
+* Templates for user customizations have been updated.
+
+* A couple of default font substitutions (this should solve recurring
+  problems with Helveticas):
+
+    - Helvetica => TeX Gyre Heros || Arial || Liberation Sans || Arimo
+    - Helvetica Neue => Open Sans
+
+* Rendering parameters for numerous fonts have been tweaked / fixed /
+  modified.
+

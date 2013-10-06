@@ -1,0 +1,78 @@
+# Contributor: Biru Ionut <biru.ionut at gmail.com>
+# Contributor: Paul Bredbury <brebs@sent.com>
+# Maintainer: Andrea Fagiani <andfagiani {at} gmail {dot} com>
+# Maintainer: bohoomil <@zoho.com>
+
+_pkgbasename=cairo
+pkgname=lib32-$_pkgbasename-infinality-ultimate
+pkgver=1.12.16
+pkgrel=2
+groups=('infinality-bundle')
+pkgdesc="Cairo vector graphics library with respect-fontconfig, expose and Ubuntu patches (32-bit, infinality-bundle)"
+arch=('x86_64')
+url="https://launchpad.net/ubuntu/precise/+source/cairo"
+groups=('infinality-bundle')
+license=('LGPL' 'MPL')
+makedepends=('gcc-multilib' 'lib32-gtk2' 'lib32-mesa-libgl')
+depends=('lib32-libpng' 'lib32-libxext' 'lib32-libxrender'
+         'lib32-fontconfig-infinality-ultimate'  'lib32-pixman'
+         'lib32-glib2' 'lib32-mesa' 'lib32-libgl'
+         $_pkgbasename-infinality-ultimate)
+provides=("lib32-cairo=$pkgver")
+conflicts=('lib32-cairo' 'lib32-cairo-ubuntu')
+options=('!libtool')
+source=(http://cairographics.org/releases/$_pkgbasename-$pkgver.tar.xz
+        cairo-respect-fontconfig.patch
+        cairo-1.12.8-expose_snapshot-1.patch
+        http://archive.ubuntu.com/ubuntu/pool/main/c/cairo/cairo_1.12.14-0ubuntu1.debian.tar.gz)
+
+prepare() {
+  cd $srcdir/$_pkgbasename-$pkgver
+
+  for _f in $(cat $srcdir/debian/patches/series) ; do    
+    patch -Np1 -i $srcdir/debian/patches/$_f    
+  done
+
+  patch -Np1 -i $srcdir/cairo-respect-fontconfig.patch
+  patch -Np1 -i $srcdir/cairo-1.12.8-expose_snapshot-1.patch
+  
+  sed '20 aAM_PROG_AR' -i $srcdir/$_pkgbasename-$pkgver/configure.ac
+}
+
+build() {
+  export CC="gcc -m32"
+  export CXX="g++ -m32"
+  export PKG_CONFIG_PATH="/usr/lib32/pkgconfig"
+
+  cd $srcdir/$_pkgbasename-$pkgver
+
+  autoreconf -if
+    
+  # configure options
+  # --enable-svg
+  # --enable-ps
+  # --enable-pdf
+  # --enable-xlib-xcb
+  # --enable-gobject
+
+  ./configure --prefix=/usr \
+    --libdir=/usr/lib32 \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --disable-static \
+    --enable-tee \
+    --enable-gl \
+    --enable-egl
+  make
+}
+
+package() {
+  cd $srcdir/cairo-$pkgver
+  make DESTDIR=$pkgdir install
+  rm -rf ${pkgdir}/usr/{bin,include,share}
+}
+
+md5sums=('a1304edcdc99282f478b995ee5f8f854'
+         '485a80383e70d8631e2355c46f3324a4'
+         '92bb0af20e9438d07a04a586841ac90f'
+         '2465d76908c35aae2be04df33c41064b')

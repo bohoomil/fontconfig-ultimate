@@ -1,0 +1,62 @@
+# Maintainer: Jan de Groot <jgc@archlinux.org>
+# Maintainer: bohoomil <@zoho.com>
+
+_pkgbasename=fontconfig
+pkgname=lib32-$_pkgbasename-infinality-ultimate
+pkgver=2.10.95
+pkgrel=2.1
+pkgdesc="A library for configuring and customizing font access (32-bit, infinality-bundle)"
+arch=(x86_64)
+url="http://www.fontconfig.org/release/"
+license=('custom')
+groups=('infinality-bundle')
+depends=('lib32-expat' 'lib32-freetype2-infinality-ultimate' $_pkgbasename-infinality-ultimate)
+makedepends=('gcc-multilib' 'lib32-expat')
+options=('!libtool')
+provides=('lib32-fontconfig')
+conflicts=('lib32-fontconfig')
+install="lib32-fontconfig.install"
+source=(http://www.fontconfig.org/release/${_pkgbasename}-${pkgver}.tar.bz2)
+
+build() {
+  export CC="gcc -m32"
+  export CXX="g++ -m32"
+  export PKG_CONFIG_PATH="/usr/lib32/pkgconfig"
+
+  cd "${srcdir}/${_pkgbasename}-${pkgver}"
+
+  # make sure there's no rpath trouble and sane .so versioning - FC and Gentoo do this as well
+  libtoolize -f
+  autoreconf -fi
+
+  ./configure --prefix=/usr \
+    --sysconfdir=/etc \
+    --with-templatedir=/etc/fonts/conf.avail \
+    --with-xmldir=/etc/fonts \
+    --localstatedir=/var \
+    --disable-static \
+    --with-default-fonts=/usr/share/fonts \
+    --with-add-fonts=/usr/share/fonts \
+    --libdir=/usr/lib32
+
+  make
+}
+
+check() {
+  cd "$srcdir/$_pkgbasename-$pkgver"
+  make -k check
+}
+
+package() {
+  cd "${srcdir}/${_pkgbasename}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+
+  rm -rf "${pkgdir}"/{etc,usr/{include,share}}
+  find "${pkgdir}/usr/bin" -not -type d -not -name fc-cache -delete
+  mv "${pkgdir}"/usr/bin/fc-cache{,-32}
+  mkdir -p "${pkgdir}/usr/share/licenses"
+  ln -s ${_pkgbasename} "${pkgdir}/usr/share/licenses/${pkgname}"
+}
+
+md5sums=('45c5ba47be70577faa05c3aaf2b6a7e1')
