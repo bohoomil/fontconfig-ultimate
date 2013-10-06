@@ -1,0 +1,50 @@
+notoconfig=(65-ttf-noto-serif.conf)
+
+post_install() {
+  echo -n "Updating font cache... "
+  fc-cache -f > /dev/null
+  mkfontscale usr/share/fonts/TTF
+  mkfontdir usr/share/fonts/TTF
+  echo "Done."
+
+  pushd etc/fonts/conf.d > /dev/null
+  echo -e "Creating fontconfig symlinks..."
+  for config in "${notoconfig[@]}"; do
+    if [[ ! -f ${config} ]] && [[ -f ../conf.avail/${config} ]]; then
+      ln -sf ../conf.avail/${config} .
+    fi
+  done
+  echo -e "Done."
+  popd > /dev/null
+
+}
+
+post_upgrade() {
+  post_install $1
+}
+
+post_remove() {
+  echo -e "Updating font cache... "
+  /usr/bin/fc-cache -f
+  echo -e "Done."
+  mkfontscale usr/share/fonts/TTF
+  mkfontdir usr/share/fonts/TTF
+
+  pushd etc/fonts/conf.d > /dev/null
+  echo -e "Removing fontconfig symlinks ..."
+  for config in "${notoconfig[@]}"; do
+    if [[ -f ../conf.avail/${config} ]]; then
+      rm -f ../conf.avail/${config}
+    fi
+  done
+  echo -e "Done."
+  popd > /dev/null
+
+  cat << _EOF
+
+  Please, remove manualy broken symbolic link:
+
+    /etc/fonts/conf.d/65-ttf-noto-serif.conf
+  
+_EOF
+}

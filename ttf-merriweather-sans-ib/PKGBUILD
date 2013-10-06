@@ -1,0 +1,43 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=ttf-merriweather-sans-ib
+pkgver=1.003
+pkgrel=3
+depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
+pkgdesc="Merriweather Sans-Serif font family by Eben Sorkin."
+url="http://sorkintype.com"
+arch=('any')
+groups=('infinality-bundle-fonts')
+conflicts=('ttf-google-webfonts-git' 'ttf-merriweather-sans')
+replaces=('ttf-merriweather-sans')
+license=('OFL-1.1')
+install=$pkgname.install
+source=(https://googlefontdirectory.googlecode.com/hg/ofl/merriweathersans/MerriweatherSans-Bold.ttf
+        https://googlefontdirectory.googlecode.com/hg/ofl/merriweathersans/MerriweatherSans-BoldItalic.ttf
+        https://googlefontdirectory.googlecode.com/hg/ofl/merriweathersans/MerriweatherSans-ExtraBold.ttf
+        https://googlefontdirectory.googlecode.com/hg/ofl/merriweathersans/MerriweatherSans-ExtraBoldItalic.ttf
+        https://googlefontdirectory.googlecode.com/hg/ofl/merriweathersans/MerriweatherSans-Italic.ttf
+        https://googlefontdirectory.googlecode.com/hg/ofl/merriweathersans/MerriweatherSans-Light.ttf
+        https://googlefontdirectory.googlecode.com/hg/ofl/merriweathersans/MerriweatherSans-LightItalic.ttf
+        https://googlefontdirectory.googlecode.com/hg/ofl/merriweathersans/MerriweatherSans-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/ofl/merriweathersans/OFL.txt)
+
+package(){
+	cd ${pkgdir}
+
+  install -m755 -d ${pkgdir}/usr/share/licenses/${pkgname}
+  install -m644 ${srcdir}/OFL.txt ${pkgdir}/usr/share/licenses/${pkgname}/OFL.txt
+
+	install -m755 -d ${pkgdir}/usr/share/fonts/TTF
+	install -m644 ${srcdir}/*.ttf ${pkgdir}/usr/share/fonts/TTF
+}
+
+md5sums=('725f72a2c882ca03709bce582f9d157e'
+         '2066c8a2f2294d1464acabd6cee00167'
+         'f02e3a0e75be608d871e63f9222077e8'
+         '676d95f2b9888815ad215d75f721380b'
+         '0ed6ad0548a99902d4a7085a4cca04a0'
+         '2d60c9b87d54412cf25a8f5b4481c6d3'
+         '535f8d98912a57bcea0648a750a05de6'
+         '737b41b44dbd7f26348748361a81b2cf'
+         '3afc3620e296d3bd5a9e5e204631b577')

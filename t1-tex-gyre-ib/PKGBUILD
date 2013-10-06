@@ -1,0 +1,154 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=t1-tex-gyre-ib
+pkgver=2.003
+pkgrel=1
+depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
+pkgdesc="The TeX Gyre (TG) Collection of Fonts. Type1 version from TeXLive."
+groups=('infinality-bundle-fonts')
+url="http://www.gust.org.pl/projects/e-foundry/tex-gyre/"
+arch=('any')
+license=('GFL')
+conflicts=('otf-texgyre')
+install=$pkgname.install
+source=("http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qagb.pfb"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qagb.pfm"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qagbi.pfb"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qagbi.pfm"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qagr.pfb"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qagr.pfm"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qagri.pfb"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qagri.pfm"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qbkb.pfb"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qbkb.pfm"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qbkbi.pfb"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qbkbi.pfm"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qbkr.pfb"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qbkr.pfm"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qbkri.pfb"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qbkri.pfm"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qcrb.pfb"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qcrb.pfm"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qcrbi.pfb"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qcrbi.pfm"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qcrr.pfb"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qcrr.pfm"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qcrri.pfb"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qcrri.pfm"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qcsb.pfb"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qcsb.pfm"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qcsbi.pfb"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qcsbi.pfm"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qcsr.pfb"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qcsr.pfm"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qcsri.pfb"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qcsri.pfm"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qhvb.pfb"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qhvb.pfm"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qhvbi.pfb"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qhvbi.pfm"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qhvcb.pfb"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qhvcb.pfm"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qhvcbi.pfb"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qhvcbi.pfm"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qhvcr.pfb"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qhvcr.pfm"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qhvcri.pfb"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qhvcri.pfm"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qhvr.pfb"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qhvr.pfm"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qhvri.pfb"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qhvri.pfm"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qplb.pfb"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qplb.pfm"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qplbi.pfb"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qplbi.pfm"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qplr.pfb"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qplr.pfm"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qplri.pfb"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qplri.pfm"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qtmb.pfb"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qtmb.pfm"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qtmbi.pfb"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qtmbi.pfm"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qtmr.pfb"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qtmr.pfm"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qtmri.pfb"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qtmri.pfm"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qzcmi.pfb"
+        "http://mirrors.ctan.org/fonts/tex-gyre/fonts/type1/public/tex-gyre/qzcmi.pfm")
+
+package(){
+	cd ${pkgdir}
+
+	install -m755 -d ${pkgdir}/usr/share/fonts/Type1
+	install -m644 ${srcdir}/*.pfb ${pkgdir}/usr/share/fonts/Type1
+	install -m644 ${srcdir}/*.pfm ${pkgdir}/usr/share/fonts/Type1
+}
+
+md5sums=('7ae2100f6a906c9595b7285891d8fc5a'
+         '3ec7a739fa803dd453c0eaa88cf91ac3'
+         'ad31851a6c753b10c828fb4690d0aac5'
+         '2dd95e00b6bc7692a4ab7d1e0b64afad'
+         '6687c9c64a1489d7cd624c92f5a815c0'
+         '02681b15a4a12dc8d76695276f01603e'
+         '5c33df1ea1b3ae76761bc2259f9ad2de'
+         'edbba3f93dade4d20eb0c2f7dde8f31f'
+         '4e8d6bf08ee276585cacb8ffe4a6e73b'
+         'b99fd88a4f0b0d023a1e391adc88edd4'
+         '4fab6b90481797d879d796a696aa6efd'
+         '1772e3270473c8a88631cc71a7e7d249'
+         '38cc43bc8d5d39bf39fec0344bcd140b'
+         '8fb8d7acf4498662ecfa5cc80e8a4a12'
+         '4a2fbb1f61bc24239b9d027f496fe578'
+         '0ab884f375eed975413978532fbd78e7'
+         'c2343ef36b9bae632ce6c8f96a65527e'
+         '361c88e25f387c3b35fe6592bcead342'
+         'e374bea6a796971f2ff130e5cc50371a'
+         'a9ad6eb678d013f864e75ecb14adb33d'
+         '81a0e3f10c7788fe7b2124896bb4fa4d'
+         '2977a1488675796a22428b808d9014d1'
+         'a70fc69cf55be50044a3f4355380ee38'
+         'cc8406545351fd44e610d3e0468495b9'
+         '2c015c51e018288cae6240e5b1c6a8c4'
+         '3b69b057bc2dd315875b076c644d0c43'
+         '7dd85fe6ea6d6d7e35087ecbe52cf682'
+         'e0a085083f1cc1de76582e86004ad2cc'
+         'cc1039cc4d454907a19f7c1711f8739b'
+         '09a6cfa9dca197798a15a7f19ae553b9'
+         'ece06d0ad647f8916eb4d0762f7ecc3f'
+         '00f8a3b8bc99a5d6cef338ea932924fc'
+         '176018dd42fcc60204173fa10e357da5'
+         'f0eb762bbf375271926c4fa40761ecc5'
+         '77ce2f0433ac7fd33dbe9968d127e4fb'
+         '8487cb2392a1a6a1a8886cc4eb4dee42'
+         '27e7109c1311c35fc26a6b3aef3928e5'
+         '012269b97e9a0cfa1eae02ce88ab17d6'
+         'f2bfc9a8dd541d42b190aba3c0cdda30'
+         'bb2be3ea9a6fa3539b67855d9ca279f2'
+         '6ef1818544fdf6a353165a5ee88fa91b'
+         '1f6cc393fb8d21b9addfd2d1274a9d5d'
+         'f7d3a959ad2a52030b3318ca20548343'
+         '76c77c1cb255742a74eaa146eaf39844'
+         'c159829aa6d7d99f1777bb40c90b8157'
+         'b48f8961e85d28647e5f754e30021cef'
+         'b17b486f62f05155703d11b6eedee9cc'
+         '40d3b570c8d774c1bf44fbfd9e81c704'
+         '92573cfc80eca925b4409b6e7b4f910a'
+         'da68af56bbb01fd3f812d12321eaebc3'
+         '12283781e6e04a881e4d189a4e7b257a'
+         'e31013d2614a7cc4c7ea7aa6ecf3ef1d'
+         'b55329880281d733ea35d6aea5c7261d'
+         '44b0539b7c036ea40d6e76ddac3b5671'
+         '09d74b78a21c71a95300023a0c9fcb49'
+         '309b460e8fdbc91db8a11eb5d2d84305'
+         '4be3e220f990dc716f91bb7965c09237'
+         '2e7080fa59ef81dbbed0bc980faca776'
+         '4b4b9aaa7c59a16507480bec59ef203f'
+         'f6bf0430e50f17b8e4c755b7bed1e96c'
+         '8dca243a80ecf4cfe00077d4bd995bd7'
+         '7cebe89fc1562aa061900b9b952031c6'
+         'aaf12ebd0b807d452087fc34bde5bd7d'
+         '774d640821796030b18129a1c504d43e'
+         'dd031027bdbafb7c6cf978360c6eff35'
+         'f075cc35118621f3558d8da0c9f6eb46')

@@ -1,0 +1,32 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=otf-crimson-text-ib
+_gitname=Crimson
+pkgver=0.8
+pkgrel=1
+depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
+pkgdesc="Crimson Text is an open source serif font family in the tradition of beautiful oldstyle typefaces."
+url="http://aldusleaf.org/"
+arch=('any')
+groups=('infinality-bundle-fonts')
+conflicts=('otf-crimson-text')
+license=('Custom')
+install=$pkgname.install
+source=(git+https://github.com/skosch/Crimson.git)
+
+#pkgver() {
+#  cd ${srcdir}/${_gitname}
+#  # Use the tag of the last commit
+#  #local ver="$(git describe --long)"
+#  local ver="$(git describe --tags)"
+#  printf "%s" "${ver//-/.}"
+#}
+
+package(){
+	cd ${pkgdir}
+
+	install -m755 -d ${pkgdir}/usr/share/fonts/OTF
+  install -Dm644 ${srcdir}/Crimson/otf/*.otf ${pkgdir}/usr/share/fonts/OTF
+}
+
+md5sums=('SKIP')

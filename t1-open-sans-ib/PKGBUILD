@@ -1,0 +1,45 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=t1-opensans-ib
+pkgver=1.10
+pkgrel=2
+depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
+pkgdesc="Open Sans is a humanist sans serif typeface designed by Steve Matteson, Type Director of Ascender Corp. Type1 version from TeXLive."
+url="http://www.ctan.org/tex-archive/fonts/opensans"
+arch=('any')
+license=('OFL-1.1')
+groups=('infinality-bundle-fonts')
+replaces=('t1-opensans')
+conflicts=('t1-opensans' 'ttf-opensans')
+install=$pkgname.install
+source=("http://mirrors.ctan.org/fonts/opensans/fonts/type1/public/opensans/OpenSans-Bold.pfb"
+        "http://mirrors.ctan.org/fonts/opensans/fonts/type1/public/opensans/OpenSans-BoldItalic.pfb"
+        "http://mirrors.ctan.org/fonts/opensans/fonts/type1/public/opensans/OpenSans-CondLight.pfb"
+        "http://mirrors.ctan.org/fonts/opensans/fonts/type1/public/opensans/OpenSans-CondLightItalic.pfb"
+        "http://mirrors.ctan.org/fonts/opensans/fonts/type1/public/opensans/OpenSans-ExtraBold.pfb"
+        "http://mirrors.ctan.org/fonts/opensans/fonts/type1/public/opensans/OpenSans-ExtraBoldItalic.pfb"
+        "http://mirrors.ctan.org/fonts/opensans/fonts/type1/public/opensans/OpenSans-Italic.pfb"
+        "http://mirrors.ctan.org/fonts/opensans/fonts/type1/public/opensans/OpenSans-Light.pfb"
+        "http://mirrors.ctan.org/fonts/opensans/fonts/type1/public/opensans/OpenSans-LightItalic.pfb"
+        "http://mirrors.ctan.org/fonts/opensans/fonts/type1/public/opensans/OpenSans-Regular.pfb"
+        "http://mirrors.ctan.org/fonts/opensans/fonts/type1/public/opensans/OpenSans-Semibold.pfb"
+        "http://mirrors.ctan.org/fonts/opensans/fonts/type1/public/opensans/OpenSans-SemiboldItalic.pfb")
+
+package(){
+	cd ${pkgdir}
+	install -m755 -d ${pkgdir}/usr/share/fonts/Type1
+	install -m644 ${srcdir}/*.pfb ${pkgdir}/usr/share/fonts/Type1
+}
+
+md5sums=('4660a54bb24b1f9448dad4bd3f4e9307'
+         'c8c03b1776f5ead7013e34545dc4283c'
+         '58727e051192fdf8c3c2a07f57fd3588'
+         'f9e1df1347ad529c8f08af695cac960d'
+         'bdf9cf78856be12665947b163f29734f'
+         '7dbd6225681e7d98bd36cfdce36ec018'
+         '3b1a901a4b5a08691c854cf671761df8'
+         '9443ddb082f21d913b20fea32cdd2fc6'
+         '835398a175ba79ac0885763f982d1601'
+         '396b689e50d2a41e6f6160a56c0c2621'
+         '4bac48a0aeaa595fc8aebf2c94da912b'
+         '47e3a15ec9e0737a6c30bade7a3606c3')

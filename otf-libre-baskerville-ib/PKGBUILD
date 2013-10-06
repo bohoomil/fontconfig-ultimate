@@ -1,0 +1,28 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=otf-libre-baskerville-ib
+pkgver=1.000
+pkgrel=1
+depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
+pkgdesc="Libre Baskerville is a webfont optimized for web body text."
+url="http://www.impallari.com/projects/overview/libre-baskerville"
+arch=('any')
+license=('OFL-1.1')
+groups=('infinality-bundle-fonts')
+conflicts=('ttf-impallari-libre-baskerville' 'ttf-librebaskerville')
+install=$pkgname.install
+source=("http://mirrors.ctan.org/fonts/librebaskerville/opentype/LibreBaskerville-Bold.otf"
+        "http://mirrors.ctan.org/fonts/librebaskerville/opentype/LibreBaskerville-BoldItalic.otf"
+        "http://mirrors.ctan.org/fonts/librebaskerville/opentype/LibreBaskerville-Italic.otf"
+        "http://mirrors.ctan.org/fonts/librebaskerville/opentype/LibreBaskerville-Regular.otf")
+
+package(){
+	cd ${pkgdir}
+	install -m755 -d ${pkgdir}/usr/share/fonts/OTF
+	install -m644 ${srcdir}/*.otf ${pkgdir}/usr/share/fonts/OTF
+}
+
+md5sums=('0e07c912b53ed5d13f2eb039d8ae3085'
+         'f5f8512497c9ce63bd98d3b9c2bfb088'
+         '6345a56c16c39839e2c9622ccf765262'
+         '6ece02a89850f4d3c1a6609adeeb6c22')

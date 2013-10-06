@@ -1,0 +1,55 @@
+# Contributor: Rick W. Chen <stuffcorpse@archlinux.us>
+# Contributor: bohoomil <@zoho.com>
+
+pkgbase=ttf-dejavu-yuanti-ibx
+pkgname=('ttf-dejavusans-yuanti-basic-ibx' 'ttf-dejavusans-yuanti-condensed-ibx' 'ttf-dejavusans-yuanti-mono-ibx')
+pkgver=20110101
+pkgrel=1
+pkgdesc="Chinese Yuan Ti family based on DejaVu Sans fonts."
+arch=(any)
+url="http://forum.ubuntu.org.cn/viewtopic.php?t=110509"
+makedepends=('p7zip')
+conflicts=('ttf-dejavusans-yuanti')
+license=(custom:Copyleft)
+groups=('infinality-bundle-fonts-extra')
+noextract=('dejavusansyuanti.7z')
+source=("http://qinsdisk.googlecode.com/files/dejavusansyuanti.7z")
+
+prepare() {
+  7z e ${srcdir}/dejavusansyuanti.7z
+}
+
+package_ttf-dejavusans-yuanti-basic-ibx() {
+  pkgdesc="Chinese Yuan Ti family based on DejaVu Sans fonts (basic sans-serif variant)."
+  depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-mkfontscale' 'xorg-mkfontdir')
+  conflicts=('ttf-dejavusans-yuanti')
+  install=${pkgname}.install
+  
+  cd ${pkgdir}
+  install -d -m755 ${pkgdir}/usr/share/fonts/TTF
+  install -m644 ${srcdir}/DejaVuSansYuanTi-*.ttf ${pkgdir}/usr/share/fonts/TTF/
+}
+
+package_ttf-dejavusans-yuanti-condensed-ibx() {
+  pkgdesc="Chinese Yuan Ti family based on DejaVu Sans fonts (condensed variant)."
+  depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-mkfontscale' 'xorg-mkfontdir')
+  conflicts=('ttf-dejavusans-yuanti')
+  install=${pkgname}.install
+
+  cd ${pkgdir}
+  install -d -m755 ${pkgdir}/usr/share/fonts/TTF
+  install -m644 ${srcdir}/DejaVuSansYuanTiCondensed-*.ttf ${pkgdir}/usr/share/fonts/TTF/
+}
+
+package_ttf-dejavusans-yuanti-mono-ibx() {
+  pkgdesc="Chinese Yuan Ti family based on DejaVu Sans fonts (monospaced variant)."
+  depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-mkfontscale' 'xorg-mkfontdir')
+  conflicts=('ttf-dejavusans-yuanti')
+  install=${pkgname}.install
+
+  cd ${pkgdir}
+  install -d -m755 ${pkgdir}/usr/share/fonts/TTF
+  install -m644 ${srcdir}/DejaVuSansYuanTiMono-*.ttf ${pkgdir}/usr/share/fonts/TTF/
+}
+
+md5sums=('c96df2210e55fecccd8a1c1407766f0e')

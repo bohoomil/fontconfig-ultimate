@@ -1,0 +1,60 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=t1-lato-ibx
+pkgver=1.104
+pkgrel=1
+depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
+pkgdesc="Lato is a sanserif type­face family designed in the Summer 2010 by Warsaw-based designer Łukasz Dziedzic. Type1 version from TeXLive."
+url="http://www.latofonts.com/"
+arch=('any')
+groups=('infinality-bundle-fonts-extra')
+license=('OFL-1.1')
+conflicts=('ttf-lato')
+install=$pkgname.install
+source=("http://mirrors.ctan.org/fonts/lato/fonts/type1/public/lato/Lato-Bla-LCDFJ.pfb"
+        "http://mirrors.ctan.org/fonts/lato/fonts/type1/public/lato/Lato-Bla.pfb"
+        "http://mirrors.ctan.org/fonts/lato/fonts/type1/public/lato/Lato-BlaIta-LCDFJ.pfb"
+        "http://mirrors.ctan.org/fonts/lato/fonts/type1/public/lato/Lato-BlaIta.pfb"
+        "http://mirrors.ctan.org/fonts/lato/fonts/type1/public/lato/Lato-Bol-LCDFJ.pfb"
+        "http://mirrors.ctan.org/fonts/lato/fonts/type1/public/lato/Lato-Bol.pfb"
+        "http://mirrors.ctan.org/fonts/lato/fonts/type1/public/lato/Lato-BolIta-LCDFJ.pfb"
+        "http://mirrors.ctan.org/fonts/lato/fonts/type1/public/lato/Lato-BolIta.pfb"
+        "http://mirrors.ctan.org/fonts/lato/fonts/type1/public/lato/Lato-Hai-LCDFJ.pfb"
+        "http://mirrors.ctan.org/fonts/lato/fonts/type1/public/lato/Lato-Hai.pfb"
+        "http://mirrors.ctan.org/fonts/lato/fonts/type1/public/lato/Lato-HaiIta-LCDFJ.pfb"
+        "http://mirrors.ctan.org/fonts/lato/fonts/type1/public/lato/Lato-HaiIta.pfb"
+        "http://mirrors.ctan.org/fonts/lato/fonts/type1/public/lato/Lato-Lig-LCDFJ.pfb"
+        "http://mirrors.ctan.org/fonts/lato/fonts/type1/public/lato/Lato-Lig.pfb"
+        "http://mirrors.ctan.org/fonts/lato/fonts/type1/public/lato/Lato-LigIta-LCDFJ.pfb"
+        "http://mirrors.ctan.org/fonts/lato/fonts/type1/public/lato/Lato-LigIta.pfb"
+        "http://mirrors.ctan.org/fonts/lato/fonts/type1/public/lato/Lato-Reg-LCDFJ.pfb"
+        "http://mirrors.ctan.org/fonts/lato/fonts/type1/public/lato/Lato-Reg.pfb"
+        "http://mirrors.ctan.org/fonts/lato/fonts/type1/public/lato/Lato-RegIta-LCDFJ.pfb"
+        "http://mirrors.ctan.org/fonts/lato/fonts/type1/public/lato/Lato-RegIta.pfb")
+
+package(){
+	cd ${pkgdir}
+	install -m755 -d ${pkgdir}/usr/share/fonts/Type1
+	install -m644 ${srcdir}/*.pfb ${pkgdir}/usr/share/fonts/Type1
+}
+
+md5sums=('a1d81c9d9aee579d48cc7137a4ca0d85'
+         'b2b8d9e3c2b441b383e5df86b900ecc3'
+         '55ca3aa566794f6ff02d13b56cba4c6d'
+         'b54b69636d53245db468949b881bed5b'
+         '8643727d4224977bad826d9473a8bf2f'
+         'f87ef34706c39012fa63aab3c67b3325'
+         '2bd40af5124ae3290a8cf9a50389b993'
+         '2cb8de0098485a86f53c2a9e239ca0ac'
+         '407e02f658a727ef47acb448b3e4dd66'
+         'b999d520883b642eccb8b20083f3b38c'
+         'c9f05668073c28c8c5f198cb127c4e46'
+         '6d218397b3e019e098e2424d2af494bf'
+         '01d30e771e8cd56c32eaf624a62b603e'
+         '47bb0d6e7dd08df4a1e8d3cfe012d33b'
+         '6502b6c79bd60ffcfdb780e18a6e5e50'
+         'e38659270c4ebfe265f0ba2a7a09b960'
+         '75ba1578037bc33dd7cd5e081531233e'
+         'a2165f6a7344ea454e0b8b00f22d0779'
+         '59bf570197d7f60815498a1f75f191d5'
+         '00f059314de5419bc72f9fe6f6e1d5ee')

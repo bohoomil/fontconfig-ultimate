@@ -1,0 +1,26 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=ttf-lohit-oriya-ib
+pkgver=2.5.4.1
+pkgrel=1
+depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
+pkgdesc="Lohit Oriya font."
+url="https://fedorahosted.org/lohit/"
+arch=('any')
+conflicts=('lohit-fonts')
+groups=('infinality-bundle-fonts')
+license=('OFL-1.1')
+install=$pkgname.install
+source=("https://fedorahosted.org/releases/l/o/lohit/lohit-oriya-ttf-2.5.4.1.tar.gz")
+
+package(){
+	cd ${pkgdir}
+
+  install -m755 -d ${pkgdir}/usr/share/licenses/${pkgname}
+  install -m644 ${srcdir}/lohit-oriya-ttf-${pkgver}/OFL.txt ${pkgdir}/usr/share/licenses/${pkgname}
+
+	install -m755 -d ${pkgdir}/usr/share/fonts/TTF
+	install -m644 ${srcdir}/lohit-oriya-ttf-${pkgver}/*.ttf ${pkgdir}/usr/share/fonts/TTF
+}
+
+md5sums=('e79cd61631e2e8f70372a44859bc8d9b')

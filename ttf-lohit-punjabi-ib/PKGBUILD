@@ -1,0 +1,26 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=ttf-lohit-punjabi-ib
+pkgver=2.5.3
+pkgrel=1
+depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
+pkgdesc="Lohit Punjabi font."
+url="https://fedorahosted.org/lohit/"
+arch=('any')
+conflicts=('lohit-fonts')
+groups=('infinality-bundle-fonts')
+license=('OFL-1.1')
+install=$pkgname.install
+source=("https://fedorahosted.org/releases/l/o/lohit/lohit-punjabi-ttf-2.5.3.tar.gz")
+
+package(){
+	cd ${pkgdir}
+
+  install -m755 -d ${pkgdir}/usr/share/licenses/${pkgname}
+  install -m644 ${srcdir}/lohit-punjabi-ttf-${pkgver}/OFL.txt ${pkgdir}/usr/share/licenses/${pkgname}
+
+	install -m755 -d ${pkgdir}/usr/share/fonts/TTF
+	install -m644 ${srcdir}/lohit-punjabi-ttf-${pkgver}/*.ttf ${pkgdir}/usr/share/fonts/TTF
+}
+
+md5sums=('deab8c052af328248e8f619178ff890d')

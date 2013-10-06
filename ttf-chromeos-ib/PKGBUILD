@@ -1,0 +1,50 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=ttf-chromeos-ib
+pkgver=1.23
+pkgrel=1
+depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
+pkgdesc="Google ChromeOS fonts."
+url="http://www.fontsquirrel.com/fonts/list/foundry/dalton-maag-ltd"
+arch=('any')
+groups=('infinality-bundle-fonts')
+conflicts=('otf-google-fonts-hg' 'ttf-google-fonts-git' 'ttf-google-fonts-hg' 'ttf-chromeos-extra-fonts' 'ttf-chromesos-fonts')
+license=('Apache')
+install=$pkgname.install
+source=(http://googlefontdirectory.googlecode.com/hg/apache/arimo/Arimo-Bold.ttf
+        http://googlefontdirectory.googlecode.com/hg/apache/arimo/Arimo-BoldItalic.ttf
+        http://googlefontdirectory.googlecode.com/hg/apache/arimo/Arimo-Italic.ttf
+        http://googlefontdirectory.googlecode.com/hg/apache/arimo/Arimo-Regular.ttf
+        http://googlefontdirectory.googlecode.com/hg/apache/cousine/Cousine-Bold.ttf
+        http://googlefontdirectory.googlecode.com/hg/apache/cousine/Cousine-BoldItalic.ttf
+        http://googlefontdirectory.googlecode.com/hg/apache/cousine/Cousine-Italic.ttf
+        http://googlefontdirectory.googlecode.com/hg/apache/cousine/Cousine-Regular.ttf
+        http://googlefontdirectory.googlecode.com/hg/apache/tinos/Tinos-Bold.ttf
+        http://googlefontdirectory.googlecode.com/hg/apache/tinos/Tinos-BoldItalic.ttf
+        http://googlefontdirectory.googlecode.com/hg/apache/tinos/Tinos-Italic.ttf
+        http://googlefontdirectory.googlecode.com/hg/apache/tinos/Tinos-Regular.ttf
+        http://googlefontdirectory.googlecode.com/hg/apache/tinos/LICENSE.txt)
+
+package(){
+	cd ${pkgdir}
+
+  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
+  install -m644 ${srcdir}/LICENSE.txt "${pkgdir}/usr/share/licenses/${pkgname}"
+  
+  install -m755 -d ${pkgdir}/usr/share/fonts/TTF
+  install -m644 ${srcdir}/*.ttf ${pkgdir}/usr/share/fonts/TTF
+}
+
+md5sums=('31cf3c974f725ce750854143dfcca310'
+         '5b9b4fd0703465af0542ca835b220a7d'
+         '6879ea3f6f75b05a34716414ce4f41f4'
+         '61b544857df9ad5266379c06f3076e38'
+         '3c5a2b7d4dd5dbf9826885c3f714e019'
+         '6ddec17802ad190d267288d0cffbcbe6'
+         '63167ba7365767f4ce900ba37da36de5'
+         '0227632bea14a9e8421d94f3128a99cc'
+         'ce8109db9df4c65a5e8fbb893a320437'
+         'b470ec51c4b6a17d666c07cf1e590810'
+         '0cc5c53920f861fdfe4ab4be114cf068'
+         'd8ba5f3ea843e1b286771055f924ded8'
+         '3b83ef96387f14655fc854ddc3c6bd57')

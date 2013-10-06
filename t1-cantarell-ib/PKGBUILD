@@ -1,0 +1,27 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=t1-cantarell-ib
+pkgver=0.0.9
+pkgrel=1
+depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
+pkgdesc="Cantarell font family. Type1 version from TeXLive."
+url="http://code.google.com/p/evristika/"
+arch=('any')
+license=('OFL-1.1')
+groups=('infinality-bundle-fonts')
+conflicts=('cantarell-fonts' 'cantarell-fonts-git' 'ttf-cantarell')
+provides=('cantarell-fonts')
+replaces=('cantarell-fonts')
+install=$pkgname.install
+source=(http://mirrors.ctan.org/fonts/cantarell/fonts/type1/public/cantarell/Cantarell-Bold.pfb
+        http://mirrors.ctan.org/fonts/cantarell/fonts/type1/public/cantarell/Cantarell-Regular.pfb)
+
+package(){
+	cd ${pkgdir}
+  
+	install -m755 -d ${pkgdir}/usr/share/fonts/Type1
+	install -m644 ${srcdir}/*.pfb ${pkgdir}/usr/share/fonts/Type1
+}
+
+md5sums=('25a488aadbfd458870aa0449983c1a73'
+         '57138860af4f52acd06c38bbeedf0199')

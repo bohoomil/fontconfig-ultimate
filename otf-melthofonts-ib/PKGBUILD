@@ -1,0 +1,27 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=otf-melthofonts-ib
+pkgver=1.21
+pkgrel=1
+depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
+pkgdesc="Font for Syriac script."
+url="http://www.bethmardutho.org/index.php/resources/fonts.html"
+arch=('any')
+groups=('infinality-bundle-fonts')
+conflicts=('ttf-meltho')
+license=('Custom')
+install=$pkgname.install
+source=(http://www.bethmardutho.org/images/fonts/melthofonts-1.21.zip)
+
+
+package(){
+	cd ${pkgdir}
+
+  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
+  install -m644 ${srcdir}/melthofonts-1.21/license.txt "${pkgdir}/usr/share/licenses/${pkgname}"
+
+	install -m755 -d ${pkgdir}/usr/share/fonts/OTF
+	install -m644 ${srcdir}/melthofonts-1.21/*.otf ${pkgdir}/usr/share/fonts/OTF
+}
+
+md5sums=('f6f8cb92c4ee2e95bf6018fc78086269')

@@ -1,0 +1,44 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=ttf-noto-sans-ib
+pkgver=1.04
+pkgrel=1
+depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
+pkgdesc="Noto Sans family: extended Latin set and UI."
+url="http://code.google.com/p/googlefontdirectory/"
+arch=('any')
+groups=('infinality-bundle-fonts')
+conflicts=('ttf-noto' 'ttf-noto-svn' 'ttf-google-webfonts-git')
+license=('Apache')
+install=$pkgname.install
+source=(https://googlefontdirectory.googlecode.com/hg/apache/notosans/LICENSE.txt
+        https://googlefontdirectory.googlecode.com/hg/apache/notosans/NotoSans-Bold.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosans/NotoSans-BoldItalic.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosans/NotoSans-Italic.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosans/NotoSans-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansui/NotoSansUI-Bold.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansui/NotoSansUI-BoldItalic.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansui/NotoSansUI-Italic.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansui/NotoSansUI-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosanssymbols/NotoSansSymbols-Regular.ttf)
+
+package(){
+	cd ${pkgdir}
+
+  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
+  install -m644 ${srcdir}/LICENSE.txt "${pkgdir}/usr/share/licenses/${pkgname}"
+
+	install -m755 -d ${pkgdir}/usr/share/fonts/TTF
+	install -m644 ${srcdir}/*.ttf ${pkgdir}/usr/share/fonts/TTF
+}
+
+md5sums=('3b83ef96387f14655fc854ddc3c6bd57'
+         '781171b269d6b31469f12789b8ba525a'
+         '4f6ff3639c1e5728b905b650c1a06e75'
+         '154da4697acc779b55af0a67f1241e4e'
+         '61c3431e4e0ac62b136bc26b427ee05f'
+         'caf82c4adf757b5316f65dbcb1593092'
+         '30a6bd02019ee35934fe12f64ca55745'
+         '0b5b371694cc37eddfb31789e649943d'
+         '238540efb6ba625aaa3511a27cf9f2f3'
+         'b1c8208b21a6d6efd0f338d2fcf3ef53')

@@ -1,0 +1,42 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=otf-signika-family-ib
+pkgver=1.0001
+pkgrel=1
+depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
+pkgdesc="Signika is a sans-serif with a gentle character, developed for wayfinding, signage, and other media where clarity of information is required."
+url="http://fontfabric.com/signika-font/"
+arch=('any')
+groups=('infinality-bundle-fonts')
+conflicts=('ttf-google-webfonts-git')
+license=('OFL-1.1')
+install=$pkgname.install
+source=(http://googlefontdirectory.googlecode.com/hg/ofl/signika/src/Signika-Regular.otf
+        http://googlefontdirectory.googlecode.com/hg/ofl/signika/src/Signika-Bold.otf
+        http://googlefontdirectory.googlecode.com/hg/ofl/signika/src/Signika-Light.otf
+        http://googlefontdirectory.googlecode.com/hg/ofl/signika/src/Signika-Semibold.otf
+        http://googlefontdirectory.googlecode.com/hg/ofl/signikanegative/src/SignikaNegative-Regular.otf
+        http://googlefontdirectory.googlecode.com/hg/ofl/signikanegative/src/SignikaNegative-Bold.otf
+        http://googlefontdirectory.googlecode.com/hg/ofl/signikanegative/src/SignikaNegative-Light.otf
+        http://googlefontdirectory.googlecode.com/hg/ofl/signikanegative/src/SignikaNegative-Semibold.otf
+        http://googlefontdirectory.googlecode.com/hg/ofl/signika/OFL.txt)
+
+package(){
+	cd ${pkgdir}
+
+  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
+  install -m644 ${srcdir}/OFL.txt "${pkgdir}/usr/share/licenses/${pkgname}"
+
+  install -m755 -d ${pkgdir}/usr/share/fonts/OTF
+	install -m644 ${srcdir}/*.otf ${pkgdir}/usr/share/fonts/OTF
+}
+
+md5sums=('4e3d8a491ce6de1e628e0dfcfd11f7bf'
+         'cb1a78e5477a9854afa3f61edb54c2eb'
+         '357eec3ff993b224a83ea5b9e2a901ee'
+         'b715954c2e6783b19cc61365edfabea4'
+         '2a59b8006dfb44af286a3831c74a2d77'
+         '42aeb170e04ca983f6719cdcc6b10efa'
+         '47b133c21cc3b2f409553fa0de0287b2'
+         '8f3ccd241d2482debba4fe6001d73471'
+         'bd349ab49a7bbdf8a4ee297bc1b3fdf9')

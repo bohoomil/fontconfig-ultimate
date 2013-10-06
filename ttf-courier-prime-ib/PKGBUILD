@@ -1,0 +1,29 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=ttf-courier-prime-ib
+pkgver=1.203
+pkgrel=1
+depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
+pkgdesc="A free, improved, classical monospaced typeface."
+url="http://quoteunquoteapps.com/courierprime/"
+arch=('any')
+groups=('infinality-bundle-fonts')
+conflicts=('ttf-courier-prime')
+license=('OFL-1.1')
+install=$pkgname.install
+source=(http://quoteunquoteapps.com/downloads/courier-prime.zip)
+
+package(){
+	cd ${pkgdir}
+
+  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
+  install -m644 "${srcdir}/Courier Prime/LICENSE/OFL.txt" "${pkgdir}/usr/share/licenses/${pkgname}"
+  install -m644 "${srcdir}/Courier Prime/LICENSE/OFL-FAQ.txt" "${pkgdir}/usr/share/licenses/${pkgname}"
+
+	install -m755 -d ${pkgdir}/usr/share/fonts/TTF
+  find "${srcdir}/Courier Prime/" -type f -name \*.ttf \
+    -exec install -Dm644 '{}' "${pkgdir}/usr/share/fonts/TTF" \;
+}
+
+
+md5sums=('cf79336ce1cf439560a5364ab7856738')

@@ -1,0 +1,28 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=otf-cantoraone-ib
+pkgver=1.001
+pkgrel=1
+depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
+pkgdesc="Cantora is a friendly semi formal, semi condensed, semi sans serif. It has reminiscences of hand lettering, mixing straight and bowed stems, and natural curves."
+url="http://www.impallari.com"
+arch=('any')
+groups=('infinality-bundle-fonts')
+conflicts=('ttf-impallari-cantora')
+license=('OFL-1.1')
+install=$pkgname.install
+source=(http://googlefontdirectory.googlecode.com/hg/ofl/cantoraone/src/CantoraOne-Regular.otf
+        http://googlefontdirectory.googlecode.com/hg/ofl/cantoraone/OFL.txt)
+
+package(){
+	cd ${pkgdir}
+
+  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
+  install -m644 ${srcdir}/OFL.txt "${pkgdir}/usr/share/licenses/${pkgname}"
+
+	install -m755 -d ${pkgdir}/usr/share/fonts/OTF
+  install -Dm644 ${srcdir}/*.otf ${pkgdir}/usr/share/fonts/OTF
+}
+
+md5sums=('9a292c0cdd3339da0237c10c30f5d5b6'
+         '94465cd192bbf13008a6e735ca0bdf6f')

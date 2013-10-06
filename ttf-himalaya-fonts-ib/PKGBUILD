@@ -1,0 +1,29 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=ttf-himalaya-fonts-ib
+pkgver=1.0
+pkgrel=1
+depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
+makedepends=('unrar')
+pkgdesc="Himalaya fonts."
+url="http://www.tibetebook.com/"
+arch=('any')
+groups=('infinality-bundle-fonts')
+license=('Custom')
+noextract=('HimalayaFonts.rar')
+install=$pkgname.install
+source=(http://www.tibetebook.com/nyer_mkho/demig/HimalayaFonts.rar)
+
+prepare(){
+  cd ${srcdir}
+  unrar e HimalayaFonts.rar
+}
+
+package(){
+	cd ${pkgdir}
+
+	install -m755 -d ${pkgdir}/usr/share/fonts/TTF
+	install -m644 ${srcdir}/*.ttf ${pkgdir}/usr/share/fonts/TTF
+}
+
+md5sums=('8106e870c69d01ad588370af69a0a781')

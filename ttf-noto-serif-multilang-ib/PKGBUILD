@@ -1,0 +1,49 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=ttf-noto-serif-multilang-ib
+pkgver=1.04
+pkgrel=1
+depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils' 'ttf-noto-serif-ib')
+pkgdesc="Noto Serif family: extended Non-Latin set."
+url="http://code.google.com/p/googlefontdirectory/"
+arch=('any')
+conflicts=('ttf-google-webfonts-git')
+groups=('infinality-bundle-fonts')
+license=('Apache')
+install=$pkgname.install
+source=(65-ttf-noto-serif.conf
+        https://googlefontdirectory.googlecode.com/hg/apache/notoserifarmenian/LICENSE.txt
+        https://googlefontdirectory.googlecode.com/hg/apache/notoserifarmenian/NotoSerifArmenian-Bold.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notoserifarmenian/NotoSerifArmenian-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notoserifgeorgian/NotoSerifGeorgian-Bold.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notoserifgeorgian/NotoSerifGeorgian-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notoseriflao/NotoSerifLao-Bold.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notoseriflao/NotoSerifLao-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notoserifthai/NotoSerifThai-Bold.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notoserifthai/NotoSerifThai-Regular.ttf
+)
+
+package(){
+
+	cd ${pkgdir}
+
+  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
+  install -m644 ${srcdir}/LICENSE.txt "${pkgdir}/usr/share/licenses/${pkgname}"
+
+	install -m755 -d "${pkgdir}/usr/share/fonts/TTF"
+  install -m644 ${srcdir}/*.ttf "${pkgdir}/usr/share/fonts/TTF"
+
+  install -m755 -d "${pkgdir}/etc/fonts/conf.avail"
+  install -m644 ${srcdir}/65-ttf-noto-serif.conf "${pkgdir}/etc/fonts/conf.avail"
+}
+
+md5sums=('0fa734257a35219d6ee7be5aebbb18f9'
+         '3b83ef96387f14655fc854ddc3c6bd57'
+         '1d22efc355684cf41c061ab8f78cf83d'
+         '0582e01f584223e8e143a3a1edaad547'
+         'fd6126657fcb75b98f594a155ee30590'
+         'efef3bfd3a3dedd8409dbd9ff3058b2a'
+         '097935d11cf188d0579fcf17b1e5fb86'
+         'b38592bec2d48e7edb966e224d3da10a'
+         '2df610ec47b71d63f9f5e3cf68e4744f'
+         'b153371834343f6d2d472840ae4aef58')

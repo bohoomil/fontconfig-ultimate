@@ -1,0 +1,30 @@
+# $Id: PKGBUILD 193626 2013-08-26 08:21:28Z jgc $
+# Maintainer:
+# Contributor: Jan de Groot <jgc@archlinux.org>
+# Contributor: Michal Krenek <mikos@sg1.cz>
+# Contributor: bohoomil <@zoho.com>
+
+pkgname=ttf-dejavu-ib
+pkgver=2.34
+pkgrel=2
+pkgdesc="Font family based on the Bitstream Vera Fonts with a wider range of characters. Re-packed for infinality-bundle-fonts."
+arch=('any')
+url="http://dejavu-fonts.org/wiki/Main_Page"
+license=('custom')
+depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-mkfontscale' 'xorg-mkfontdir')
+provides=('ttf-font' 'ttf-dejavu')
+conflicts=('ttf-dejavu')
+replaces=('ttf-dejavu')
+groups=('infinality-bundle-fonts')
+install=${pkgname}.install
+source=(http://downloads.sourceforge.net/project/dejavu/dejavu/${pkgver}/dejavu-fonts-ttf-${pkgver}.tar.bz2)
+md5sums=('161462de16e2ca79873bc2b0d2e6c74c')
+
+package() {
+  install -dm755 "${pkgdir}"/usr/share/fonts/TTF
+
+  cd "${srcdir}"/dejavu-fonts-ttf-${pkgver}
+  install -m644 ttf/*.ttf "${pkgdir}"/usr/share/fonts/TTF/
+
+  install -Dm644 LICENSE "${pkgdir}"/usr/share/licenses/${pkgname}/LICENSE
+}

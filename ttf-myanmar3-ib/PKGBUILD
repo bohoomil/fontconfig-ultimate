@@ -1,0 +1,24 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=ttf-myanmar3-ib
+pkgver=1.358
+pkgrel=1
+depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
+pkgdesc="Font for Myanmar/Burmese script."
+url="https://sites.google.com/site/chrisfynn2/home/fonts/ddc-uchen"
+arch=('any')
+groups=('infinality-bundle-fonts')
+conflicts=('ttf-myanmar3')
+license=('OFL-1.1')
+install=$pkgname.install
+source=("http://myanmar3source.googlecode.com/files/mm3-multi-os%2816-08-2011%29.ttf")
+
+
+package(){
+	cd ${pkgdir}
+
+	install -m755 -d ${pkgdir}/usr/share/fonts/TTF
+	install -m644 ${srcdir}/*.ttf ${pkgdir}/usr/share/fonts/TTF
+}
+
+md5sums=('9db1fa231d9e330dfb54dc7ecb364705')

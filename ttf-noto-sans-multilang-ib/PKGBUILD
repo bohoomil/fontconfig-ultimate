@@ -1,0 +1,174 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=ttf-noto-sans-multilang-ib
+pkgver=1.04
+pkgrel=1
+depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils' 'ttf-noto-sans-ib')
+pkgdesc="Noto Sans family: extended Non-Latin set and UI."
+url="http://code.google.com/p/googlefontdirectory/"
+arch=('any')
+groups=('infinality-bundle-fonts')
+conflicts=('ttf-noto' 'ttf-noto-svn' 'ttf-google-webfonts-git')
+license=('Apache')
+install=$pkgname.install
+source=(65-ttf-noto-sans-ui.conf
+        65-ttf-noto-sans.conf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansarmenian/LICENSE.txt
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansarmenian/NotoSansArmenian-Bold.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansarmenian/NotoSansArmenian-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansavestan/NotoSansAvestan-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansbengali/NotoSansBengali-Bold.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansbengali/NotoSansBengali-Regular.ttf 
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansbrahmi/NotoSansBrahmi-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosanscarian/NotoSansCarian-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosanscherokee/NotoSansCherokee-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosanscoptic/NotoSansCoptic-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosanscypriotsyllabary/NotoSansCypriotSyllabary-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansdeseret/NotoSansDeseret-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansdevanagari/NotoSansDevanagari-Bold.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansdevanagari/NotoSansDevanagari-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansdevanagariui/NotoSansDevanagariUI-Bold.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansdevanagariui/NotoSansDevanagariUI-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansegyptianhieroglyphs/NotoSansEgyptianHieroglyphs-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansethiopic/NotoSansEthiopic-Bold.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansethiopic/NotoSansEthiopic-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansgeorgian/NotoSansGeorgian-Bold.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansgeorgian/NotoSansGeorgian-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansglagolitic/NotoSansGlagolitic-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansgujarati/NotoSansGujarati-Bold.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansgujarati/NotoSansGujarati-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansgujaratiui/NotoSansGujaratiUI-Bold.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansgujaratiui/NotoSansGujaratiUI-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosanshanunoo/NotoSansHanunoo-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosanshebrew/NotoSansHebrew-Bold.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosanshebrew/NotoSansHebrew-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansimperilaramaic/NotoSansImperialAramaic-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosanskaithi/NotoSansKaithi-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosanskannada/NotoSansKannada-Bold.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosanskannada/NotoSansKannada-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosanskayahli/NotoSansKayahLi-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosanskharoshthi/NotoSansKharoshthi-Regular.ttf
+        http://noto.googlecode.com/svn/trunk/fonts/individual/hinted/NotoSansKhmer-Bold.ttf
+        http://noto.googlecode.com/svn/trunk/fonts/individual/hinted/NotoSansKhmer-Regular.ttf
+        http://noto.googlecode.com/svn/trunk/fonts/individual/hinted/NotoSansKhmerUI-Bold.ttf
+        http://noto.googlecode.com/svn/trunk/fonts/individual/hinted/NotoSansKhmerUI-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosanslao/NotoSansLao-Bold.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosanslao/NotoSansLao-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosanslaoui/NotoSansLaoUI-Bold.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosanslaoui/NotoSansLaoUI-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosanslisu/NotoSansLisu-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosanslycian/NotoSansLycian-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosanslydian/NotoSansLydian-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansmalayalam/NotoSansMalayalam-Bold.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansmalayalam/NotoSansMalayalam.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansmandaic/NotoSansMandaic-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansmeeteimayek/NotoSansMeeteiMayek-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansnko/NotoSansNKo-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansoldsoutharabian/NotoSansOldSouthArabian-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansoldturkic/NotoSansOldTurkic-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansosmanya/NotoSansOsmanya-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansphoenician/NotoSansPhoenician-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansshavian/NotoSansShavian-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosanstagalog/NotoSansTagalog-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosanstaitham/NotoSansTaiTham-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosanstaiviet/NotoSansTaiViet-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosanstamil/NotoSansTamil-Bold.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosanstamil/NotoSansTamil-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosanstamilui/NotoSansTamilUI-Bold.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosanstamilui/NotoSansTamilUI-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosanstelugu/NotoSansTelugu-Bold.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosanstelugu/NotoSansTelugu-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansthai/NotoSansThai-Bold.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansthai/NotoSansThai-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansthaiui/NotoSansThaiUI-Bold.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansthaiui/NotoSansThaiUI-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansugaritic/NotoSansUgaritic-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansvai/NotoSansVai-Regular.ttf)
+
+package(){
+	cd ${pkgdir}
+
+  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
+  install -m644 ${srcdir}/LICENSE.txt "${pkgdir}/usr/share/licenses/${pkgname}"
+
+	install -m755 -d "${pkgdir}/usr/share/fonts/TTF"
+  install -m644 ${srcdir}/*.ttf "${pkgdir}/usr/share/fonts/TTF"
+
+  install -m755 -d "${pkgdir}/etc/fonts/conf.avail"
+  install -m644 ${srcdir}/65-ttf-noto-sans-ui.conf "${pkgdir}/etc/fonts/conf.avail"
+  install -m644 ${srcdir}/65-ttf-noto-sans.conf "${pkgdir}/etc/fonts/conf.avail"
+}
+
+md5sums=('ff202f6b6a54fd5ce83f01e8ce47ec02'
+         '4ad9729e42fc93bc939321b33c29a397'
+         '3b83ef96387f14655fc854ddc3c6bd57'
+         '8d4a998dba32cce4a33cfe72e127a6ed'
+         'e71dbdf0fc1172fef3c31638d81ec834'
+         'fd9108b06a57a608079ba9fc5603e9ec'
+         '995bd7dafda51009e5a10d942a1ba617'
+         '5e2a2d49a5663495aceede2b4e52b051'
+         '320459fc66d757995d4d85285ff5477b'
+         '31b91aee3b0e1099ac893ec9311b53f4'
+         '80dda2e2c26bd7a591373aaf2cb6cf76'
+         'fa7676636d9485e36de007fc591f2fb3'
+         '73c3d97f118e040a8a0c600d9dd1ec0e'
+         '03a0501035ee3100c4b5a0e3477af8ae'
+         'c1344cd0e5e6f808c19cfee1e97c3c4f'
+         'f9f7ac9bc0459bb1eb3aa0a9d85ef877'
+         'da83300484fed64443c7b7e3d0630956'
+         '30d1ae0bade2180b56a1c50937c95bda'
+         'ae1d5f57a2a480b9fa3fc7caf6045b3c'
+         'd8256db922ca18ee8dee643318296858'
+         '92600518c54e1bdf098173d382fb3feb'
+         'db50601c526e8c44e3d492bfb418a9d7'
+         'd24a6e2ea30ecf72ee3ff32d21792395'
+         '72a4973806667e40008ab611798eed4e'
+         'bef169e598a127c2f7ce805f3d5182ed'
+         '421720cbe408097b8aa0546782dcacb9'
+         '1dc4213100acc37f766bfefcac4ee569'
+         '463d82a7e03bb5e970c0bbe8dc6013af'
+         '28bbdcaf458271b709a0b3e16a7cac56'
+         '5b781c1d1c744781e12493da199532dc'
+         'e9282aafe33eb04a0728c0b331c079d7'
+         '0a91271aa0591e6401bb2c62121ed150'
+         '2027e068ef79dc995aa8fe72ffe8f2ce'
+         'b65650bd09e7147bfdaf79c9b5b1c7da'
+         '146dd29d22b56df42c5dfd5f170817f9'
+         '17f9f6cc6e4ec12ae81dda24746b6fd3'
+         '7330500c4da6d66c5ddc7afea90941b9'
+         'bfd3f34839ccb45447e51e99bb769a29'
+         '8efa67aa6bf2e08b2f743f1e350150e2'
+         '49be631a702542528e0e1f9cc118960c'
+         '2d258079e72768b370f7a727f1b1a698'
+         '3fb6fcfbb10e2c0beb906303aaaeb3ba'
+         'fc13905c3f0ed43d343d6be0ca1e3d23'
+         'd1adc78e605f006cf8dd10113a086943'
+         'e332dc645a5a7c9462fc68d26c0773b2'
+         '13d3edad2f366686db3536a2820d7d9b'
+         'b381873d9fc1ea9b6ab2a60e632e26b5'
+         '96a7abcee3dc4b7718c51ad9e164538e'
+         '8890628cd9d23f50a770682aa005d927'
+         'd31fd04fccddd88cd244c12f2a41bc13'
+         '734e6b4fe274c44ef73a31f363506d14'
+         'e214609df56543d8038d031cfa8640ed'
+         '08c3ee2dec0fb31a7c418d6a7de598bb'
+         '466b0e427ee1b0a7d3dcea05dfcb99f6'
+         '17a0e46a6a533d8b6e3daddd2ea3dcdc'
+         'bff26d984b1d351a5a77868019fab381'
+         '749861433dc216e614bd94a38474a944'
+         '9c32e5e1e6b7f4ecc5051b71ed2b8597'
+         '6afbf1cb93e78923bed3ad001701f388'
+         '819fb22657e9a72dc6a70f412cfff96f'
+         'eca4ce4af764039012e56eb8c7f05141'
+         '6c1e0f9732ac843bc6a3826d9f041cc9'
+         'a479e015bd5ee6e2ed0e3f6e77072d07'
+         'e6e3d894e4fec47918fc1acff6a04358'
+         'ae6bd73a0b6a2a3ff0f89c8967ded8bb'
+         '037c96ebc28d67a85cdf8cd5e452ff25'
+         '3bcdfcb3286d956a796b4d63d08cfd4c'
+         '1fd09c79a94d0eb21593c93ea072d03d'
+         '5eb0018995f7296ef85114dc010e2e95'
+         '305f368a5b75802277a5396859b0aa20'
+         '52503dfa28776a5149b96c16e4eb4e1f'
+         '540ca228f927ea8292c5351bd3d04fe1'
+         '1762327dcef2890357239c900507d56c')

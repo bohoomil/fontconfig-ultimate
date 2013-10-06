@@ -1,0 +1,35 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=ttf-noto-serif-ib
+pkgver=1.02
+pkgrel=1
+depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
+pkgdesc="Noto Serif family: extended Latin set."
+url="http://code.google.com/p/googlefontdirectory/"
+arch=('any')
+conflicts=('ttf-google-webfonts-git')
+groups=('infinality-bundle-fonts')
+license=('Apache')
+install=$pkgname.install
+source=(https://googlefontdirectory.googlecode.com/hg/apache/notoserif/LICENSE.txt
+        https://googlefontdirectory.googlecode.com/hg/apache/notoserif/NotoSerif-Bold.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notoserif/NotoSerif-BoldItalic.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notoserif/NotoSerif-Italic.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notoserif/NotoSerif-Regular.ttf
+)
+
+package(){
+	cd ${pkgdir}
+
+  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
+  install -m644 ${srcdir}/LICENSE.txt "${pkgdir}/usr/share/licenses/${pkgname}"
+
+	install -m755 -d ${pkgdir}/usr/share/fonts/TTF
+	install -m644 ${srcdir}/*.ttf ${pkgdir}/usr/share/fonts/TTF
+}
+
+md5sums=('3b83ef96387f14655fc854ddc3c6bd57'
+         'f4ab9c54f2f7cebb40019a3de04729e9'
+         '2347280bde22f480f47efbf0a5f2d6f2'
+         '0538bb1ad57e6ab8a7294b956e8bba04'
+         'dae3d34e6864e191432e3c4c939114c3')
