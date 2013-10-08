@@ -10,7 +10,8 @@ url=('http://www.fontconfig.org/release/')
 license=('custom' 'CC-BY-SA')
 pkgver=2.10.95
 _freetypever=2.5.0.1
-pkgrel=2
+_freetyperel=5
+pkgrel=3.1
 arch=('i686' 'x86_64')
 groups=('infinality-bundle')
 depends=('expat' 'freetype2-infinality-ultimate')
@@ -43,8 +44,8 @@ prepare() {
 
   cd "${srcdir}/${_basename}-${pkgver}"
 
-  cp -r ${srcdir}/fontconfig-ultimate/infinality-bundle-src/${pkgver}-${_freetypever}/conf.d.infinality ${srcdir}/${_basename}-${pkgver}/conf.d.infinality
-  cp -r ${srcdir}/fontconfig-ultimate/infinality-bundle-src/${pkgver}-${_freetypever}/fontconfig_patches/*.patch .
+  cp -r ${srcdir}/fontconfig-ultimate/infinality-bundle-src/${pkgver}-${pkgrel}-${_freetypever}-${_freetyperel}/conf.d.infinality ${srcdir}/${_basename}-${pkgver}/conf.d.infinality
+  cp -r ${srcdir}/fontconfig-ultimate/infinality-bundle-src/${pkgver}-${pkgrel}-${_freetypever}-${_freetyperel}/fontconfig_patches/*.patch .
 
   # infinality & post release fixes
   for patch in "${patches[@]}"; do
@@ -80,27 +81,35 @@ check() {
 package() {
   cd "${srcdir}/${_basename}-${pkgver}"
   make DESTDIR="${pkgdir}" install
-  install -m644 "${srcdir}/fontconfig-ultimate/infinality-bundle-src/${pkgver}-${_freetypever}/fontconfig_patches/29-replace-bitmap-fonts.conf" "${pkgdir}/etc/fonts/conf.avail"
+  install -m644 "${srcdir}/fontconfig-ultimate/infinality-bundle-src/${pkgver}-${pkgrel}-${_freetypever}-${_freetyperel}/fontconfig_patches/29-replace-bitmap-fonts.conf" "${pkgdir}/etc/fonts/conf.avail"
 
   #Install license
   install -m755 -d "${pkgdir}/usr/share/licenses/${_basename}"
   install -m644 COPYING "${pkgdir}/usr/share/licenses/${_basename}"
 
-  #install infinality bits
+  #install infinality stuff
   cd ../${_gitname}
 
+  # copy presets
+  cp -r ${srcdir}/fontconfig-ultimate/infinality-bundle-src/${pkgver}-${pkgrel}-${_freetypever}-${_freetyperel}/fontconfig_patches/{custom,free,ms} ${pkgdir}/etc/fonts/conf.avail.infinality
+
+  # install fc-presets
+  install -m755 ${srcdir}/fontconfig-ultimate/infinality-bundle-src/${pkgver}-${pkgrel}-${_freetypever}-${_freetyperel}/fontconfig_patches/fc-presets ${pkgdir}/usr/bin/fc-presets
+
+  # install license
   install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
   install -Dm644 "${srcdir}/fontconfig-ultimate/infinality-bundle-src/LICENSE" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 
+  # install documentation
   install -m755 -d "${pkgdir}/usr/share/doc/${pkgname}"
-  cp -r "${srcdir}/fontconfig-ultimate/infinality-bundle-src/${pkgver}-${_freetypever}/doc" "${pkgdir}/usr/share" 
+  cp -r "${srcdir}/fontconfig-ultimate/infinality-bundle-src/${pkgver}-${pkgrel}-${_freetypever}-${_freetyperel}/doc" "${pkgdir}/usr/share/"
 
-  cp -r "${srcdir}/fontconfig-ultimate/infinality-bundle-src/${pkgver}-${_freetypever}/doc" "${pkgdir}/usr/share/"
-
+  # install infinality-settings.sh
   install -m755 -d "${pkgdir}/usr/share/doc/${pkgname}/freetype"
-  install -m755 "${srcdir}/fontconfig-ultimate/infinality-bundle-src/${pkgver}-${_freetypever}/freetype/infinality-settings.sh" "${pkgdir}/usr/share/doc/${pkgname}/freetype/infinality-settings.sh"
+  install -m755 "${srcdir}/fontconfig-ultimate/infinality-bundle-src/${pkgver}-${pkgrel}-${_freetypever}-${_freetyperel}/freetype/infinality-settings.sh" "${pkgdir}/usr/share/doc/${pkgname}/freetype/infinality-settings.sh"
 
   find "${pkgdir}" -type d -name .git -exec rm -r '{}' +
 }
+
 md5sums=('45c5ba47be70577faa05c3aaf2b6a7e1'
          'SKIP')

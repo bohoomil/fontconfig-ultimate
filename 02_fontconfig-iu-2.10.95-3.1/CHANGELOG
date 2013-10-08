@@ -3,6 +3,17 @@ CHANGELOG
 ---------
 
 
+2013-10-07 by bohoomil
+----------------------
+
+* fontconfig-infinality-bundle-2.10.85-3a
+  Initial release of fontconfig-infinality-bundle with
+  presets for custom, free and MS font collections.
+
+* fc-presets script for easy preset switching.
+
+* Various minor fixes to MS font rendering.
+
 2013-08-31 by bohoomil
 ~~~~~~~~~~~~~~~~~~~~~~
 

@@ -9,7 +9,14 @@ post_install() {
 
   cat << _EOF
 
-  Thank you for checking out fontconfig-infinality-ultimate-git.
+  Thank you for checking out fontconfig-infinality-ultimate.
+
+  By default, fontconfig will use presets for the free font collection
+  from [infinality-bundle-fonts] repository.
+
+  If you are going to use either a custom font collection or core
+  Microsoft families, set the appropriate presets using
+  fc-presets command.
   
 _EOF
 
@@ -20,6 +27,14 @@ _EOF
       rm -f ${bit}
     fi
   done
+  echo -e "Done."
+
+  echo -e "Creating symlinks for free font collection ..."
+  ln -sf ../conf.avail.infinality/free/37-repl-global-free.conf .
+  ln -sf ../conf.avail.infinality/free/60-latin-free.conf .
+  ln -sf ../conf.avail.infinality/free/65-non-latin-free.conf .
+  ln -sf ../conf.avail.infinality/free/66-aliases-wine-free.conf .
+  ln -sf ../conf.avail.infinality/free/93-final-lang-spec-free.conf .
   echo -e "Done."
 
   popd > /dev/null
