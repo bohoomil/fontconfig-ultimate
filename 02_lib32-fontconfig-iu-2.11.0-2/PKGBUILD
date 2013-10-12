@@ -3,8 +3,8 @@
 
 _pkgbasename=fontconfig
 pkgname=lib32-$_pkgbasename-infinality-ultimate
-pkgver=2.10.95
-pkgrel=2.1
+pkgver=2.11.0
+pkgrel=2
 pkgdesc="A library for configuring and customizing font access (32-bit, infinality-bundle)"
 arch=(x86_64)
 url="http://www.fontconfig.org/release/"
@@ -59,4 +59,4 @@ package() {
   ln -s ${_pkgbasename} "${pkgdir}/usr/share/licenses/${pkgname}"
 }
 
-md5sums=('45c5ba47be70577faa05c3aaf2b6a7e1')
+md5sums=('000bd4baf7aefa828e03414d0c8c7dc5')
