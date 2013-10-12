@@ -5,13 +5,13 @@
 # Installation order: freetype2-iu, fontconfig-iu, cairo-iu
 pkgname=freetype2-infinality-ultimate
 pkgver=2.5.0.1
-pkgrel=5
+pkgrel=7
 pkgdesc="TrueType font rendering library with Infinality patches and custom settings by bohoomil (infinality-bundle)."
 arch=(i686 x86_64)
 license=('GPL' 'CC-BY-SA')
 groups=('infinality-bundle')
 url="http://freetype.sourceforge.net"
-depends=('zlib' 'bzip2' 'sh' 'xorg-xrdb')
+depends=('zlib' 'bzip2' 'sh' 'xorg-xrdb' 'libpng')
 conflicts=('freetype2' 'freetype2-infinality')
 provides=('freetype2=$pkgver' 'freetype2-infinality' 'freetype2-infinality-ultimate')
 options=('!libtool')
@@ -41,7 +41,7 @@ prepare() {
 build() {
   cd "${srcdir}/freetype-${pkgver}"
 
-  ./configure --prefix=/usr --without-png
+  ./configure --prefix=/usr
   make
 }
 
@@ -61,5 +61,5 @@ md5sums=('c72e9010b1d986d556fc0b2b5fcbf31a'
          '214119610444c9b02766ccee5e220680'
          'd821725c1c99bacd76dc97e91d7d4172'
          'bd98f04c25d3223b238cd9c713eb3b6a'
-         '278f8136e30f8cb6613e204e21b59782'
+         'e0e6b52fcf0db527b4a6fa51b6e52d7b'
          '21aef34c08c34cf53c58b4bee52efd40')
