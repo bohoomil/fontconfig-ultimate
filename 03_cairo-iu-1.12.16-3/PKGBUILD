@@ -6,7 +6,7 @@
 pkgname=cairo-infinality-ultimate
 _pkgbasename=cairo
 pkgver=1.12.16
-pkgrel=2
+pkgrel=3
 groups=('infinality-bundle')
 pkgdesc="Cairo vector graphics library with respect-fontconfig, expose and Ubuntu patches (infinality-bundle)"
 arch=('i686' 'x86_64')
@@ -25,7 +25,7 @@ options=('!libtool')
 source=(http://cairographics.org/releases/$_pkgbasename-$pkgver.tar.xz
         cairo-respect-fontconfig.patch
         cairo-1.12.8-expose_snapshot-1.patch
-        http://archive.ubuntu.com/ubuntu/pool/main/c/cairo/cairo_1.12.14-0ubuntu1.debian.tar.gz)
+        http://archive.ubuntu.com/ubuntu/pool/main/c/cairo/cairo_1.12.16-0ubuntu2.debian.tar.gz)
 
 prepare(){
   cd "$srcdir/$_pkgbasename-$pkgver"
@@ -75,4 +75,4 @@ package() {
 md5sums=('a1304edcdc99282f478b995ee5f8f854'
          '485a80383e70d8631e2355c46f3324a4'
          '92bb0af20e9438d07a04a586841ac90f'
-         '2465d76908c35aae2be04df33c41064b')
+         'd380aa46d1432112189eb228d2c6f12b')
