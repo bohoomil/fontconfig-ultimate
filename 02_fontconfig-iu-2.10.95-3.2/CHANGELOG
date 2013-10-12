@@ -2,6 +2,20 @@
 CHANGELOG
 ---------
 
+2013-10-11 by bohoomil
+----------------------
+
+* Upstream version upgrade: fontconfig 2.11.0
+* fontconfig-infinality-bundle 2.11.0-3
+** optimized support for 3 different font collections:
+   free (default), MS and custom
+** fc-presets rev. 0.2 included
+
+* freetype2-infinality-ultimate: revision update to 2.5.0.1-7
+** added libpng dependency
+
+* cairo-infinality-ultimate: revision update to 1.12.16-3
+** recompiled with updated Ubuntu patch set
 
 2013-10-07 by bohoomil
 ----------------------
@@ -17,7 +31,7 @@ CHANGELOG
 2013-08-31 by bohoomil
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* Upstream version upgrade: fontconfig 2.10.95.
+* Upstream version upgrade: fontconfig 2.10.95
 
 * Minor fixes & tweaks, a few font families added.
 

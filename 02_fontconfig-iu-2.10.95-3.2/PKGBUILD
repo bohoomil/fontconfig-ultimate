@@ -8,10 +8,10 @@ _gitname=fontconfig-ultimate
 pkgdesc="A library for configuring and customizing font access (includes generic fontconfig package and ultimate settings by bohoomil; git version)."
 url=('http://www.fontconfig.org/release/')
 license=('custom' 'CC-BY-SA')
-pkgver=2.10.95
+pkgver=2.11.0
 _freetypever=2.5.0.1
-_freetyperel=5
-pkgrel=3.2
+_freetyperel=7
+pkgrel=3
 arch=('i686' 'x86_64')
 groups=('infinality-bundle')
 depends=('expat' 'freetype2-infinality-ultimate')
@@ -40,7 +40,8 @@ prepare() {
            01-configure.patch
            02-configure.ac.patch
            03-Makefile.in.patch
-           04-Makefile.conf.d.patch)
+           04-Makefile.conf.d.patch
+           05-Makefile.am.in.patch)
 
   cd "${srcdir}/${_basename}-${pkgver}"
 
@@ -51,15 +52,21 @@ prepare() {
   for patch in "${patches[@]}"; do
     patch -Np1 -i ${patch}
   done
+
+  # make sure there's no rpath trouble and sane .so versioning -
+  # FC and Gentoo do this as well
+  aclocal
+  libtoolize -f
+  automake --add-missing -fi
 }
 
 build() {
   cd "${srcdir}/${_basename}-${pkgver}"
   # make sure there's no rpath trouble and sane .so versioning -
   # FC and Gentoo do this as well
-  aclocal
-  libtoolize -f
-  automake --add-missing -fi
+  #aclocal
+  #libtoolize -f
+  #automake --add-missing -fi
 
   ./configure --prefix=/usr \
     --sysconfdir=/etc \
@@ -111,5 +118,5 @@ package() {
   find "${pkgdir}" -type d -name .git -exec rm -r '{}' +
 }
 
-md5sums=('45c5ba47be70577faa05c3aaf2b6a7e1'
+md5sums=('000bd4baf7aefa828e03414d0c8c7dc5'
          'SKIP')
