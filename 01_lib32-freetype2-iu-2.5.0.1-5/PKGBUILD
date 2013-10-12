@@ -6,7 +6,7 @@
 _pkgbasename=freetype2
 pkgname=lib32-$_pkgbasename-infinality-ultimate
 pkgver=2.5.0.1
-pkgrel=4
+pkgrel=5
 pkgdesc="TrueType font rendering library with Infinality patches and custom settings by bohoomil (32-bit, infinality-bundle)."
 arch=(x86_64)
 license=('GPL' 'CC-BY-SA')
@@ -43,13 +43,12 @@ build() {
 
   ./configure \
     --prefix=/usr \
-    --without-png \
     --libdir=/usr/lib32
   make
 }
 
 package() {
-  depends=('lib32-zlib' 'lib32-bzip2' $_pkgbasename-infinality-ultimate)
+  depends=('lib32-zlib' 'lib32-bzip2' 'lib32-libpng' $_pkgbasename-infinality-ultimate)
 
   cd "${srcdir}/freetype-${pkgver}"
   make DESTDIR="${pkgdir}" install
