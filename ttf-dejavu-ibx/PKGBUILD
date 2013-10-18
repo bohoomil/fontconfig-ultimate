@@ -4,7 +4,7 @@
 # Contributor: Michal Krenek <mikos@sg1.cz>
 # Contributor: bohoomil <@zoho.com>
 
-pkgname=ttf-dejavu-ib
+pkgname=ttf-dejavu-ibx
 pkgver=2.34
 pkgrel=2
 pkgdesc="Font family based on the Bitstream Vera Fonts with a wider range of characters. Re-packed for infinality-bundle-fonts."
@@ -13,18 +13,26 @@ url="http://dejavu-fonts.org/wiki/Main_Page"
 license=('custom')
 depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-mkfontscale' 'xorg-mkfontdir')
 provides=('ttf-font' 'ttf-dejavu')
-conflicts=('ttf-dejavu')
+conflicts=('ttf-dejavu' 't1-dejavu-ib')
 replaces=('ttf-dejavu')
 groups=('infinality-bundle-fonts')
 install=${pkgname}.install
-source=(http://downloads.sourceforge.net/project/dejavu/dejavu/${pkgver}/dejavu-fonts-ttf-${pkgver}.tar.bz2)
-md5sums=('161462de16e2ca79873bc2b0d2e6c74c')
+source=(http://downloads.sourceforge.net/project/dejavu/dejavu/${pkgver}/dejavu-fonts-ttf-${pkgver}.tar.bz2
+        90-dejavu-ttf.conf)
+md5sums=('161462de16e2ca79873bc2b0d2e6c74c'
+         '1cf1231685f5fb61dacad979268c7a53')
 
 package() {
-  install -dm755 "${pkgdir}"/usr/share/fonts/TTF
-
   cd "${srcdir}"/dejavu-fonts-ttf-${pkgver}
+  install -dm755 "${pkgdir}"/usr/share/fonts/TTF
   install -m644 ttf/*.ttf "${pkgdir}"/usr/share/fonts/TTF/
 
   install -Dm644 LICENSE "${pkgdir}"/usr/share/licenses/${pkgname}/LICENSE
+
+  install -dm755 "${pkgdir}"/etc/fonts/conf.avail
+  install -dm755 "${pkgdir}"/etc/fonts/conf.d
+  install -m644 "${srcdir}"/90-dejavu-ttf.conf "${pkgdir}"/etc/fonts/conf.avail/90-dejavu-ttf.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/90-dejavu-ttf.conf .
 }
