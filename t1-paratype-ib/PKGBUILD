@@ -1,8 +1,8 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=t1-paratype-ib
-pkgver=1.000
-pkgrel=1
+pkgver=2013.05.21
+pkgrel=2
 depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
 pkgdesc="Paratype font family. Type1 version from TeXLive."
 groups=('infinality-bundle-fonts')
@@ -11,76 +11,20 @@ arch=('any')
 license=('Custom')
 conflicts=('ttf-paratype' 'ttf-ptsans' 'ttf-pt-mono' 'ttf-pt-sans' 'ttf-pt-serif')
 install=$pkgname.install
-source=(http://www.ctan.org/tex-archive/fonts/paratype/type1/PTC55F.pfb
-        http://www.ctan.org/tex-archive/fonts/paratype/type1/PTC55F.pfm
-        http://www.ctan.org/tex-archive/fonts/paratype/type1/PTC75F.pfb
-        http://www.ctan.org/tex-archive/fonts/paratype/type1/PTC75F.pfm
-        http://www.ctan.org/tex-archive/fonts/paratype/type1/PTF55F.pfb
-        http://www.ctan.org/tex-archive/fonts/paratype/type1/PTF55F.pfm
-        http://www.ctan.org/tex-archive/fonts/paratype/type1/PTF56F.pfb
-        http://www.ctan.org/tex-archive/fonts/paratype/type1/PTF56F.pfm
-        http://www.ctan.org/tex-archive/fonts/paratype/type1/PTF75F.pfb
-        http://www.ctan.org/tex-archive/fonts/paratype/type1/PTF75F.pfm
-        http://www.ctan.org/tex-archive/fonts/paratype/type1/PTF76F.pfb
-        http://www.ctan.org/tex-archive/fonts/paratype/type1/PTF76F.pfm
-        http://www.ctan.org/tex-archive/fonts/paratype/type1/PTM55F.pfb
-        http://www.ctan.org/tex-archive/fonts/paratype/type1/PTM55F.pfm
-        http://www.ctan.org/tex-archive/fonts/paratype/type1/PTM75F.pfb
-        http://www.ctan.org/tex-archive/fonts/paratype/type1/PTM75F.pfm
-        http://www.ctan.org/tex-archive/fonts/paratype/type1/PTN57F.pfb
-        http://www.ctan.org/tex-archive/fonts/paratype/type1/PTN57F.pfm
-        http://www.ctan.org/tex-archive/fonts/paratype/type1/PTN77F.pfb
-        http://www.ctan.org/tex-archive/fonts/paratype/type1/PTN77F.pfm
-        http://www.ctan.org/tex-archive/fonts/paratype/type1/PTS55F.pfb
-        http://www.ctan.org/tex-archive/fonts/paratype/type1/PTS55F.pfm
-        http://www.ctan.org/tex-archive/fonts/paratype/type1/PTS56F.pfb
-        http://www.ctan.org/tex-archive/fonts/paratype/type1/PTS56F.pfm
-        http://www.ctan.org/tex-archive/fonts/paratype/type1/PTS75F.pfb
-        http://www.ctan.org/tex-archive/fonts/paratype/type1/PTS75F.pfm
-        http://www.ctan.org/tex-archive/fonts/paratype/type1/PTS76F.pfb
-        http://www.ctan.org/tex-archive/fonts/paratype/type1/PTS76F.pfm
-        http://www.ctan.org/tex-archive/fonts/paratype/type1/PTZ55F.pfb
-        http://www.ctan.org/tex-archive/fonts/paratype/type1/PTZ55F.pfm
-        http://www.ctan.org/tex-archive/fonts/paratype/type1/PTZ56F.pfb
-        http://www.ctan.org/tex-archive/fonts/paratype/type1/PTZ56F.pfm)
+source=("http://mirrors.ctan.org/fonts/paratype.zip")
 
 package(){
-	cd ${pkgdir}
+  cd ${srcdir}/paratype
+
+	install -m755 -d ${pkgdir}/usr/share/doc/${pkgname}
+	install -m644 ./doc/CHANGELOG ${pkgdir}/usr/share/doc/${pkgname}
+
+  install -m755 -d ${pkgdir}/usr/share/licenses/${pkgname}
+	install -m644 ./doc/PT_Free_Font_License_eng_1.3.txt ${pkgdir}/usr/share/licenses/${pkgname}
 
 	install -m755 -d ${pkgdir}/usr/share/fonts/Type1
-	install -m644 ${srcdir}/*.pfb ${pkgdir}/usr/share/fonts/Type1
-	install -m644 ${srcdir}/*.pfm ${pkgdir}/usr/share/fonts/Type1
+	install -m644 ./type1/*.{pfb,pfm} ${pkgdir}/usr/share/fonts/Type1
+	install -m644 ./afm/*.{afm,inf} ${pkgdir}/usr/share/fonts/Type1
 }
 
-md5sums=('6c1cce6443c8b3ae651b687d17088349'
-         '1f7bc9932fbe0c6ca4f65f08f4a83446'
-         'c2d063cc91acadbcbbecdd76a90662a4'
-         '2d1403c48c19a6020bab46bf5558a7d9'
-         '060e11ea6db1428d100c09e444c51453'
-         '3dd297e6285e139acaa256a56e0835fd'
-         '25bf78cfc9dfd91c474695eb60e7a327'
-         '01558f579b97dcbee6e1b2f705abc20e'
-         'f55dfe0f03576a0d796ae888d9fcc0f8'
-         'a2d93b7b5da37c41d43cc6706fe6fc1c'
-         '7ab441f3bb5d80328ed7a704e22ba457'
-         '2a7ebc02da4e2559322852ed77e3f46f'
-         'df18bb35f709a7a718781e6838e0c57f'
-         'ebe5089e654f6ec1b135cafb5bb5d4f0'
-         'ea57c4eb9aaae4708e5e437bfbc90989'
-         'e55e5dfbefedf8b5339bd7b228ca0b4c'
-         'f89a81b9e22392451057e459c311dfce'
-         '622fad22c7504c2577fe33fd3bf68f55'
-         'cabfb732f1bf244606aff1ce6e402bbe'
-         'caa2892fbc57e27c1ce545ea5e48aba4'
-         '3584029904ed46f5e02af20c9bf0e189'
-         'c04414f9149b9b3bc3b72edca17bdc91'
-         'bcd2cda474b01e79966df7e93c793ef1'
-         '1c1798a7da7b9788db590088aeb94b26'
-         '99bc51fb5f08a964f0ed0deccb088d4a'
-         '6e7aeaf320ed0a8afe810e4c5db958d8'
-         'fdb1d5effb40d82af0dcac78f2e604a7'
-         '24395c2fb8ccb790a08c40048718f046'
-         '5a9ab68426c142eef5864ab2d589cba5'
-         '71e6be2d4a1bc61d16f162a275246dd4'
-         '51d4bd0a04de490b98d9b421f9d3875e'
-         '7e0091b269eb82740f761e72e2a8085f')
+md5sums=('0da39d8efba5bb68bffdad8439df6f7c')

@@ -1,8 +1,8 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=t1-inconsolata-zi4-ibx
-pkgver=1.0.14
-pkgrel=2
+pkgver=1.03
+pkgrel=3
 depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
 pkgdesc="Monospace font for pretty code listings and for the terminal. Type1 version from TeXLive."
 url="http://www.ctan.org/tex-archive/fonts/inconsolata/"
@@ -12,14 +12,21 @@ groups=('infinality-bundle-fonts-extra')
 replaces=('t1-inconsolata-zi4')
 conflicts=('t1-inconsolata-zi4' 'ttf-inconsolata' 'ttf-inconsolata-g' 'ttf-inconsolata-dz')
 install=$pkgname.install
-source=("http://mirrors.ctan.org/fonts/inconsolata/type1/Inconsolata-zi4r.pfb"
-        "http://mirrors.ctan.org/fonts/inconsolata/type1/Inconsolata-zi4b.pfb")
+source=("http://mirrors.ctan.org/fonts/inconsolata.zip")
 
-package(){
-	cd ${pkgdir}
-	install -m755 -d ${pkgdir}/usr/share/fonts/Type1
-	install -m644 ${srcdir}/*.pfb ${pkgdir}/usr/share/fonts/Type1
+prepare(){
+  cd ${srcdir}/inconsolata/type1
+  type1afm *.pfb
 }
 
-md5sums=('6ee5981f616ec911551cb93525eb57b0'
-         'a07e59b29b148b6b9e8de833a57da00a')
+package(){
+  cd ${srcdir}/inconsolata
+
+	install -m755 -d ${pkgdir}/usr/share/licenses/${pkgname}
+	install -m644 ./doc/OFL.txt ${pkgdir}/usr/share/licenses/${pkgname}
+
+	install -m755 -d ${pkgdir}/usr/share/fonts/Type1
+	install -m644 ./type1/*.{pfb,afm} ${pkgdir}/usr/share/fonts/Type1
+}
+
+md5sums=('b0c2e9400b829f7100259a653b0ba815')

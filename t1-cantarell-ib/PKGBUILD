@@ -1,7 +1,7 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=t1-cantarell-ib
-pkgver=0.0.9
+pkgver=2.4
 pkgrel=1
 depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
 pkgdesc="Cantarell font family. Type1 version from TeXLive."
@@ -13,15 +13,22 @@ conflicts=('cantarell-fonts' 'cantarell-fonts-git' 'ttf-cantarell')
 provides=('cantarell-fonts')
 replaces=('cantarell-fonts')
 install=$pkgname.install
-source=(http://mirrors.ctan.org/fonts/cantarell/fonts/type1/public/cantarell/Cantarell-Bold.pfb
-        http://mirrors.ctan.org/fonts/cantarell/fonts/type1/public/cantarell/Cantarell-Regular.pfb)
+source=("http://mirrors.ctan.org/fonts/cantarell.zip")
 
-package(){
-	cd ${pkgdir}
-  
-	install -m755 -d ${pkgdir}/usr/share/fonts/Type1
-	install -m644 ${srcdir}/*.pfb ${pkgdir}/usr/share/fonts/Type1
+prepare(){
+  cd ${srcdir}/cantarell/fonts/type1/public/cantarell
+  type1afm *.pfb
 }
 
-md5sums=('25a488aadbfd458870aa0449983c1a73'
-         '57138860af4f52acd06c38bbeedf0199')
+package(){
+  cd ${srcdir}/cantarell
+
+	install -m755 -d ${pkgdir}/usr/share/doc/${pkgname}
+	install -m644 ./doc/fonts/cantarell/README ${pkgdir}/usr/share/doc/${pkgname}
+	install -m644 ./doc/fonts/cantarell/CHANGES ${pkgdir}/usr/share/doc/${pkgname}
+
+	install -m755 -d ${pkgdir}/usr/share/fonts/Type1
+	install -m644 ./fonts/type1/public/cantarell/*.{pfb,afm} ${pkgdir}/usr/share/fonts/Type1
+}
+
+md5sums=('aabaa0ef7f4c5e66e4b413f9ad489027')

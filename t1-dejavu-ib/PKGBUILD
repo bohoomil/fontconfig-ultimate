@@ -1,0 +1,40 @@
+# $Id: PKGBUILD 193626 2013-08-26 08:21:28Z jgc $
+# Maintainer:
+# Contributor: Jan de Groot <jgc@archlinux.org>
+# Contributor: Michal Krenek <mikos@sg1.cz>
+# Contributor: bohoomil <@zoho.com>
+
+pkgname=t1-dejavu-ib
+pkgver=2.34
+pkgrel=2
+pkgdesc="Font family based on the Bitstream Vera Fonts with a wider range of characters. Re-packed for infinality-bundle-fonts. Type 1 version."
+arch=('any')
+url="http://dejavu-fonts.org/wiki/Main_Page"
+license=('custom')
+depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-mkfontscale' 'xorg-mkfontdir')
+provides=('ttf-font' 'ttf-dejavu')
+conflicts=('ttf-dejavu' 'ttf-dejavu-ibx')
+replaces=('ttf-dejavu')
+groups=('infinality-bundle-fonts-extra')
+install=${pkgname}.install
+source=(http://mirrors.ctan.org/fonts/dejavu.zip
+        90-dejavu-t1.conf)
+md5sums=('c5a9d02952dce3792e34d29134f1d991'
+         '0c498a66a13928e01d36362e0206d61b')
+
+package() {
+  install -dm755 "${pkgdir}"/usr/share/fonts/T1
+
+  cd "${srcdir}"/dejavu
+  install -m644 afm/*.afm "${pkgdir}"/usr/share/fonts/T1/
+  install -m644 type1/*.{pfb,pfm} "${pkgdir}"/usr/share/fonts/T1/
+
+  install -Dm644 doc/font-doc/LICENSE "${pkgdir}"/usr/share/licenses/${pkgname}/LICENSE
+
+  install -dm755 "${pkgdir}"/etc/fonts/conf.avail
+  install -dm755 "${pkgdir}"/etc/fonts/conf.d
+  install -m644 "${srcdir}"/90-dejavu-t1.conf "${pkgdir}"/etc/fonts/conf.avail/90-dejavu-t1.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/90-dejavu-t1.conf .
+}

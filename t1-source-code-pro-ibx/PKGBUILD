@@ -1,0 +1,32 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=t1-source-code-pro-ibx
+pkgver=2.1
+pkgrel=1
+depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
+pkgdesc="A set of mono-spaced OpenType fonts designed for coding environments. Type1 version from TeXLive."
+url="http://www.ctan.org/tex-archive/fonts/opensans"
+arch=('any')
+license=('OFL-1.1')
+groups=('infinality-bundle-fonts-extra')
+replaces=('adobe-source-code-pro-fonts')
+conflicts=('adobe-source-code-pro-fonts' 'ttf-source-code-pro' 'source-code-pro-fonts' 'otf-source-code-pro')
+install=$pkgname.install
+source=("http://mirrors.ctan.org/fonts/sourcecodepro.zip")
+
+prepare(){
+  cd ${srcdir}/sourcecodepro/fonts
+  type1afm *.pfb
+}
+
+package(){
+  cd ${srcdir}/sourcecodepro
+
+	install -m755 -d ${pkgdir}/usr/share/licenses/${pkgname}
+	install -m644 ./doc/LICENSE.txt ${pkgdir}/usr/share/licenses/${pkgname}
+
+	install -m755 -d ${pkgdir}/usr/share/fonts/Type1
+	install -m644 ./fonts/*.{pfb,afm} ${pkgdir}/usr/share/fonts/Type1
+}
+
+md5sums=('1e061742fc08d5ffa336ee80db2d3f02')
