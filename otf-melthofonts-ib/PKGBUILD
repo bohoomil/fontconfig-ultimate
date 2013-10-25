@@ -2,8 +2,8 @@
 
 pkgname=otf-melthofonts-ib
 pkgver=1.21
-pkgrel=1
-depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
+pkgrel=2
+depends=('fontconfig')
 pkgdesc="Font for Syriac script."
 url="http://www.bethmardutho.org/index.php/resources/fonts.html"
 arch=('any')
@@ -15,13 +15,13 @@ source=(http://www.bethmardutho.org/images/fonts/melthofonts-1.21.zip)
 
 
 package(){
-	cd ${pkgdir}
+  cd "${srcdir}"/melthofonts-"${pkgver}"
 
-  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
-  install -m644 ${srcdir}/melthofonts-1.21/license.txt "${pkgdir}/usr/share/licenses/${pkgname}"
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 license.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
 
-	install -m755 -d ${pkgdir}/usr/share/fonts/OTF
-	install -m644 ${srcdir}/melthofonts-1.21/*.otf ${pkgdir}/usr/share/fonts/OTF
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
 
 md5sums=('f6f8cb92c4ee2e95bf6018fc78086269')

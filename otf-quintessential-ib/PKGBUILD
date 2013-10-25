@@ -2,8 +2,8 @@
 
 pkgname=otf-quintessential-ib
 pkgver=1.000
-pkgrel=1
-depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
+pkgrel=2
+depends=('fontconfig')
 pkgdesc="The Quintessential typeface is a calligraphic lettering style based on the Italic Hand."
 url="http://www.impallari.com"
 arch=('any')
@@ -14,13 +14,13 @@ source=(http://googlefontdirectory.googlecode.com/hg/ofl/quintessential/src/Quin
         http://googlefontdirectory.googlecode.com/hg/ofl/quintessential/OFL.txt)
 
 package(){
-	cd ${pkgdir}
+  cd "${srcdir}"
 
-  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
-  install -m644 ${srcdir}/OFL.txt "${pkgdir}/usr/share/licenses/${pkgname}"
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
 
-	install -m755 -d ${pkgdir}/usr/share/fonts/OTF
-  install -Dm644 ${srcdir}/*.otf ${pkgdir}/usr/share/fonts/OTF
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -Dm644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
 
 md5sums=('a8324545c8c11da13d440855400cd0e6'

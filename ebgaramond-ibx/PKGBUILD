@@ -1,0 +1,47 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=ebgaramond-ibx
+pkgname=('t1-ebgaramond-ibx' 'otf-ebgaramond-ibx')
+pkgver=0.15
+pkgrel=1
+depends=('fontconfig')
+pkgdesc="EB Garamond is a revival by Ge­org Duffner of the 16th century fonts designed by Claude Garamond."
+url="http://www.georgduffner.at/ebgaramond/"
+arch=('any')
+groups=('infinality-bundle-fonts-extra')
+license=('OFL-1.1')
+conflicts=('ttf-ebgaramond' 'otf-ebgaramond' 'otf-eb-garamond')
+source=("http://mirrors.ctan.org/fonts/ebgaramond.zip")
+
+prepare(){
+  cd ${srcdir}/ebgaramond/type1
+  type1afm *.pfb
+}
+
+package_t1-ebgaramond-ibx(){
+  pkgdesc="EB Garamond is a revival by Ge­org Duffner of the 16th century fonts designed by Claude Garamond. Type 1 version."
+  conflicts=('ttf-ebgaramond' 'otf-ebgaramond' 'otf-eb-garamond' 'otf-ebgaramond-ibx')
+  install=$pkgname.install
+  cd "${srcdir}"/ebgaramond
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 doc/COPYING "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 type1/*.{pfb,afm} "${pkgdir}"/usr/share/fonts/"${pkgname}"
+}
+
+package_otf-ebgaramond-ibx(){
+  pkgdesc="EB Garamond is a revival by Ge­org Duffner of the 16th century fonts designed by Claude Garamond. OpenType version."
+  conflicts=('ttf-ebgaramond' 'otf-ebgaramond' 'otf-eb-garamond' 't1-ebgaramond-ibx')
+  install=$pkgname.install
+  cd "${srcdir}"/ebgaramond
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 doc/COPYING "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 opentype/*.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+}
+
+md5sums=('f1f4abb3a71aa6177b08c9cac007e5c9')

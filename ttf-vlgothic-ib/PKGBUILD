@@ -2,8 +2,8 @@
 
 pkgname=ttf-vlgothic-ib
 pkgver=2.108
-pkgrel=1
-depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
+pkgrel=2
+depends=('fontconfig')
 pkgdesc="Japanese VL Gothic font family."
 url="http://vlgothic.dicey.org/"
 arch=('any')
@@ -14,20 +14,21 @@ install=$pkgname.install
 source=(http://dl.sourceforge.jp/vlgothic/58961/VLGothic-20130607.tar.xz)
 
 package(){
-	cd ${pkgdir}
-  install -D -m644 ${srcdir}/VLGothic/LICENSE ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE
-  install -D -m644 ${srcdir}/VLGothic/LICENSE.en ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE.en
-  install -D -m644 ${srcdir}/VLGothic/LICENSE_E.mplus ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE_E.mplus
-  install -D -m644 ${srcdir}/VLGothic/LICENSE_J.mplus ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE_J.mplus
+  cd "${srcdir}"/VLGothic
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 LICENSE "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 LICENSE.en "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 LICENSE_E.mplus "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 LICENSE_J.mplus "${pkgdir}"/usr/share/licenses/"${pkgname}"
 
-	install -m755 -d "${pkgdir}/usr/share/doc/${pkgname}"
-  install -m644 ${srcdir}/VLGothic/Changelog "${pkgdir}/usr/share/doc/${pkgname}"
-  install -m644 ${srcdir}/VLGothic/README "${pkgdir}/usr/share/doc/${pkgname}"
-  install -m644 ${srcdir}/VLGothic/README.sazanami "${pkgdir}/usr/share/doc/${pkgname}"
-  install -m644 ${srcdir}/VLGothic/README_E.mplus "${pkgdir}/usr/share/doc/${pkgname}"
-  install -m644 ${srcdir}/VLGothic/README_J.mplus "${pkgdir}/usr/share/doc/${pkgname}"
+  install -m755 -d "${pkgdir}"/usr/share/doc/"${pkgname}"
+  install -m644 Changelog "${pkgdir}"/usr/share/doc/"${pkgname}"
+  install -m644 README "${pkgdir}"/usr/share/doc/"${pkgname}"
+  install -m644 README.sazanami "${pkgdir}"/usr/share/doc/"${pkgname}"
+  install -m644 README_E.mplus "${pkgdir}"/usr/share/doc/"${pkgname}"
+  install -m644 README_J.mplus "${pkgdir}"/usr/share/doc/"${pkgname}"
 
-	install -m755 -d ${pkgdir}/usr/share/fonts/TTF
-	install -m644 ${srcdir}/VLGothic/*.ttf ${pkgdir}/usr/share/fonts/TTF/
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
 md5sums=('c3e016b4b489d49bf9812e566c28fb06')

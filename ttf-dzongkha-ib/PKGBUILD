@@ -2,8 +2,8 @@
 
 pkgname=ttf-dzongkha-ib
 pkgver=1.0
-pkgrel=1
-depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
+pkgrel=2
+depends=('fontconfig')
 makedep=('unzip')
 pkgdesc="Dzongkha fonts."
 url="http://www.dit.gov.bt/"
@@ -14,17 +14,17 @@ install=$pkgname.install
 source=("http://www.dit.gov.bt/sites/default/files/dzongkhafonts.zip")
 
 prepare(){
-  cd ${srcdir}
+  cd "${srcdir}"
   unzip joyig.zip
   unzip tashi.zip
   unzip uchen.zip
 }
 
 package(){
-	cd ${pkgdir}
+  cd "${srcdir}"
 
-	install -m755 -d ${pkgdir}/usr/share/fonts/TTF
-	install -m644 ${srcdir}/*.ttf ${pkgdir}/usr/share/fonts/TTF
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
 
 md5sums=('e7dc0894a139844c9c19ed6934b1b242')

@@ -2,8 +2,8 @@
 
 pkgname=ttf-aller-ib
 pkgver=1.0
-pkgrel=1
-depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
+pkgrel=2
+depends=('fontconfig')
 pkgdesc="Free sans-serif font family by Dalton Maag Ltd."
 url="http://www.daltonmaag.com/about/aller.html"
 arch=('any')
@@ -14,14 +14,15 @@ install=$pkgname.install
 source=(http://www.daltonmaag.com/Aller_Std_Family.zip)
 
 package(){
-	cd ${pkgdir}
+  cd "${srcdir}"
 
-  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
-  install -m644 ${srcdir}/"AllerFreeLicenceAgreement.pdf" "${pkgdir}/usr/share/licenses/${pkgname}"
-  install -m644 ${srcdir}/"EULA.pdf" "${pkgdir}/usr/share/licenses/${pkgname}"
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 "AllerFreeLicenceAgreement.pdf" \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 "EULA.pdf" "${pkgdir}"/usr/share/licenses/"${pkgname}"
 
-	install -m755 -d ${pkgdir}/usr/share/fonts/TTF
-	install -m644 ${srcdir}/*.ttf ${pkgdir}/usr/share/fonts/TTF
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
 
 md5sums=('37e5a496c9c0d8945389740f8cb5a7fe')

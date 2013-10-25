@@ -2,8 +2,8 @@
 
 pkgname=ttf-noto-serif-multilang-ib
 pkgver=1.04
-pkgrel=1
-depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils' 'ttf-noto-serif-ib')
+pkgrel=2
+depends=('fontconfig' 'ttf-noto-serif-ib')
 pkgdesc="Noto Serif family: extended Non-Latin set."
 url="http://code.google.com/p/googlefontdirectory/"
 arch=('any')
@@ -13,28 +13,25 @@ license=('Apache')
 install=$pkgname.install
 source=(65-ttf-noto-serif.conf
         https://googlefontdirectory.googlecode.com/hg/apache/notoserifarmenian/LICENSE.txt
-        https://googlefontdirectory.googlecode.com/hg/apache/notoserifarmenian/NotoSerifArmenian-Bold.ttf
-        https://googlefontdirectory.googlecode.com/hg/apache/notoserifarmenian/NotoSerifArmenian-Regular.ttf
-        https://googlefontdirectory.googlecode.com/hg/apache/notoserifgeorgian/NotoSerifGeorgian-Bold.ttf
-        https://googlefontdirectory.googlecode.com/hg/apache/notoserifgeorgian/NotoSerifGeorgian-Regular.ttf
-        https://googlefontdirectory.googlecode.com/hg/apache/notoseriflao/NotoSerifLao-Bold.ttf
-        https://googlefontdirectory.googlecode.com/hg/apache/notoseriflao/NotoSerifLao-Regular.ttf
-        https://googlefontdirectory.googlecode.com/hg/apache/notoserifthai/NotoSerifThai-Bold.ttf
-        https://googlefontdirectory.googlecode.com/hg/apache/notoserifthai/NotoSerifThai-Regular.ttf
-)
+        https://googlefontdirectory.googlecode.com/hg/apache/notoserifarmenian/NotoSerifArmenian-{Bold,Regular}.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notoserifgeorgian/NotoSerifGeorgian-{Bold,Regular}.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notoseriflao/NotoSerifLao-{Bold,Regular}.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notoserifthai/NotoSerifThai-{Bold,Regular}.ttf)
 
 package(){
+  cd ${srcdir}
 
-	cd ${pkgdir}
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 LICENSE.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
 
-  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
-  install -m644 ${srcdir}/LICENSE.txt "${pkgdir}/usr/share/licenses/${pkgname}"
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-	install -m755 -d "${pkgdir}/usr/share/fonts/TTF"
-  install -m644 ${srcdir}/*.ttf "${pkgdir}/usr/share/fonts/TTF"
-
-  install -m755 -d "${pkgdir}/etc/fonts/conf.avail"
-  install -m644 ${srcdir}/65-ttf-noto-serif.conf "${pkgdir}/etc/fonts/conf.avail"
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m644 65-ttf-noto-serif.conf "${pkgdir}"/etc/fonts/conf.avail/65-ttf-noto-serif.conf
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/65-ttf-noto-serif.conf .
 }
 
 md5sums=('0fa734257a35219d6ee7be5aebbb18f9'

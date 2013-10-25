@@ -1,9 +1,9 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=ttf-sawarabi-ib
-pkgver=000.0045
-pkgrel=1
-depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
+pkgver=0.0045
+pkgrel=2
+depends=('fontconfig')
 pkgdesc="Sawarabi font family for Japanese script."
 url="http://sawarabi-fonts.sourceforge.jp/en/"
 arch=('any')
@@ -15,11 +15,13 @@ source=(http://dl.sourceforge.jp/sawarabi-fonts/59501/sawarabi-gothic-20130915.t
         http://dl.sourceforge.jp/sawarabi-fonts/59500/sawarabi-mincho-20130915.tar.gz)
 
 package(){
-	cd ${pkgdir}
+  cd "${srcdir}"
 
-	install -m755 -d ${pkgdir}/usr/share/fonts/TTF
-	install -m644 ${srcdir}/sawarabi-gothic/sawarabi-gothic-medium.ttf ${pkgdir}/usr/share/fonts/TTF
-	install -m644 ${srcdir}/sawarabi-mincho/sawarabi-mincho-medium.ttf ${pkgdir}/usr/share/fonts/TTF
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 sawarabi-gothic/sawarabi-gothic-medium.ttf \
+    "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 sawarabi-mincho/sawarabi-mincho-medium.ttf \
+    "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
 
 md5sums=('7eb68cc930fd29c48ce3e6358a8af941'

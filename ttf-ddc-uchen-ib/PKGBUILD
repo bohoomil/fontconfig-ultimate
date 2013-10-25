@@ -2,8 +2,8 @@
 
 pkgname=ttf-ddc-uchen-ib
 pkgver=1.000
-pkgrel=1
-depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
+pkgrel=2
+depends=('fontconfig')
 pkgdesc="DDC Uchen is a font designed by Chris Fynn for the Dzongkha Development Commission."
 url="https://sites.google.com/site/chrisfynn2/home/fonts/ddc-uchen"
 arch=('any')
@@ -12,12 +12,11 @@ license=('OFL-1.1')
 install=$pkgname.install
 source=(http://www.dzongkha.gov.bt/IT/download/fonts/DDC_Uchen.ttf)
 
-
 package(){
-	cd ${pkgdir}
+  cd "${srcdir}"
 
-	install -m755 -d ${pkgdir}/usr/share/fonts/TTF
-	install -m644 ${srcdir}/*.ttf ${pkgdir}/usr/share/fonts/TTF
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
 
 md5sums=('3c6b29f025ed9e9f8904181fb96c3722')

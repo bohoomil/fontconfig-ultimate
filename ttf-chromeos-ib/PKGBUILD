@@ -2,8 +2,8 @@
 
 pkgname=ttf-chromeos-ib
 pkgver=1.23
-pkgrel=3
-depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
+pkgrel=4
+depends=('fontconfig')
 pkgdesc="Google ChromeOS fonts."
 url="http://www.fontsquirrel.com/fonts/list/foundry/dalton-maag-ltd"
 arch=('any')
@@ -11,28 +11,19 @@ groups=('infinality-bundle-fonts')
 conflicts=('otf-google-fonts-hg' 'ttf-google-fonts-git' 'ttf-google-fonts-hg' 'ttf-chromeos-fonts' 'ttf-chromeos-extra-fonts')
 license=('Apache')
 install=$pkgname.install
-source=(http://googlefontdirectory.googlecode.com/hg/apache/arimo/Arimo-Bold.ttf
-        http://googlefontdirectory.googlecode.com/hg/apache/arimo/Arimo-BoldItalic.ttf
-        http://googlefontdirectory.googlecode.com/hg/apache/arimo/Arimo-Italic.ttf
-        http://googlefontdirectory.googlecode.com/hg/apache/arimo/Arimo-Regular.ttf
-        http://googlefontdirectory.googlecode.com/hg/apache/cousine/Cousine-Bold.ttf
-        http://googlefontdirectory.googlecode.com/hg/apache/cousine/Cousine-BoldItalic.ttf
-        http://googlefontdirectory.googlecode.com/hg/apache/cousine/Cousine-Italic.ttf
-        http://googlefontdirectory.googlecode.com/hg/apache/cousine/Cousine-Regular.ttf
-        http://googlefontdirectory.googlecode.com/hg/apache/tinos/Tinos-Bold.ttf
-        http://googlefontdirectory.googlecode.com/hg/apache/tinos/Tinos-BoldItalic.ttf
-        http://googlefontdirectory.googlecode.com/hg/apache/tinos/Tinos-Italic.ttf
-        http://googlefontdirectory.googlecode.com/hg/apache/tinos/Tinos-Regular.ttf
+source=(http://googlefontdirectory.googlecode.com/hg/apache/arimo/Arimo-{Bold,BoldItalic,Italic,Regular}.ttf
+        http://googlefontdirectory.googlecode.com/hg/apache/cousine/Cousine-{Bold,BoldItalic,Italic,Regular}.ttf
+        http://googlefontdirectory.googlecode.com/hg/apache/tinos/Tinos-{Bold,BoldItalic,Italic,Regular}.ttf
         http://googlefontdirectory.googlecode.com/hg/apache/tinos/LICENSE.txt)
 
 package(){
-	cd ${pkgdir}
+  cd "${srcdir}"
 
-  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
-  install -m644 ${srcdir}/LICENSE.txt "${pkgdir}/usr/share/licenses/${pkgname}"
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 LICENSE.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
   
-  install -m755 -d ${pkgdir}/usr/share/fonts/TTF
-  install -m644 ${srcdir}/*.ttf ${pkgdir}/usr/share/fonts/TTF
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
 
 md5sums=('31cf3c974f725ce750854143dfcca310'

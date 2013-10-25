@@ -4,9 +4,10 @@
 pkgbase=ttf-dejavu-yuanti-ibx
 pkgname=('ttf-dejavusans-yuanti-basic-ibx' 'ttf-dejavusans-yuanti-condensed-ibx' 'ttf-dejavusans-yuanti-mono-ibx')
 pkgver=20110101
-pkgrel=1
+pkgrel=2
 pkgdesc="Chinese Yuan Ti family based on DejaVu Sans fonts."
 arch=(any)
+depends=('fontconfig')
 url="http://forum.ubuntu.org.cn/viewtopic.php?t=110509"
 makedepends=('p7zip')
 conflicts=('ttf-dejavusans-yuanti')
@@ -16,40 +17,40 @@ noextract=('dejavusansyuanti.7z')
 source=("http://qinsdisk.googlecode.com/files/dejavusansyuanti.7z")
 
 prepare() {
-  7z e ${srcdir}/dejavusansyuanti.7z
+  7z e "${srcdir}"/dejavusansyuanti.7z
 }
 
 package_ttf-dejavusans-yuanti-basic-ibx() {
   pkgdesc="Chinese Yuan Ti family based on DejaVu Sans fonts (basic sans-serif variant)."
-  depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-mkfontscale' 'xorg-mkfontdir')
   conflicts=('ttf-dejavusans-yuanti')
   install=${pkgname}.install
   
-  cd ${pkgdir}
-  install -d -m755 ${pkgdir}/usr/share/fonts/TTF
-  install -m644 ${srcdir}/DejaVuSansYuanTi-*.ttf ${pkgdir}/usr/share/fonts/TTF/
+  cd "${srcdir}"
+  install -d -m755 "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 DejaVuSansYuanTi-*.ttf \
+    "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
 
 package_ttf-dejavusans-yuanti-condensed-ibx() {
   pkgdesc="Chinese Yuan Ti family based on DejaVu Sans fonts (condensed variant)."
-  depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-mkfontscale' 'xorg-mkfontdir')
   conflicts=('ttf-dejavusans-yuanti')
   install=${pkgname}.install
 
-  cd ${pkgdir}
-  install -d -m755 ${pkgdir}/usr/share/fonts/TTF
-  install -m644 ${srcdir}/DejaVuSansYuanTiCondensed-*.ttf ${pkgdir}/usr/share/fonts/TTF/
+  cd "${srcdir}"
+  install -d -m755 "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 DejaVuSansYuanTiCondensed-*.ttf \
+    "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
 
 package_ttf-dejavusans-yuanti-mono-ibx() {
   pkgdesc="Chinese Yuan Ti family based on DejaVu Sans fonts (monospaced variant)."
-  depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-mkfontscale' 'xorg-mkfontdir')
   conflicts=('ttf-dejavusans-yuanti')
   install=${pkgname}.install
 
-  cd ${pkgdir}
-  install -d -m755 ${pkgdir}/usr/share/fonts/TTF
-  install -m644 ${srcdir}/DejaVuSansYuanTiMono-*.ttf ${pkgdir}/usr/share/fonts/TTF/
+  cd "${srcdir}"
+  install -d -m755 "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 DejaVuSansYuanTiMono-*.ttf \
+    "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
 
 md5sums=('c96df2210e55fecccd8a1c1407766f0e')

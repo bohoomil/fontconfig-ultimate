@@ -2,8 +2,8 @@
 
 pkgname=ttf-liberastika-ib
 pkgver=1.1.3
-pkgrel=1
-depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
+pkgrel=2
+depends=('fontconfig')
 pkgdesc="Liberastika is a Liberation Sans derivative typeface with re-designed and enhanced Cyrillic section."
 url="http://code.google.com/p/liberastika/"
 arch=('any')
@@ -14,13 +14,13 @@ source=(http://liberastika.googlecode.com/files/liberastika-ttf-1.1.3.tar.xz)
 install=$pkgname.install
 
 package(){
-	cd ${pkgdir}
+  cd "${srcdir}"
 
-	install -m755 -d ${pkgdir}/usr/share/licenses/${pkgname}
-  install -m644 ${srcdir}/COPYING ${pkgdir}/usr/share/licenses/${pkgname}
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 COPYING "${pkgdir}"/usr/share/licenses/"${pkgname}"
 
-	install -m755 -d ${pkgdir}/usr/share/fonts/TTF
-	install -m644 ${srcdir}/*.ttf ${pkgdir}/usr/share/fonts/TTF
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
 
 md5sums=('7b4b98f882cc359d4b56264b01fc52eb')

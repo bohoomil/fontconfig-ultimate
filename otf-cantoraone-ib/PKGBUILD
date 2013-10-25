@@ -2,8 +2,8 @@
 
 pkgname=otf-cantoraone-ib
 pkgver=1.001
-pkgrel=1
-depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
+pkgrel=2
+depends=('fontconfig')
 pkgdesc="Cantora is a friendly semi formal, semi condensed, semi sans serif. It has reminiscences of hand lettering, mixing straight and bowed stems, and natural curves."
 url="http://www.impallari.com"
 arch=('any')
@@ -15,13 +15,13 @@ source=(http://googlefontdirectory.googlecode.com/hg/ofl/cantoraone/src/CantoraO
         http://googlefontdirectory.googlecode.com/hg/ofl/cantoraone/OFL.txt)
 
 package(){
-	cd ${pkgdir}
+  cd "${srcdir}"
 
-  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
-  install -m644 ${srcdir}/OFL.txt "${pkgdir}/usr/share/licenses/${pkgname}"
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
 
-	install -m755 -d ${pkgdir}/usr/share/fonts/OTF
-  install -Dm644 ${srcdir}/*.otf ${pkgdir}/usr/share/fonts/OTF
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -Dm644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
 
 md5sums=('9a292c0cdd3339da0237c10c30f5d5b6'

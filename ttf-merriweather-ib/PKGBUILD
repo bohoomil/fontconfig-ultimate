@@ -2,8 +2,8 @@
 
 pkgname=ttf-merriweather-ib
 pkgver=1.003
-pkgrel=3
-depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
+pkgrel=4
+depends=('fontconfig')
 pkgdesc="Merriweather Serif font family by Eben Sorkin."
 url="http://sorkintype.com"
 conflicts=('ttf-google-webfonts-git' 'ttf-merriweather')
@@ -11,26 +11,20 @@ replaces=('ttf-merriweather')
 groups=('infinality-bundle-fonts')
 arch=('any')
 license=('OFL-1.1')
-source=(https://googlefontdirectory.googlecode.com/hg/ofl/merriweather/Merriweather-Black.ttf
-        https://googlefontdirectory.googlecode.com/hg/ofl/merriweather/Merriweather-Bold.ttf
-        https://googlefontdirectory.googlecode.com/hg/ofl/merriweather/Merriweather-BoldItalic.ttf
-        https://googlefontdirectory.googlecode.com/hg/ofl/merriweather/Merriweather-HeavyItalic.ttf
-        https://googlefontdirectory.googlecode.com/hg/ofl/merriweather/Merriweather-Italic.ttf
-        https://googlefontdirectory.googlecode.com/hg/ofl/merriweather/Merriweather-Light.ttf
-        https://googlefontdirectory.googlecode.com/hg/ofl/merriweather/Merriweather-LightItalic.ttf
-        https://googlefontdirectory.googlecode.com/hg/ofl/merriweather/Merriweather-Regular.ttf
+install=$pkgname.install
+source=(https://googlefontdirectory.googlecode.com/hg/ofl/merriweather/Merriweather-{Black,Bold,BoldItalic,HeavyItalic,Italic,Light,LightItalic,Regular}.ttf
         https://googlefontdirectory.googlecode.com/hg/ofl/merriweather/OFL.txt)
 
-install=$pkgname.install
-
 package(){
-	cd ${pkgdir}
-	install -m755 -d ${pkgdir}/usr/share/fonts/TTF
-	install -m644 ${srcdir}/*.ttf ${pkgdir}/usr/share/fonts/TTF
+  cd "${srcdir}"
 
-	install -m755 -d ${pkgdir}/usr/share/licenses/${pkgname}
-  install -m644 ${srcdir}/OFL.txt ${pkgdir}/usr/share/licenses/${pkgname}/OFL.txt
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
+
 md5sums=('07eb35c9ffe83721dee7ef3fc5e13c55'
          '6bd0d773d701259858b00ff9ce70d7e4'
          '972b5c1e71f6199afa2bf159484be9a3'
@@ -39,4 +33,4 @@ md5sums=('07eb35c9ffe83721dee7ef3fc5e13c55'
          '2378259da6333bc02fbdf558118cca9b'
          'acf733b27d6983e644407533ca2a4577'
          'f2e4a31c9defd3f77e1711031ece8cf8'
-         '3afc3620e296d3bd5a9e5e204631b577')
+         '94465cd192bbf13008a6e735ca0bdf6f')

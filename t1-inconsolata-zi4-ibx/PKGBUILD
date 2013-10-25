@@ -2,9 +2,9 @@
 
 pkgname=t1-inconsolata-zi4-ibx
 pkgver=1.03
-pkgrel=3
-depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
-pkgdesc="Monospace font for pretty code listings and for the terminal. Type1 version from TeXLive."
+pkgrel=4
+depends=('fontconfig')
+pkgdesc="Monospace font for pretty code listings and for the terminal. Type 1 version."
 url="http://www.ctan.org/tex-archive/fonts/inconsolata/"
 arch=('any')
 license=('OFL-1.1')
@@ -15,18 +15,18 @@ install=$pkgname.install
 source=("http://mirrors.ctan.org/fonts/inconsolata.zip")
 
 prepare(){
-  cd ${srcdir}/inconsolata/type1
+  cd "${srcdir}"/inconsolata/type1
   type1afm *.pfb
 }
 
 package(){
-  cd ${srcdir}/inconsolata
+  cd "${srcdir}"/inconsolata
 
-	install -m755 -d ${pkgdir}/usr/share/licenses/${pkgname}
-	install -m644 ./doc/OFL.txt ${pkgdir}/usr/share/licenses/${pkgname}
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 doc/OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
 
-	install -m755 -d ${pkgdir}/usr/share/fonts/Type1
-	install -m644 ./type1/*.{pfb,afm} ${pkgdir}/usr/share/fonts/Type1
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 type1/*.{pfb,afm} "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
 
 md5sums=('b0c2e9400b829f7100259a653b0ba815')

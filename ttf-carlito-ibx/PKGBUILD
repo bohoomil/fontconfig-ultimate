@@ -1,27 +1,27 @@
 # Maintainer: bohoomil <@zoho.com>
 
-pkgname=ttf-carlito-ibx
+pkgname=ttf-carlito-ib
 pkgver=1.103
-pkgrel=1
+pkgrel=2
 _tarname=crosextrafonts-carlito
 _tardate=20130920
-depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
-pkgdesc="Carlito is a sans-serif font metrically compatible with Calibri.."
+depends=('fontconfig')
+pkgdesc="Carlito is a sans-serif font metrically compatible with Calibri."
 url="https://plus.google.com/106163021290874968147/posts"
 arch=('any')
-groups=('infinality-bundle-fonts-extra')
+groups=('infinality-bundle-fonts')
 license=('OFL-1.1')
 source=(http://gsdview.appspot.com/chromeos-localmirror/distfiles/${_tarname}-${_tardate}.tar.gz)
 install=$pkgname.install
 
 package(){
-	cd ${pkgdir}
+  cd "${srcdir}"/"${_tarname}"-"${_tardate}"
 
-  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
-  install -m644 ${srcdir}/${_tarname}-${_tardate}/LICENSE "${pkgdir}/usr/share/licenses/${pkgname}"
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 LICENSE "${pkgdir}"/usr/share/licenses/"${pkgname}"
 
-	install -m755 -d ${pkgdir}/usr/share/fonts/TTF
-	install -m644 ${srcdir}/${_tarname}-${_tardate}/*.ttf ${pkgdir}/usr/share/fonts/TTF
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
 
 md5sums=('c74b7223abe75949b4af367942d96c7a')

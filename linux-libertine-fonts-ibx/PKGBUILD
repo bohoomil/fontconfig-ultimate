@@ -1,0 +1,94 @@
+# Contributor: Rick W. Chen <stuffcorpse@archlinux.us>
+# Contributor: bohoomil <@zoho.com>
+
+pkgbase=linux-libertine-fonts-ibx
+pkgname=('ttf-libertine-ibx' 'otf-libertine-ibx' 't1-libertine-ibx')
+pkgver=5.3.0
+pkgrel=1
+pkgdesc="Linux Libertine and Linux Biolinum fonts."
+depends=('fontconfig')
+arch=(any)
+url="http://www.linuxlibertine.org/"
+license=('GPL' 'OFL')
+groups=('infinality-bundle-fonts-extra')
+source=("http://mirrors.ctan.org/fonts/libertine.zip"
+        "http://downloads.sourceforge.net/project/linuxlibertine/linuxlibertine/5.3.0/LinLibertineTTF_5.3.0_2012_07_02.tgz"
+        "http://downloads.sourceforge.net/project/linuxlibertine/linuxlibertine/5.3.0/LinLibertineOTF_5.3.0_2012_07_02.tgz"
+        90-libertine-otf.conf
+        90-libertine-ttf.conf
+        90-libertine-t1.conf)
+
+prepare() {
+  cd "${srcdir}"/libertine/type1
+  type1afm *.pfb
+}
+
+package_ttf-libertine-ibx() {
+  pkgdesc="Linux Libertine and Linux Biolinum fonts. TrueType version."
+  conflicts=('ttf-linux-libertine' 'ttf-linux-libertine-g' 'texlive-libertine-type1' 'texlive-biolinum-type1' 'otf-libertine-ibx' 't1-libertine-ibx')
+  install=${pkgname}.install
+
+  cd "${srcdir}"
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 LICENCE.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"/GPL.txt
+  install -m644 OFL-1.1.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"/OFL.txt
+
+  install -d -m755 "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -dm755 "${pkgdir}"/etc/fonts/conf.avail
+  install -dm755 "${pkgdir}"/etc/fonts/conf.d
+  install -m644 90-libertine-ttf.conf "${pkgdir}"/etc/fonts/conf.avail/90-libertine-ttf.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/90-libertine-ttf.conf .
+}
+
+package_otf-libertine-ibx() {
+  pkgdesc="Linux Libertine and Linux Biolinum fonts. OpenType version."
+  conflicts=('ttf-linux-libertine' 'ttf-linux-libertine-g' 'texlive-libertine-type1' 'texlive-biolinum-type1' 'ttf-libertine-ibx' 't1-libertine-ibx')
+  install=${pkgname}.install
+
+  cd "${srcdir}"
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 LICENCE.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"/GPL.txt
+  install -m644 OFL-1.1.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"/OFL.txt
+
+  install -d -m755 "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -dm755 "${pkgdir}"/etc/fonts/conf.avail
+  install -dm755 "${pkgdir}"/etc/fonts/conf.d
+  install -m644 90-libertine-otf.conf "${pkgdir}"/etc/fonts/conf.avail/90-libertine-otf.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/90-libertine-otf.conf .
+}
+
+package_t1-libertine-ibx() {
+  pkgdesc="Linux Libertine and Linux Biolinum fonts. Type 1 version."
+  conflicts=('ttf-linux-libertine' 'ttf-linux-libertine-g' 'texlive-libertine-type1' 'texlive-biolinum-type1' 'ttf-libertine-ibx' 'otf-libertine-ibx')
+  install=${pkgname}.install
+
+  cd "${srcdir}"
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 LICENCE.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"/GPL.txt
+  install -m644 OFL-1.1.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"/OFL.txt
+
+  install -d -m755 "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 libertine/type1/*.{pfb,afm} "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -dm755 "${pkgdir}"/etc/fonts/conf.avail
+  install -dm755 "${pkgdir}"/etc/fonts/conf.d
+  install -m644 90-libertine-t1.conf "${pkgdir}"/etc/fonts/conf.avail/90-libertine-t1.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/90-libertine-t1.conf .
+}
+
+md5sums=('35b188cf6bcd9896b8ca010bea02cfac'
+         '3ff3ede32b0a62e57a62e33783815b70'
+         'e859a19401464097ab35226fdea64c3e'
+         'aad4a9be1683fc01c881d7517e074412'
+         '080a199d66d5171273c971c4793ad04c'
+         'a3a0fc1e6eb75eee28267dda1242fe1a')

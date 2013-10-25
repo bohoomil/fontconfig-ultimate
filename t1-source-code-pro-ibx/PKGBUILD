@@ -2,9 +2,9 @@
 
 pkgname=t1-source-code-pro-ibx
 pkgver=2.1
-pkgrel=1
-depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
-pkgdesc="A set of mono-spaced OpenType fonts designed for coding environments. Type1 version from TeXLive."
+pkgrel=2
+depends=('fontconfig')
+pkgdesc="A set of mono-spaced OpenType fonts designed for coding environments. Type 1."
 url="http://www.ctan.org/tex-archive/fonts/opensans"
 arch=('any')
 license=('OFL-1.1')
@@ -15,18 +15,18 @@ install=$pkgname.install
 source=("http://mirrors.ctan.org/fonts/sourcecodepro.zip")
 
 prepare(){
-  cd ${srcdir}/sourcecodepro/fonts
+  cd "${srcdir}"/sourcecodepro/fonts
   type1afm *.pfb
 }
 
 package(){
-  cd ${srcdir}/sourcecodepro
+  cd "${srcdir}"/sourcecodepro
 
-	install -m755 -d ${pkgdir}/usr/share/licenses/${pkgname}
-	install -m644 ./doc/LICENSE.txt ${pkgdir}/usr/share/licenses/${pkgname}
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 doc/LICENSE.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
 
-	install -m755 -d ${pkgdir}/usr/share/fonts/Type1
-	install -m644 ./fonts/*.{pfb,afm} ${pkgdir}/usr/share/fonts/Type1
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 fonts/*.{pfb,afm} "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
 
 md5sums=('1e061742fc08d5ffa336ee80db2d3f02')

@@ -2,8 +2,8 @@
 
 pkgname=otf-oswald-ib
 pkgver=3.0
-pkgrel=1
-depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
+pkgrel=2
+depends=('fontconfig')
 pkgdesc="Oswald is a reworking of the classic Gothic and Grotesque type styles."
 url="http://oswaldfont.com"
 arch=('any')
@@ -14,26 +14,14 @@ install=$pkgname.install
 source=(git+https://github.com/vernnobile/OswaldFont.git)
 
 package(){
-	cd ${pkgdir}
+  cd "${srcdir}"/OswaldFont/3.0
 
-  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
-  install -m644 ${srcdir}/OswaldFont/3.0/OFL.txt "${pkgdir}/usr/share/licenses/${pkgname}"
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
 
-	install -m755 -d ${pkgdir}/usr/share/fonts/OTF
-	install -m644 ${srcdir}/OswaldFont/3.0/Italic/200/src/*.otf ${pkgdir}/usr/share/fonts/OTF
-	install -m644 ${srcdir}/OswaldFont/3.0/Italic/300/src/*.otf ${pkgdir}/usr/share/fonts/OTF
-	install -m644 ${srcdir}/OswaldFont/3.0/Italic/400/src/*.otf ${pkgdir}/usr/share/fonts/OTF
-	install -m644 ${srcdir}/OswaldFont/3.0/Italic/500/src/*.otf ${pkgdir}/usr/share/fonts/OTF
-	install -m644 ${srcdir}/OswaldFont/3.0/Italic/600/src/*.otf ${pkgdir}/usr/share/fonts/OTF
-	install -m644 ${srcdir}/OswaldFont/3.0/Italic/700/src/*.otf ${pkgdir}/usr/share/fonts/OTF
-	install -m644 ${srcdir}/OswaldFont/3.0/Italic/800/src/*.otf ${pkgdir}/usr/share/fonts/OTF
-	install -m644 ${srcdir}/OswaldFont/3.0/Roman/200/src/*.otf ${pkgdir}/usr/share/fonts/OTF
-	install -m644 ${srcdir}/OswaldFont/3.0/Roman/300/src/*.otf ${pkgdir}/usr/share/fonts/OTF
-	install -m644 ${srcdir}/OswaldFont/3.0/Roman/400/src/*.otf ${pkgdir}/usr/share/fonts/OTF
-	install -m644 ${srcdir}/OswaldFont/3.0/Roman/500/src/*.otf ${pkgdir}/usr/share/fonts/OTF
-	install -m644 ${srcdir}/OswaldFont/3.0/Roman/600/src/*.otf ${pkgdir}/usr/share/fonts/OTF
-	install -m644 ${srcdir}/OswaldFont/3.0/Roman/700/src/*.otf ${pkgdir}/usr/share/fonts/OTF
-	install -m644 ${srcdir}/OswaldFont/3.0/Roman/800/src/*.otf ${pkgdir}/usr/share/fonts/OTF
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 Italic/[2-8]00/src/*.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 Roman/[2-8]00/src/*.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
 
 md5sums=('SKIP')

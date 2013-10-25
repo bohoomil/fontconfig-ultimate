@@ -2,8 +2,8 @@
 
 pkgname=ttf-noto-sans-multilang-ib
 pkgver=1.04
-pkgrel=1
-depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils' 'ttf-noto-sans-ib')
+pkgrel=2
+depends=('fontconfig' 'ttf-noto-sans-ib')
 pkgdesc="Noto Sans family: extended Non-Latin set and UI."
 url="http://code.google.com/p/googlefontdirectory/"
 arch=('any')
@@ -14,48 +14,34 @@ install=$pkgname.install
 source=(65-ttf-noto-sans-ui.conf
         65-ttf-noto-sans.conf
         https://googlefontdirectory.googlecode.com/hg/apache/notosansarmenian/LICENSE.txt
-        https://googlefontdirectory.googlecode.com/hg/apache/notosansarmenian/NotoSansArmenian-Bold.ttf
-        https://googlefontdirectory.googlecode.com/hg/apache/notosansarmenian/NotoSansArmenian-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansarmenian/NotoSansArmenian-{Bold,Regular}.ttf
         https://googlefontdirectory.googlecode.com/hg/apache/notosansavestan/NotoSansAvestan-Regular.ttf
-        https://googlefontdirectory.googlecode.com/hg/apache/notosansbengali/NotoSansBengali-Bold.ttf
-        https://googlefontdirectory.googlecode.com/hg/apache/notosansbengali/NotoSansBengali-Regular.ttf 
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansbengali/NotoSansBengali-{Bold,Regular}.ttf 
         https://googlefontdirectory.googlecode.com/hg/apache/notosansbrahmi/NotoSansBrahmi-Regular.ttf
         https://googlefontdirectory.googlecode.com/hg/apache/notosanscarian/NotoSansCarian-Regular.ttf
         https://googlefontdirectory.googlecode.com/hg/apache/notosanscherokee/NotoSansCherokee-Regular.ttf
         https://googlefontdirectory.googlecode.com/hg/apache/notosanscoptic/NotoSansCoptic-Regular.ttf
         https://googlefontdirectory.googlecode.com/hg/apache/notosanscypriotsyllabary/NotoSansCypriotSyllabary-Regular.ttf
         https://googlefontdirectory.googlecode.com/hg/apache/notosansdeseret/NotoSansDeseret-Regular.ttf
-        https://googlefontdirectory.googlecode.com/hg/apache/notosansdevanagari/NotoSansDevanagari-Bold.ttf
-        https://googlefontdirectory.googlecode.com/hg/apache/notosansdevanagari/NotoSansDevanagari-Regular.ttf
-        https://googlefontdirectory.googlecode.com/hg/apache/notosansdevanagariui/NotoSansDevanagariUI-Bold.ttf
-        https://googlefontdirectory.googlecode.com/hg/apache/notosansdevanagariui/NotoSansDevanagariUI-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansdevanagari/NotoSansDevanagari-{Bold,Regular}.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansdevanagariui/NotoSansDevanagariUI-{Bold,Regular}.ttf
         https://googlefontdirectory.googlecode.com/hg/apache/notosansegyptianhieroglyphs/NotoSansEgyptianHieroglyphs-Regular.ttf
-        https://googlefontdirectory.googlecode.com/hg/apache/notosansethiopic/NotoSansEthiopic-Bold.ttf
-        https://googlefontdirectory.googlecode.com/hg/apache/notosansethiopic/NotoSansEthiopic-Regular.ttf
-        https://googlefontdirectory.googlecode.com/hg/apache/notosansgeorgian/NotoSansGeorgian-Bold.ttf
-        https://googlefontdirectory.googlecode.com/hg/apache/notosansgeorgian/NotoSansGeorgian-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansethiopic/NotoSansEthiopic-{Bold,Regular}.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansgeorgian/NotoSansGeorgian-{Bold,Regular}.ttf
         https://googlefontdirectory.googlecode.com/hg/apache/notosansglagolitic/NotoSansGlagolitic-Regular.ttf
-        https://googlefontdirectory.googlecode.com/hg/apache/notosansgujarati/NotoSansGujarati-Bold.ttf
-        https://googlefontdirectory.googlecode.com/hg/apache/notosansgujarati/NotoSansGujarati-Regular.ttf
-        https://googlefontdirectory.googlecode.com/hg/apache/notosansgujaratiui/NotoSansGujaratiUI-Bold.ttf
-        https://googlefontdirectory.googlecode.com/hg/apache/notosansgujaratiui/NotoSansGujaratiUI-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansgujarati/NotoSansGujarati-{Bold,Regular}.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansgujaratiui/NotoSansGujaratiUI-{Bold,Regular}.ttf
         https://googlefontdirectory.googlecode.com/hg/apache/notosanshanunoo/NotoSansHanunoo-Regular.ttf
-        https://googlefontdirectory.googlecode.com/hg/apache/notosanshebrew/NotoSansHebrew-Bold.ttf
-        https://googlefontdirectory.googlecode.com/hg/apache/notosanshebrew/NotoSansHebrew-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosanshebrew/NotoSansHebrew-{Bold,Regular}.ttf
         https://googlefontdirectory.googlecode.com/hg/apache/notosansimperilaramaic/NotoSansImperialAramaic-Regular.ttf
         https://googlefontdirectory.googlecode.com/hg/apache/notosanskaithi/NotoSansKaithi-Regular.ttf
-        https://googlefontdirectory.googlecode.com/hg/apache/notosanskannada/NotoSansKannada-Bold.ttf
-        https://googlefontdirectory.googlecode.com/hg/apache/notosanskannada/NotoSansKannada-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosanskannada/NotoSansKannada-{Bold,Regular}.ttf
         https://googlefontdirectory.googlecode.com/hg/apache/notosanskayahli/NotoSansKayahLi-Regular.ttf
         https://googlefontdirectory.googlecode.com/hg/apache/notosanskharoshthi/NotoSansKharoshthi-Regular.ttf
-        http://noto.googlecode.com/svn/trunk/fonts/individual/hinted/NotoSansKhmer-Bold.ttf
-        http://noto.googlecode.com/svn/trunk/fonts/individual/hinted/NotoSansKhmer-Regular.ttf
-        http://noto.googlecode.com/svn/trunk/fonts/individual/hinted/NotoSansKhmerUI-Bold.ttf
-        http://noto.googlecode.com/svn/trunk/fonts/individual/hinted/NotoSansKhmerUI-Regular.ttf
-        https://googlefontdirectory.googlecode.com/hg/apache/notosanslao/NotoSansLao-Bold.ttf
-        https://googlefontdirectory.googlecode.com/hg/apache/notosanslao/NotoSansLao-Regular.ttf
-        https://googlefontdirectory.googlecode.com/hg/apache/notosanslaoui/NotoSansLaoUI-Bold.ttf
-        https://googlefontdirectory.googlecode.com/hg/apache/notosanslaoui/NotoSansLaoUI-Regular.ttf
+        http://noto.googlecode.com/svn/trunk/fonts/individual/hinted/NotoSansKhmer-{Bold,Regular}.ttf
+        http://noto.googlecode.com/svn/trunk/fonts/individual/hinted/NotoSansKhmerUI-{Bold,Regular}.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosanslao/NotoSansLao-{Bold,Regular}.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosanslaoui/NotoSansLaoUI-{Bold,Regular}.ttf
         https://googlefontdirectory.googlecode.com/hg/apache/notosanslisu/NotoSansLisu-Regular.ttf
         https://googlefontdirectory.googlecode.com/hg/apache/notosanslycian/NotoSansLycian-Regular.ttf
         https://googlefontdirectory.googlecode.com/hg/apache/notosanslydian/NotoSansLydian-Regular.ttf
@@ -72,31 +58,32 @@ source=(65-ttf-noto-sans-ui.conf
         https://googlefontdirectory.googlecode.com/hg/apache/notosanstagalog/NotoSansTagalog-Regular.ttf
         https://googlefontdirectory.googlecode.com/hg/apache/notosanstaitham/NotoSansTaiTham-Regular.ttf
         https://googlefontdirectory.googlecode.com/hg/apache/notosanstaiviet/NotoSansTaiViet-Regular.ttf
-        https://googlefontdirectory.googlecode.com/hg/apache/notosanstamil/NotoSansTamil-Bold.ttf
-        https://googlefontdirectory.googlecode.com/hg/apache/notosanstamil/NotoSansTamil-Regular.ttf
-        https://googlefontdirectory.googlecode.com/hg/apache/notosanstamilui/NotoSansTamilUI-Bold.ttf
-        https://googlefontdirectory.googlecode.com/hg/apache/notosanstamilui/NotoSansTamilUI-Regular.ttf
-        https://googlefontdirectory.googlecode.com/hg/apache/notosanstelugu/NotoSansTelugu-Bold.ttf
-        https://googlefontdirectory.googlecode.com/hg/apache/notosanstelugu/NotoSansTelugu-Regular.ttf
-        https://googlefontdirectory.googlecode.com/hg/apache/notosansthai/NotoSansThai-Bold.ttf
-        https://googlefontdirectory.googlecode.com/hg/apache/notosansthai/NotoSansThai-Regular.ttf
-        https://googlefontdirectory.googlecode.com/hg/apache/notosansthaiui/NotoSansThaiUI-Bold.ttf
-        https://googlefontdirectory.googlecode.com/hg/apache/notosansthaiui/NotoSansThaiUI-Regular.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosanstamil/NotoSansTamil-{Bold,Regular}.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosanstamilui/NotoSansTamilUI-{Bold,Regular}.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosanstelugu/NotoSansTelugu-{Bold,Regular}.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansthai/NotoSansThai-{Bold,Regular}.ttf
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansthaiui/NotoSansThaiUI-{Bold,Regular}.ttf
         https://googlefontdirectory.googlecode.com/hg/apache/notosansugaritic/NotoSansUgaritic-Regular.ttf
         https://googlefontdirectory.googlecode.com/hg/apache/notosansvai/NotoSansVai-Regular.ttf)
 
 package(){
-	cd ${pkgdir}
+  cd "${srcdir}"
 
-  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
-  install -m644 ${srcdir}/LICENSE.txt "${pkgdir}/usr/share/licenses/${pkgname}"
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 LICENSE.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
 
-	install -m755 -d "${pkgdir}/usr/share/fonts/TTF"
-  install -m644 ${srcdir}/*.ttf "${pkgdir}/usr/share/fonts/TTF"
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -m755 -d "${pkgdir}/etc/fonts/conf.avail"
-  install -m644 ${srcdir}/65-ttf-noto-sans-ui.conf "${pkgdir}/etc/fonts/conf.avail"
-  install -m644 ${srcdir}/65-ttf-noto-sans.conf "${pkgdir}/etc/fonts/conf.avail"
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m644  65-ttf-noto-sans.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/65-ttf-noto-sans.conf
+  install -m644 65-ttf-noto-sans-ui.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/65-ttf-noto-sans-ui.conf
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/65-ttf-noto-sans.conf .
+  ln -s ../conf.avail/65-ttf-noto-sans-ui.conf .
 }
 
 md5sums=('ff202f6b6a54fd5ce83f01e8ce47ec02'

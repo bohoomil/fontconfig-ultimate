@@ -4,8 +4,8 @@ pkgname=ttf-unfonts-core-ib
 _basename=un-fonts-core
 pkgver=1.0.2
 _pkgrev=080608
-pkgrel=1
-depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
+pkgrel=2
+depends=('fontconfig')
 pkgdesc="Un Core family of Korean TrueType fonts."
 url="http://kldp.net/projects/unfonts/"
 arch=('any')
@@ -16,13 +16,15 @@ install=$pkgname.install
 source=(http://kldp.net/frs/download.php/4695/$_basename-$pkgver-$_pkgrev.tar.gz)
 
 package(){
-  cd ${pkgdir}
+  cd "${srcdir}"/un-fonts
 
-  install -D -m644 ${srcdir}/un-fonts/COPYING ${pkgdir}/usr/share/licenses/${pkgname}/COPYING
-  install -D -m644 ${srcdir}/un-fonts/README ${pkgdir}/usr/share/doc/${pkgname}/README
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 COPYING "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m755 -d "${pkgdir}"/usr/share/doc/"${pkgname}"
+  install -m644 README "${pkgdir}"/usr/share/doc/"${pkgname}"
 
-  install -m755 -d ${pkgdir}/usr/share/fonts/TTF
-  install -m644 ${srcdir}/un-fonts/*.ttf ${pkgdir}/usr/share/fonts/TTF/
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
 
 md5sums=('87edeb65586b85d4ce10c1fab4f1e1aa')

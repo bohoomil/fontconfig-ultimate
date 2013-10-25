@@ -2,9 +2,9 @@
 
 pkgname=t1-lato-ibx
 pkgver=2.2
-pkgrel=2
-depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
-pkgdesc="Lato is a sanserif type­face family designed in the Summer 2010 by Warsaw-based designer Łukasz Dziedzic. Type1 version from TeXLive."
+pkgrel=3
+depends=('fontconfig')
+pkgdesc="Lato is a sanserif type­face family designed in the Summer 2010 by Warsaw-based designer Łukasz Dziedzic. Type 1 version."
 url="http://www.latofonts.com/"
 arch=('any')
 groups=('infinality-bundle-fonts-extra')
@@ -14,19 +14,20 @@ install=$pkgname.install
 source=("http://mirrors.ctan.org/fonts/lato.zip")
 
 prepare(){
-  cd ${srcdir}/lato/fonts/type1/public/lato
+  cd "${srcdir}"/lato/fonts/type1/public/lato
   type1afm *.pfb
 }
 
 package(){
-  cd ${srcdir}/lato
+  cd "${srcdir}"/lato
 
-	install -m755 -d ${pkgdir}/usr/share/doc/${pkgname}
-	install -m644 ./doc/fonts/lato/README ${pkgdir}/usr/share/doc/${pkgname}
-	install -m644 ./doc/fonts/lato/CHANGES ${pkgdir}/usr/share/doc/${pkgname}
+  install -m755 -d "${pkgdir}"/usr/share/doc/"${pkgname}"
+  install -m644 doc/fonts/lato/README "${pkgdir}"/usr/share/doc/"${pkgname}"
+  install -m644 doc/fonts/lato/CHANGES "${pkgdir}"/usr/share/doc/"${pkgname}"
 
-	install -m755 -d ${pkgdir}/usr/share/fonts/Type1
-	install -m644 ./fonts/type1/public/lato/*.{pfb,afm} ${pkgdir}/usr/share/fonts/Type1
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 fonts/type1/public/lato/*.{pfb,afm} \
+    "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
 
 md5sums=('557d2594463009cc2a868928e964fca7')

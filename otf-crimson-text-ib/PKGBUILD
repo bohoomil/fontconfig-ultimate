@@ -3,8 +3,8 @@
 pkgname=otf-crimson-text-ib
 _gitname=Crimson
 pkgver=0.8
-pkgrel=1
-depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
+pkgrel=2
+depends=('fontconfig')
 pkgdesc="Crimson Text is an open source serif font family in the tradition of beautiful oldstyle typefaces."
 url="http://aldusleaf.org/"
 arch=('any')
@@ -14,19 +14,11 @@ license=('Custom')
 install=$pkgname.install
 source=(git+https://github.com/skosch/Crimson.git)
 
-#pkgver() {
-#  cd ${srcdir}/${_gitname}
-#  # Use the tag of the last commit
-#  #local ver="$(git describe --long)"
-#  local ver="$(git describe --tags)"
-#  printf "%s" "${ver//-/.}"
-#}
-
 package(){
-	cd ${pkgdir}
+	cd "${srcdir}"/Crimson
 
-	install -m755 -d ${pkgdir}/usr/share/fonts/OTF
-  install -Dm644 ${srcdir}/Crimson/otf/*.otf ${pkgdir}/usr/share/fonts/OTF
+	install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -Dm644 otf/*.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
 
 md5sums=('SKIP')

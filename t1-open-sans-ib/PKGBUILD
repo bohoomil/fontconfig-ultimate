@@ -2,9 +2,9 @@
 
 pkgname=t1-opensans-ib
 pkgver=1.2
-pkgrel=4
-depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
-pkgdesc="Open Sans is a humanist sans serif typeface designed by Steve Matteson, Type Director of Ascender Corp. Type1 version from TeXLive."
+pkgrel=5
+depends=('fontconfig')
+pkgdesc="Open Sans is a humanist sans serif typeface designed by Steve Matteson, Type Director of Ascender Corp. Type 1 version."
 url="http://www.ctan.org/tex-archive/fonts/opensans"
 arch=('any')
 license=('OFL-1.1')
@@ -15,19 +15,20 @@ install=$pkgname.install
 source=("http://mirrors.ctan.org/fonts/opensans.zip")
 
 prepare(){
-  cd ${srcdir}/opensans/fonts/type1/public/opensans
+  cd "${srcdir}"/opensans/fonts/type1/public/opensans
   type1afm *.pfb
 }
 
 package(){
-  cd ${srcdir}/opensans
+  cd "${srcdir}"/opensans
 
-	install -m755 -d ${pkgdir}/usr/share/doc/${pkgname}
-	install -m644 ./doc/fonts/opensans/README ${pkgdir}/usr/share/doc/${pkgname}
-	install -m644 ./doc/fonts/opensans/CHANGES ${pkgdir}/usr/share/doc/${pkgname}
+  install -m755 -d "${pkgdir}"/usr/share/doc/"${pkgname}"
+  install -m644 doc/fonts/opensans/README "${pkgdir}"/usr/share/doc/"${pkgname}"
+  install -m644 doc/fonts/opensans/CHANGES "${pkgdir}"/usr/share/doc/"${pkgname}"
 
-	install -m755 -d ${pkgdir}/usr/share/fonts/Type1
-	install -m644 ./fonts/type1/public/opensans/*.{pfb,afm} ${pkgdir}/usr/share/fonts/Type1
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 fonts/type1/public/opensans/*.{pfb,afm} \
+    "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
 
 md5sums=('a75921555ee86a1c1bfa3b7f150a3f4c')

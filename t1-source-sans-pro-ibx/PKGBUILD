@@ -1,10 +1,10 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=t1-source-sans-pro-ibx
-pkgver=2.2
+pkgver=2.3
 pkgrel=1
-depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
-pkgdesc="A set of OpenType fonts designed for user interfaces. Type1 version from TeXLive."
+depends=('fontconfig')
+pkgdesc="A set of OpenType fonts designed for user interfaces. Type 1 version."
 url="http://www.ctan.org/tex-archive/fonts/opensans"
 arch=('any')
 license=('OFL-1.1')
@@ -15,18 +15,18 @@ install=$pkgname.install
 source=("http://mirrors.ctan.org/fonts/sourcesanspro.zip")
 
 prepare(){
-  cd ${srcdir}/sourcesanspro/fonts
+  cd "${srcdir}"/sourcesanspro/fonts
   type1afm *.pfb
 }
 
 package(){
-  cd ${srcdir}/sourcesanspro
+  cd "${srcdir}"/sourcesanspro
 
-	install -m755 -d ${pkgdir}/usr/share/licenses/${pkgname}
-	install -m644 ./doc/LICENSE.txt ${pkgdir}/usr/share/licenses/${pkgname}
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 doc/LICENSE.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
 
-	install -m755 -d ${pkgdir}/usr/share/fonts/Type1
-	install -m644 ./fonts/*.{pfb,afm} ${pkgdir}/usr/share/fonts/Type1
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 fonts/*.{pfb,afm} "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
 
-md5sums=('c2f0f33fffae7da3c58775bf82037d21')
+md5sums=('5ea342afed69e9f2fbc38d7c75f01e93')

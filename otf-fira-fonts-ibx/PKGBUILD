@@ -2,9 +2,9 @@
 
 pkgbase=otf-fira-fonts
 pkgver=2.001
-pkgrel=1
+pkgrel=2
 pkgname=('otf-fira-sans-ibx' 'otf-fira-mono-ibx')
-depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
+depends=('fontconfig')
 pkgdesc="Mozilla font family designed for the Firefox OS."
 url="https://www.mozilla.org/en-US/styleguide/products/firefox-os/typeface/"
 arch=('any')
@@ -14,24 +14,24 @@ source=(git://github.com/mozilla-b2g/moztt.git)
 
 package_otf-fira-sans-ibx() {
   pkgdesc="A sans-serif typeface designed for the Firefox OS."
-  depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-mkfontscale' 'xorg-mkfontdir')
   conflicts=('ttf-fira-sans' 'otf-fira-sans')
   install=${pkgname}.install
   
-  cd ${srcdir}/moztt
-  install -d -m755 ${pkgdir}/usr/share/fonts/OTF
-  install -m644 ./FiraSans-${pkgver}/*.otf ${pkgdir}/usr/share/fonts/OTF
+  cd "${srcdir}"/moztt
+  install -d -m755 "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 FiraSans-"${pkgver}"/*.otf \
+    "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
 
 package_otf-fira-mono-ibx() {
   pkgdesc="A monospace typeface designed for the Firefox OS."
-  depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-mkfontscale' 'xorg-mkfontdir')
   conflicts=('ttf-fira-mono' 'otf-fira-mono')
   install=${pkgname}.install
 
-  cd ${srcdir}/moztt
-  install -d -m755 ${pkgdir}/usr/share/fonts/OTF
-  install -m644 ./FiraMono-${pkgver}/*.otf ${pkgdir}/usr/share/fonts/OTF
+  cd "${srcdir}"/moztt
+  install -d -m755 "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 FiraMono-"${pkgver}"/*.otf \
+    "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
 
 md5sums=('SKIP')

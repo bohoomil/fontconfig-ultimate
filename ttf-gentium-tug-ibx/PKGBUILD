@@ -2,8 +2,8 @@
 
 pkgname=ttf-gentium-tug-ibx
 pkgver=1.0
-pkgrel=1
-depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
+pkgrel=2
+depends=('fontconfig')
 pkgdesc="Gentium is a serif typeface family designed by Victor Gaultney."
 url="http://www.ctan.org/tex-archive/fonts/gentium-tug"
 arch=('any')
@@ -12,42 +12,18 @@ groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-gentium-basic' 'ttf-gentium-plus' 'ttf-gentium')
 replaces=('ttf-gentium')
 install=$pkgname.install
-source=(http://mirrors.ctan.org/fonts/gentium-tug/truetype/GenBasB.ttf
-        http://mirrors.ctan.org/fonts/gentium-tug/truetype/GenBasBI.ttf
-        http://mirrors.ctan.org/fonts/gentium-tug/truetype/GenBasI.ttf
-        http://mirrors.ctan.org/fonts/gentium-tug/truetype/GenBasR.ttf
-        http://mirrors.ctan.org/fonts/gentium-tug/truetype/GenBkBasB.ttf
-        http://mirrors.ctan.org/fonts/gentium-tug/truetype/GenBkBasBI.ttf
-        http://mirrors.ctan.org/fonts/gentium-tug/truetype/GenBkBasI.ttf
-        http://mirrors.ctan.org/fonts/gentium-tug/truetype/GenBkBasR.ttf
-        http://mirrors.ctan.org/fonts/gentium-tug/truetype/Gentium-I.ttf
-        http://mirrors.ctan.org/fonts/gentium-tug/truetype/Gentium-R.ttf
-        http://mirrors.ctan.org/fonts/gentium-tug/truetype/GentiumAlt-I.ttf
-        http://mirrors.ctan.org/fonts/gentium-tug/truetype/GentiumAlt-R.ttf
-        http://mirrors.ctan.org/fonts/gentium-tug/truetype/GentiumPlus-I.ttf
-        http://mirrors.ctan.org/fonts/gentium-tug/truetype/GentiumPlus-R.ttf
-        http://mirrors.ctan.org/fonts/gentium-tug/truetype/GentiumPlusCompact-I.ttf
-        http://mirrors.ctan.org/fonts/gentium-tug/truetype/GentiumPlusCompact-R.ttf)
 
-package(){
-	cd ${pkgdir}
-	install -m755 -d ${pkgdir}/usr/share/fonts/TTF
-	install -m644 ${srcdir}/*.ttf ${pkgdir}/usr/share/fonts/TTF
+source=(http://mirrors.ctan.org/fonts/gentium-tug.zip)
+
+package_ttf-gentium-tug-ibx(){
+  cd "${srcdir}"/gentium-tug
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 doc/OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 doc/OFL-FAQ.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 truetype/*.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
 
-md5sums=('03ca29844a7db9b018b2dd4de50be6d6'
-         'c8b88a8ecf5f6f93052fb2d1628438d5'
-         '35d3e33e121e23b67a02f137bef01d74'
-         'f56e7d3d12b77bf6a567fba3e5cdc10d'
-         '38a591dcca7e25aec98758df29d630a3'
-         'a6b2e3de4519ac6e39e0613a2cafda2d'
-         '06e5db0cd0987ca21d967907a889bfdf'
-         '6ff06b9791bba2ce044fbd6035770b9e'
-         'b099443049976cedc0b6935214dcf55f'
-         'f378b7396632f0d20be414038cae89f3'
-         'f2d6b3a989b0bef8f69632b1cb269cf2'
-         '0c0032a3e392ffd19b24a124fc299c80'
-         '23e334a7e8821ab8913a4a191d4841a2'
-         '66f1794021934be7a640191b73b494d8'
-         'c2467a1fa02eb1197a1e7b9f07e93e73'
-         '8f730d443cfe3a201c73b1cefc4c3029')
+md5sums=('5e0fbb0767df5da6dceaedb72630d726')
