@@ -1,0 +1,98 @@
+#!/bin/sh
+
+# fc-presets v.0.2 | by bohoomil, 2013, GPL
+# Set default fontconfig presets for your font collection.
+# Part of fontconfig-infinality-ultimate.
+
+presets_dir="/etc/fonts/conf.avail.infinality"
+config_dir="/etc/fonts/conf.d"
+
+presets_list=(custom ms free)
+
+option=$1
+
+# Check privileges
+if [[ $UID -ne 0 ]]; then
+  echo -e 'Run this script as root.'
+  exit 1
+fi
+
+usage(){
+  echo "Usage: ${0##*/} [check|set|help]"
+  echo ' Run this script to chose fontconfig presets for your font collection.'
+  echo ''
+  echo 'Options:'
+  echo ' check    Check which preset is currently active'
+  echo ' set      Set a preset configuration'
+  echo '          Available presets are:'
+  echo '            custom  --  custom font collection'
+  echo '              free  --  free font collection'
+  echo '                ms  --  Microsoft font collection'
+  echo ' help     Print this help and exit'
+  echo ''
+  echo ''
+  exit 1
+}
+
+check_current(){
+  for preset in ${presets_list[@]}; do
+    pushd $config_dir >/dev/null
+    check_preset=$(ls | grep "\-$preset.conf")
+    count_all=$(echo $check_preset | wc -w)
+    if [[ $? -eq 0 ]] && [[ $count_all -eq 5 ]]; then
+      echo -e "You are currently using [ ${preset} ] presets."
+    fi
+    popd >/dev/null
+  done
+}
+
+set_preset(){
+  select preset in ${presets_list[@]}; do
+    pushd $config_dir >/dev/null
+    check_preset=$(ls | grep "\-$preset.conf")
+    count_all=$(echo $check_preset | wc -w)
+    # Check If the selected preset is currently in use
+    if [[ $? -eq 0 ]] && [[ $count_all -eq 5 ]]; then
+      current=$preset
+      echo -e "$current preset is currently in use."
+      exit 1
+    else
+      targets_rm=("37-repl-global-*.conf" "60-latin-*.conf" "65-non-latin-*.conf" "66-aliases-wine-*.conf" "93-final-lang-spec-*.conf")
+      for target in ${targets_rm[@]}; do
+        rm $target
+      done
+      # Do the job now...
+      targets_list=$(ls $presets_dir/$preset/*.conf)
+      for target in ${targets_list[@]}; do
+        echo -e $target
+        ln -sf $target .
+      done
+    fi
+    popd >/dev/null
+    break
+    unset $current
+  done
+}
+
+howto(){
+  echo -e "Run '${0##*/} help' to list available options."
+  echo -e ''
+  echo -e 'Unknown or no option selected, aborting.'
+  exit 1
+}
+
+case $option in
+  help)
+    usage
+    ;;
+  check)
+    check_current
+    ;;
+  set)
+    set_preset
+    ;;
+  *)
+    howto
+    ;;
+esac
+

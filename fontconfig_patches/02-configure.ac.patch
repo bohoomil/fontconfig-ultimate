@@ -1,6 +1,6 @@
---- a/configure.ac	2013-03-29 08:10:15.000000000 +0100
-+++ b/configure.ac	2013-05-12 12:32:24.493474542 +0200
-@@ -514,9 +514,14 @@ AC_SUBST(FC_FONTDATE)
+--- a/configure.ac	2013-10-11 06:27:42.000000000 +0200
++++ b/configure.ac	2013-10-11 19:02:55.440016339 +0200
+@@ -553,9 +553,14 @@ AC_SUBST(FC_FONTDATE)
  
  AC_ARG_WITH(templatedir,
  	[AC_HELP_STRING([--with-templatedir=DIR],
@@ -16,7 +16,7 @@
  AC_ARG_WITH(baseconfigdir,
  	[AC_HELP_STRING([--with-baseconfigdir=DIR],
  			[Use DIR to store the base configuration files [default=SYSCONFDIR/fonts]])],
-@@ -540,6 +545,13 @@ no|yes)
+@@ -579,6 +584,13 @@ no|yes)
  *)
  	;;
  esac
@@ -30,7 +30,7 @@
  case "$baseconfigdir" in
  no|yes)
  	baseconfigdir='${sysconfdir}'/fonts
-@@ -563,11 +575,14 @@ no|yes)
+@@ -602,10 +614,12 @@ no|yes)
  esac
  
  TEMPLATEDIR=${templatedir}
@@ -38,14 +38,12 @@
  BASECONFIGDIR=${baseconfigdir}
  CONFIGDIR=${configdir}
  XMLDIR=${xmldir}
- AC_SUBST(templatedir)
  AC_SUBST(TEMPLATEDIR)
-+AC_SUBST(templateinfdir)
 +AC_SUBST(TEMPLATEINFDIR)
- AC_SUBST(baseconfigdir)
  AC_SUBST(BASECONFIGDIR)
- AC_SUBST(configdir)
-@@ -692,6 +707,7 @@ fc-glyphname/Makefile
+ AC_SUBST(CONFIGDIR)
+ AC_SUBST(XMLDIR)
+@@ -733,6 +747,7 @@ fc-glyphname/Makefile
  fc-case/Makefile
  src/Makefile
  conf.d/Makefile
