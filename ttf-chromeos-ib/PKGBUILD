@@ -4,8 +4,8 @@ pkgname=ttf-chromeos-ib
 pkgver=1.23
 pkgrel=4
 depends=('fontconfig')
-pkgdesc="Google ChromeOS fonts."
-url="http://www.fontsquirrel.com/fonts/list/foundry/dalton-maag-ltd"
+pkgdesc="Google Chrome OS fonts."
+url="http://code.google.com/p/chromium-os/issues/detail?id=5287"
 arch=('any')
 groups=('infinality-bundle-fonts')
 conflicts=('otf-google-fonts-hg' 'ttf-google-fonts-git' 'ttf-google-fonts-hg' 'ttf-chromeos-fonts' 'ttf-chromeos-extra-fonts')

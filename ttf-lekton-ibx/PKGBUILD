@@ -5,19 +5,27 @@ pkgver=34.0
 pkgrel=3
 depends=('fontconfig')
 pkgdesc="Lekton monospace font from Accademia di Belle Arti di Urbino."
-url="http://sorkintype.com"
+url="http://code.google.com/p/googlefontdirectory/"
 arch=('any')
 groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-lekton')
 replaces=('ttf-lekton')
 license=('OFL-1.1')
-source=(http://www.fontsquirrel.com/fonts/download/lekton)
 install=$pkgname.install
+source=(https://googlefontdirectory.googlecode.com/hg/ofl/lekton/Lekton-{Bold,Italic,Regular}.ttf
+        https://googlefontdirectory.googlecode.com/hg/ofl/lekton/OFL.txt)
 
 package(){
   cd "${srcdir}"
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
 
-md5sums=('e21dcf0f586f265f5ab5e34d8890b069')
+md5sums=('e1d92ee2e37166e9efc0a76de0ef8fe3'
+         'eb2bec254fb2dcb802d38ced4d5d6318'
+         '27568f60335a1ca91a2c9c9c855d68a5'
+         '41b987cb3bc00551c062be8a7cba73bb')

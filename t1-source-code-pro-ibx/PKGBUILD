@@ -1,11 +1,11 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=t1-source-code-pro-ibx
-pkgver=2.1
-pkgrel=2
+pkgver=2.2
+pkgrel=1
 depends=('fontconfig')
 pkgdesc="A set of mono-spaced OpenType fonts designed for coding environments. Type 1."
-url="http://www.ctan.org/tex-archive/fonts/opensans"
+url="http://sourceforge.net/projects/sourcecodepro.adobe/"
 arch=('any')
 license=('OFL-1.1')
 groups=('infinality-bundle-fonts-extra')
@@ -29,4 +29,4 @@ package(){
   install -m644 fonts/*.{pfb,afm} "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
 
-md5sums=('1e061742fc08d5ffa336ee80db2d3f02')
+md5sums=('2eb43d71678656a38cedacd5a0da464c')
