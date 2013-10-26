@@ -1,0 +1,26 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=otf-alegreya-ibx
+pkgver=1.003
+pkgrel=1
+depends=('fontconfig')
+pkgdesc="Alegreya is a serif typeface originally intended for literature."
+url="http://www.fontsquirrel.com/fonts/alegreya"
+arch=('any')
+groups=('infinality-bundle-fonts-extra')
+license=('OFL-1.1')
+install=$pkgname.install
+source=(http://www.fontsquirrel.com/fonts/download/alegreya)
+
+package(){
+  cd "${srcdir}"
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 'SIL Open Font License.txt' \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"/OFL.txt
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -Dm644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+}
+
+md5sums=('bda0d276b1f80cebd657a6a6cf7566a3')

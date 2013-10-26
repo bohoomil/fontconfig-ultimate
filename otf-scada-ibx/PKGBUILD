@@ -1,0 +1,25 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=otf-scada-ibx
+pkgver=3.005
+pkgrel=1
+depends=('fontconfig')
+pkgdesc="Scada is a sans serif font designed by Jovanny Lemonad."
+url="http://www.scada.lv/en/company/scada-font"
+arch=('any')
+groups=('infinality-bundle-fonts-extra')
+license=('OFL-1.1')
+install=$pkgname.install
+source=(http://code.google.com/p/googlefontdirectory/source/browse/ofl/scada/src/Scada-{Bold,BoldItalic,Italic,Regular}.otf)
+
+package(){
+  cd "${srcdir}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -Dm644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+}
+
+md5sums=('c4f4d8e41d73824f1a90c890c40f402f'
+         'b78dd1d113741713d8b8c3b62a76c650'
+         'c8470d21c72ab39b558dbdbc3b388d83'
+         '060a6d66f4c15f1f4dc2466b4d323ce2')
