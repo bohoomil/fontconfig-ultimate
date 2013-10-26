@@ -2,9 +2,9 @@ conf.d/README
 
 Each file in this directory is a fontconfig configuration file.  Fontconfig
 scans this directory, loading all files of the form [0-9][0-9]*.conf.
-These files are normally installed in ../conf.avail and then symlinked here,
-allowing them to be easily installed and then enabled/disabled by adjusting
-the symlinks.
+These files are normally installed in @TEMPLATEDIR@
+and then symlinked here, allowing them to be easily installed and then
+enabled/disabled by adjusting the symlinks.
 
 The files are loaded in numeric order, the structure of the configuration
 has led to the following conventions in usage:
@@ -23,7 +23,7 @@ has led to the following conventions in usage:
  90 through 99		font synthesis
 
 If you are using fontconfig-infinality-ultimate from the infinality-bundle
-collection, configuration files are located in ../conf.avail.infinality and
-they are symlinked here instead. The stock template directory and configuration
+collection, configuration files are located in @TEMPLATEINFDIR@ and
+the are symlinked here instead. The stock template directory and configuration
 files are still available for compatibility reasons and should not be removed.
 

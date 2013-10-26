@@ -21,23 +21,19 @@
 #  TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 #  PERFORMANCE OF THIS SOFTWARE.
 
-DOC_FILES= \
-	README
+BUILT_SOURCES = README
+DOC_SOURCES = README.in
+DOC_FILES = $(DOC_SOURCES:.in=)
 
 CONF_LINKS = \
 	10-base-rendering.conf    \
 	31-fix-cantarell.conf   \
-	37-repl-global.conf   \
 	38-repl-tt-traced-bitmap.conf   \
-	39-repl-corrective.conf   \
 	40-non-latin.conf    \
 	45-latin.conf   \
 	49-sansserif.conf   \
 	50-user.conf    \
 	51-local.conf   \
-	60-latin.conf   \
-	65-non-latin.conf   \
-	66-aliases-wine.conf    \
 	68-override.conf    \
 	82-no-embedded-bitmaps.conf   \
 	82-no-force-autohint.conf   \
@@ -48,31 +44,26 @@ CONF_LINKS = \
 	90-non-tt-fonts.conf    \
 	90-tt-fonts.conf    \
 	92-selective-rendering.conf   \
-	93-final-lang-spec.conf   \
 	93-final-rendering.conf   \
 	94-no-synthetic.conf    \
 	95-reject.conf
 
-EXTRA_DIST = $(templateinf_DATA) $(DOC_FILES)
+EXTRA_DIST = $(templateinf_DATA) $(DOC_SOURCES)
+CLEANFILES = $(DOC_FILES)
 
-configdir=$(CONFIGDIR)
+configdir = $(CONFIGDIR)
 config_DATA = $(DOC_FILES)
 
 templateinfdir = $(TEMPLATEINFDIR)
 templateinf_DATA =				\
 	10-base-rendering.conf    \
 	31-fix-cantarell.conf   \
-	37-repl-global.conf   \
 	38-repl-tt-traced-bitmap.conf   \
-	39-repl-corrective.conf   \
 	40-non-latin.conf    \
 	45-latin.conf   \
 	49-sansserif.conf   \
 	50-user.conf    \
 	51-local.conf   \
-	60-latin.conf   \
-	65-non-latin.conf   \
-	66-aliases-wine.conf    \
 	68-override.conf    \
 	82-no-bitmaps.conf    \
 	82-no-embedded-bitmaps.conf   \
@@ -88,10 +79,12 @@ templateinf_DATA =				\
 	90-non-tt-fonts.conf    \
 	90-tt-fonts.conf    \
 	92-selective-rendering.conf   \
-	93-final-lang-spec.conf   \
 	93-final-rendering.conf   \
 	94-no-synthetic.conf    \
 	95-reject.conf
+
+README: $(srcdir)/README.in
+	sed "s|\@TEMPLATEINFDIR\@|$(templateinfdir)|" $< > $@
 
 install-data-hook:
 	mkdir -p $(DESTDIR)$(configdir)
