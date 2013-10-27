@@ -8,8 +8,6 @@ pkgdesc="A library for configuring and customizing font access (includes generic
 url=('http://www.fontconfig.org/release/')
 license=('custom' 'CC-BY-SA')
 pkgver=2.11.0
-_freetypever=2.5.0.1
-_freetyperel=7
 pkgrel=5
 arch=('i686' 'x86_64')
 groups=('infinality-bundle')
@@ -25,7 +23,7 @@ backup=('etc/fonts/fonts.conf'
         'etc/fonts/conf.avail.infinality/custom/93-final-lang-spec-custom.conf')
 install=fontconfig-ultimate.install
 source=(http://www.fontconfig.org/release/${_basename}-${pkgver}.tar.bz2
-        git://github.com/bohoomil/fontconfig-ultimate.git#branch=infinality-bundle)
+        git://github.com/bohoomil/fontconfig-ultimate.git#branch=master)
 
 # a nice page to test font matching:
 # http://zipcon.net/~swhite/docs/computers/browsers/fonttest.html
@@ -44,7 +42,7 @@ prepare() {
            05-Makefile.am.in.patch)
 
   # copy fontconfig-ib patches & stuff
-  cd "${srcdir}/${_gitname}"/infinality-bundle-src/"${pkgver}-${pkgrel}-${_freetypever}-${_freetyperel}"
+  cd "${srcdir}/${_gitname}"
 
   cp -r conf.d.infinality "${srcdir}/${_basename}-${pkgver}"/conf.d.infinality
   cp -r fontconfig_patches/*.patch "${srcdir}/${_basename}-${pkgver}"
@@ -93,7 +91,7 @@ package() {
   install -m644 COPYING "${pkgdir}"/usr/share/licenses/"${_basename}"
 
   #install infinality stuff
-  cd "${srcdir}/${_gitname}"/infinality-bundle-src/"${pkgver}-${pkgrel}-${_freetypever}-${_freetyperel}"
+  cd "${srcdir}/${_gitname}"
 
   # copy presets
   cp -r fontconfig_patches/{custom,free,ms} \
@@ -104,7 +102,7 @@ package() {
 
   # install license
   install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -Dm644 ../LICENSE "${pkgdir}"/usr/share/licenses/"${pkgname}"/LICENSE
+  install -Dm644 LICENSE "${pkgdir}"/usr/share/licenses/"${pkgname}"/LICENSE
 
   # copy documentation
   install -m755 -d "${pkgdir}"/usr/share/doc/"${pkgname}"
