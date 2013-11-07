@@ -1,6 +1,7 @@
-#!/bin/sh
+#!/bin/bash
 
 # fc-presets v.0.5 | by bohoomil, 2013, GPL
+# [ Thanks cfr for testing and suggestions. ]
 # Set default fontconfig presets for your font collection.
 # Part of fontconfig-infinality-ultimate.
 
@@ -57,13 +58,13 @@ usage(){
   echo ' How to fix:'
   echo ' -----------'
   echo ' 1. Run <fc-presets set> as root.'
-  echo ' 2. Choose 4) to reset current settings.'
+  echo ' 2. Choose 4) to disable all presets.'
   echo ' 3. Re-run <fc-presets set> as root and choose a preset 1) - 3).'
   echo ''
   echo ' If no preset has been set (which means that at least 1 symbolic link'
   echo ' from a preset is missing), the relevant message is displayed:'
-  echo '    [ custom ] not set.'
-  echo '    [ ms ] not set.'
+  echo '    [ custom ] not set'
+  echo '    [ ms ] not set'
   echo '    [ free ] not set'
   echo ' How to fix:'
   echo ' -----------'
@@ -117,6 +118,31 @@ check_current(){
   popd >/dev/null
 }
 
+check_current_prejob(){
+  pushd $config_dir >/dev/null
+  targets_current=("37-repl-global-$option.conf" "60-latin-$option.conf" "65-non-latin-$option.conf" "66-aliases-wine-$option.conf" "93-final-lang-spec-$option.conf")
+  for preset in ${targets_current[@]}; do
+    check_current=$(ls *.conf | grep "\-$option.conf")
+    count_all=$(echo $check_current | wc -w)
+    if [[ -e $preset ]] && [[ $count_all -eq 5 ]]; then
+      echo -e " You are already using [ $option ] preset. Aborting."
+      exit 1
+    fi
+  done
+  popd >/dev/null
+}
+
+targets_check_prejob(){
+  pushd $presets_dir >/dev/null
+  preset_selected=$(ls "$option"/*\-$option.conf | wc -w)
+  if [ $preset_selected -lt 5 ]; then
+      echo -e 'Target not found. Did you set up'
+      echo -e 'fontconfig-infinality-ultimate correctly?'
+      exit 1
+    fi
+  popd >/dev/null
+}
+
 fc_reset(){
   pushd $config_dir >/dev/null
   targets_rm=("37-repl-global-*.conf" "60-latin-*.conf" "65-non-latin-*.conf" "66-aliases-wine-*.conf" "93-final-lang-spec-*.conf")
@@ -126,8 +152,8 @@ fc_reset(){
       echo -e 'Run the script again as root to commit changes.'
       exit 1
     else
-    rm $target >/dev/null 2>&1
-  fi
+      rm $target >/dev/null 2>&1
+    fi
   done
   popd >/dev/null
 }
@@ -162,6 +188,8 @@ set_preset(){
       custom)
         echo ' [ custom ] preset chosen...'
         option='custom'
+        check_current_prejob
+        targets_check_prejob
         fc_reset
         fc_set
         [ $? -eq 0 ] && OK || NOTOK
@@ -169,6 +197,8 @@ set_preset(){
       free)
         echo ' [ free ] preset chosen...'
         option='free'
+        check_current_prejob
+        targets_check_prejob
         fc_reset
         fc_set
         [ $? -eq 0 ] && OK || NOTOK
@@ -176,6 +206,8 @@ set_preset(){
       ms)
         echo ' [ ms ] preset chosen...'
         option='ms'
+        check_current_prejob
+        targets_check_prejob
         fc_reset
         fc_set
         [ $? -eq 0 ] && OK || NOTOK
@@ -188,6 +220,7 @@ set_preset(){
       quit)
         echo ' No preset chosen. Aborting.'
         break
+        exit 1
         ;;
       *)
         echo 'Invalid option. Try again:'
@@ -196,6 +229,7 @@ set_preset(){
     esac
   break
   unset $current
+  unset $option
 done
 exit 0
 }
