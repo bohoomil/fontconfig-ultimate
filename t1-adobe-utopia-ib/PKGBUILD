@@ -1,0 +1,44 @@
+# $Id: PKGBUILD 150376 2012-02-17 09:55:00Z allan $
+# Maintainer: Jan de Groot <jgc@archlinux.org>
+# Contributor: bohoomil <@zoho.com>
+
+pkgname=t1-adobe-utopia-ib
+pkgver=1.0.2
+pkgrel=2
+pkgdesc="Adobe Utopia font. Type 1 version."
+arch=(any)
+license=('custom')
+url="http://xorg.freedesktop.org/"
+depends=('fontconfig')
+groups=('infinality-bundle-fonts')
+install=$pkgname.install
+source=(${url}/releases/individual/font/font-adobe-utopia-type1-1.0.2.tar.bz2)
+
+md5sums=('ad945b19b2db64dec3a19507848ff63b')
+
+build() {
+  cd "${srcdir}"
+  for dir in *; do
+    if [ -d "${dir}" ]; then
+      pushd "${dir}"
+      ./configure --prefix=/usr \
+        --with-fontdir=/usr/share/fonts/${pkgname}
+      make
+      popd
+    fi
+  done
+}
+
+package() {
+  cd "${srcdir}"
+  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
+  for dir in *; do
+    if [ -d "${dir}" ]; then
+      pushd "${dir}"
+      make DESTDIR="${pkgdir}" install
+      install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE.${dir%-*}"
+      popd
+    fi
+  done
+  rm -f "${pkgdir}"/usr/share/fonts/${pkgname}/fonts.*
+}

@@ -6,12 +6,12 @@
 _pkgbasename=cairo
 pkgname=lib32-$_pkgbasename-infinality-ultimate
 pkgver=1.12.16
-pkgrel=2
+pkgrel=4
 groups=('infinality-bundle')
 pkgdesc="Cairo vector graphics library with respect-fontconfig, expose and Ubuntu patches (32-bit, infinality-bundle)"
 arch=('x86_64')
 url="https://launchpad.net/ubuntu/precise/+source/cairo"
-groups=('infinality-bundle')
+groups=('infinality-bundle-multilib')
 license=('LGPL' 'MPL')
 makedepends=('gcc-multilib' 'lib32-gtk2' 'lib32-mesa-libgl')
 depends=('lib32-libpng' 'lib32-libxext' 'lib32-libxrender'

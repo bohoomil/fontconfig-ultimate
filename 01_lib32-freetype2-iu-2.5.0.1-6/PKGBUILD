@@ -6,12 +6,12 @@
 _pkgbasename=freetype2
 pkgname=lib32-$_pkgbasename-infinality-ultimate
 pkgver=2.5.0.1
-pkgrel=5
+pkgrel=6
 pkgdesc="TrueType font rendering library with Infinality patches and custom settings by bohoomil (32-bit, infinality-bundle)."
 arch=(x86_64)
 license=('GPL' 'CC-BY-SA')
 url="http://freetype.sourceforge.net"
-groups=('infinality-bundle')
+groups=('infinality-bundle-multilib')
 makedepends=(gcc-multilib)
 conflicts=('lib32-freetype2' 'lib32-freetype2-infinality' 'lib32-freetype2-git-infinality' 'lib32-freetype2-ubuntu')
 provides=('lib32-freetype2' 'lib32-freetype2-infinality')
