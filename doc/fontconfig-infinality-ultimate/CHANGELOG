@@ -1,9 +1,41 @@
 
 infinality-bundle+fonts
------------------------
+=======================
 
 CHANGELOG
 ---------
+
+2013-11-08
+~~~~~~~~~~
+
+* fontconfig-infinality-ultimate 2.11.04-6
+** fc-presets reworked:
+   - new [reset] option
+   - added new sanity checks and improved old ones
+   - extended help and basic troubleshooting FAQ included
+** 37-repl-global-free.conf -- added replacements for
+   @font-face:Lora and @font-face:Autonym
+** 92-selective-rendering.conf -- minor fixes to
+   Noto Sans and Liberation Sans
+
+* infinality-bundle-fonts
+** splitting xorg-fonts-type1 from [extra] to 4 independent packages:
+   - t1-adobe-utopia-ib
+   - t1-bh-ib
+   - t1-cursor-ib
+   - t1-ibm-courier-ib
+** removed Bitstream Type 1 fonts (as per xorg-fonts-type1):
+   - Bitstream Charter
+   - Courier 10 pitch
+** adding remaining font packages from [extra] and [community]
+   to [infinality-bundle-fonts{-extra}]:
+   - ttf-droid-ib
+   - ttf-liberation-ib
+   - ttf-mph-2b-damase-ib
+   - ttf-ubuntu-font-family-ibx
+** adding gsfonts from [extra]: t1-urw-fonts-ib
+** added prebuild ttf-droid-monovar from AUR to
+   [infinality-bundle-fonts-extra]
 
 2013-10-25
 ~~~~~~~~~~
