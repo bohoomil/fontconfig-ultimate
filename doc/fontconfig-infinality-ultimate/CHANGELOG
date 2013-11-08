@@ -8,7 +8,7 @@ CHANGELOG
 2013-11-08
 ~~~~~~~~~~
 
-* fontconfig-infinality-ultimate 2.11.04-6
+* fontconfig-infinality-ultimate 2.11.0-6
 ** fc-presets reworked:
    - new [reset] option
    - added new sanity checks and improved old ones
@@ -40,7 +40,7 @@ CHANGELOG
 2013-10-25
 ~~~~~~~~~~
 
-* fontconfig-infinality-ultimate 2.11.04-5
+* fontconfig-infinality-ultimate 2.11.0-5
 ** 37-repl-global-free.conf -- added new substitution patterns,
    a few were modified:
    Calibri       => Carlito (temporary beta switch)
