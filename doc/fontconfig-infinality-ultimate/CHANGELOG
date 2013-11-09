@@ -5,7 +5,7 @@ infinality-bundle+fonts
 CHANGELOG
 ---------
 
-2013-11-08
+2013-11-09
 ~~~~~~~~~~
 * fontconfig-infinality-ultimate 2.11.0-7
 ** fc-presets: re-run the main loop after disabling
