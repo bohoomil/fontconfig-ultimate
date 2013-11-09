@@ -16,6 +16,7 @@ CHANGELOG
 
 * infinality-bundle-fonts
 ** added ttf-caladea-ib
+** added ttf-junicode-ibx
 ** ttf-droid-ib: fixed fontconfig configuration files
 ** meta packages for base and extended collections
 
