@@ -11,9 +11,11 @@ Quick installation instructions
 
 * `infinality-bundle user notes <http://bohoomil.cu.cc/>`_ (frequently updated, general information about infinality-bundle),
 
-* `Font Configuration - Infinality: the easy way <https://wiki.archlinux.org/index.php/Font_Configuration#Infinality:_the_easy_way>`_ (quick install notes)
+* `Infinality-bundle+fonts <https://wiki.archlinux.org/index.php/Infinality-bundle+fonts>`_ (install notes & troubleshooting)
 
-* `Arch Linux Forums <https://bbs.archlinux.org/viewtopic.php?id=162098>`_ (a support thread for Arch Linux users).
+* `infinality-bundle: good looking fonts made (even) easier <https://bbs.archlinux.org/viewtopic.php?id=162098>`_ (support thread for Arch Linux users)
+
+* `infinality-bundle-fonts: a free multilingual font collection for Arch <https://bbs.archlinux.org/viewtopic.php?id=170976>`_ (support thread for infinality-bundle-fonts repository)
 
 Source packages, including PKGBUILD scripts, are available `in the src directory <http://ibn.net63.net/infinality-bundle/src/>`_.
 
