@@ -10,8 +10,12 @@ CHANGELOG
 * fontconfig-infinality-ultimate 2.11.0-7
 ** fc-presets: re-run the main loop after disabling
    all presets
+** new replacements:
+   - Cambria => Caladea
+   - Candara => Linux Biolinum
 
 * infinality-bundle-fonts
+** added ttf-caladea-ib
 ** ttf-droid-ib: fixed fontconfig configuration files
 ** meta packages for base and extended collections
 
