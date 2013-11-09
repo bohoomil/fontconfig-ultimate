@@ -1,0 +1,25 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=ttf-junicode-ibx
+pkgver=0.7.8
+pkgrel=1
+depends=('fontconfig')
+pkgdesc="Junicode is a serif typeface for medievalists with many OpenType features."
+url="http://junicode.sourceforge.net/"
+arch=('any')
+license=('OFL-1.1')
+groups=('infinality-bundle-fonts-extra')
+conflicts=('ttf-junicode')
+install=$pkgname.install
+source=(http://downloads.sourceforge.net/project/junicode/junicode/junicode-0-7-8/junicode-0-7-8.zip)
+
+package(){
+  cd "${srcdir}"/junicode/fonts
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+}
+
+md5sums=('6ed38ad9b8217b4eb371a72a60c99389')
+
+

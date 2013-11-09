@@ -1,0 +1,23 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=ttf-caladea-ib
+pkgver=20130214
+pkgrel=2
+_tarname=crosextrafonts
+depends=('fontconfig')
+pkgdesc="Caladeo is a serif font metrically compatible with Cambria."
+url="https://code.google.com/p/chromium/issues/detail?id=168879"
+arch=('any')
+groups=('infinality-bundle-fonts')
+license=('Apache')
+source=(http://commondatastorage.googleapis.com/chromeos-localmirror/distfiles/${_tarname}-$pkgver.tar.gz)
+install=$pkgname.install
+
+package(){
+  cd "${srcdir}"/"${_tarname}"-"${pkgver}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+}
+
+md5sums=('368f114c078f94214a308a74c7e991bc')
