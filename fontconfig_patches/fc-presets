@@ -215,7 +215,8 @@ set_preset(){
       reset)
         echo ' Removing current preset...'
         fc_reset
-        [ $? -eq 0 ] && OK || NOTOK
+        [ $? -eq 0 ] && echo -e 'Done. Now select a new preset...'
+        continue
         ;;
       quit)
         echo ' No preset chosen. Aborting.'
