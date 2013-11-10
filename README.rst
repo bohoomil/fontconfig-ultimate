@@ -1,13 +1,18 @@
 fontconfig-{infinality}-ultimate
 --------------------------------
 
-Font configuration files, patches, scripts and source packages (Infinality & friends)
------
+**Font configuration files, patches, scripts and source packages (Infinality & friends)**
+
 
 Quick installation instructions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**I. If you are an Arch Linux user, or if you are using one of the Arch Linux derivatives,** you may want to use pre-compiled packages from the [infinality-bundle] repository I maintain. This is a recommended approach in a majority of cases as it gives access to the entire functionality offered by Infinality patches and the ultimate configuration without a typical post installation routine. For more information, see:
+**I. If you are an Arch Linux user, or if you are using one of the Arch Linux
+derivatives,** you may want to use pre-compiled packages from the
+[infinality-bundle] repository I maintain. This is a recommended approach in a
+majority of cases as it gives access to the entire functionality offered by
+Infinality patches and the ultimate configuration without a typical post
+installation routine. For more information, see:
 
 * `infinality-bundle user notes <http://bohoomil.cu.cc/>`_ (general information about infinality-bundle, needs update),
 
@@ -49,15 +54,27 @@ Last but not least, don't forget to copy custom ``infinality-settings.sh`` from 
 Further customization and misc options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Any changes to the global ``fontconfig-ultimate`` settings should be introduced on a per-user ground in a local ``$HOME/.config/fontconfig`` directory. Please, consult ``/usr/share/doc/fontconfig-infinality-ultimate{-git}/fontconfig`` for examples and templates you will need to start tweaking.
+* Many changes to the global ``fontconfig-ultimate`` settings can be introduced 
+  on a per-user ground in a local ``$HOME/.config/fontconfig`` directory. 
+  Please, consult ``/usr/share/doc/fontconfig-infinality-ultimate{-git}/
+  fontconfig`` for examples and templates you will need to start tweaking.
 
-The configuration defaults to MS core fonts, so make sure you have already installed them. (For best results use the most recent MS fonts.) In case you don't have them or don't want to use them, modify your local copy of ``60-latin.conf`` and ``65-non-latin.conf`` and set your default font faces there.
+* At the moment, there are two font collections supported by
+  ``fontconfig-infinality-ultimate`` out of the box: a free one (activated by
+  default), available for Arch Linux users as easy to install packages, and a
+  proprietary one (Microsoft's fonts supplied with MS Windows and MS Office). In
+  you want to switch between them, use ``fc-presets`` script. There is also a
+  ``custom`` preset available for highly customized font collections.
+  Configuration files for all the presets are located in
+  ``/etc/fonts/conf.avail.infinality/``.
 
-If you want to force fontconfig to use a particular typeface for a specified language, you can do so in ``81-final-lang-spec.conf`` (working examples have been provided).
+* If you are using a desktop environment (KDE, Gnome) that lets you adjust font
+  settings on its own, you can duplicate the base values as found in
+  ``/etc/profile.d/infinality-settings.sh``.
 
-If you are using a desktop environment (KDE, Gnome) that lets you adjust font settings on its own, you can duplicate the base values as found in ``/etc/fonts/conf.d/10-base-rendering.conf``.
-
-If you are in need of good looking fonts but you aren't sure which to choose, see a brief list of my favourite free specimen `here <https://github.com/bohoomil/fontconf/wiki/Free-font-recomendations>`_ (to be updated).
+* All the necessary build scripts can be found in ``infinality-bundle`` branch.
+  It should not be a very demanding task to 'translare' them for use in
+  your own Linux distribution.
 
 .. _fontconfig-infinality-ultimate-git: https://aur.archlinux.org/packages/fontconfig-infinality-ultimate-git/
 
@@ -66,5 +83,24 @@ If you are in need of good looking fonts but you aren't sure which to choose, se
 License
 .......
 
-This work is licensed under a `Creative Commons Attribution 3.0 Unported License <http://creativecommons.org/licenses/by/3.0>`_.
+The MIT License (MIT) <http://opensource.org/licenses/MIT>
+Copyright (c) 2013 bohoomil
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
 
