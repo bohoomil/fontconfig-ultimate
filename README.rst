@@ -1,21 +1,21 @@
-fontconfig-{infinality}-ultimate-git
-====================================
+fontconfig-{infinality}-ultimate
+--------------------------------
 
-Font configuration files (Infinality & friends).
-------------------------------------------------
+Font configuration files, patches, scripts and source packages (Infinality & friends)
+-----
 
 Quick installation instructions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **I. If you are an Arch Linux user, or if you are using one of the Arch Linux derivatives,** you may want to use pre-compiled packages from the [infinality-bundle] repository I maintain. This is a recommended approach in a majority of cases as it gives access to the entire functionality offered by Infinality patches and the ultimate configuration without a typical post installation routine. For more information, see:
 
-* `infinality-bundle user notes <http://bohoomil.cu.cc/>`_ (frequently updated, general information about infinality-bundle),
+* `infinality-bundle user notes <http://bohoomil.cu.cc/>`_ (general information about infinality-bundle, needs update),
 
-* `Infinality-bundle+fonts <https://wiki.archlinux.org/index.php/Infinality-bundle+fonts>`_ (install notes & troubleshooting)
+* `Infinality-bundle+fonts <https://wiki.archlinux.org/index.php/Infinality-bundle+fonts>`_ (install notes, troubleshooting)
 
-* `infinality-bundle: good looking fonts made (even) easier <https://bbs.archlinux.org/viewtopic.php?id=162098>`_ (support thread for Arch Linux users)
+* `infinality-bundle: good looking fonts made (even) easier <https://bbs.archlinux.org/viewtopic.php?id=162098>`_ (official infinality-bundle support thread for Arch Linux users)
 
-* `infinality-bundle-fonts: a free multilingual font collection for Arch <https://bbs.archlinux.org/viewtopic.php?id=170976>`_ (support thread for infinality-bundle-fonts repository)
+* `infinality-bundle-fonts: a free multilingual font collection for Arch <https://bbs.archlinux.org/viewtopic.php?id=170976>`_ (official infinality-bundle-fonts support thread)
 
 Source packages, including PKGBUILD scripts, are available `in the src directory <http://ibn.net63.net/infinality-bundle/src/>`_.
 
