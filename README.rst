@@ -14,25 +14,51 @@ majority of cases as it gives access to the entire functionality offered by
 Infinality patches and the ultimate configuration without a typical post
 installation routine. For more information, see:
 
-* `infinality-bundle user notes <http://bohoomil.cu.cc/>`_ (general information about infinality-bundle, needs update),
+* `infinality-bundle user notes <http://bohoomil.cu.cc/>`_ (general information
+  about infinality-bundle, needs update),
 
-* `Infinality-bundle+fonts <https://wiki.archlinux.org/index.php/Infinality-bundle+fonts>`_ (install notes, troubleshooting)
+* `Infinality-bundle+fonts
+  <https://wiki.archlinux.org/index.php/Infinality-bundle+fonts>`_ (install
+  notes, troubleshooting)
 
-* `infinality-bundle: good looking fonts made (even) easier <https://bbs.archlinux.org/viewtopic.php?id=162098>`_ (official infinality-bundle support thread for Arch Linux users)
+* `infinality-bundle: good looking fonts made (even) easier
+  <https://bbs.archlinux.org/viewtopic.php?id=162098>`_ (official
+  infinality-bundle support thread for Arch Linux users)
 
-* `infinality-bundle-fonts: a free multilingual font collection for Arch <https://bbs.archlinux.org/viewtopic.php?id=170976>`_ (official infinality-bundle-fonts support thread)
+* `infinality-bundle-fonts: a free multilingual font collection for Arch
+  <https://bbs.archlinux.org/viewtopic.php?id=170976>`_ (official
+  infinality-bundle-fonts support thread)
 
-Source packages, including PKGBUILD scripts, are available `in the src directory <http://ibn.net63.net/infinality-bundle/src/>`_.
+Source packages, including PKGBUILD scripts, are available `in the src directory
+<http://ibn.net63.net/infinality-bundle/src/>`_.
 
   | **CAUTION**
-  | Make sure your distribution has been fully updated and is using 
-  | the most recent libraries as present in the official Arch Linux 
-  | repositories. Using outdated system components with the bundle 
-  | is not recommended as it may severely break your system.
+  | Make sure your distribution has been fully updated and is using the most 
+  | recent libraries as present in the official Arch Linux repositories. 
+  | Using outdated system components with the bundle is not recommended as it 
+  | may severely break your system.
 
-**II. If you still prefer or have to go the generic way,** i.e. install ``freetype2-infinality`` from the AUR, you can use  `fontconfig-infinality-ultimate-git`_ and build it on your own. The git version may be less stable than the one available in my repository since it is a testing ground for future ``fontconfig-infinality-ultimate`` official releases. When you are done with insatllation, you will have to copy custom ``infinality-settings.sh`` from ``/usr/share/doc/fontconfig-infinality-ultimate-git/freetype`` to ``/etc/profile.d`` and replace the one that came with the non-bundle ``freetype2-infinality``.
+**II. If you still prefer or have to go the generic way,** i.e. install
+``freetype2-infinality`` from the AUR, you can use
+`fontconfig-infinality-ultimate-git`_ and build it on your own. The git version
+may be less stable than the one available in my repository since it is a testing
+ground for future ``fontconfig-infinality-ultimate`` official releases. When you
+are done with insatllation, you will have to copy custom
+``infinality-settings.sh`` from
+``/usr/share/doc/fontconfig-infinality-ultimate-git/freetype`` to
+``/etc/profile.d`` and replace the one that came with the non-bundle
+``freetype2-infinality``.
 
-**III. If you are using any Linux distribution but Arch Linux or its derivative,** you can use all available resources here to rebuild ``fontconfig`` package available in your distribution. (For pre-2.10.93 versions of stock ``fontconfig``--especially version 2.10.92--check the ``infinality-bundle`` branch of this repo for compatible patches.) Building a patched version of ``fontconfig`` should be relatively easy: all you will need is appropriate ``src`` and ``devel`` packages and libraries and your favourite text editor to modify the build script. You can always use Arch's PKGBUILD as a model to follow. If you have questions, please consult your distro's documentation and community.
+**III. If you are using any Linux distribution but Arch Linux or its
+derivative,** you can use all available resources here to rebuild ``fontconfig``
+package available in your distribution. (For pre-2.10.93 versions of stock
+``fontconfig``--especially version 2.10.92--check the ``infinality-bundle``
+branch of this repo for compatible patches.) Building a patched version of
+``fontconfig`` should be relatively easy: all you will need is appropriate
+``src`` and ``devel`` packages and libraries and your favourite text editor to
+modify the build script. You can always use Arch's PKGBUILD as a model to
+follow. If you have questions, please consult your distro's documentation and
+community.
    
   | **CAUTION**
   | Before installing any patched version ``fontconfig``, backup the whole
@@ -46,10 +72,14 @@ Source packages, including PKGBUILD scripts, are available `in the src directory
   | configuration. It may be possible that your personal configuration overrides
   | and interferes with global ``fontconfig`` settings.
 
-Last but not least, don't forget to copy custom ``infinality-settings.sh`` from ``/usr/share/doc/fontconfig-infinality-ultimate-git/freetype`` to ``/etc/profile.d`` and replace the one that came with the non-bundle ``freetype2-infinality``.
+Last but not least, don't forget to copy custom ``infinality-settings.sh`` from
+``/usr/share/doc/fontconfig-infinality-ultimate-git/freetype`` to
+``/etc/profile.d`` and replace the one that came with the non-bundle
+``freetype2-infinality``.
 
   | **NOTE**
-  | You will need at least ``freetype2-infinality`` version ``2.4.11``.
+  | You will need ``freetype2-infinality`` version ``2.5.0.1``.
+
 
 Further customization and misc options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
