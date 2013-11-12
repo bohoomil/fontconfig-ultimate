@@ -64,6 +64,7 @@ community.
   | available in ``$HOME/.config/fontconfig``. This way you can simply revert
   | your setup to its previous state.
 
+
   | **NOTE**
   | Start troubleshooting by temporarily disabling your local ``fontconfig``
   | configuration. It may be possible that your personal configuration overrides
