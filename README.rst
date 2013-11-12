@@ -29,7 +29,7 @@ installation routine. For more information, see:
   <https://bbs.archlinux.org/viewtopic.php?id=170976>`_ (official
   infinality-bundle-fonts support thread)
 
-  | **CAUTION**
+  | NOTE
   | Make sure your distribution has been fully updated and is using the most
   | recent libraries as present in the official Arch Linux repositories. Using
   | outdated system components with the bundle is not recommended as it
@@ -57,7 +57,7 @@ modify the build script. You can always use Arch's PKGBUILD as a model to
 follow. If you have questions, please consult your distro's documentation and
 community.
    
-  | **CAUTION**
+  | NOTE
   | Before installing any patched version ``fontconfig``, backup the whole
   | ``/etc/fonts`` directory in case something goes wrong and you are sure
   | it has nothing to do with your local ``fontconfig`` configuration, usually 
