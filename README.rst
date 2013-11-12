@@ -16,15 +16,12 @@ installation routine. For more information, see:
 
 * `infinality-bundle user notes <http://bohoomil.cu.cc/>`_ (general information
   about infinality-bundle, needs update),
-
 * `Infinality-bundle+fonts
   <https://wiki.archlinux.org/index.php/Infinality-bundle+fonts>`_ (install
   notes, troubleshooting)
-
 * `infinality-bundle: good looking fonts made (even) easier
   <https://bbs.archlinux.org/viewtopic.php?id=162098>`_ (official
   infinality-bundle support thread for Arch Linux users)
-
 * `infinality-bundle-fonts: a free multilingual font collection for Arch
   <https://bbs.archlinux.org/viewtopic.php?id=170976>`_ (official
   infinality-bundle-fonts support thread)
