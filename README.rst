@@ -31,8 +31,8 @@ installation routine. For more information, see:
 
   | **CAUTION**
   | Make sure your distribution has been fully updated and is using the most 
-  | recent libraries as present in the official Arch Linux repositories. 
-  | Using outdated system components with the bundle is not recommended as it 
+  | recent libraries as present in the official Arch Linux repositories. Using 
+  | outdated system components with the bundle is not recommended as it 
   | may severely break your system.
 
 **II. If you still prefer or have to go the generic way,** i.e. install
