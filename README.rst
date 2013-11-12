@@ -12,7 +12,15 @@ derivatives,** you may want to use pre-compiled packages from the
 [infinality-bundle] repository I maintain. This is a recommended approach in a
 majority of cases as it gives access to the entire functionality offered by
 Infinality patches and the ultimate configuration without a typical post
-installation routine. For more information, see:
+installation routine. 
+
+  | **NOTE**
+  | Make sure your distribution has been fully updated and is using the most
+  | recent libraries as present in the official Arch Linux repositories. Using
+  | outdated system components with the bundle is not recommended as it
+  | may severely break your system.
+
+For more information, see:
 
 * `infinality-bundle user notes <http://bohoomil.cu.cc/>`_ (general information
   about infinality-bundle, needs update),
@@ -25,12 +33,6 @@ installation routine. For more information, see:
 * `infinality-bundle-fonts: a free multilingual font collection for Arch
   <https://bbs.archlinux.org/viewtopic.php?id=170976>`_ (official
   infinality-bundle-fonts support thread)
-
-  | **NOTE**
-  | Make sure your distribution has been fully updated and is using the most
-  | recent libraries as present in the official Arch Linux repositories. Using
-  | outdated system components with the bundle is not recommended as it
-  | may severely break your system.
 
 **II. If you still prefer or have to go the generic way,** i.e. install
 ``freetype2-infinality`` from the AUR, you can use
