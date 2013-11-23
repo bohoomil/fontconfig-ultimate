@@ -10,8 +10,7 @@ CHANGELOG
 
 * fontconfig-infinality-ultimate
 ** fixed bitmap to outline replacement rules
-   and split 38-repl-tt-traced-bitmap.conf
-   https://github.com/bohoomil/fontconfig-ultimate/issues/8
+   and split 38-repl-tt-traced-bitmap.conf (issue #8)
 
 2013-11-09
 ~~~~~~~~~~
