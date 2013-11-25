@@ -5,12 +5,13 @@ infinality-bundle+fonts
 CHANGELOG
 ---------
 
-2013-11-21
+2013-11-25
 ----------
 
 * fontconfig-infinality-ultimate
 ** fixed bitmap to outline replacement rules
    and split 38-repl-tt-traced-bitmap.conf (issue #8)
+** fixed Liberation Sans Bold & Regular < 13px
 
 2013-11-09
 ~~~~~~~~~~
