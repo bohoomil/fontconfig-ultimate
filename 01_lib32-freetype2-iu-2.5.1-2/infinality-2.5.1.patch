@@ -1,5 +1,5 @@
 --- a/configure	2013-05-28 23:00:03.000000000 +0200
-+++ b/configure	2013-06-19 22:11:51.000000000 +0200
++++ b/configure	2013-11-25 22:29:19.843476528 +0100
 @@ -13,6 +13,8 @@
  # Call the `configure' script located in `builds/unix'.
  #
@@ -9,8 +9,8 @@
  rm -f config.mk builds/unix/unix-def.mk builds/unix/unix-cc.mk
  
  # respect GNUMAKE environment variable for backwards compatibility
---- a/devel/ftoption.h	2013-06-03 10:13:23.000000000 +0200
-+++ b/devel/ftoption.h	2013-06-19 22:11:51.000000000 +0200
+--- a/devel/ftoption.h	2013-11-12 12:34:56.000000000 +0100
++++ b/devel/ftoption.h	2013-11-25 22:29:19.843476528 +0100
 @@ -596,6 +596,17 @@ FT_BEGIN_HEADER
  
    /*************************************************************************/
@@ -29,8 +29,8 @@
    /* If you define TT_CONFIG_OPTION_UNPATENTED_HINTING, a special version  */
    /* of the TrueType bytecode interpreter is used that doesn't implement   */
    /* any of the patented opcodes and algorithms.  The patents related to   */
---- a/include/freetype/config/ftoption.h	2013-06-03 10:05:36.000000000 +0200
-+++ b/include/freetype/config/ftoption.h	2013-06-19 22:11:51.220002139 +0200
+--- a/include/config/ftoption.h	2013-11-12 12:26:25.000000000 +0100
++++ b/include/config/ftoption.h	2013-11-25 22:29:19.843476528 +0100
 @@ -92,7 +92,7 @@ FT_BEGIN_HEADER
    /* This is done to allow FreeType clients to run unmodified, forcing     */
    /* them to display normal gray-level anti-aliased glyphs.                */
@@ -64,8 +64,8 @@
    /* If you define TT_CONFIG_OPTION_UNPATENTED_HINTING, a special version  */
    /* of the TrueType bytecode interpreter is used that doesn't implement   */
    /* any of the patented opcodes and algorithms.  The patents related to   */
---- a/src/autofit/aflatin.c	2013-05-28 23:00:03.000000000 +0200
-+++ b/src/autofit/aflatin.c	2013-06-19 22:11:51.223335473 +0200
+--- a/src/autofit/aflatin.c	2013-10-19 21:41:12.000000000 +0200
++++ b/src/autofit/aflatin.c	2013-11-25 22:29:19.843476528 +0100
 @@ -23,6 +23,7 @@
  #include "afglobal.h"
  #include "aflatin.h"
@@ -74,7 +74,7 @@
  
  
  #ifdef AF_CONFIG_OPTION_USE_WARPER
-@@ -577,8 +578,33 @@
+@@ -801,8 +802,33 @@
      FT_Pos        delta;
      AF_LatinAxis  axis;
      FT_UInt       nn;
@@ -108,7 +108,7 @@
      if ( dim == AF_DIMENSION_HORZ )
      {
        scale = scaler->x_scale;
-@@ -605,7 +631,7 @@
+@@ -829,7 +855,7 @@
      {
        AF_LatinAxis  Axis = &metrics->axis[AF_DIMENSION_VERT];
        AF_LatinBlue  blue = NULL;
@@ -117,7 +117,7 @@
  
        for ( nn = 0; nn < Axis->blue_count; nn++ )
        {
-@@ -615,7 +641,12 @@
+@@ -839,7 +865,12 @@
            break;
          }
        }
@@ -131,7 +131,7 @@
        if ( blue )
        {
          FT_Pos   scaled;
-@@ -701,7 +732,13 @@
+@@ -958,7 +989,13 @@
  
          /* a blue zone is only active if it is less than 3/4 pixels tall */
          dist = FT_MulFix( blue->ref.org - blue->shoot.org, scale );
@@ -145,7 +145,7 @@
          {
  #if 0
            FT_Pos  delta1;
-@@ -752,7 +789,12 @@
+@@ -1009,7 +1046,12 @@
              delta2 = -delta2;
  
            blue->ref.fit   = FT_PIX_ROUND( blue->ref.cur );
@@ -158,7 +158,7 @@
  
  #endif
  
-@@ -1498,7 +1540,10 @@
+@@ -1768,7 +1810,10 @@
                dist = edge->fpos - blue->shoot.org;
                if ( dist < 0 )
                  dist = -dist;
@@ -170,7 +170,7 @@
                dist = FT_MulFix( dist, scale );
                if ( dist < best_dist )
                {
-@@ -1659,8 +1704,31 @@
+@@ -1929,8 +1974,31 @@
      FT_Pos           dist     = width;
      FT_Int           sign     = 0;
      FT_Int           vertical = ( dim == AF_DIMENSION_VERT );
@@ -202,7 +202,7 @@
      if ( !AF_LATIN_HINTS_DO_STEM_ADJUST( hints ) ||
           axis->extra_light                       )
        return width;
-@@ -1670,9 +1738,73 @@
+@@ -1940,9 +2008,73 @@
        dist = -width;
        sign = 1;
      }
@@ -277,7 +277,7 @@
      {
        /* smooth hinting process: very lightly quantize the stem width */
  
-@@ -1732,6 +1864,9 @@
+@@ -2002,6 +2134,9 @@
        }
      }
      else
@@ -287,7 +287,7 @@
      {
        /* strong hinting process: snap the stem width to integer pixels */
  
-@@ -1739,7 +1874,10 @@
+@@ -2009,7 +2144,10 @@
  
  
        dist = af_latin_snap_width( axis->widths, axis->width_count, dist );
@@ -299,7 +299,7 @@
        if ( vertical )
        {
          /* in the case of vertical hinting, always round */
-@@ -1802,6 +1940,32 @@
+@@ -2072,6 +2210,32 @@
      }
  
    Done_Width:
@@ -332,7 +332,7 @@
      if ( sign )
        dist = -dist;
  
-@@ -1824,6 +1988,8 @@
+@@ -2094,6 +2258,8 @@
                               (AF_Edge_Flags)base_edge->flags,
                               (AF_Edge_Flags)stem_edge->flags );
  
@@ -341,7 +341,7 @@
  
      stem_edge->pos = base_edge->pos + fitted_width;
  
-@@ -2357,8 +2523,32 @@
+@@ -2628,8 +2794,32 @@
    {
      FT_Error  error;
      int       dim;
@@ -375,9 +375,9 @@
      error = af_glyph_hints_reload( hints, outline );
      if ( error )
        goto Exit;
-@@ -2415,7 +2605,17 @@
-       }
+@@ -2687,7 +2877,17 @@
      }
+ 
      af_glyph_hints_save( hints, outline );
 +#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
 +    {
@@ -394,7 +394,7 @@
      return error;
    }
 --- a/src/base/ftlcdfil.c	2013-05-28 23:00:03.000000000 +0200
-+++ b/src/base/ftlcdfil.c	2013-06-19 22:11:51.000000000 +0200
++++ b/src/base/ftlcdfil.c	2013-11-25 22:29:19.843476528 +0100
 @@ -23,6 +23,9 @@
  #include FT_IMAGE_H
  #include FT_INTERNAL_OBJECTS_H
@@ -460,9 +460,9 @@
      if ( !library )
        return FT_THROW( Invalid_Argument );
  
---- a/src/base/ftobjs.c	2013-06-19 10:00:05.000000000 +0200
-+++ b/src/base/ftobjs.c	2013-06-19 22:11:51.226668807 +0200
-@@ -69,6 +69,10 @@
+--- a/src/base/ftobjs.c	2013-11-20 19:54:42.000000000 +0100
++++ b/src/base/ftobjs.c	2013-11-25 22:29:19.843476528 +0100
+@@ -67,6 +67,10 @@
  
  #define GRID_FIT_METRICS
  
@@ -473,7 +473,7 @@
  
    FT_BASE_DEF( FT_Pointer )
    ft_service_list_lookup( FT_ServiceDesc  service_descriptors,
-@@ -540,6 +544,25 @@
+@@ -538,6 +542,25 @@
    ft_lookup_glyph_renderer( FT_GlyphSlot  slot );
  
  
@@ -499,7 +499,7 @@
  #ifdef GRID_FIT_METRICS
    static void
    ft_glyphslot_grid_fit_metrics( FT_GlyphSlot  slot,
-@@ -598,8 +621,40 @@
+@@ -596,8 +619,40 @@
      FT_Bool       autohint = FALSE;
      FT_Module     hinter;
      TT_Face       ttface = (TT_Face)face;
@@ -540,7 +540,7 @@
      if ( !face || !face->size || !face->glyph )
        return FT_THROW( Invalid_Face_Handle );
  
-@@ -680,6 +735,18 @@
+@@ -685,6 +740,18 @@
      {
        FT_AutoHinter_Interface  hinting;
  
@@ -559,7 +559,7 @@
  
        /* try to load embedded bitmaps first if available            */
        /*                                                            */
-@@ -718,6 +785,10 @@
+@@ -723,6 +790,10 @@
      }
      else
      {
@@ -570,7 +570,7 @@
        error = driver->clazz->load_glyph( slot,
                                           face->size,
                                           glyph_index,
-@@ -725,6 +796,18 @@
+@@ -730,6 +801,18 @@
        if ( error )
          goto Exit;
  
@@ -589,9 +589,9 @@
        if ( slot->format == FT_GLYPH_FORMAT_OUTLINE )
        {
          /* check that the loaded outline is correct */
---- a/src/base/ftoutln.c	2013-05-28 23:00:03.000000000 +0200
-+++ b/src/base/ftoutln.c	2013-06-19 22:11:51.226668807 +0200
-@@ -905,7 +905,34 @@
+--- a/src/base/ftoutln.c	2013-08-01 10:23:27.000000000 +0200
++++ b/src/base/ftoutln.c	2013-11-25 22:29:19.846809862 +0100
+@@ -907,7 +907,34 @@
      FT_Vector   v_prev, v_first, v_next, v_cur;
      FT_Int      c, n, first;
      FT_Int      orientation;
@@ -626,8 +626,8 @@
  
      if ( !outline )
        return FT_THROW( Invalid_Argument );
---- a/src/base/ftsynth.c	2012-09-29 09:42:15.000000000 +0200
-+++ b/src/base/ftsynth.c	2013-06-19 22:11:51.226668807 +0200
+--- a/src/base/ftsynth.c	2013-09-20 07:20:13.000000000 +0200
++++ b/src/base/ftsynth.c	2013-11-26 16:50:29.916744432 +0100
 @@ -88,7 +88,32 @@
      FT_Face     face    = slot->face;
      FT_Error    error;
@@ -635,7 +635,7 @@
 +#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET 
 +    int checked_use_various_tweaks_env = 0;
 +    FT_Bool use_various_tweaks = FALSE;
- 
++ 
 +    if ( checked_use_various_tweaks_env == 0 )
 +    {
 +      char *use_various_tweaks_env
@@ -653,7 +653,7 @@
 +          else if ( strcasecmp(use_various_tweaks_env, "yes" ) == 0 )
 +            use_various_tweaks = TRUE;
 +        }
-+
+ 
 +      }
 +      checked_use_various_tweaks_env = 1;
 +    }
@@ -677,26 +677,26 @@
      }
 @@ -141,6 +173,9 @@
  
-     slot->metrics.width       += xstr;
-     slot->metrics.height      += ystr;
+     slot->metrics.width        += xstr;
+     slot->metrics.height       += ystr;
 +#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
 +    if ( !use_various_tweaks )
 +#endif
-     slot->metrics.horiAdvance += xstr;
-     slot->metrics.vertAdvance += ystr;
- 
+     slot->metrics.horiAdvance  += xstr;
+     slot->metrics.vertAdvance  += ystr;
+     slot->metrics.horiBearingY += ystr;
 --- a/src/smooth/ftsmooth.c	2013-06-05 12:12:47.000000000 +0200
-+++ b/src/smooth/ftsmooth.c	2013-06-19 22:11:51.233335473 +0200
++++ b/src/smooth/ftsmooth.c	2013-11-25 22:29:19.846809862 +0100
 @@ -26,6 +26,17 @@
  
  #include "ftsmerrs.h"
  
 +#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
 +#include <math.h>
-+#include "../../include/freetype/ftbitmap.h"
++#include "../../include/ftbitmap.h"
 +#include <strings.h>
 +#include "../autofit/aflatin.h"
-+#include "../../include/freetype/ftoutln.h"
++#include "../../include/ftoutln.h"
 +
 +#define verbose FALSE
 +#define STVALUES if (verbose) \
@@ -4483,9 +4483,9 @@
  #else /* !FT_CONFIG_OPTION_SUBPIXEL_RENDERING */
  
      /* render outline into bitmap */
---- a/src/truetype/ttinterp.c	2013-06-19 10:23:30.000000000 +0200
-+++ b/src/truetype/ttinterp.c	2013-06-19 22:11:51.253335473 +0200
-@@ -4771,6 +4771,10 @@
+--- a/src/truetype/ttinterp.c	2013-11-02 11:26:59.000000000 +0100
++++ b/src/truetype/ttinterp.c	2013-11-25 22:29:19.850143195 +0100
+@@ -4885,6 +4885,10 @@
      CUR.sph_in_func_flags = 0x0000;
  #endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
  
@@ -4496,7 +4496,7 @@
      if ( CUR.callTop <= 0 )     /* We encountered an ENDF without a call */
      {
        CUR.error = FT_THROW( ENDF_In_Exec_Stream );
-@@ -6118,6 +6122,12 @@
+@@ -6230,6 +6234,12 @@
                     ( CUR.sph_in_func_flags & SPH_FDEF_INLINE_DELTA_2 ) ) )
                goto Skip;
  
@@ -4509,7 +4509,7 @@
              if ( !( CUR.sph_tweak_flags & SPH_TWEAK_ALWAYS_SKIP_DELTAP ) &&
                    ( ( CUR.is_composite && CUR.GS.freeVector.y != 0 ) ||
                      ( CUR.zp2.tags[point] & FT_CURVE_TAG_TOUCH_Y )   ||
-@@ -6407,6 +6417,7 @@
+@@ -6519,6 +6529,7 @@
      if ( SUBPIXEL_HINTING                                  &&
           CUR.ignore_x_mode                                 &&
           CUR.GS.freeVector.x != 0                          &&
@@ -4517,7 +4517,7 @@
           !( CUR.sph_tweak_flags & SPH_TWEAK_NORMAL_ROUND ) )
        minimum_distance = 0;
  #endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
-@@ -8270,6 +8281,34 @@
+@@ -8378,6 +8389,34 @@
  
  #endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
  

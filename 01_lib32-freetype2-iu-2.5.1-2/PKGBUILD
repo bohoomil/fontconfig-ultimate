@@ -5,11 +5,11 @@
 
 _pkgbasename=freetype2
 pkgname=lib32-$_pkgbasename-infinality-ultimate
-pkgver=2.5.0.1
-pkgrel=6
+pkgver=2.5.1
+pkgrel=2
 pkgdesc="TrueType font rendering library with Infinality patches and custom settings by bohoomil (32-bit, infinality-bundle)."
 arch=(x86_64)
-license=('GPL' 'CC-BY-SA')
+license=('GPL' 'MIT')
 url="http://freetype.sourceforge.net"
 groups=('infinality-bundle-multilib')
 makedepends=(gcc-multilib)
@@ -18,19 +18,15 @@ provides=('lib32-freetype2' 'lib32-freetype2-infinality')
 options=('!libtool')
 source=(http://download.savannah.gnu.org/releases/freetype/freetype-${pkgver}.tar.bz2
         freetype-2.2.1-enable-valid.patch
-        freetype-2.4.12-pkgconfig.patch
-        infinality-2.5.patch
-        autofit.patch)
+        freetype-2.5.1-pkgconfig.patch
+        infinality-2.5.1.patch)
 
 prepare(){
   cd "${srcdir}/freetype-${pkgver}"
 
   patch -Np1 -i "${srcdir}/freetype-2.2.1-enable-valid.patch"
-  patch -Np1 -i "${srcdir}/freetype-2.4.12-pkgconfig.patch"
-  patch -Np1 -i "${srcdir}/infinality-2.5.patch"
-
-  # upstream post-release fixes
-  patch -Np1 -i "${srcdir}/autofit.patch"
+  patch -Np1 -i "${srcdir}/freetype-2.5.1-pkgconfig.patch"
+  patch -Np1 -i "${srcdir}/infinality-2.5.1.patch"
 }
 
 
@@ -55,8 +51,7 @@ package() {
   rm -rf "${pkgdir}"/usr/{include,share,bin}
 }
 
-md5sums=('c72e9010b1d986d556fc0b2b5fcbf31a'
+md5sums=('93eba7854094f46d7d98a9a2370af4d6'
          '214119610444c9b02766ccee5e220680'
-         'd821725c1c99bacd76dc97e91d7d4172'
-         'bd98f04c25d3223b238cd9c713eb3b6a'
-         '21aef34c08c34cf53c58b4bee52efd40')
+         '4fd922532b451d862a5374c2cc801581'
+         'ac23b2f92d084d2fff1c3766b9c955dc')
