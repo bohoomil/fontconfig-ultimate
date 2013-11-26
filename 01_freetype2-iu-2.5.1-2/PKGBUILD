@@ -4,33 +4,30 @@
 
 # Installation order: freetype2-iu, fontconfig-iu, cairo-iu
 pkgname=freetype2-infinality-ultimate
-pkgver=2.5.0.1
-pkgrel=8
+pkgver=2.5.1
+pkgrel=2
 pkgdesc="TrueType font rendering library with Infinality patches and custom settings by bohoomil (infinality-bundle)."
 arch=(i686 x86_64)
-license=('GPL' 'CC-BY-SA')
+license=('GPL' 'MIT')
 groups=('infinality-bundle')
 url="http://freetype.sourceforge.net"
 depends=('zlib' 'bzip2' 'sh' 'xorg-xrdb' 'libpng')
 conflicts=('freetype2' 'freetype2-infinality')
 provides=("freetype2=$pkgver" 'freetype2-infinality' 'freetype2-infinality-ultimate')
-options=('!libtool')
 install='infinality.install'
 backup=('etc/profile.d/infinality-settings.sh')
-source=(http://download.savannah.gnu.org/releases/freetype/freetype-${pkgver}.tar.bz2
+source=(http://downloads.sourceforge.net/sourceforge/freetype/freetype-${pkgver}.tar.bz2
         freetype-2.2.1-enable-valid.patch
-        freetype-2.4.12-pkgconfig.patch
-        infinality-2.5.patch
-        infinality-settings.sh
-        autofit.patch)
+        freetype-2.5.1-pkgconfig.patch
+        infinality-2.5.1.patch
+        infinality-settings.sh)
 
 prepare() {
   cd "${srcdir}/freetype-${pkgver}"
 
   patches=(freetype-2.2.1-enable-valid.patch
-           freetype-2.4.12-pkgconfig.patch
-           infinality-2.5.patch
-           autofit.patch)
+           freetype-2.5.1-pkgconfig.patch
+           infinality-2.5.1.patch)
 
   # infinality & post release fixes
   for patch in "${patches[@]}"; do
@@ -57,9 +54,8 @@ package() {
   install -D -T "${srcdir}/infinality-settings.sh" "${pkgdir}/etc/profile.d/infinality-settings.sh"
 }
 
-md5sums=('c72e9010b1d986d556fc0b2b5fcbf31a'
+md5sums=('93eba7854094f46d7d98a9a2370af4d6'
          '214119610444c9b02766ccee5e220680'
-         'd821725c1c99bacd76dc97e91d7d4172'
-         'bd98f04c25d3223b238cd9c713eb3b6a'
-         'e0e6b52fcf0db527b4a6fa51b6e52d7b'
-         '21aef34c08c34cf53c58b4bee52efd40')
+         '4fd922532b451d862a5374c2cc801581'
+         'ac23b2f92d084d2fff1c3766b9c955dc'
+         'e0e6b52fcf0db527b4a6fa51b6e52d7b')
