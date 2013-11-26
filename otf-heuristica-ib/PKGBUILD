@@ -1,17 +1,18 @@
 # Maintainer: bohoomil <@zoho.com>
 
-pkgname=t1-heuristica-ib
+pkgname=otf-heuristica-ib
 pkgver=1.0.1
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="Heuristica is an extended version of Adobe Utopia font."
 url="http://code.google.com/p/evristika/"
 arch=('any')
 license=('OFL-1.1')
 groups=('infinality-bundle-fonts')
-conflicts=('otf-heuristica')
+replaces=('t1-heuristica-ib')
+conflicts=('otf-heuristica' 't1-heuristica-ib')
 install=$pkgname.install
-source=(http://evristika.googlecode.com/files/heuristica-pfb-1.0.1.tar.xz)
+source=(http://evristika.googlecode.com/files/heuristica-otf-1.0.1.tar.xz)
 
 package(){
   cd "${srcdir}"
@@ -20,7 +21,7 @@ package(){
   install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
 
   install -m755 -d ${pkgdir}/usr/share/fonts/"${pkgname}"
-  install -m644 *.{pfb,afm} ${pkgdir}/usr/share/fonts/"${pkgname}"
+  install -m644 *.otf ${pkgdir}/usr/share/fonts/"${pkgname}"
 }
 
-md5sums=('ab1d96bee40634c676c98600adf77aeb')
+md5sums=('f14c426b0511693b00ffd48cb18c6a9b')
