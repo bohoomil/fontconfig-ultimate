@@ -5,6 +5,13 @@ infinality-bundle+fonts
 CHANGELOG
 ---------
 
+2013-11-28
+----------
+
+* fontconfig-infinality-ultimate
+** splitting OpenSans T1 & TTF settings
+** adding OpenSans TTF to the collection
+
 2013-11-26
 ----------
 
