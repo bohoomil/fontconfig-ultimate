@@ -1,0 +1,72 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=opensans-ib
+pkgname=('t1-opensans-ib' 'ttf-opensans-ib')
+pkgver=1.2
+pkgrel=7
+depends=('fontconfig')
+pkgdesc="Open Sans is a humanist sans serif typeface designed by Steve Matteson, Type Director of Ascender Corp."
+url="http://opensans.com/"
+arch=('any')
+license=('OFL-1.1')
+source=("http://mirrors.ctan.org/fonts/opensans.zip"
+        https://googlefontdirectory.googlecode.com/hg/apache/opensanscondensed/OpenSans-CondBold.ttf
+        90-opensans-t1.conf
+        90-opensans-ttf.conf)
+
+package_t1-opensans-ib(){
+  pkgdesc="Open Sans is a humanist sans serif typeface designed by Steve Matteson, Type Director of Ascender Corp. Type 1 version."
+  conflicts=('ttf-opensans-ib' 'ttf-opensans')
+  groups=('infinality-bundle-fonts')
+  install=$pkgname.install
+
+  cd "${srcdir}"/opensans
+  install -m755 -d "${pkgdir}"/usr/share/doc/"${pkgname}"
+  install -m644 doc/fonts/opensans/README "${pkgdir}"/usr/share/doc/"${pkgname}"
+  install -m644 doc/fonts/opensans/CHANGES "${pkgdir}"/usr/share/doc/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 fonts/type1/public/opensans/*.pfb \
+    "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 fonts/afm/public/opensans/*.afm \
+    "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  cd "${srcdir}"
+  install -dm755 "${pkgdir}"/etc/fonts/conf.avail
+  install -dm755 "${pkgdir}"/etc/fonts/conf.d
+  install -m644 90-opensans-t1.conf "${pkgdir}"/etc/fonts/conf.avail/90-opensans-t1.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/90-opensans-t1.conf .
+}
+
+package_ttf-opensans-ib(){
+  pkgdesc="Open Sans is a humanist sans serif typeface designed by Steve Matteson, Type Director of Ascender Corp. TrueType version."
+  conflicts=('t1-opensans-ib' 'ttf-opensans')
+  groups=('infinality-bundle-fonts')
+  install=$pkgname.install
+
+  cd "${srcdir}"/opensans
+  install -m755 -d "${pkgdir}"/usr/share/doc/"${pkgname}"
+  install -m644 doc/fonts/opensans/README "${pkgdir}"/usr/share/doc/"${pkgname}"
+  install -m644 doc/fonts/opensans/CHANGES "${pkgdir}"/usr/share/doc/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 fonts/truetype/public/opensans/*.ttf \
+    "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  cd "${srcdir}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  cd "${srcdir}"
+  install -dm755 "${pkgdir}"/etc/fonts/conf.avail
+  install -dm755 "${pkgdir}"/etc/fonts/conf.d
+  install -m644 90-opensans-ttf.conf "${pkgdir}"/etc/fonts/conf.avail/90-opensans-ttf.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/90-opensans-ttf.conf .
+}
+
+md5sums=('a75921555ee86a1c1bfa3b7f150a3f4c'
+         'c28df5d67b8e0fd14ff07235537b1c77'
+         '7d71f819d90571cc24b6609ae3019deb'
+         'd621af38611790b93b753aca83037104')
