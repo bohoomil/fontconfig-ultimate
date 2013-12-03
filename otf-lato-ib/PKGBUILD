@@ -1,0 +1,29 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=otf-lato-ib
+pkgver=2.2
+pkgrel=4
+depends=('fontconfig')
+pkgdesc="Lato is a sanserif type­face family designed in the Summer 2010 by Warsaw-based designer Łukasz Dziedzic."
+url="http://www.latofonts.com/"
+arch=('any')
+groups=('infinality-bundle-fonts')
+license=('OFL-1.1')
+conflicts=('ttf-lato' 't1-lato-ibx')
+replaces=('t1-lato-ibx')
+install=$pkgname.install
+source=("http://www.latofonts.com/download/LatoOFL.zip")
+
+package(){
+  cd "${srcdir}"
+
+  install -m755 -d "${pkgdir}"/usr/share/doc/"${pkgname}"
+  install -m644 README.txt "${pkgdir}"/usr/share/doc/"${pkgname}"
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 OTF/*.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+}
+
+md5sums=('5effc8ceaca6caeb9548e2248e0ceb9b')
