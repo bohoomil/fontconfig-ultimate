@@ -50,7 +50,7 @@ CONF_LINKS = \
 	94-no-synthetic.conf    \
 	95-reject.conf
 
-EXTRA_DIST = $(templateinf_DATA) $(DOC_SOURCES)
+EXTRA_DIST = $(templateinf_DATA) $(template_DATA) $(DOC_SOURCES)
 CLEANFILES = $(DOC_FILES)
 
 configdir = $(CONFIGDIR)
@@ -86,6 +86,38 @@ templateinf_DATA =				\
 	93-final-rendering.conf   \
 	94-no-synthetic.conf    \
 	95-reject.conf
+
+templatedir = $(TEMPLATEDIR)
+template_DATA = \
+	10-autohint.conf		\
+	10-no-sub-pixel.conf		\
+	10-scale-bitmap-fonts.conf	\
+	10-sub-pixel-bgr.conf		\
+	10-sub-pixel-rgb.conf		\
+	10-sub-pixel-vbgr.conf		\
+	10-sub-pixel-vrgb.conf		\
+	10-unhinted.conf		\
+	11-lcdfilter-default.conf	\
+	11-lcdfilter-legacy.conf	\
+	11-lcdfilter-light.conf		\
+	20-unhint-small-vera.conf	\
+	25-unhint-nonlatin.conf		\
+	30-urw-aliases.conf		\
+	30-metric-aliases.conf		\
+	40-nonlatin.conf		\
+	45-latin.conf			\
+	49-sansserif.conf		\
+	50-user.conf			\
+	51-local.conf			\
+	60-latin.conf			\
+	65-fonts-persian.conf		\
+	65-khmer.conf			\
+	65-nonlatin.conf		\
+	69-unifont.conf			\
+	70-no-bitmaps.conf		\
+	70-yes-bitmaps.conf		\
+	80-delicious.conf		\
+	90-synthetic.conf
 
 README: $(srcdir)/README.in
 	sed "s|\@TEMPLATEINFDIR\@|$(templateinfdir)|" $< > $@
