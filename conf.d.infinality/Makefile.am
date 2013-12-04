@@ -27,6 +27,8 @@ DOC_FILES = $(DOC_SOURCES:.in=)
 
 CONF_LINKS = \
 	10-base-rendering.conf    \
+	10-scale-bitmap-fonts.conf		\
+	30-metric-aliases.conf		\
 	31-fix-cantarell.conf   \
 	36-repl-custom.conf		\
 	40-non-latin.conf    \
