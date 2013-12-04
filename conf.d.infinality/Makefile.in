@@ -162,8 +162,8 @@ am__uninstall_files_from_dir = { \
     || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
          $(am__cd) "$$dir" && rm -f $$files; }; \
   }
-am__installdirs = "$(DESTDIR)$(configdir)" "$(DESTDIR)$(templateinfdir)"
-DATA = $(config_DATA) $(templateinf_DATA)
+am__installdirs = "$(DESTDIR)$(configdir)" "$(DESTDIR)$(templatedir)"
+DATA = $(config_DATA) $(template_DATA)
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
@@ -263,7 +263,7 @@ SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
-TEMPLATEINFDIR = @TEMPLATEINFDIR@
+TEMPLATEDIR = @TEMPLATEDIR@
 VERSION = @VERSION@
 WARN_CFLAGS = @WARN_CFLAGS@
 XMLDIR = @XMLDIR@
@@ -330,12 +330,12 @@ CONF_LINKS =	\
 	10-scale-bitmap-fonts.conf	\
 	30-metric-aliases.conf
 
-EXTRA_DIST = $(templateinf_DATA) $(DOC_SOURCES)
+EXTRA_DIST = $(template_DATA) $(DOC_SOURCES)
 CLEANFILES = $(DOC_FILES)
 configdir = $(CONFIGDIR)
 config_DATA = $(DOC_FILES)
-templateinfdir = $(TEMPLATEINFDIR)
-templateinf_DATA = \
+templatedir = $(TEMPLATEDIR)
+template_DATA = \
 	10-autohint.conf		\
 	10-no-sub-pixel.conf		\
 	10-scale-bitmap-fonts.conf	\
