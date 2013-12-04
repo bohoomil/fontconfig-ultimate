@@ -5,13 +5,35 @@ infinality-bundle+fonts
 CHANGELOG
 ---------
 
-2013-11-25
+
+2013-12-04
+----------
+
+* fontconfig-infinality-ultimate
+** added Symbol and Wingdings support
+** added Symbola.ttf font
+** minor Open Sans rendering fix
+
+2013-11-28
+----------
+
+* fontconfig-infinality-ultimate
+** splitting OpenSans T1 & TTF settings
+** added OpenSans TTF to the collection
+
+2013-11-26
 ----------
 
 * fontconfig-infinality-ultimate
 ** fixed bitmap to outline replacement rules
    and split 38-repl-tt-traced-bitmap.conf (issue #8)
 ** fixed Liberation Sans Bold & Regular < 13px
+** swapping Heuristica T1 for OTF (bug in T1 Unicode
+   encoding)
+
+* freetype2-infinality-ultimate
+** upstream version upgrade to 2.5.1
+** revised and regenerated Infinality patchset
 
 2013-11-09
 ~~~~~~~~~~
