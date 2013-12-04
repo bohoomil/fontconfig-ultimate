@@ -442,6 +442,22 @@ install-templateinfDATA: $(templateinf_DATA)
 	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(templateinfdir)'"; \
 	  $(INSTALL_DATA) $$files "$(DESTDIR)$(templateinfdir)" || exit $$?; \
 	done
+install-templateDATA: $(template_DATA)
+	@$(NORMAL_INSTALL)
+	@list='$(template_DATA)'; test -n "$(templatedir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(templatedir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(templatedir)" || exit 1; \
+	fi; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(templatedir)'"; \
+	  $(INSTALL_DATA) $$files "$(DESTDIR)$(templatedir)" || exit $$?; \
+	done
+
 
 uninstall-templateinfDATA:
 	@$(NORMAL_UNINSTALL)
@@ -449,6 +465,13 @@ uninstall-templateinfDATA:
 	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
 	dir='$(DESTDIR)$(templateinfdir)'; $(am__uninstall_files_from_dir)
 tags TAGS:
+uninstall-templateDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(template_DATA)'; test -n "$(templatedir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	dir='$(DESTDIR)$(templatedir)'; $(am__uninstall_files_from_dir)
+tags TAGS:
+
 
 ctags CTAGS:
 
