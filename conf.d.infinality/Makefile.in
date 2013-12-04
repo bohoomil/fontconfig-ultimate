@@ -326,22 +326,7 @@ top_srcdir = @top_srcdir@
 BUILT_SOURCES = README
 DOC_SOURCES = README.in
 DOC_FILES = $(DOC_SOURCES:.in=)
-CONF_LINKS = \
-	10-scale-bitmap-fonts.conf \
-	20-unhint-small-vera.conf \
-	30-urw-aliases.conf \
-	30-metric-aliases.conf \
-	40-nonlatin.conf \
-	45-latin.conf \
-	49-sansserif.conf \
-	50-user.conf \
-	51-local.conf \
-	60-latin.conf \
-	65-fonts-persian.conf \
-	65-nonlatin.conf \
-	69-unifont.conf \
-	80-delicious.conf \
-	90-synthetic.conf
+CONF_LINKS = 
 
 EXTRA_DIST = $(templateinf_DATA) $(DOC_SOURCES)
 CLEANFILES = $(DOC_FILES)
