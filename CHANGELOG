@@ -6,6 +6,13 @@ CHANGELOG
 ---------
 
 
+2013-12-07
+----------
+
+* fontconfig-infinality-ultimate
+** replaced TeX Gyre T1 with OTF
+** modified 60-latin-free.conf
+
 2013-12-04
 ----------
 
@@ -13,6 +20,8 @@ CHANGELOG
 ** added Symbol and Wingdings support
 ** added Symbola.ttf font
 ** minor Open Sans rendering fix
+** added customization template
+   36-repl-custom.conf
 
 2013-11-28
 ----------
