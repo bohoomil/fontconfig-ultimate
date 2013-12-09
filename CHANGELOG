@@ -6,6 +6,18 @@ CHANGELOG
 ---------
 
 
+2013-12-09
+----------
+
+* freetype2-infinality-ultimate
+** upstream update to 2.5.2
+
+* fontconfig-infinality-ultimate
+** added support for new fonts:
+   - Amble (TTF)
+   - Signika Text (TTF)
+** updated 45-latin.conf & 90-tt-fonts.conf
+
 2013-12-07
 ----------
 
