@@ -5,6 +5,12 @@ infinality-bundle+fonts
 CHANGELOG
 ---------
 
+2013-12-10
+----------
+
+* freetype2-infinality-ultimate
+** infinality-settings.sh update
+   - fixing kerning issues
 
 2013-12-09
 ----------
@@ -15,7 +21,7 @@ CHANGELOG
 * fontconfig-infinality-ultimate
 ** added support for new fonts:
    - Amble (TTF)
-   - Signika Text (TTF)
+   - Noticia Text (TTF)
 ** updated 45-latin.conf & 90-tt-fonts.conf
 
 2013-12-07
