@@ -4,7 +4,7 @@
 
 # Installation order: freetype2-iu, fontconfig-iu, cairo-iu
 pkgname=freetype2-infinality-ultimate
-pkgver=2.5.1
+pkgver=2.5.2
 pkgrel=2
 pkgdesc="TrueType font rendering library with Infinality patches and custom settings by bohoomil (infinality-bundle)."
 arch=(i686 x86_64)
@@ -18,16 +18,16 @@ install='infinality.install'
 backup=('etc/profile.d/infinality-settings.sh')
 source=(http://downloads.sourceforge.net/sourceforge/freetype/freetype-${pkgver}.tar.bz2
         freetype-2.2.1-enable-valid.patch
-        freetype-2.5.1-pkgconfig.patch
-        infinality-2.5.1.patch
+        freetype-2.5.2-pkgconfig.patch
+        infinality-2.5.2.patch
         infinality-settings.sh)
 
 prepare() {
   cd "${srcdir}/freetype-${pkgver}"
 
   patches=(freetype-2.2.1-enable-valid.patch
-           freetype-2.5.1-pkgconfig.patch
-           infinality-2.5.1.patch)
+           freetype-2.5.2-pkgconfig.patch
+           infinality-2.5.2.patch)
 
   # infinality & post release fixes
   for patch in "${patches[@]}"; do
@@ -38,7 +38,7 @@ prepare() {
 build() {
   cd "${srcdir}/freetype-${pkgver}"
 
-  ./configure --prefix=/usr
+  ./configure --prefix=/usr --disable-static
   make
 }
 
@@ -54,8 +54,8 @@ package() {
   install -D -T "${srcdir}/infinality-settings.sh" "${pkgdir}/etc/profile.d/infinality-settings.sh"
 }
 
-md5sums=('93eba7854094f46d7d98a9a2370af4d6'
+md5sums=('10e8f4d6a019b124088d18bc26123a25'
          '214119610444c9b02766ccee5e220680'
          '4fd922532b451d862a5374c2cc801581'
          'ac23b2f92d084d2fff1c3766b9c955dc'
-         'e0e6b52fcf0db527b4a6fa51b6e52d7b')
+         'dc6dde852b966234d2dd820f83f0472e')
