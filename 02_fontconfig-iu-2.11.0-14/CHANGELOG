@@ -5,12 +5,42 @@ infinality-bundle+fonts
 CHANGELOG
 ---------
 
+
+2013-12-09
+----------
+
+* freetype2-infinality-ultimate
+** upstream update to 2.5.2
+
+* fontconfig-infinality-ultimate
+** added support for new fonts:
+   - Amble (TTF)
+   - Signika Text (TTF)
+** updated 45-latin.conf & 90-tt-fonts.conf
+
+2013-12-07
+----------
+
+* fontconfig-infinality-ultimate
+** replaced TeX Gyre T1 with OTF
+** modified 60-latin-free.conf
+
+2013-12-04
+----------
+
+* fontconfig-infinality-ultimate
+** added Symbol and Wingdings support
+** added Symbola.ttf font
+** minor Open Sans rendering fix
+** added customization template
+   36-repl-custom.conf
+
 2013-11-28
 ----------
 
 * fontconfig-infinality-ultimate
 ** splitting OpenSans T1 & TTF settings
-** adding OpenSans TTF to the collection
+** added OpenSans TTF to the collection
 
 2013-11-26
 ----------
