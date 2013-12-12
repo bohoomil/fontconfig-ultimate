@@ -1,0 +1,49 @@
+# $Id: PKGBUILD 82253 2013-01-13 15:02:45Z foutrelis $
+# Maintainer: Lukas Fleischer <archlinux at cryptocrack dot de>
+# Contributor: Ronald van Haren <ronald.archlinux.org>
+# Contributor: Roman Kyrylych <Roman.Kyrylych@gmail.com>
+# Contributor: Andreas Zwinkau
+# Contributor: rabyte <rabyte__gmail>
+# Contributor: Stefan Husmann < stefan-husmann@t-online.de>
+# Contributor: bohoomil <@zoho.com>
+
+pkgname=ttf-liberation-ib
+pkgver=2.00.1
+pkgrel=3
+pkgdesc='Red Hats Liberation fonts for infinality-bundle-fonts'
+arch=('any')
+license=('custom:OFL')
+url='https://www.redhat.com/promo/fonts/'
+depends=('fontconfig')
+groups=('infinality-bundle-fonts')
+conflicts=('ttf-liberation')
+replaces=('ttf-liberation')
+provides=('ttf-font' 'ttf-liberation')
+install=$pkgname.install
+source=("https://fedorahosted.org/releases/l/i/liberation-fonts/liberation-fonts-ttf-$pkgver.tar.gz"
+        30-0-liberation-mono.conf
+        30-0-liberation-sans.conf
+        30-0-liberation-serif.conf)
+md5sums=('5c781723a0d9ed6188960defba8e91cf'
+         '23ce227d5d72c6df2c69caf367d96341'
+         '88e91e718053d46cb1215067ffb0024a'
+         '5bc229f0f7ad387f1ba311148fcbff00')
+
+package() {
+  cd "$srcdir/liberation-fonts-ttf-$pkgver"
+
+  install -d "$pkgdir/usr/share/fonts/$pkgname/"
+  install -m644 *.ttf "$pkgdir/usr/share/fonts/$pkgname/"
+
+  # install fontconfig files
+  install -Dm0644 ../30-0-liberation-mono.conf \
+    "$pkgdir/etc/fonts/conf.avail/30-$pkgname-mono.conf"
+  install -Dm0644 ../30-0-liberation-sans.conf \
+    "$pkgdir/etc/fonts/conf.avail/30-$pkgname-sans.conf"
+  install -Dm0644 ../30-0-liberation-serif.conf \
+    "$pkgdir/etc/fonts/conf.avail/30-$pkgname-serif.conf"
+
+  # install license
+  install -Dm644 "${srcdir}/liberation-fonts-ttf-${pkgver}/LICENSE" \
+    "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+}

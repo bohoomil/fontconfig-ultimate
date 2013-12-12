@@ -1,0 +1,39 @@
+# Maintainer: Jelle van der Waa <jelle@vdwaa.nl>
+# Contributor: Urs Wolfer <uwolfer @ fwo.ch>
+# Contributor: bohoomil <@zoho.com>
+
+pkgname=ttf-droid-ib
+pkgver=20121017
+pkgrel=3
+pkgdesc="General-purpose fonts released by Google as part of Android. Part of infinality-bundle-fonts."
+arch=('any')
+license=('apache')
+url="http://code.google.com/android/"
+depends=('fontconfig')
+groups=('infinality-bundle-fonts')
+replaces=('ttf-droid')
+provides=('ttf-font' 'ttf-droid')
+install=$pkgname.install
+source=(ftp://ftp.archlinux.org/other/community/ttf-droid/ttf-droid-20121017.tar.xz
+        65-ttf-droid-serif.conf
+        65-ttf-droid-sans.conf)
+
+package(){
+  cd "${srcdir}"/google-droid-fonts-"${pkgver}"
+  install -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  cd "${srcdir}"
+  install -d "${pkgdir}"/etc/fonts/conf.avail
+  install -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 65-ttf-droid-sans.conf "${pkgdir}"/etc/fonts/conf.avail
+  install -m644 65-ttf-droid-serif.conf "${pkgdir}"/etc/fonts/conf.avail
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/65-ttf-droid-sans.conf .
+  ln -s ../conf.avail/65-ttf-droid-serif.conf .
+}
+
+md5sums=('0fa20eb63d7d05b23be955777bb52a5d'
+         'c77c95a047aeefbcfb2106a8d28d21d9'
+         '31ac9de85b3b94d833c06a09ad440003')

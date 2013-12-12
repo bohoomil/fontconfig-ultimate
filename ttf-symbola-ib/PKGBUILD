@@ -1,0 +1,22 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=ttf-symbola-ib
+pkgver=7.12
+pkgrel=1
+depends=('fontconfig')
+pkgdesc="Symbola is a free symbol-type font."
+url="http://users.teilar.gr/~g1951d/"
+arch=('any')
+groups=('infinality-bundle-fonts')
+license=('Custom')
+source=(http://users.teilar.gr/~g1951d/Symbola.ttf)
+install=$pkgname.install
+
+package(){
+  cd "${srcdir}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 Symbola.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+}
+
+md5sums=('75cd76e3c3ee09ec854b71eb5a19bdb3')

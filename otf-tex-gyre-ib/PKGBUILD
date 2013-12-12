@@ -1,0 +1,29 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=otf-tex-gyre-ib
+pkgver=2.005
+pkgrel=3
+depends=('fontconfig')
+pkgdesc="The TeX Gyre (TG) Collection of Fonts."
+groups=('infinality-bundle-fonts')
+url="http://www.gust.org.pl/projects/e-foundry/tex-gyre/"
+arch=('any')
+license=('GFL')
+conflicts=('otf-texgyre' 'tex-gyre-fonts' 't1-tex-gyre-ib')
+replaces=('t1-tex-gyre-ib')
+install=$pkgname.install
+source=("http://www.gust.org.pl/projects/e-foundry/tex-gyre/whole/tg-${pkgver}otf.zip"
+        GFL.txt)
+
+package(){
+  cd "${srcdir}"
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 GFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+}
+
+md5sums=('3774af603b5a13d374bf4668967bff57'
+         '5a4927a17baba16dcab8b3a6a3bb0165')

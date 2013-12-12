@@ -1,0 +1,28 @@
+# $Id: PKGBUILD 88127 2013-04-12 09:51:38Z mtorromeo $
+# Maintainer: Massimiliano Torromeo <massimiliano.torromeo@gmail.com>
+# Contributor: bohoomil <@zoho.com>
+
+pkgname=ttf-ubuntu-font-family-ibx
+pkgver=0.80
+pkgrel=4
+pkgdesc="Ubuntu font family. Part of infinality-bundle-fonts."
+arch=('any')
+url="http://font.ubuntu.com/"
+license=('custom:Ubuntu Font Licence 1.0')
+depends=('fontconfig')
+groups=('infinality-bundle-fonts-extra')
+conflicts=('ttf-ubuntu-font-family')
+provides=('ttf-font' 'ttf-ubuntu-font-family')
+replaces=('ttf-ubuntu-font-family')
+install=$pkgname.install
+source=(http://font.ubuntu.com/download/ubuntu-font-family-$pkgver.zip)
+sha256sums=('107170099bbc3beae8602b97a5c423525d363106c3c24f787d43e09811298e4c')
+
+package() {
+  cd "${srcdir}"/ubuntu-font-family-"${pkgver}"
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 Ubuntu-{L,R,B,C}*.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 UbuntuMono-*.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -D -m644 LICENCE.txt "${pkgdir}/usr/share/licenses/${pkgname}/LICENCE"
+}

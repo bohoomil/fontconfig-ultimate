@@ -1,0 +1,26 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=ttf-amble-ibx
+pkgver=1.0
+pkgrel=1
+depends=('fontconfig')
+pkgdesc="A free, screen-optimized sans-serif font from Punchcut."
+url="http://punchcut.com/"
+arch=('any')
+groups=('infinality-bundle-fonts-extra')
+license=('Apache')
+install=$pkgname.install
+source=(http://www.fontsquirrel.com/fonts/download/amble)
+
+package(){
+  cd "${srcdir}"
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 "Apache License.txt" \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"/LICENSE.txt
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+}
+
+md5sums=('f40d245fcc919c4ea699ad892092d8fd')

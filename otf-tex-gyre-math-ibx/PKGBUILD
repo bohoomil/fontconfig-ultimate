@@ -1,0 +1,40 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=otf-tex-gyre-math-ibx
+pkgver=2.005
+pkgrel=1
+depends=('fontconfig' 'otf-tex-gyre-ib')
+pkgdesc="The TeX Gyre (TG) Math Fonts."
+groups=('infinality-bundle-fonts-extra')
+url="http://www.gust.org.pl/projects/e-foundry/tex-gyre/"
+arch=('any')
+license=('GFL')
+install=$pkgname.install
+source=(http://www.gust.org.pl/projects/e-foundry/tg-math/download/texgyrebonum-math-0973.zip
+        http://www.gust.org.pl/projects/e-foundry/tg-math/download/texgyrepagella-math-1605.zip
+        http://www.gust.org.pl/projects/e-foundry/tg-math/download/texgyretermes-math-1502.zip
+        GFL.txt)
+
+package(){
+  cd "${srcdir}"
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 GFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 texgyrebonum-math-0973.otf \
+    "${pkgdir}"/usr/share/fonts/"${pkgname}"/texgyrebonum-math.otf
+
+  cd "${srcdir}"/texgyrepagella-math-1605/otf
+  install -m644 texgyrepagella-math.otf \
+    "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  cd "${srcdir}"/texgyretermes-math-1502/otf
+  install -m644 texgyretermes-math.otf \
+    "${pkgdir}"/usr/share/fonts/"${pkgname}"
+}
+
+md5sums=('80bcf13d94f17c24b40424aa173ad7f4'
+         '48f1b1074f03edf0d5374cec85b96223'
+         '8789344272ff29e6282e80e90fd1418a'
+         '5a4927a17baba16dcab8b3a6a3bb0165')

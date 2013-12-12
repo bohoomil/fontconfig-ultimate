@@ -4,7 +4,6 @@ pkgname=libre-baskerville-ib
 pkgname=('t1-libre-baskerville-ibx' 'otf-libre-baskerville-ib')
 pkgver=2013.09.20
 pkgrel=1
-depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
 pkgdesc="Libre Baskerville font designed by Pablo Impallari."
 url="http://www.impallari.com/"
 depends=('fontconfig')

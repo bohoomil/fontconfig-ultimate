@@ -1,0 +1,33 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=otf-latin-modern-ibx
+pkgver=2.004
+pkgrel=1
+pkgdesc="The Latin Modern (LM) Family of Fonts. OpenType version."
+url="http://www.gust.org.pl/projects/e-foundry/latin-modern"
+depends=('fontconfig')
+conflicts=('otf-latin-modern')
+groups=('infinality-bundle-fonts-extra')
+arch=('any')
+license=('Custom')
+install=${pkgname}.install
+source=("http://mirrors.ctan.org/fonts/lm.zip")
+
+package_otf-latin-modern-ibx(){
+  cd "${srcdir}"/lm
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 doc/fonts/lm/GUST-FONT-LICENSE.TXT \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"/GUST-FONT-LICENSE.txt
+  install -m644 doc/fonts/lm/MANIFEST-Latin-Modern.TXT "${pkgdir}"/usr/share/licenses/"${pkgname}"/MANIFEST-Latin-Modern.txt
+
+  install -m755 -d "${pkgdir}"/usr/share/doc/"${pkgname}"
+  install -m644 doc/fonts/lm/README-Latin-Modern.TXT \
+    "${pkgdir}"/usr/share/doc/"${pkgname}"/README-Latin-Modern.txt
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 fonts/opentype/public/lm/*.otf \
+    "${pkgdir}"/usr/share/fonts/"${pkgname}"
+}
+
+md5sums=('63fa72236a23cefab41f622fec97be1a')

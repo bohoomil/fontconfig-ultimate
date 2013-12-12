@@ -1,0 +1,32 @@
+# $Id: PKGBUILD 176893 2013-02-02 06:08:32Z bisson $
+# Contributor: Damir Perisa <damir.perisa@bluewin.ch>
+# Maintainer: Gaetan Bisson <bisson@archlinux.org>
+# Contributor: bohoomil <@zoho.com>
+
+pkgname=ttf-mph-2b-damase-ib
+pkgname_org=ttf-mph-2b-damase
+pkgver=001.000.4.dfsg.2
+_pkgver=001.000.dfsg.2+ds1
+pkgrel=4
+pkgdesc='Unicode font covering full plane 1, and numerous scripts. Part of infinality-bundle-fonts.'
+url="http://packages.debian.org/unstable/x11/ttf-mph-2b-damase" 
+license=('custom:Public_Domain')
+arch=('any')
+depends=('fontconfig')
+groups=('infinality-bundle-fonts')
+conflicts=('ttf-mph-2b-damase')
+provides=('ttf-mph-2b-damase')
+replaces=('ttf-mph-2b-damase')
+install=$pkgname.install
+source=("http://ftp.debian.org/debian/pool/main/t/ttf-mph-2b-damase/ttf-mph-2b-damase_${_pkgver}.orig.tar.gz")
+sha1sums=('8663d937dabce9bebb9c46b6e985102d03830fd4')
+
+package() {
+  cd "${srcdir}"/"${pkgname_org}-${_pkgver}.orig"
+  install -dm755 "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -dm755 "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  echo 'No copyright applies; this work is in the public domain.' > \
+    "${pkgdir}/usr/share/licenses/${pkgname}/COPYING"
+}

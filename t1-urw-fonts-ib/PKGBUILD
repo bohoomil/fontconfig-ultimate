@@ -1,0 +1,36 @@
+# $Id: PKGBUILD 149058 2012-02-05 15:58:05Z bisson $
+# Contributor: Firmicus <francois.archlinux.org>
+# Contributor: dorphell <dorphell@archlinux.org>
+# Maintainer: Gaetan Bisson <bisson@archlinux.org>
+# bohoomil
+
+pkgname=t1-urw-fonts-ib
+pkgname_org=urw-fonts
+pkgver=2.4
+_fedoraver=2.4
+_fedorarel=17.fc20
+pkgrel=3
+pkgdesc='Standard Ghostscript Type1 fonts from URW for infinality-bundle-fonts.'
+url='http://sourceforge.net/projects/gs-fonts/'
+arch=('any')
+license=('GPL2')
+makedepends=('rpmextract')
+depends=('fontconfig')
+conflicts=('gsfonts')
+provides=('gsfonts' "$pkgname_org")
+groups=('infinality-bundle-fonts')
+source=("http://kojipkgs.fedoraproject.org/packages/${pkgname_org}/${_fedoraver}/${_fedorarel}/src/${pkgname_org}-${_fedoraver}-${_fedorarel}.src.rpm")
+sha1sums=('0066723d9cd086cfdaecc57f7b216545a50924dd')
+install=$pkgname.install
+
+build() {
+  cd "${srcdir}"
+  rpmextract.sh "${pkgname_org}-${_fedoraver}-${_fedorarel}.src.rpm"
+  bsdtar xf *.tar.bz2
+}
+
+package() {
+  cd "${srcdir}"
+  install -d "${pkgdir}"/usr/share/fonts/${pkgname}
+  install -m644 *.{pfb,pfm,afm} "${pkgdir}"/usr/share/fonts/${pkgname}
+}

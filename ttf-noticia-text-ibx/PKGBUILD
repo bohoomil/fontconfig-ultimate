@@ -1,0 +1,26 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=ttf-noticia-text-ibx
+pkgver=1.003
+pkgrel=1
+depends=('fontconfig')
+pkgdesc="Noticia Text is a contemporary humanist slab serif typeface designed to be used for running text on digital newspapers (both on websites and mobile apps)."
+url="http://jmsole.cl/"
+arch=('any')
+groups=('infinality-bundle-fonts-extra')
+license=('OFL-1.1')
+install=$pkgname.install
+source=(http://www.fontsquirrel.com/fonts/download/noticia-text)
+
+package(){
+  cd "${srcdir}"
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 "SIL Open Font License.txt" \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"/LICENSE.txt
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+}
+
+md5sums=('cb2449d7383966d735389745a77f280d')
