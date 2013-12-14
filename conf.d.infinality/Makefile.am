@@ -30,7 +30,7 @@ CONF_LINKS = \
 	10-scale-bitmap-fonts.conf		\
 	30-metric-aliases.conf		\
 	31-fix-cantarell.conf   \
-	36-repl-custom.conf		\
+	35-repl-custom.conf		\
 	40-non-latin.conf    \
 	45-latin.conf   \
 	49-sansserif.conf   \
@@ -62,7 +62,8 @@ templateinf_DATA =				\
 	10-scale-bitmap-fonts.conf	\
 	31-fix-cantarell.conf   \
 	30-metric-aliases.conf		\
-	36-repl-custom.conf		\
+	35-repl-custom.conf		\
+	36-repl-missing-glyphs.conf  \
 	38-repl-proggy-bitmap.conf   \
 	38-repl-terminus-bitmap.conf   \
 	40-non-latin.conf    \
