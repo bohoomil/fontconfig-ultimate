@@ -100,7 +100,7 @@ Further customization and misc options
   ``/etc/profile.d/infinality-settings.sh``.
 
 * All the necessary build scripts can be found in ``infinality-bundle`` branch.
-  It should not be a very demanding task to 'translare' them for use in
+  It should not be a very demanding task to 'translate' them for use in
   your own Linux distribution.
 
 .. _fontconfig-infinality-ultimate-git: https://aur.archlinux.org/packages/fontconfig-infinality-ultimate-git/
