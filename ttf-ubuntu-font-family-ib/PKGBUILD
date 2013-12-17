@@ -2,18 +2,18 @@
 # Maintainer: Massimiliano Torromeo <massimiliano.torromeo@gmail.com>
 # Contributor: bohoomil <@zoho.com>
 
-pkgname=ttf-ubuntu-font-family-ibx
+pkgname=ttf-ubuntu-font-family-ib
 pkgver=0.80
-pkgrel=4
+pkgrel=5
 pkgdesc="Ubuntu font family. Part of infinality-bundle-fonts."
 arch=('any')
 url="http://font.ubuntu.com/"
 license=('custom:Ubuntu Font Licence 1.0')
 depends=('fontconfig')
-groups=('infinality-bundle-fonts-extra')
+groups=('infinality-bundle-fonts')
 conflicts=('ttf-ubuntu-font-family')
 provides=('ttf-font' 'ttf-ubuntu-font-family')
-replaces=('ttf-ubuntu-font-family')
+replaces=('ttf-ubuntu-font-family' 'ttf-ubuntu-font-family-ibx')
 install=$pkgname.install
 source=(http://font.ubuntu.com/download/ubuntu-font-family-$pkgver.zip)
 sha256sums=('107170099bbc3beae8602b97a5c423525d363106c3c24f787d43e09811298e4c')
