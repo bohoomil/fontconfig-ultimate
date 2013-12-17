@@ -5,14 +5,17 @@ infinality-bundle+fonts
 CHANGELOG
 ---------
 
-2013-12-10
+
+2013-12-17
 ----------
 
-* freetype2-infinality-ultimate
-** infinality-settings.sh update
-   - fixing kerning issues
+* fontconfig-infinality-ultimate
+  & infinality-bundle-fonts
+** replacing Aller with Ubuntu due to
+   license restrictions of the former
 
-2013-12-09
+
+*2013-12-09
 ----------
 
 * freetype2-infinality-ultimate
@@ -21,7 +24,7 @@ CHANGELOG
 * fontconfig-infinality-ultimate
 ** added support for new fonts:
    - Amble (TTF)
-   - Noticia Text (TTF)
+   - Signika Text (TTF)
 ** updated 45-latin.conf & 90-tt-fonts.conf
 
 2013-12-07
