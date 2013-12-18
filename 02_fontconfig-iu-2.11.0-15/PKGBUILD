@@ -8,7 +8,7 @@ pkgdesc="A library for configuring and customizing font access (includes generic
 url=('http://www.fontconfig.org/release/')
 license=('custom' 'MIT')
 pkgver=2.11.0
-pkgrel=14
+pkgrel=15
 arch=('i686' 'x86_64')
 changelog=CHANGELOG
 groups=('infinality-bundle')
@@ -22,7 +22,8 @@ backup=('etc/fonts/fonts.conf'
         'etc/fonts/conf.avail.infinality/custom/65-non-latin-custom.conf'
         'etc/fonts/conf.avail.infinality/custom/66-aliases-wine-custom.conf'
         'etc/fonts/conf.avail.infinality/custom/93-final-lang-spec-custom.conf'
-        'etc/fonts/conf.avail.infinality/36-repl-custom.conf')
+        'etc/fonts/conf.avail.infinality/35-repl-custom.conf'
+        'etc/fonts/conf.avail.infinality/36-repl-missing-glyphs.conf')
 install=fontconfig-ultimate.install
 source=(http://www.fontconfig.org/release/${_basename}-${pkgver}.tar.bz2
         git://github.com/bohoomil/fontconfig-ultimate.git#branch=master)

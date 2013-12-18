@@ -6,7 +6,24 @@ CHANGELOG
 ---------
 
 
-2013-12-09
+2013-12-17
+----------
+
+* fontconfig-infinality-ultimate
+  & infinality-bundle-fonts
+** replacing Aller with Ubuntu due to
+   licensing restrictions of the former
+** added support for new fonts:
+   - Clear Sans (TTF)
+   - Brill (OTF)
+   - Neris (OTF)
+** added 36-repl-missing-glyphs.conf for fixing
+   missing glyphs issues with some fonts
+** 35-repl-custom.conf override both 36-repl-missing-glyphs.conf
+   and 37-repl-global-{preset}.conf
+** fixed kerning for Liberation Sans
+
+*2013-12-09
 ----------
 
 * freetype2-infinality-ultimate
