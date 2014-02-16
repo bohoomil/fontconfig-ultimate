@@ -1,5 +1,5 @@
 ### infinality environment variables for extra run-time options ###
-### custom settings by bohoomil, rev. 0.4.4, for freetype2 v. 2.5.x ###
+### custom settings by bohoomil, rev. 0.4.6.1, for freetype2 v. 2.5.x ###
 ### http://bohoomil.cu.cc ###
 
 XFT_SETTINGS="
@@ -19,8 +19,9 @@ echo "$XFT_SETTINGS" | xrdb -merge > /dev/null 2>&1
 ### 2 <> well balanced
 ### 3 <> darker & smoother #1
 ### 4 <> darker & smoother #2
+### 5 <> for testing purposes only
 
-USE_STYLE="1"
+USE_STYLE="5"
 
 if [ "$USE_STYLE" = "1" ]; then
   export INFINALITY_FT_FILTER_PARAMS="06 25 44 25 06"
@@ -30,20 +31,22 @@ elif [ "$USE_STYLE" = "3" ]; then
   export INFINALITY_FT_FILTER_PARAMS="13 25 38 25 13"
 elif [ "$USE_STYLE" = "4" ]; then
   export infinality_ft_filter_PARAMS="14 24 38 24 14"
+elif [ "$USE_STYLE" = "5" ]; then
+  export INFINALITY_FT_FILTER_PARAMS="07 23 36 23 07"
 fi
 
 export INFINALITY_FT_GRAYSCALE_FILTER_STRENGTH="0"
-export INFINALITY_FT_FRINGE_FILTER_STRENGTH="75"
+export INFINALITY_FT_FRINGE_FILTER_STRENGTH="0"
 export INFINALITY_FT_AUTOHINT_HORIZONTAL_STEM_DARKEN_STRENGTH="0"
 export INFINALITY_FT_AUTOHINT_VERTICAL_STEM_DARKEN_STRENGTH="0"
-export INFINALITY_FT_CHROMEOS_STYLE_SHARPENING_STRENGTH="0"
-export INFINALITY_FT_WINDOWS_STYLE_SHARPENING_STRENGTH="15"
-export INFINALITY_FT_STEM_ALIGNMENT_STRENGTH="25"
-export INFINALITY_FT_STEM_FITTING_STRENGTH="25"
-export INFINALITY_FT_STEM_SNAPPING_SLIDING_SCALE="50"
+export INFINALITY_FT_CHROMEOS_STYLE_SHARPENING_STRENGTH="30"
+export INFINALITY_FT_WINDOWS_STYLE_SHARPENING_STRENGTH="0"
+export INFINALITY_FT_STEM_ALIGNMENT_STRENGTH="0"
+export INFINALITY_FT_STEM_FITTING_STRENGTH="0"
+export INFINALITY_FT_STEM_SNAPPING_SLIDING_SCALE="0"
 export INFINALITY_FT_AUTOHINT_SNAP_STEM_HEIGHT="0"
 export INFINALITY_FT_AUTOHINT_INCREASE_GLYPH_HEIGHTS="false"
-export INFINALITY_FT_GAMMA_CORRECTION="15 110"
+export INFINALITY_FT_GAMMA_CORRECTION="15 90"
 export INFINALITY_FT_BRIGHTNESS="0"
 export INFINALITY_FT_CONTRAST="0"
 export INFINALITY_FT_USE_VARIOUS_TWEAKS="true"
