@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# fc-presets v.0.6 | by bohoomil, 2013, GPL
+# fc-presets v.0.7 | by bohoomil, 2013, GPL
 # [ Thanks cfr for testing and suggestions. ]
 # Set default fontconfig presets for your font collection.
 # Part of fontconfig-infinality-ultimate.
