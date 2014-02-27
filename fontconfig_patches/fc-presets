@@ -44,6 +44,7 @@ usage(){
   echo '    The active preset seems to be [ preset2 ].'
   echo '    Checking symlinks now...'
   echo ''
+  echo '    30-metric-aliases-preset2.conf is OK'
   echo '    37-repl-global-preset2.conf is OK'
   echo '    60-latin-preset2.conf is OK'
   echo '    65-non-latin-preset2.conf is OK'
@@ -92,7 +93,7 @@ check_current(){
   for preset in ${presets_list[@]}; do
     check_preset=$(ls *.conf | grep "\-$preset.conf")
     count_all=$(echo $check_preset | wc -w)
-    if [[ $? -ne 0 ]] || [[ $count_all -ne 5 ]]; then
+    if [[ $? -ne 0 ]] || [[ $count_all -ne 6 ]]; then
       echo -e " [ $preset ] is not set "
       echo -e " $YEL:: Run <fc-presets help> for more information.$RES"
     else
@@ -120,11 +121,11 @@ check_current(){
 
 check_current_prejob(){
   pushd $config_dir >/dev/null
-  targets_current=("37-repl-global-$option.conf" "60-latin-$option.conf" "65-non-latin-$option.conf" "66-aliases-wine-$option.conf" "93-final-lang-spec-$option.conf")
+  targets_current=("30-metric-aliases-$option.conf" "37-repl-global-$option.conf" "60-latin-$option.conf" "65-non-latin-$option.conf" "66-aliases-wine-$option.conf" "93-final-lang-spec-$option.conf")
   for preset in ${targets_current[@]}; do
     check_current=$(ls *.conf | grep "\-$option.conf")
     count_all=$(echo $check_current | wc -w)
-    if [[ -e $preset ]] && [[ $count_all -eq 5 ]]; then
+    if [[ -e $preset ]] && [[ $count_all -eq 6 ]]; then
       echo -e " You are already using [ $option ] preset. Aborting."
       exit 1
     fi
@@ -135,7 +136,7 @@ check_current_prejob(){
 targets_check_prejob(){
   pushd $presets_dir >/dev/null
   preset_selected=$(ls "$option"/*\-$option.conf | wc -w)
-  if [ $preset_selected -lt 5 ]; then
+  if [ $preset_selected -lt 6 ]; then
       echo -e 'Target not found. Did you set up'
       echo -e 'fontconfig-infinality-ultimate correctly?'
       exit 1
@@ -145,7 +146,7 @@ targets_check_prejob(){
 
 fc_reset(){
   pushd $config_dir >/dev/null
-  targets_rm=("37-repl-global-*.conf" "60-latin-*.conf" "65-non-latin-*.conf" "66-aliases-wine-*.conf" "93-final-lang-spec-*.conf")
+  targets_rm=("30-metric-aliases-*.conf" "37-repl-global-*.conf" "60-latin-*.conf" "65-non-latin-*.conf" "66-aliases-wine-*.conf" "93-final-lang-spec-*.conf")
   for target in "${targets_rm[@]}"; do
     # remove old
     if [ $UID -ne 0 ]; then
@@ -162,7 +163,7 @@ fc_set(){
   pushd $config_dir >/dev/null
   check_preset=$(ls | grep "\-$option.conf")
   count_all=$(echo $check_preset | wc -w)
-  if [[ $? -eq 0 ]] && [[ $count_all -eq 5 ]]; then
+  if [[ $? -eq 0 ]] && [[ $count_all -eq 6 ]]; then
     current=$option
     echo -e " [ $current ] preset is currently in use. Aborting."
   else

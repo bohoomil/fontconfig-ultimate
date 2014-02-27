@@ -27,7 +27,6 @@ DOC_FILES = $(DOC_SOURCES:.in=)
 
 CONF_LINKS = \
 	10-base-rendering.conf    \
-	30-metric-aliases.conf		\
 	31-fix-cantarell.conf   \
 	35-repl-custom.conf		\
 	40-non-latin.conf    \
@@ -60,7 +59,6 @@ templateinf_DATA =				\
 	10-base-rendering.conf    \
 	10-scale-bitmap-fonts.conf	\
 	31-fix-cantarell.conf   \
-	30-metric-aliases.conf		\
 	35-repl-custom.conf		\
 	36-repl-missing-glyphs.conf  \
 	38-repl-proggy-bitmap.conf   \
