@@ -1,0 +1,31 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=ttf-gelasio-ib
+pkgver=1.00
+pkgrel=1
+_hgrev=325e7174147acd060cb6dfe982cf57594a180d53
+depends=('fontconfig')
+pkgdesc="Gelasio serif family by Eben Sorkin."
+url="http://code.google.com/p/googlefontdirectory/"
+arch=('any')
+groups=('infinality-bundle-fonts')
+license=('OFL-1.1')
+install=$pkgname.install
+source=(https://googlefontdirectory.googlecode.com/hg-history/${_hgrev}/ofl/gelasio/Gelasio-{Bold,BoldItalic,Italic,Regular}.ttf
+        https://googlefontdirectory.googlecode.com/hg-history/${_hgrev}/ofl/gelasio/OFL.txt)
+
+package(){
+  cd "${srcdir}"
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+}
+
+md5sums=('7be1d568c30cf0392e265effc0e8604f'
+         'd3c8a6d0d785a2774aa93cf061af46bb'
+         '54575c749906783220bc30cd278d4cb9'
+         'bd1bdf873b65bde2d28e5320a441f733'
+         'ca3c98438790aadb97ba0b5f50fea681')

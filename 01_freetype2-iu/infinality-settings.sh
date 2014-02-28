@@ -1,5 +1,5 @@
 ### infinality environment variables for extra run-time options ###
-### custom settings by bohoomil, rev. 0.4.6.1, for freetype2 v. 2.5.x ###
+### custom settings by bohoomil, rev. 0.4.7.1, for freetype2 v. 2.5.x ###
 ### http://bohoomil.cu.cc ###
 
 XFT_SETTINGS="
@@ -15,24 +15,24 @@ Xft.rgba:       rgb
 echo "$XFT_SETTINGS" | xrdb -merge > /dev/null 2>&1
 
 ### Available styles:
-### 1 <> classical (infinality default in a new context; brighter & sharper)
-### 2 <> well balanced
-### 3 <> darker & smoother #1
-### 4 <> darker & smoother #2
-### 5 <> for testing purposes only
+### 1 <> classical improved
+### 2 <> classical (infinality default in a new context; brighter & sharper)
+### 3 <> well balanced
+### 4 <> darker & smoother #1
+### 5 <> darker & smoother #2
 
-USE_STYLE="5"
+USE_STYLE="1"
 
 if [ "$USE_STYLE" = "1" ]; then
-  export INFINALITY_FT_FILTER_PARAMS="06 25 44 25 06"
+  export INFINALITY_FT_FILTER_PARAMS="07 23 34 23 07"
 elif [ "$USE_STYLE" = "2" ]; then
-  export INFINALITY_FT_FILTER_PARAMS="11 22 38 22 11"
+  export INFINALITY_FT_FILTER_PARAMS="06 25 44 25 06"
 elif [ "$USE_STYLE" = "3" ]; then
-  export INFINALITY_FT_FILTER_PARAMS="13 25 38 25 13"
+  export INFINALITY_FT_FILTER_PARAMS="11 22 38 22 11"
 elif [ "$USE_STYLE" = "4" ]; then
-  export infinality_ft_filter_PARAMS="14 24 38 24 14"
+  export INFINALITY_FT_FILTER_PARAMS="13 25 38 25 13"
 elif [ "$USE_STYLE" = "5" ]; then
-  export INFINALITY_FT_FILTER_PARAMS="07 23 36 23 07"
+  export infinality_ft_filter_PARAMS="14 24 38 24 14"
 fi
 
 export INFINALITY_FT_GRAYSCALE_FILTER_STRENGTH="0"

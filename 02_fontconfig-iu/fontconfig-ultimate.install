@@ -30,6 +30,7 @@ _EOF
   echo -e "Done."
 
   echo -e "Creating symlinks for free font collection ..."
+  ln -sf ../conf.avail.infinality/free/30-metric-aliases-free.conf .
   ln -sf ../conf.avail.infinality/free/37-repl-global-free.conf .
   ln -sf ../conf.avail.infinality/free/60-latin-free.conf .
   ln -sf ../conf.avail.infinality/free/65-non-latin-free.conf .
@@ -37,18 +38,11 @@ _EOF
   ln -sf ../conf.avail.infinality/free/93-final-lang-spec-free.conf .
   echo -e "Done."
 
-  echo -e "Creating additional symlinks ..."
-  ln -sf ../conf.avail/10-scale-bitmap-fonts.conf .
-  ln -sf ../conf.avail/30-metric-aliases.conf .
-  echo -e "Done."
-
   popd > /dev/null
 
   echo -e "Updating font cache... "
   /usr/bin/fc-cache -f
   echo -e "Done."
-  mkfontscale usr/share/fonts/TTF
-  mkfontdir usr/share/fonts/TTF
 }
 
 post_upgrade() {

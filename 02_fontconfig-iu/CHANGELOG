@@ -6,6 +6,22 @@ CHANGELOG
 ---------
 
 
+2014-02-27
+----------
+
+* fontconfig-infinality-ultimate
+  & infinality-bundle-fonts
+** added 30-metric-aliases-foo.conf for each
+   font collection (should improve document portability
+   depending on the default font set)
+** updated fc-presetsg
+** added support for Gelasio font (TTF), the new
+   metrically compatible replacement for Georgia
+** removing Inconsolata-zi4 (Type 1) and added
+   support for Inconsolatazi4 (OTF)
+** multiple update to several fontconfig *.config
+   files
+
 2013-12-17
 ----------
 

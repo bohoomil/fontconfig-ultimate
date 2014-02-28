@@ -5,7 +5,7 @@
 # Installation order: freetype2-iu, fontconfig-iu, cairo-iu
 pkgname=freetype2-infinality-ultimate
 pkgver=2.5.2
-pkgrel=3
+pkgrel=4
 pkgdesc="TrueType font rendering library with Infinality patches and custom settings by bohoomil (infinality-bundle)."
 arch=(i686 x86_64)
 license=('GPL' 'MIT')
@@ -58,4 +58,4 @@ md5sums=('10e8f4d6a019b124088d18bc26123a25'
          '214119610444c9b02766ccee5e220680'
          '4fd922532b451d862a5374c2cc801581'
          'ac23b2f92d084d2fff1c3766b9c955dc'
-         'fff46797425cda04e61a05d93fb3b046')
+         'e8a6adae9329bc5fbce90d29629dc6a2')

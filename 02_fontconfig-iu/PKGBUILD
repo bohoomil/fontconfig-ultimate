@@ -8,7 +8,7 @@ pkgdesc="A library for configuring and customizing font access (includes generic
 url=('http://www.fontconfig.org/release/')
 license=('custom' 'MIT')
 pkgver=2.11.0
-pkgrel=15
+pkgrel=17
 arch=('i686' 'x86_64')
 changelog=CHANGELOG
 groups=('infinality-bundle')
@@ -17,6 +17,7 @@ options=('!libtool')
 provides=('fontconfig=$pkgver' 'fontconfig-infinality' 'fontconfig-infinality-ultimate')
 conflicts=('fontconfig' 'fontconfig-infinality' 'fontconfig-infinality-git' 'fontconfig-infinality-ultimate-git')
 backup=('etc/fonts/fonts.conf'
+        'etc/fonts/conf.avail.infinality/custom/30-metric-aliases-custom.conf'
         'etc/fonts/conf.avail.infinality/custom/37-repl-global-custom.conf'
         'etc/fonts/conf.avail.infinality/custom/60-latin-custom.conf'
         'etc/fonts/conf.avail.infinality/custom/65-non-latin-custom.conf'
