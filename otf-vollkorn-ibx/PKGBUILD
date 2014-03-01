@@ -1,0 +1,24 @@
+# Maintainer: jdarch <jda -dot- cloud -plus- archlinux -at- gmail -dot- com>
+# Contributor: bohoomil <@zoho.com>
+
+pkgname=otf-vollkorn-ibx
+pkgdesc="Vollkorn typeface by Friedrich Althausen (OpenType)"
+url=('http://vollkorn-typeface.com/')
+license=('custom:SIL Open Font License')
+pkgver=3.001
+pkgrel=2
+depends=('fontconfig')
+groups=('infinality-bundle-fonts-extra')
+arch=('any')
+install=$pkgname.install
+
+source=(http://vollkorn-typeface.com/download/vollkorn-${pkgver//./-}.zip)
+md5sums=('d2ca48fb47e901e334c6c601a8f18ce3')
+sha512sums=('deac718504d02728088e24d8f2c5a6a643365d2e6d3b5205a55e0978efbc51300edc2619921d6d5403d60c4f6b93f205c65fd5d486bcebd7aa3096c045082bfb')
+
+package() {
+  install -d "${pkgdir}/usr/share/fonts/${pkgname}"
+  install -m644 "${srcdir}/PS-OTF/"*.otf "${pkgdir}/usr/share/fonts/${pkgname}"
+  install -D -m644 "${srcdir}/OpenFontLicense.txt" "${pkgdir}/usr/share/licenses/${pkgname}/OpenFontLicense.txt"
+  install -D -m644 "${srcdir}/Fontlog.txt" "${pkgdir}/usr/share/doc/${pkgname}/Fontlog.txt"
+}
