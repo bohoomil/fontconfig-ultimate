@@ -10,17 +10,26 @@ CHANGELOG
 ----------
 
 * fontconfig-infinality-ultimate
-  & infinality-bundle-fonts
 ** added 30-metric-aliases-foo.conf for each
    font collection (should improve document portability
    depending on the default font set)
 ** updated fc-presetsg
-** added support for Gelasio font (TTF), the new
-   metrically compatible replacement for Georgia
+** added support for Gelasio font (TTF)
 ** removing Inconsolata-zi4 (Type 1) and added
    support for Inconsolatazi4 (OTF)
 ** multiple update to several fontconfig *.config
    files
+
+* infinality-bundle-fonts
+** added Inconsolatazi4 (OTF) and removed Iconsolata-zi4 (T1)
+** moved Inconsolatazi4 to infinality-bundle-fonts base group
+** updated Linux Libertine (OTF) and removed T1 & TTF versions
+** added updated Lato (TTF) and removed Lato OTF
+** moved Chrome OS fonts to infinality-bundle-fonts-extra group
+** moved Vollkorn (OTF) to infinality-bundle-fonts-extra group
+** added Gelasio (TTF) as the new, metrically compatible
+   replacement for Georgia
+** updated ibfonts-meta-extended
 
 2013-12-17
 ----------
