@@ -17,17 +17,17 @@ provides=("freetype2=$pkgver" 'freetype2-infinality' 'freetype2-infinality-ultim
 install='infinality.install'
 backup=('etc/profile.d/infinality-settings.sh')
 source=(http://downloads.sourceforge.net/sourceforge/freetype/freetype-${pkgver}.tar.bz2
-        freetype-2.2.1-enable-valid.patch
-        freetype-2.5.2-pkgconfig.patch
-        infinality-2.5.2.patch
+        freetype-2.5.3-enable-valid.patch
+        freetype-2.5.3-pkgconfig.patch
+        infinality-2.5.3.patch
         infinality-settings.sh)
 
 prepare() {
   cd "${srcdir}/freetype-${pkgver}"
 
-  patches=(freetype-2.2.1-enable-valid.patch
-           freetype-2.5.2-pkgconfig.patch
-           infinality-2.5.2.patch)
+  patches=(freetype-2.5.3-enable-valid.patch
+           freetype-2.5.3-pkgconfig.patch
+           infinality-2.5.3.patch)
 
   # infinality & post release fixes
   for patch in "${patches[@]}"; do
@@ -55,7 +55,7 @@ package() {
 }
 
 md5sums=('d6b60f06bfc046e43ab2a6cbfd171d65'
-         '214119610444c9b02766ccee5e220680'
-         '4fd922532b451d862a5374c2cc801581'
-         'ac23b2f92d084d2fff1c3766b9c955dc'
+         'aa55f7eae584dec7463930ab71ad3dc2'
+         'c16dcaa5fb0fe00d303b9fd819a390ef'
+         'c9e1b03f6460e4fad1c1514052bea1cf'
          'b4e48d4e3d762593973a9b8da25b91a7')
