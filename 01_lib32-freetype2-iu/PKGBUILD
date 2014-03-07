@@ -17,16 +17,16 @@ conflicts=('lib32-freetype2' 'lib32-freetype2-infinality' 'lib32-freetype2-git-i
 provides=('lib32-freetype2' 'lib32-freetype2-infinality')
 options=('!libtool')
 source=(http://download.savannah.gnu.org/releases/freetype/freetype-${pkgver}.tar.bz2
-        freetype-2.2.1-enable-valid.patch
-        freetype-2.5.2-pkgconfig.patch
-        infinality-2.5.2.patch)
+        freetype-2.5.3-enable-valid.patch
+        freetype-2.5.3-pkgconfig.patch
+        infinality-2.5.3.patch)
 
 prepare(){
   cd "${srcdir}/freetype-${pkgver}"
 
-  patch -Np1 -i "${srcdir}/freetype-2.2.1-enable-valid.patch"
-  patch -Np1 -i "${srcdir}/freetype-2.5.2-pkgconfig.patch"
-  patch -Np1 -i "${srcdir}/infinality-2.5.2.patch"
+  patch -Np1 -i "${srcdir}/freetype-2.5.3-enable-valid.patch"
+  patch -Np1 -i "${srcdir}/freetype-2.5.3-pkgconfig.patch"
+  patch -Np1 -i "${srcdir}/infinality-2.5.3.patch"
 }
 
 
