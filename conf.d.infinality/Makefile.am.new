@@ -48,7 +48,7 @@ CONF_LINKS = \
 	94-no-synthetic.conf    \
 	95-reject.conf
 
-EXTRA_DIST = $(templateinf_DATA) $(DOC_SOURCES)
+EXTRA_DIST = $(templateinf_DATA) $(DOC_SOURCES) $(fontcol_DATA)
 CLEANFILES = $(DOC_FILES)
 
 configdir = $(CONFIGDIR)
@@ -87,6 +87,33 @@ templateinf_DATA =				\
 	94-no-synthetic.conf    \
 	95-reject.conf
 
+fontcol = custom
+fontcol_DATA =	\
+	30-metric-aliases-custom.conf \
+	37-repl-global-custom.conf \
+	60-latin-custom.conf	\
+	65-non-latin-custom.conf	\
+	66-aliases-wine-custom.conf	\
+	93-final-lang-spec-custom.conf
+
+fontcol = free
+fontcol_DATA=	\
+	30-metric-aliases-free.conf \
+	37-repl-global-free.conf \
+	60-latin-free.conf	\
+	65-non-latin-free.conf	\
+	66-aliases-wine-free.conf	\
+	93-final-lang-spec-free.conf
+
+fontcol = ms
+fontcol_DATA =	\
+	30-metric-aliases-ms.conf \
+	37-repl-global-ms.conf \
+	60-latin-ms.conf	\
+	65-non-latin-ms.conf	\
+	66-aliases-wine-ms.conf	\
+	93-final-lang-spec-ms.conf
+
 README: $(srcdir)/README.in
 	sed "s|\@TEMPLATEINFDIR\@|$(templateinfdir)|" $< > $@
 
@@ -98,6 +125,33 @@ install-data-hook:
 	    echo $(RM) $$i";" ln -s $(templateinfdir)/$$i .;	\
 	    $(RM) $$i;						\
 	    ln -s $(templateinfdir)/$$i .;				\
+	  done)
+install-fontcol-hook:
+	@(echo cd $(DESTDIR)$(configdir);			\
+	  cd $(DESTDIR)$(configdir);				\
+	  for i in $(FONTCOL_DATA); do				\
+      case COL in $(fontcol) \
+			custom)   \
+				echo $(RM) $$i";" ln -s $(templateinfdir)/custom/$$i .;	\
+	    	$(RM) $$i;						\
+	    	ln -s $(templateinfdir)/custom/$$i .;				\
+      	;;  \
+      free)   \
+	    	echo $(RM) $$i";" ln -s $(templateinfdir)/free/$$i .;	\
+	    	$(RM) $$i;						\
+	    	ln -s $(templateinfdir)/free/$$i .;				\
+      	;;  \
+      ms)   \
+	    	echo $(RM) $$i";" ln -s $(templateinfdir)/ms/$$i .;	\
+	    	$(RM) $$i;						\
+	    	ln -s $(templateinfdir)/ms/$$i .;				\
+      	;;  \
+      *)    \
+	    	echo $(RM) $$i";" ln -s $(templateinfdir)/free/$$i .;	\
+	    	$(RM) $$i;						\
+	    	ln -s $(templateinfdir)/free/$$i .;				\
+      	;;  \
+			esac		\
 	  done)
 uninstall-local:
 	@(echo cd $(DESTDIR)$(configdir);			\
