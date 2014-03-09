@@ -12,6 +12,8 @@ CHANGELOG
 * fontconfig-infinality-ultimate
 ** revised free font collection rules for better compatibility
    with Chrome / Chromium browsers
+** added `ftypes` subdir for better handling of multiple format
+   fonts
 ** general revision and config update
 
 2014-02-27
