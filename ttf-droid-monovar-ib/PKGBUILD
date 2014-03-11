@@ -2,14 +2,14 @@
 # Contributor: Ignas Anikevicius <anikevicius at gmail dot com>
 # Contributor: bohoomil <@zoho.com>
 
-pkgname=ttf-droid-monovar-ibx
+pkgname=ttf-droid-monovar-ib
 pkgver=1.0
-pkgrel=4
+pkgrel=5
 pkgdesc="A monospacedfont created by Ascender Corporation with dotted and slashed zeros. Part of infinality-bundle-fonts."
 url="http://www.cosmix.org/software/"
 license=('apache')
 depends=('fontconfig')
-groups=('infinality-bundle-fonts-extra')
+groups=('infinality-bundle-fonts')
 conflicts=('ttf-droid-monovar')
 provides=('ttf-droid-monovar')
 source=('http://www.cosmix.org/software/files/DroidSansMonoSlashed.zip'
