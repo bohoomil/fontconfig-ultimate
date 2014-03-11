@@ -5,6 +5,17 @@ infinality-bundle+fonts
 CHANGELOG
 ---------
 
+2014-03-11
+~~~~~~~~~~
+
+* fontconfig-infinality-ultimate
+** new default substitution:
+   Consolas => Droid Sans Mono Slashed
+
+* infinality-bundle-fonts
+** moving ttf-droid-monovar-ibx to infinality-bundle-fonts group
+** moving otf-inconsolatazi4-ib to infinality-bundle-fonts-extra group
+
 
 2014-03-09
 ~~~~~~~~~~
