@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# fc-presets v.0.7 | by bohoomil, 2013, GPL
+# fc-presets v.0.8 | by bohoomil, 2013, GPL
 # [ Thanks cfr for testing and suggestions. ]
 # Set default fontconfig presets for your font collection.
 # Part of fontconfig-infinality-ultimate.
@@ -13,8 +13,8 @@ RES='\E[0m'
 presets_dir="/etc/fonts/conf.avail.infinality"
 config_dir="/etc/fonts/conf.d"
 
-presets_list=(custom ms free)
-options=(custom ms free reset quit)
+presets_list=(combi free ms)
+options=(combi free ms reset quit)
 
 option=$1
 
@@ -29,7 +29,7 @@ usage(){
   echo ' check    Check which preset is currently active'
   echo ' set      Set a preset configuration (requires root privileges)'
   echo '          Available presets are:'
-  echo '            custom  --  custom font collection'
+  echo '             combi  --  custom font collection'
   echo '              free  --  free font collection'
   echo '                ms  --  Microsoft font collection'
   echo ' help     Print this help and exit'
@@ -64,7 +64,7 @@ usage(){
   echo ''
   echo ' If no preset has been set (which means that at least 1 symbolic link'
   echo ' from a preset is missing), the relevant message is displayed:'
-  echo '    [ custom ] not set'
+  echo '    [ combi ] not set'
   echo '    [ ms ] not set'
   echo '    [ free ] not set'
   echo ' How to fix:'
@@ -182,17 +182,34 @@ fc_set(){
   popd >/dev/null
 }
 
+custom_postjob(){
+  pushd $config_dir >/dev/null
+  targets_current=("30-metric-aliases-$option.conf" "37-repl-global-$option.conf" "60-latin-$option.conf" "65-non-latin-$option.conf" "66-aliases-wine-$option.conf" "93-final-lang-spec-$option.conf")
+  for preset in ${targets_current[@]}; do
+    check_current=$(ls *.conf | grep "\-$option.conf")
+    if [[ $check_current == *combi* ]] && [[ -f ./35-repl-custom.conf ]]; then
+      rm -f 35-repl-custom.conf 2>/dev/null
+    elif [[ $check_current == *free* ]] || [[ $check_current == *ms* ]]; then
+      if [ ! -f 35-repl-custom ]; then
+        ln -s ../conf.avail.infinality/35-repl-custom.conf . 2>/dev/null
+      fi
+    fi
+  done
+  popd >/dev/null
+}
+
 set_preset(){
   PS3='Enter your choice... '
   select preset in "${options[@]}"; do
     case "$preset" in
-      custom)
-        echo ' [ custom ] preset chosen...'
-        option='custom'
+      combi)
+        echo ' [ combi ] preset chosen...'
+        option='combi'
         check_current_prejob
         targets_check_prejob
         fc_reset
         fc_set
+        custom_postjob
         [ $? -eq 0 ] && OK || NOTOK
         ;;
       free)
@@ -202,6 +219,7 @@ set_preset(){
         targets_check_prejob
         fc_reset
         fc_set
+        custom_postjob
         [ $? -eq 0 ] && OK || NOTOK
         ;;
       ms)
@@ -211,6 +229,7 @@ set_preset(){
         targets_check_prejob
         fc_reset
         fc_set
+        custom_postjob
         [ $? -eq 0 ] && OK || NOTOK
         ;;
       reset)
