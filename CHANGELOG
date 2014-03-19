@@ -10,25 +10,30 @@ CHANGELOG
 
 * fontconfig-infinality-ultimate
 ** major revision of ms collection configuration files
-   (ms collection is fully compatible with the most
-   recent Windows 8.1 fonts releases)
+   (`ms` collection is fully compatible with the most recent Windows 8.1
+   fonts releases)
 ** numerous bugs fixed and inconsistencies removed
-** major revision of custom collection configuration files
-   * latin scripts are based on the customized free collection
-     with TeX Gyre Heros & Termes as main metrical replacements
-     for Arial/Helvetica
+** major revision of `custom` collection configuration files
+   * latin scripts are based on the customized free collection with
+     TeX Gyre Heros & Termes as main metrical replacements for Arial/Helvetica
    * non-latin scripts are based on customized ms collection
+** updated `fc-presets`:
+   * renamed `custom` collection to `combi`
+   * added a postjob function for free & ms collection to set
+     `35-repl-custom.conf` for custom tweaks (not needed with the `combi` 
+     collection)
 ** added support for new font families
 
 * freetype2-infinality-ultimate
-** infinality-settings.sh: revised and updated rendering styles
+** `infinality-settings.sh`: revised and updated rendering styles
+** updated dependencies
 
 2014-03-11
 ~~~~~~~~~~
 
 * fontconfig-infinality-ultimate
 ** new default substitution:
-   Consolas => Droid Sans Mono Slashed
+   - Consolas => Droid Sans Mono Slashed
 
 * infinality-bundle-fonts
 ** moving ttf-droid-monovar-ibx to infinality-bundle-fonts group
@@ -39,44 +44,37 @@ CHANGELOG
 ~~~~~~~~~~
 
 * fontconfig-infinality-ultimate
-** revised free font collection rules for better compatibility
-   with Chrome / Chromium browsers
-** added `ftypes` subdir for better handling of multiple format
-   fonts
+** revised `free` font collection rules for better compatibility with
+   Chrome / Chromium browsers
+** added `ftypes` subdir for better handling of multiple format fonts
 ** general revision and config update
 
 2014-02-27
 ~~~~~~~~~~
 
-* fontconfig-infinality-ultimate
-  & infinality-bundle-fonts
-** added 30-metric-aliases-foo.conf for each
-   font collection (should improve document portability
-   depending on the default font set)
+* fontconfig-infinality-ultimate & infinality-bundle-fonts
+** added `30-metric-aliases-foo.conf` for each font collection
+   (should improve document portability depending on the default font set)
 ** updated fc-presetsg
-** added support for Gelasio font (TTF), the new
-   metrically compatible replacement for Georgia
-** removing Inconsolata-zi4 (Type 1) and added
-   support for Inconsolatazi4 (OTF)
-** multiple update to several fontconfig *.config
-   files
+** added support for Gelasio font (TTF), the new metrically compatible 
+   replacement for Georgia
+** removing Inconsolata-zi4 (Type 1) and added support for Inconsolatazi4 (OTF)
+** multiple update to several fontconfig `*.config` files
 
 2013-12-17
 ~~~~~~~~~~
 
-* fontconfig-infinality-ultimate
-  & infinality-bundle-fonts
-** replacing Aller with Ubuntu due to
-   licensing restrictions of the former
+* fontconfig-infinality-ultimate & infinality-bundle-fonts
+** replacing Aller with Ubuntu due to licensing restrictions of the former
 ** added support for new fonts:
    - Clear Sans (TTF)
    - Brill (OTF)
    - Neris (OTF)
-** added 36-repl-missing-glyphs.conf for fixing
-   missing glyphs issues with some fonts
-** 35-repl-custom.conf override both 36-repl-missing-glyphs.conf
-   and 37-repl-global-{preset}.conf
-** fixed kerning for Liberation Sans
+** added `36-repl-missing-glyphs.conf` for fixing missing glyphs issues
+   with some fonts
+** `35-repl-custom.conf` override both `36-repl-missing-glyphs.conf`
+   and `37-repl-global-{preset}.conf`
+** fixed kerning issues with Liberation Sans
 
 2013-12-09
 ~~~~~~~~~~
@@ -88,14 +86,14 @@ CHANGELOG
 ** added support for new fonts:
    - Amble (TTF)
    - Signika Text (TTF)
-** updated 45-latin.conf & 90-tt-fonts.conf
+** updated `45-latin.conf` & `90-tt-fonts.conf`
 
 2013-12-07
 ~~~~~~~~~~
 
 * fontconfig-infinality-ultimate
 ** replaced TeX Gyre T1 with OTF
-** modified 60-latin-free.conf
+** modified `60-latin-free.conf`
 
 2013-12-04
 ~~~~~~~~~~
@@ -104,8 +102,7 @@ CHANGELOG
 ** added Symbol and Wingdings support
 ** added Symbola.ttf font
 ** minor Open Sans rendering fix
-** added customization template
-   36-repl-custom.conf
+** added customization template `36-repl-custom.conf`
 
 2013-11-28
 ~~~~~~~~~~
@@ -119,10 +116,9 @@ CHANGELOG
 
 * fontconfig-infinality-ultimate
 ** fixed bitmap to outline replacement rules
-   and split 38-repl-tt-traced-bitmap.conf (issue #8)
+   and split `38-repl-tt-traced-bitmap.conf` (issue #8)
 ** fixed Liberation Sans Bold & Regular < 13px
-** swapping Heuristica T1 for OTF (bug in T1 Unicode
-   encoding)
+** swapping Heuristica T1 for OTF (bug in T1 Unicode encoding)
 
 * freetype2-infinality-ultimate
 ** upstream version upgrade to 2.5.1
@@ -132,8 +128,7 @@ CHANGELOG
 ~~~~~~~~~~
 
 * fontconfig-infinality-ultimate 2.11.0-7
-** fc-presets: re-run the main loop after disabling
-   all presets
+** `fc-presets`: re-run the main loop after disabling all presets
 ** new replacements:
    - Cambria => Caladea
    - Candara => Linux Biolinum
@@ -147,13 +142,13 @@ CHANGELOG
 ~~~~~~~~~~
 
 * fontconfig-infinality-ultimate 2.11.0-6
-** fc-presets reworked:
-   - new [reset] option
+** `fc-presets` reworked:
+   - new `reset` option
    - added new sanity checks and improved old ones
    - extended help and basic troubleshooting FAQ included
-** 37-repl-global-free.conf: added replacements for
+** `37-repl-global-free.conf`: added replacements for
    @font-face:Lora and @font-face:Autonym
-** 92-selective-rendering.conf: minor fixes to
+** `92-selective-rendering.conf`: minor fixes to
    Noto Sans and Liberation Sans
 ** fonts.conf: 72 dpi option added fixing Chrome issues
 
@@ -181,7 +176,7 @@ CHANGELOG
 ~~~~~~~~~~
 
 * fontconfig-infinality-ultimate 2.11.0-5
-** 37-repl-global-free.conf: added new substitution patterns,
+** `37-repl-global-free.conf`: added new substitution patterns,
    a few were modified:
    Calibri       => Carlito (temporary beta switch)
    Garamond      => EB Garamond
@@ -209,16 +204,16 @@ CHANGELOG
 * fontconfig-infinality-ultimate 2.11.0-4
 ** swapping DejaVu TrueType for Type 1 (new default)
 ** splitting rendering instructions for DejaVu family (TTF vs. T1)
-   from 90-tt-fonts.conf and 90-non-tt-fonts.conf
+   from `90-tt-fonts.conf` and `90-non-tt-fonts.conf`
 
 2013-10-11
 ~~~~~~~~~~
 
 * upstream version upgrade: fontconfig 2.11.0
 * fontconfig-infinality-bundle 2.11.0-3
-** optimized support for 3 different font collections:
-   free (default), MS and custom
-** fc-presets rev. 0.2 included
+** optimized support for 3 different font collections: `free` (default), 
+   `ms` (Microsoft font families) and `custom`
+** `fc-presets` rev. 0.2 included
 
 * freetype2-infinality-ultimate: revision update to 2.5.0.1-7
 ** added libpng dependency
@@ -230,9 +225,9 @@ CHANGELOG
 ~~~~~~~~~~
 
 * fontconfig-infinality-bundle-2.10.85-2.1
-** initial release of fontconfig-infinality-bundle with
-   presets for custom, free and MS font collections
-** fc-presets script for easy preset switching
+** initial release of fontconfig-infinality-bundle with presets
+   for custom, free and MS font collections
+** initial release of `fc-presets` script for easy preset switching
 ** various minor fixes to MS font rendering
 
 2013-08-31
@@ -244,38 +239,38 @@ CHANGELOG
 2013-07-24
 ~~~~~~~~~~
 
-* changes to infinality-settings.sh:
+* changes to `infinality-settings.sh`:
 ** Xft hintstyle    => hintslight (this should fix
    kerning issues in a few cases)
 ** fringe filter    => 50
 
-* changes to 37-repl-global.conf:
+* changes to `37-repl-global.conf`:
 ** Courier rule can be commented out if using Adobe Courier T1
 ** Geneva TTF       => Noto Sans TTF
 ** Inconsolata TTF  => Inconsolata-zi4 T1 (TeXLive)
 ** proxima-nova TTF => Open Sans T1
 
-* changes to 66-wine-aliases.conf:
+* changes to `66-wine-aliases.conf`:
 ** SegoeUI          => Microsoft Sans Serif
    (due to recent issues with SegoeUI)
 
-* minor changes to 90-non-tt-fonts.conf, 90-tt-fonts.conf,
-  92-selective-rendering.conf
+* minor changes to `90-non-tt-fonts.conf`, `90-tt-fonts.conf`,
+  and `92-selective-rendering.conf`
 
 2013-07-11
 ~~~~~~~~~~
 
-* changes to infinality-settings.sh:
+* changes to `infinality-settings.sh`:
 ** increased fringe filter 30 => 40
 
-* changes to 37-repl-global.conf:
+* changes to `37-repl-global.conf`:
 ** Courier TTF      => Courier T1 (TeXLive)
 ** Helvetica        => Liberastika
 ** Inconsolata TTF  => Inconsolata-zi4 T1 (TeXLive)
 ** Open Sans TTF    => Open Sans T1 (TexLive)
 ** proxima-nova TTF => Open Sans T1 (TeXLive)
 
-* changes and fixes in 90-{non)-tt-fonts.conf:
+* changes and fixes to `90-{non)-tt-fonts.conf`:
 ** Cantarell OTF    => Cantarell T1 (TeXLive)
 ** Inconsolata TTF  => Inconsolata-zi4 T1 (TeXLive)
 ** Courier TTF      => Courier T1 (TeXLive)
@@ -284,7 +279,7 @@ CHANGELOG
 ** Liberastika      => 90-tt-fonts.conf
 ** Lekton           => 90-tt-fonts.conf
 
-* changes to 92-selective-rendering.conf:
+* changes to `92-selective-rendering.conf`:
 ** Arial Regular > 28px < 33px, hintslight
 ** Arial Bold > 14px, hintslight
 ** TeX Gyre Heros (OTF) > 17.5px < 19.5px, autohint, hintfull
@@ -299,14 +294,14 @@ CHANGELOG
 
 * freetype2-infinality-ultimate 2.5.0.1-2:
 ** moving to Adobe CFF as the default renderer
-** improved and simplified infinality setttings: most minor rendering issues
-   was reolved
+** improved and simplified infinality setttings: most minor rendering
+   issues was reolved
 ** added new style, Classical
 
 * fontconfig-infinality-ultimate 2.10.93-3:
 ** code cleanup and revision results in more consistent rules
-** simpler yes (83-yes-foo.conf) / no (82-no-foo.conf) switches for more
-   intuitive access to global features
+** simpler yes (`83-yes-foo.conf`) / no (`82-no-foo.conf`) switches for
+   more intuitive access to global features
 ** added support for several new font families
 ** new per-user config templates
 
@@ -321,7 +316,7 @@ CHANGELOG
   packages.
 
 * Default Serif, Sans-Serif and Monospace faces are now set hierarchically in
-  /etc/fonts/conf.d/60-latin.conf. In order to override these settings, the
+  `/etc/fonts/conf.d/60-latin.conf`. In order to override these settings, the
   user is supposed to create a custom file in the local, XDG compliant 
   fontconfig directory (a relevant example has been provided). Once
   custom settings have been created, they will be honored by applications.
