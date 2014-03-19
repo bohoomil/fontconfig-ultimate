@@ -5,6 +5,19 @@ infinality-bundle+fonts
 CHANGELOG
 ---------
 
+2014-03-20
+~~~~~~~~~~
+
+* fontconfig-infinality-ultimate
+** major revision of ms collection configuration files
+   (ms collection is fully compatible with the most
+   recent Windows 8.1 fonts releases)
+** numerous bugs fixed and inconsistencies removed
+** added support for new font families
+
+* freetype2-infinality-ultimate
+** infinality-settings.sh: revised and updated rendering styles
+
 2014-03-11
 ~~~~~~~~~~
 
