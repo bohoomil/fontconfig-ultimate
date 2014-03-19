@@ -13,6 +13,11 @@ CHANGELOG
    (ms collection is fully compatible with the most
    recent Windows 8.1 fonts releases)
 ** numerous bugs fixed and inconsistencies removed
+** major revision of custom collection configuration files
+   * latin scripts are based on the customized free collection
+     with TeX Gyre Heros & Termes as main metrical replacements
+     for Arial/Helvetica
+   * non-latin scripts are based on customized ms collection
 ** added support for new font families
 
 * freetype2-infinality-ultimate
