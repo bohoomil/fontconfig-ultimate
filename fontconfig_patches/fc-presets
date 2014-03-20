@@ -1,9 +1,10 @@
 #!/bin/bash
 
-# fc-presets v.0.8
-# [ Thanks cfr for testing and suggestions. ]
-# Set default fontconfig presets for your font collection.
-# Part of fontconfig-infinality-ultimate.
+###                     fc-presets v.0.8                     ###
+### Set default fontconfig presets for your font collection. ###
+###          (Thanks cfr for testing and suggestions.)       ###
+###                                                          ###
+###       part of infinality-bundle http://bohoomil.com      ###
 
 # Copyright (C) 2014 bohoomil
 
