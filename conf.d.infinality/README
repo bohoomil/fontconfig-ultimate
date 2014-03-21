@@ -30,7 +30,8 @@ configuration files (depending on which font collection you are using)
 
  ../conf.avail.infinality/combi - for a custom, user-compiled collection
  ../conf.avail.infinality/free  - for the free font collection, available in the
-                                  infinality-bundle-fonts repository
+                                  infinality-bundle-fonts repository (default in
+                                  Arch Linux)
  ../conf.avail.infinality/ms    - for the proprietary font collection available
                                   with Microsoft Windows and Office software
                                   (not freely available)
