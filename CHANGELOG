@@ -5,7 +5,7 @@ infinality-bundle+fonts
 CHANGELOG
 ---------
 
-2014-03-20
+2014-03-21
 ~~~~~~~~~~
 
 * fontconfig-infinality-ultimate
@@ -14,14 +14,17 @@ CHANGELOG
    fonts releases)
 ** numerous bugs fixed and inconsistencies removed
 ** major revision of `custom` collection configuration files
-   * latin scripts are based on the customized free collection with
-     TeX Gyre Heros & Termes as main metrical replacements for Arial/Helvetica
-   * non-latin scripts are based on customized ms collection
+   * renamed `custom` collection to `combi` (required by `fc-presets` to
+     correctly set 35-repl-custom.conf for `free` and `ms` presets)
+   * latin scripts are based on the customized `free` collection with
+     TeX Gyre Heros / Termes and Adobe Courier as main metrical replacements
+     for Arial/Helvetica, Times New Roman and Courier New
+   * non-latin scripts are based on customized `ms` collection
 ** updated `fc-presets`:
-   * renamed `custom` collection to `combi`
    * added a postjob function for free & ms collection to set
      `35-repl-custom.conf` for custom tweaks (not needed with the `combi` 
      collection)
+** modified naming convention for `ftypes` config files
 ** added support for new font families
 
 * freetype2-infinality-ultimate
