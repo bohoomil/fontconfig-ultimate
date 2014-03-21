@@ -24,6 +24,22 @@ has led to the following conventions in usage:
 
 If you are using fontconfig-infinality-ultimate from the infinality-bundle
 collection, configuration files are located in @TEMPLATEINFDIR@ and
-the are symlinked here instead. The stock template directory and configuration
-files are still available for compatibility reasons and should not be removed.
+they are symlinked here instead. Besides, there are four more subdirectories
+located in the main template direcotory. Three of them provide necessary
+configuration files (depending on which font collection you are using):
+
+ @TEMPLATEINFDIR@/combi - for a custom, user-compiled collection
+ @TEMPLATEINFDIR@/free  - for the free font collection, available in the
+                                  infinality-bundle-fonts repository
+ @TEMPLATEINFDIR@/ms    - for the proprietary font collection available
+                                  with Microsoft Windows and Office software
+                                  (not freely available)
+
+The fourth one, @TEMPLATEINFDIR@/ftypes, provides optional base
+rendering instructions for fonts that are not installed by default and are
+available in multiple formats (TrueType, OpenType and Type 1). See
+@TEMPLATEINFDIR@/README for instruction on how to use them.
+
+The stock fontconfig template directory and configuration files are still
+available for compatibility reasons and should not be removed.
 
