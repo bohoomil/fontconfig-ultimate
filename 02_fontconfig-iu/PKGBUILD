@@ -7,8 +7,8 @@ _gitname=fontconfig-ultimate
 pkgdesc="A library for configuring and customizing font access (includes generic fontconfig package and ultimate settings by bohoomil)."
 url=('http://www.fontconfig.org/release/')
 license=('custom' 'MIT')
-pkgver=2.11.0
-pkgrel=22
+pkgver=2.11.1
+pkgrel=2
 arch=('i686' 'x86_64')
 changelog=CHANGELOG
 groups=('infinality-bundle')
@@ -17,12 +17,12 @@ options=('!libtool')
 provides=('fontconfig=$pkgver' 'fontconfig-infinality' 'fontconfig-infinality-ultimate')
 conflicts=('fontconfig' 'fontconfig-infinality' 'fontconfig-infinality-git' 'fontconfig-infinality-ultimate-git')
 backup=('etc/fonts/fonts.conf'
-        'etc/fonts/conf.avail.infinality/custom/30-metric-aliases-custom.conf'
-        'etc/fonts/conf.avail.infinality/custom/37-repl-global-custom.conf'
-        'etc/fonts/conf.avail.infinality/custom/60-latin-custom.conf'
-        'etc/fonts/conf.avail.infinality/custom/65-non-latin-custom.conf'
-        'etc/fonts/conf.avail.infinality/custom/66-aliases-wine-custom.conf'
-        'etc/fonts/conf.avail.infinality/custom/93-final-lang-spec-custom.conf'
+        'etc/fonts/conf.avail.infinality/combi/30-metric-aliases-combi.conf'
+        'etc/fonts/conf.avail.infinality/combi/37-repl-global-combi.conf'
+        'etc/fonts/conf.avail.infinality/combi/60-latin-combi.conf'
+        'etc/fonts/conf.avail.infinality/combi/65-non-latin-combi.conf'
+        'etc/fonts/conf.avail.infinality/combi/66-aliases-wine-combi.conf'
+        'etc/fonts/conf.avail.infinality/combi/93-final-lang-spec-combi.conf'
         'etc/fonts/conf.avail.infinality/35-repl-custom.conf'
         'etc/fonts/conf.avail.infinality/36-repl-missing-glyphs.conf')
 install=fontconfig-ultimate.install
@@ -98,7 +98,7 @@ package() {
   cd "${srcdir}/${_gitname}"
 
   # copy presets
-  cp -r fontconfig_patches/{custom,free,ms,ftypes} \
+  cp -r fontconfig_patches/{combi,free,ms,ftypes} \
     "${pkgdir}"/etc/fonts/conf.avail.infinality
 
   # install fc-presets
@@ -116,5 +116,5 @@ package() {
   find "${pkgdir}" -type d -name .git -exec rm -r '{}' +
 }
 
-md5sums=('000bd4baf7aefa828e03414d0c8c7dc5'
+md5sums=('824d000eb737af6e16c826dd3b2d6c90'
          'SKIP')
