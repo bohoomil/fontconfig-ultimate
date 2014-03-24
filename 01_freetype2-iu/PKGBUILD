@@ -5,13 +5,13 @@
 # Installation order: freetype2-iu, fontconfig-iu, cairo-iu
 pkgname=freetype2-infinality-ultimate
 pkgver=2.5.3
-pkgrel=2
+pkgrel=4
 pkgdesc="TrueType font rendering library with Infinality patches and custom settings by bohoomil (infinality-bundle)."
 arch=(i686 x86_64)
 license=('GPL' 'MIT')
 groups=('infinality-bundle')
 url="http://freetype.sourceforge.net"
-depends=('zlib' 'bzip2' 'sh' 'xorg-xrdb' 'libpng')
+depends=('zlib' 'bzip2' 'sh' 'xorg-xrdb' 'libpng' 'harfbuzz')
 conflicts=('freetype2' 'freetype2-infinality')
 provides=("freetype2=$pkgver" 'freetype2-infinality' 'freetype2-infinality-ultimate')
 install='infinality.install'
@@ -20,7 +20,8 @@ source=(http://downloads.sourceforge.net/sourceforge/freetype/freetype-${pkgver}
         freetype-2.5.3-enable-valid.patch
         freetype-2.5.3-pkgconfig.patch
         infinality-2.5.3.patch
-        infinality-settings.sh)
+        infinality-settings.sh
+        fix_segfault_with_harfbuzz.diff)
 
 prepare() {
   cd "${srcdir}/freetype-${pkgver}"
@@ -33,6 +34,10 @@ prepare() {
   for patch in "${patches[@]}"; do
     patch -Np1 -i ${srcdir}/${patch}
   done
+
+  # fix segfaults # https://bugs.archlinux.org/task/39365
+  # http://git.savannah.gnu.org/cgit/freetype/freetype2.git/commit/?id=23367ff97f33ef6a2b7e1fced1157c87a46d9596
+  patch -Np1 -i ${srcdir}/fix_segfault_with_harfbuzz.diff
 }
 
 build() {
@@ -58,4 +63,5 @@ md5sums=('d6b60f06bfc046e43ab2a6cbfd171d65'
          'aa55f7eae584dec7463930ab71ad3dc2'
          'c16dcaa5fb0fe00d303b9fd819a390ef'
          'c9e1b03f6460e4fad1c1514052bea1cf'
-         'b4e48d4e3d762593973a9b8da25b91a7')
+         'e89d92fafcefa232cff482acbc2d41a4'
+         '58adb4c2ecf7a060e56341f236445cc4')

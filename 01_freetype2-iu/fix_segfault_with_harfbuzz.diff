@@ -1,0 +1,32 @@
+From 23367ff97f33ef6a2b7e1fced1157c87a46d9596 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Mon, 17 Mar 2014 06:33:14 +0000
+Subject: Fix Savannah bug #41869.
+
+This works around a problem with HarfBuzz (<= 0.9.26), which doesn't
+validate glyph indices returned by
+`hb_ot_layout_lookup_collect_glyphs'.
+
+* src/autofit/hbshim.c (af_get_coverage): Guard `idx'.
+
+* docs/CHANGES: Updated.
+---
+diff --git a/src/autofit/hbshim.c b/src/autofit/hbshim.c
+index 11fb743..2eda8d7 100644
+--- a/src/autofit/hbshim.c
++++ b/src/autofit/hbshim.c
+@@ -347,6 +347,11 @@
+       count++;
+ #endif
+ 
++      /* HarfBuzz 0.9.26 and older doesn't validate glyph indices */
++      /* returned by `hb_ot_layout_lookup_collect_glyphs'...      */
++      if ( idx >= (hb_codepoint_t)globals->glyph_count )
++        continue;
++
+       if ( gstyles[idx] == AF_STYLE_UNASSIGNED )
+         gstyles[idx] = (FT_Byte)style_class->style;
+ #ifdef FT_DEBUG_LEVEL_TRACE
+--
+cgit v0.9.0.2
+
