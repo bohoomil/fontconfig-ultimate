@@ -1,5 +1,5 @@
---- a/configure	2013-10-11 06:28:48.000000000 +0200
-+++ b/configure	2013-10-11 18:57:39.303346232 +0200
+--- a/configure	2014-03-24 07:04:16.000000000 +0100
++++ b/configure	2014-03-24 22:26:05.533614459 +0100
 @@ -655,6 +655,7 @@ XMLDIR
  CONFIGDIR
  BASECONFIGDIR
@@ -27,7 +27,7 @@
    --with-baseconfigdir=DIR
                            Use DIR to store the base configuration files
                            [default=SYSCONFDIR/fonts]
-@@ -14825,6 +14831,12 @@ else
+@@ -14856,6 +14862,12 @@ else
    templatedir=yes
  fi
  
@@ -40,7 +40,7 @@
  
  # Check whether --with-baseconfigdir was given.
  if test "${with_baseconfigdir+set}" = set; then :
-@@ -14857,6 +14869,13 @@ no|yes)
+@@ -14888,6 +14900,13 @@ no|yes)
  *)
  	;;
  esac
@@ -54,7 +54,7 @@
  case "$baseconfigdir" in
  no|yes)
  	baseconfigdir='${sysconfdir}'/fonts
-@@ -14880,6 +14899,7 @@ no|yes)
+@@ -14911,6 +14930,7 @@ no|yes)
  esac
  
  TEMPLATEDIR=${templatedir}
@@ -62,7 +62,7 @@
  BASECONFIGDIR=${baseconfigdir}
  CONFIGDIR=${configdir}
  XMLDIR=${xmldir}
-@@ -15857,8 +15877,8 @@ _ACEOF
+@@ -15939,8 +15959,8 @@ _ACEOF
  
  
  
@@ -73,7 +73,7 @@
  cat >confcache <<\_ACEOF
  # This file is a shell script that caches the results of configure
  # tests run on this system so they can be shared between configure
-@@ -16921,6 +16941,7 @@ do
+@@ -17003,6 +17023,7 @@ do
      "fc-case/Makefile") CONFIG_FILES="$CONFIG_FILES fc-case/Makefile" ;;
      "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
      "conf.d/Makefile") CONFIG_FILES="$CONFIG_FILES conf.d/Makefile" ;;

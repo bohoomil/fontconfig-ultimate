@@ -1,5 +1,5 @@
---- a/conf.d/Makefile.am	2013-10-11 05:10:17.000000000 +0200
-+++ b/conf.d/Makefile.am	2013-10-12 14:24:16.313451652 +0200
+--- a/conf.d/Makefile.am	2014-01-20 09:14:19.000000000 +0100
++++ b/conf.d/Makefile.am	2014-03-24 22:42:04.326965609 +0100
 @@ -21,26 +21,9 @@
  #  TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  #  PERFORMANCE OF THIS SOFTWARE.
@@ -53,8 +53,8 @@
 -	  done)
 -
  -include $(top_srcdir)/git.mk
---- a/conf.d/Makefile.in	2013-10-11 06:28:47.000000000 +0200
-+++ b/conf.d/Makefile.in	2013-10-12 14:24:05.830118126 +0200
+--- a/conf.d/Makefile.in	2014-03-24 07:04:15.000000000 +0100
++++ b/conf.d/Makefile.in	2014-03-24 22:42:04.326965609 +0100
 @@ -102,7 +102,7 @@ POST_UNINSTALL = :
  build_triplet = @build@
  host_triplet = @host@
@@ -62,9 +62,9 @@
 -DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am README
 +DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am
  ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
- am__aclocal_m4_deps = $(top_srcdir)/m4/ax_cc_for_build.m4 \
- 	$(top_srcdir)/m4/ax_create_stdint_h.m4 \
-@@ -162,7 +162,7 @@ am__uninstall_files_from_dir = { \
+ am__aclocal_m4_deps = $(top_srcdir)/m4/ac_check_symbol.m4 \
+ 	$(top_srcdir)/m4/ax_cc_for_build.m4 \
+@@ -163,7 +163,7 @@ am__uninstall_files_from_dir = { \
      || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
           $(am__cd) "$$dir" && rm -f $$files; }; \
    }
@@ -73,7 +73,7 @@
  DATA = $(config_DATA) $(template_DATA)
  am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
  DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-@@ -323,25 +323,8 @@ target_alias = @target_alias@
+@@ -324,25 +324,8 @@ target_alias = @target_alias@
  top_build_prefix = @top_build_prefix@
  top_builddir = @top_builddir@
  top_srcdir = @top_srcdir@
@@ -100,7 +100,7 @@
  
  EXTRA_DIST = $(template_DATA) $(DOC_SOURCES)
  CLEANFILES = $(DOC_FILES)
-@@ -503,7 +486,7 @@ check: $(BUILT_SOURCES)
+@@ -504,7 +487,7 @@ check: $(BUILT_SOURCES)
  	$(MAKE) $(AM_MAKEFLAGS) check-am
  all-am: Makefile $(DATA)
  installdirs:
@@ -109,7 +109,7 @@
  	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
  	done
  install: $(BUILT_SOURCES)
-@@ -624,9 +607,6 @@ uninstall-am: uninstall-configDATA unins
+@@ -625,9 +608,6 @@ uninstall-am: uninstall-configDATA unins
  	uninstall-local uninstall-templateDATA
  
  
