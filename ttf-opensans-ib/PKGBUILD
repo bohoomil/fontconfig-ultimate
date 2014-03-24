@@ -2,7 +2,7 @@
 
 pkgname=ttf-opensans-ib
 pkgver=1.2
-pkgrel=7
+pkgrel=8
 depends=('fontconfig')
 pkgdesc="Open Sans is a humanist sans serif typeface designed by Steve Matteson, Type Director of Ascender Corp."
 url="http://opensans.com/"
@@ -13,7 +13,7 @@ groups=('infinality-bundle-fonts')
 install=$pkgname.install
 source=("http://mirrors.ctan.org/fonts/opensans.zip"
         https://googlefontdirectory.googlecode.com/hg/apache/opensanscondensed/OpenSans-CondBold.ttf
-        90-opensans-ttf.conf)
+        90-tt-opensans.conf)
 
 package(){
   cd "${srcdir}"/opensans
@@ -31,10 +31,11 @@ package(){
   cd "${srcdir}"
   install -dm755 "${pkgdir}"/etc/fonts/conf.avail
   install -dm755 "${pkgdir}"/etc/fonts/conf.d
-  install -m644 90-opensans-ttf.conf "${pkgdir}"/etc/fonts/conf.avail/90-opensans-ttf.conf
+  install -m644 90-tt-opensans.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-opensans.conf
 
   cd "${pkgdir}"/etc/fonts/conf.d
-  ln -s ../conf.avail/90-opensans-ttf.conf .
+  ln -s ../conf.avail/90-tt-opensans.conf .
 }
 
 md5sums=('a75921555ee86a1c1bfa3b7f150a3f4c'
