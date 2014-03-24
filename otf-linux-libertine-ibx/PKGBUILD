@@ -3,17 +3,17 @@
 
 pkgname=otf-linux-libertine-ibx
 pkgver=5.3.0
-pkgrel=2
+pkgrel=3
 pkgdesc="Linux Libertine and Linux Biolinum fonts."
 depends=('fontconfig')
 arch=(any)
 url="http://www.linuxlibertine.org/"
 license=('GPL' 'OFL')
 groups=('infinality-bundle-fonts-extra')
-replaces=('t1-libertine-ibx')
+replaces=('t1-libertine-ibx' 'otf-libertine-ibx')
 conflicts=('ttf-linux-libertine' 'ttf-linux-libertine-g' 'texlive-libertine-type1' 'texlive-biolinum-type1' 'ttf-libertine-ibx' 't1-libertine-ibx')
 source=("http://mirrors.ctan.org/fonts/libertine.zip"
-        90-linux-libertine-otf.conf)
+        90-non-tt-linux-libertine.conf)
 install=${pkgname}.install
 
 package() {
@@ -27,10 +27,11 @@ package() {
   cd "${srcdir}"
   install -dm755 "${pkgdir}"/etc/fonts/conf.avail
   install -dm755 "${pkgdir}"/etc/fonts/conf.d
-  install -m644 90-linux-libertine-otf.conf "${pkgdir}"/etc/fonts/conf.avail/90-linux-libertine-otf.conf
+  install -m644 90-non-tt-linux-libertine.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-linux-libertine.conf
 
   cd "${pkgdir}"/etc/fonts/conf.d
-  ln -s ../conf.avail/90-linux-libertine-otf.conf .
+  ln -s ../conf.avail/90-non-tt-linux-libertine.conf .
 }
 
 md5sums=('ea5b97d6abb300fc2a4d6e1503bbfc0c'
