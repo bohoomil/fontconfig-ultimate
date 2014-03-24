@@ -5,6 +5,12 @@ infinality-bundle+fonts
 CHANGELOG
 ---------
 
+2014-03-24
+~~~~~~~~~~
+* fontconfig-infinality-ultimate
+  ** upstream upgrade to v.2.11.1
+  ** revised and updated patches
+
 2014-03-21
 ~~~~~~~~~~
 
