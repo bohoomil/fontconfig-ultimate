@@ -2,12 +2,13 @@
 
 pkgname=ibfonts-meta-extended
 pkgver=1
-pkgrel=10
+pkgrel=12
 arch=('any')
 url="https://github.com/bohoomil/fontconfig-ultimate"
 license=('GPL')
 pkgdesc="infinality-bundle-fonts extended collection meta package"
 depends=('ibfonts-meta-base'
+         'otf-cantarell-ib'
          'otf-cantoraone-ib'
          'otf-libre-baskerville-ib'
          'otf-melthofonts-ib'
@@ -15,7 +16,6 @@ depends=('ibfonts-meta-base'
          'otf-quintessential-ib'
          'otf-signika-family-ib'
          'otf-tex-gyre-ib'
-         't1-cantarell-ib'
          't1-paratype-ib'
          't1-urw-fonts-ib'
          't1-xorg-fonts-meta-ib'
@@ -27,7 +27,6 @@ depends=('ibfonts-meta-base'
          'ttf-droid-monovar-ib'
          'ttf-dzongkha-ib'
          'ttf-gelasio-ib'
-         'ttf-himalaya-fonts-ib'
          'ttf-liberastika-ib'
          'ttf-lklug-ib'
          'ttf-lohit-oriya-ib'
