@@ -7,7 +7,7 @@
 pkgname=dejavu-ib
 pkgname=('t1-dejavu-ib' 'ttf-dejavu-ibx')
 pkgver=2.34
-pkgrel=4
+pkgrel=5
 pkgdesc="Font family based on the Bitstream Vera Fonts with a wider range of characters. Re-packed for infinality-bundle-fonts."
 arch=('any')
 url="http://dejavu-fonts.org/wiki/Main_Page"
@@ -17,8 +17,8 @@ provides=('ttf-font' 'ttf-dejavu')
 replaces=('ttf-dejavu')
 source=(http://mirrors.ctan.org/fonts/dejavu.zip
         http://downloads.sourceforge.net/project/dejavu/dejavu/${pkgver}/dejavu-fonts-ttf-${pkgver}.tar.bz2
-        90-dejavu-t1.conf
-        90-dejavu-ttf.conf)
+        90-non-tt-dejavu.conf
+        90-tt-dejavu.conf)
 
 package_t1-dejavu-ib() {
   pkgdesc="Font family based on the Bitstream Vera Fonts with a wider range of characters. Re-packed for infinality-bundle-fonts. Type 1 version."
@@ -37,11 +37,11 @@ package_t1-dejavu-ib() {
 
   install -dm755 "${pkgdir}"/etc/fonts/conf.avail
   install -dm755 "${pkgdir}"/etc/fonts/conf.d
-  install -m644 "${srcdir}"/90-dejavu-t1.conf \
-    "${pkgdir}"/etc/fonts/conf.avail/90-dejavu-t1.conf
+  install -m644 "${srcdir}"/90-non-tt-dejavu.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-dejavu.conf
 
   cd "${pkgdir}"/etc/fonts/conf.d
-  ln -s ../conf.avail/90-dejavu-t1.conf .
+  ln -s ../conf.avail/90-non-tt-dejavu.conf .
 }
 
 package_ttf-dejavu-ibx() {
@@ -58,11 +58,11 @@ package_ttf-dejavu-ibx() {
 
   install -dm755 "${pkgdir}"/etc/fonts/conf.avail
   install -dm755 "${pkgdir}"/etc/fonts/conf.d
-  install -m644 "${srcdir}/"90-dejavu-ttf.conf \
-    "${pkgdir}"/etc/fonts/conf.avail/90-dejavu-ttf.conf
+  install -m644 "${srcdir}/"90-tt-dejavu.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-dejavu.conf
 
   cd "${pkgdir}"/etc/fonts/conf.d
-  ln -s ../conf.avail/90-dejavu-ttf.conf .
+  ln -s ../conf.avail/90-tt-dejavu.conf .
 }
 
 md5sums=('c5a9d02952dce3792e34d29134f1d991'
