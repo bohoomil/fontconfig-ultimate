@@ -4,6 +4,10 @@
 
 #### Font configuration files, patches, scripts and source packages (Infinality & friends)
 
+Project's website: [bohoomil.com](bohoomil.com)
+
+<a href="http://flattr.com/thing/2210523/bohoomilfontconfig-ultimate-on-GitHub" target="_blank"><img src="http://api.flattr.com/button/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0" /></a>
+
 
 #### Quick installation instructions
 
