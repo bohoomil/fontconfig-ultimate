@@ -35,6 +35,7 @@ CONF_LINKS = \
 	50-user.conf    \
 	51-local.conf   \
 	68-override.conf    \
+	67-override-aliases.conf		\
 	82-no-embedded-bitmaps.conf   \
 	82-no-force-autohint.conf   \
 	82-no-ttf-as-bitmap.conf    \
@@ -68,6 +69,7 @@ templateinf_DATA =				\
 	49-sansserif.conf   \
 	50-user.conf    \
 	51-local.conf   \
+	67-override-aliases.conf		\
 	68-override.conf    \
 	82-no-bitmaps.conf    \
 	82-no-embedded-bitmaps.conf   \
