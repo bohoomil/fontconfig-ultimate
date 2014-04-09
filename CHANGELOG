@@ -5,6 +5,56 @@ infinality-bundle+fonts
 CHANGELOG
 ---------
 
+2014-04-09
+~~~~~~~~~~
+
+##### infinality-bundle-fonts
+
+The following packages have been added to the collection:
+
+* `ttf-ipafont-ib` (new default for Japanese script)
+* `ttf-nanum-fonts-ib` (new default for Korean script)
+* `ttf-nanumgothic-coding-ibx`
+* `ttf-pfeffer-mediaeval-ibx` (for mediaevalists)
+* `ttf-tharlon-ib` (new default for Buginese / Myanmar scripts)
+* `ttf-triod-postnaja-ibx` (for Old Church Slavonic language)
+* `ttf-wqy-microhei-ib` (new default for Chinese script)
+* `ttf-lohit-fonts-ib` (the entire family for all Indic scripts, incl. early releases)
+
+The following packages have been moved to the `extra` group (they can be installed on demand):
+
+* `otf-libre-baskerville-ib`
+* `t1-cantarell-ib`
+* `t1-paratype-ib`
+* `ttf-himalaya-fonts-ib` 
+* `ttf-myanmar3-ib` 
+* `ttf-sawarabi-ib`
+* `ttf-unfonts-core-ib` 
+* `ttf-vlgothic-ib`
+
+Unless needed, they can be safely removed from the system.
+
+The following packages have been merged:
+
+* `ttf-droid-ib` and `ttf-droid-monovar-ib`
+* `otf-alegreya-ibx` and `otf-alegreya-sans-ht-ibx`
+
+Miscellaneous changes:
+
+* `otf-melthofonts-ib` has been split into two packages, with the base one providing Estrangelo Edessa only. `otf-melthofonts-ext-ibx`, supposed to be installed on demand, offers additional fonts from the Meltho family.
+* An additional meta package -- `ibfonts-meta-extended-lt` -- was added for users who want to install extended collection of fonts without support for non-Latin language scripts.
+
+ 
+##### fontconfig-infinality-ultimate, rev. 2.11.1-3
+
+* `93-final-lang-spec-foo.conf` config files have been deprecated.
+* `65-non-latin-foo.conf` files have been revised and updated to reflect changes to the `infinality-bundle-fonts` and provide more reliable selection of pre-assigned fonts.
+* A new globally enabled `67-override-aliases.conf` config file was added.
+  If a font is distributed in multiple variants and under different names, documents pointing to its most common global alias may not recognize it and not use it even if one of the versions is locally present (e.g. Inconsolatazi4 vs Inconsolata). Additional configuration file listing acceptable and preferable local names fixes the problem.
+* `fc-presets` has been updated to reflect changes to preset files.
+
+
+
 2014-03-24
 ~~~~~~~~~~
 * fontconfig-infinality-ultimate
