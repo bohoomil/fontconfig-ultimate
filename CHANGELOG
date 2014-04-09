@@ -5,6 +5,7 @@ infinality-bundle+fonts
 CHANGELOG
 ---------
 
+
 2014-04-09
 ~~~~~~~~~~
 
@@ -53,7 +54,17 @@ Miscellaneous changes:
   If a font is distributed in multiple variants and under different names, documents pointing to its most common global alias may not recognize it and not use it even if one of the versions is locally present (e.g. Inconsolatazi4 vs Inconsolata). Additional configuration file listing acceptable and preferable local names fixes the problem.
 * `fc-presets` has been updated to reflect changes to preset files.
 
+##### Appendix
 
+##### infinality-bundle-fonts
+
+* EB Garamond font family has been updated.
+* `ttf-ebgaramond-ibx` has been added to the collection.
+* Each `foo-ebgaramond-ibx` package is now available with its own fontconfig configuration file, specific to the variant.
+
+##### fontconfig-infinality-ultimate, rev. 2.11.1-4
+
+* Global rendering configuration for EB Garamond family has been removed (each font format is now configured individually).
 
 2014-03-24
 ~~~~~~~~~~
