@@ -211,7 +211,7 @@ Miscellaneous changes:
 2013-11-08
 ~~~~~~~~~~
 
-* fontconfig-infinality-ultimate 2.11.0-6
+##### fontconfig-infinality-ultimate, rev. 2.11.0-6
 ** `fc-presets` reworked:
    - new `reset` option
    - added new sanity checks and improved old ones
