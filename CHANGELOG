@@ -197,7 +197,7 @@ Miscellaneous changes:
 2013-11-09
 ~~~~~~~~~~
 
-* fontconfig-infinality-ultimate 2.11.0-7
+#####  fontconfig-infinality-ultimate, rev. 2.11.0-7
 ** `fc-presets`: re-run the main loop after disabling all presets
 ** new replacements:
    - Cambria => Caladea
