@@ -5,6 +5,12 @@ infinality-bundle+fonts
 CHANGELOG
 ---------
 
+2014-04-10
+~~~~~~~~~~
+
+##### fontconfig-infinality-ultimate, rev. 2.11.1-6
+
+* Fixing issue [#14](https://github.com/bohoomil/fontconfig-ultimate/issues/14).
 
 2014-04-10
 ~~~~~~~~~~
