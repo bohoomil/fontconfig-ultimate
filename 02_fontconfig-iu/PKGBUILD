@@ -8,7 +8,7 @@ pkgdesc="A library for configuring and customizing font access (includes generic
 url=('http://www.fontconfig.org/release/')
 license=('custom' 'MIT')
 pkgver=2.11.1
-pkgrel=2
+pkgrel=5
 arch=('i686' 'x86_64')
 changelog=CHANGELOG
 groups=('infinality-bundle')
@@ -22,7 +22,6 @@ backup=('etc/fonts/fonts.conf'
         'etc/fonts/conf.avail.infinality/combi/60-latin-combi.conf'
         'etc/fonts/conf.avail.infinality/combi/65-non-latin-combi.conf'
         'etc/fonts/conf.avail.infinality/combi/66-aliases-wine-combi.conf'
-        'etc/fonts/conf.avail.infinality/combi/93-final-lang-spec-combi.conf'
         'etc/fonts/conf.avail.infinality/35-repl-custom.conf'
         'etc/fonts/conf.avail.infinality/36-repl-missing-glyphs.conf')
 install=fontconfig-ultimate.install
@@ -58,6 +57,10 @@ prepare() {
   for patch in "${patches[@]}"; do
     patch -Np1 -i ${patch}
   done
+
+  # fix for [bug 7752]
+  # http://lists.freedesktop.org/archives/fontconfig-bugs/2014-April/000835.html
+  patch -Np1 -i fc-cache.c.patch
 
   # make sure there's no rpath trouble and sane .so versioning -
   # FC and Gentoo do this as well

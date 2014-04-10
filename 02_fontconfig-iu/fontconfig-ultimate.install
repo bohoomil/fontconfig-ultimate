@@ -35,7 +35,6 @@ _EOF
   ln -sf ../conf.avail.infinality/free/60-latin-free.conf .
   ln -sf ../conf.avail.infinality/free/65-non-latin-free.conf .
   ln -sf ../conf.avail.infinality/free/66-aliases-wine-free.conf .
-  ln -sf ../conf.avail.infinality/free/93-final-lang-spec-free.conf .
   echo -e "Done."
 
   popd > /dev/null

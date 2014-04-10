@@ -4,7 +4,7 @@
 _pkgbasename=fontconfig
 pkgname=lib32-$_pkgbasename-infinality-ultimate
 pkgver=2.11.1
-pkgrel=2
+pkgrel=3
 pkgdesc="A library for configuring and customizing font access (32-bit, infinality-bundle)"
 arch=(x86_64)
 url="http://www.fontconfig.org/release/"
@@ -16,7 +16,16 @@ options=('!libtool')
 provides=('lib32-fontconfig')
 conflicts=('lib32-fontconfig')
 install="lib32-fontconfig.install"
-source=(http://www.fontconfig.org/release/${_pkgbasename}-${pkgver}.tar.bz2)
+source=(http://www.fontconfig.org/release/${_pkgbasename}-${pkgver}.tar.bz2
+        'fc-cache.c.patch')
+
+prepare() {
+  cd "${srcdir}/${_pkgbasename}-${pkgver}"
+
+  # fix for [bug 7752]
+  # http://lists.freedesktop.org/archives/fontconfig-bugs/2014-April/000835.html
+  patch -Np1 -i "${srcdir}"/fc-cache.c.patch
+}
 
 build() {
   export CC="gcc -m32"
@@ -59,4 +68,5 @@ package() {
   ln -s ${_pkgbasename} "${pkgdir}/usr/share/licenses/${pkgname}"
 }
 
-md5sums=('824d000eb737af6e16c826dd3b2d6c90')
+md5sums=('824d000eb737af6e16c826dd3b2d6c90'
+         '51b760fb0658af0f9b85b819a3e94c9a')
