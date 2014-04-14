@@ -27,13 +27,13 @@ DOC_FILES = $(DOC_SOURCES:.in=)
 
 CONF_LINKS = \
 	10-base-rendering.conf    \
+	28-user.conf    \
+	29-local.conf   \
 	31-fix-cantarell.conf   \
 	35-repl-custom.conf		\
 	40-non-latin.conf    \
 	45-latin.conf   \
 	49-sansserif.conf   \
-	50-user.conf    \
-	51-local.conf   \
 	68-override.conf    \
 	67-override-aliases.conf		\
 	82-no-embedded-bitmaps.conf   \
@@ -59,6 +59,8 @@ templateinfdir = $(TEMPLATEINFDIR)
 templateinf_DATA =				\
 	10-base-rendering.conf    \
 	10-scale-bitmap-fonts.conf	\
+	28-user.conf    \
+	29-local.conf   \
 	31-fix-cantarell.conf   \
 	35-repl-custom.conf		\
 	36-repl-missing-glyphs.conf  \
@@ -67,8 +69,6 @@ templateinf_DATA =				\
 	40-non-latin.conf    \
 	45-latin.conf   \
 	49-sansserif.conf   \
-	50-user.conf    \
-	51-local.conf   \
 	67-override-aliases.conf		\
 	68-override.conf    \
 	82-no-bitmaps.conf    \
