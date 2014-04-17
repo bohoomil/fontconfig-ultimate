@@ -5,6 +5,23 @@ infinality-bundle+fonts
 CHANGELOG
 ---------
 
+
+2014-04-18
+~~~~~~~~~~
+
+##### fontconfig-infinality-ultimate, rev. 2.11.1-7
+
+* `XDG_HOME_CONFIG/fontconfig` support for per-user customizations has been improved (issue [#3](https://github.com/bohoomil/fontconfig-ultimate/issues/3)). It is now possible to alter default font replacement rules on a per-user basis, which previously was reserved for system wide configuration (via `35-repl-custom.conf`).
+* Updated per-user configuration files.
+* Removed obsolete replacement rule for `@font-face:Roboto` from `37-repl-global.conf` (issue [#18](https://github.com/bohoomil/fontconfig-ultimate/issues/18)).
+* `37-repl-global-foo.conf` configuration files have been revised and updated.
+* Fixed Arial rendering.
+
+##### infinality-bundle-fonts
+
+* `ttf-dejavu-ib` has been set default for `ibfonts-meta-base`.
+* Sorts Mill Goudy (OTF & TTF) has been added to the collection.
+
 2014-04-10
 ~~~~~~~~~~
 
