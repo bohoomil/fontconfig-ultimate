@@ -17,6 +17,16 @@ source=(65-ttf-noto-serif.conf
         https://googlefontdirectory.googlecode.com/hg/apache/notoserifgeorgian/NotoSerifGeorgian-{Bold,Regular}.ttf
         https://googlefontdirectory.googlecode.com/hg/apache/notoseriflao/NotoSerifLao-{Bold,Regular}.ttf
         https://googlefontdirectory.googlecode.com/hg/apache/notoserifthai/NotoSerifThai-{Bold,Regular}.ttf)
+sha1sums=('a25859d668dd09df03231ff37ebed32a4d23b5e1'
+          '2b8b815229aa8a61e483fb4ba0588b8b6c491890'
+          'a60ccd5c84ebcbc2a63b9a73ddacb71cf4de9a93'
+          'e7c8a10634a9181a35bb275041a3c90870de0f1d'
+          '27956f440c34195af1ae4adfa929df0429358f48'
+          '200898523611688d43466fadbaac112317a9ca4e'
+          'b7a39d7912b58b05a5af196ae11d1a27e16d75e1'
+          '620bcab42fca8f11ed97417f7e853b459cf5229d'
+          '12cd36239aba60ce76c0c3831e3521683bef0128'
+          '148c21c301dece1d02a5449ebc12ce5111fa333d')
 
 package(){
   cd ${srcdir}
@@ -34,13 +44,3 @@ package(){
   ln -s ../conf.avail/65-ttf-noto-serif.conf .
 }
 
-md5sums=('0fa734257a35219d6ee7be5aebbb18f9'
-         '3b83ef96387f14655fc854ddc3c6bd57'
-         '1d22efc355684cf41c061ab8f78cf83d'
-         '0582e01f584223e8e143a3a1edaad547'
-         'fd6126657fcb75b98f594a155ee30590'
-         'efef3bfd3a3dedd8409dbd9ff3058b2a'
-         '097935d11cf188d0579fcf17b1e5fb86'
-         'b38592bec2d48e7edb966e224d3da10a'
-         '2df610ec47b71d63f9f5e3cf68e4744f'
-         'b153371834343f6d2d472840ae4aef58')
