@@ -3,7 +3,7 @@
 pkgname=ttf-clear-sans-ibx
 _archname=clearsans
 pkgver=1.00
-pkgrel=1
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Clear Sans is a versatile OpenType font for screen, print, and Web."
 url="https://01.org/clear-sans"
@@ -11,14 +11,16 @@ arch=('any')
 license=('Apache')
 groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-clear-sans')
+replaces=('ttf-clear-sans')
 install=$pkgname.install
 source=("https://01.org/sites/default/files/downloads/${_archname}-${pkgver}.zip")
+sha1sums=('092c5d8e19621d78cb7e14a7eac02c29415d3e0c')
 
 package(){
   cd "${srcdir}"/TTF
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
-  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 ClearSans-{Bold,BoldItalic,Italic,Light,Medium,MediumItalic,Regular}.ttf \
+    "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
 
-md5sums=('38a0fe51bc52352066f9c85f65275232')
