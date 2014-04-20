@@ -1,17 +1,18 @@
 # Maintainer: bohoomil <@zoho.com>
 
-pkgname=ttf-dzongkha-ib
+pkgname=ttf-dzongkha-ibx
 pkgver=1.0
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 makedep=('unzip')
 pkgdesc="Dzongkha fonts."
 url="http://www.dit.gov.bt/"
 arch=('any')
-groups=('infinality-bundle-fonts')
+groups=('infinality-bundle-fonts-extra')
 license=('Custom')
 install=$pkgname.install
 source=("http://www.dit.gov.bt/sites/default/files/dzongkhafonts.zip")
+sha1sums=('ff080d37846ae4d0130a59b38f3783faf3f4f2a1')
 
 prepare(){
   cd "${srcdir}"
@@ -26,5 +27,3 @@ package(){
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
-
-md5sums=('e7dc0894a139844c9c19ed6934b1b242')
