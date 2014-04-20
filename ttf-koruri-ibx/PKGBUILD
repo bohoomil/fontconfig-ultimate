@@ -1,0 +1,25 @@
+# Contributor: orumin <dev@orum.in>
+# Contributor: bohoomil <@zoho.com>
+
+pkgname=ttf-koruri-ibx
+pkgver=20140319
+pkgrel=2
+pkgdesc="Japanese TrueType font obtained by mixing M+ and Open Sans (fixed base family name)."
+arch=('any')
+url="http://sourceforge.jp/projects/koruri"
+license=('APACHE')
+depends=('fontconfig')
+groups=('infinality-bundle-fonts-extra')
+conflicts=('ttf-koruri')
+replaces=('ttf-koruri')
+_mirror="jaist"
+install=${pkgname}.install
+source=(http://${_mirror}.dl.sourceforge.jp/koruri/60791/Koruri-${pkgver}.tar.xz)
+sha1sums=('b497c6d500afe6a3bf31db74614f8ad26e8f8af1')
+
+package() {
+  cd "${srcdir}/Koruri-${pkgver}"
+
+  install -d "${pkgdir}/usr/share/fonts/${pkgname}"
+  install -m644 *.ttf "${pkgdir}/usr/share/fonts/${pkgname}"
+}
