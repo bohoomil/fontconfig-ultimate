@@ -1,7 +1,6 @@
 post_install() {
-  echo -n "Updating font cache... "
-  fc-cache -f > /dev/null
-  echo "done."
+  fc-cache -f /usr/share/fonts/ttf-noto-sans-ib > /dev/null
+  echo "Done."
 }
 
 post_upgrade() {
@@ -9,5 +8,11 @@ post_upgrade() {
 }
 
 post_remove() {
-  post_install $1
+  fc-cache -sf > /dev/null
+  echo "Done."
 }
+
+op=$1
+shift
+$op $*
+

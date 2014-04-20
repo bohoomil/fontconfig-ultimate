@@ -26,13 +26,13 @@ package(){
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
 
-md5sums=('3b83ef96387f14655fc854ddc3c6bd57'
-         '781171b269d6b31469f12789b8ba525a'
-         '4f6ff3639c1e5728b905b650c1a06e75'
-         '154da4697acc779b55af0a67f1241e4e'
-         '61c3431e4e0ac62b136bc26b427ee05f'
-         'caf82c4adf757b5316f65dbcb1593092'
-         '30a6bd02019ee35934fe12f64ca55745'
-         '0b5b371694cc37eddfb31789e649943d'
-         '238540efb6ba625aaa3511a27cf9f2f3'
-         'b1c8208b21a6d6efd0f338d2fcf3ef53')
+sha1sums=('2b8b815229aa8a61e483fb4ba0588b8b6c491890'
+          '563bd982ccf5b05c6234c40a5758dda2f19160fb'
+          'a1fbfdfb3fb027e50061e795e1262bfc15c920e2'
+          '0ce726939b7e3237c6eddd998f249e9b969906d7'
+          '830953c678e6a50697108a9c87d229cef130975a'
+          'b07189f0a378f94de084ac9f5b994d2acdbd4800'
+          'eca4fbbdfb3072a2b8003ae9dbbd48f9f642870c'
+          '6263d5a984ad7eea4294f13728b5146aeaf1239d'
+          'aee42ea7a07c26134c6f9163cfc6d0ab1d61b6f6'
+          '8eca158f58d968f9f9395914a259e36a62ae0770')
