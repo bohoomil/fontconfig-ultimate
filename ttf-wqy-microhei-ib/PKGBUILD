@@ -1,0 +1,33 @@
+# Maintainer: Felix Yan <felixonmars@gmail.com>
+# Contributor: Philacorns <opuspace@gmail.com>
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=ttf-wqy-microhei-ib
+_src_pkg=wqy-microhei
+pkgver=0.2.0_beta
+pkgrel=6
+pkgdesc="A Sans-Serif style high quality CJK outline font."
+arch=('any')
+license=('GPL3' 'APACHE' 'custom:"font embedding exception"')
+groups=('infinality-bundle-fonts')
+install=${pkgname}.install
+url="http://wenq.org"
+depends=('fontconfig')
+conflicts=('wqy-microhei')
+replaces=('wqy-microhei')
+source=("http://downloads.sourceforge.net/project/wqy/${_src_pkg}/${pkgver//_/-}/${_src_pkg}-${pkgver//_/-}.tar.gz")
+sha1sums=('28023041b22b6368bcfae076de68109b81e77976')
+
+build() {
+  cd "${srcdir}/${_src_pkg}"
+  tail README.txt --lines=16|head --lines=-3>| FONTEXCEPTION
+}
+
+package() {
+  cd "${srcdir}/${_src_pkg}"
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 FONTEXCEPTION "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttc "${pkgdir}"/usr/share/fonts/"${pkgname}"
+}
