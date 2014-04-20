@@ -1,13 +1,13 @@
 # Maintainer: bohoomil <@zoho.com>
 
-pkgname=ttf-chromeos-ib
+pkgname=ttf-chromeos-ibx
 pkgver=1.23
-pkgrel=4
+pkgrel=5
 depends=('fontconfig')
 pkgdesc="Google Chrome OS fonts."
 url="http://code.google.com/p/chromium-os/issues/detail?id=5287"
 arch=('any')
-groups=('infinality-bundle-fonts')
+groups=('infinality-bundle-fonts-extra')
 conflicts=('otf-google-fonts-hg' 'ttf-google-fonts-git' 'ttf-google-fonts-hg' 'ttf-chromeos-fonts' 'ttf-chromeos-extra-fonts')
 license=('Apache')
 install=$pkgname.install
@@ -25,17 +25,17 @@ package(){
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
+sha1sums=('301e3a72da338e2e90515ca17fba21dacb6dc9a6'
+          'b5fb77ecf84eb7fe4bacd85dfe8c106955f04a35'
+          'd0146d0cb341e23b42b5e7b42b99a2952272e978'
+          '8ef39a68732790911047703eed90976fd0f40c45'
+          '178fada9e2f88aa461cc6a938a254c69b2d5329d'
+          '70b5aabe10913a7847d26865a38aa97c59d3791c'
+          '324b9e62864cb0cac8c8362e9640948b2091aa8a'
+          '278ee74bbc5e025f64e3143b55a3b24ec118ff3e'
+          'eefbefc01a0044ab2624cf62606b844b96c68491'
+          '52e64469dbddbb8eb52b1323de0ffe2d5738e395'
+          '574aac8a30909abb28686470ba41737e318af003'
+          '9cb8c892e66a52d0950265296f7e468da4f65414'
+          '2b8b815229aa8a61e483fb4ba0588b8b6c491890')
 
-md5sums=('31cf3c974f725ce750854143dfcca310'
-         '5b9b4fd0703465af0542ca835b220a7d'
-         '6879ea3f6f75b05a34716414ce4f41f4'
-         '61b544857df9ad5266379c06f3076e38'
-         '3c5a2b7d4dd5dbf9826885c3f714e019'
-         '6ddec17802ad190d267288d0cffbcbe6'
-         '63167ba7365767f4ce900ba37da36de5'
-         '0227632bea14a9e8421d94f3128a99cc'
-         'ce8109db9df4c65a5e8fbb893a320437'
-         'b470ec51c4b6a17d666c07cf1e590810'
-         '0cc5c53920f861fdfe4ab4be114cf068'
-         'd8ba5f3ea843e1b286771055f924ded8'
-         '3b83ef96387f14655fc854ddc3c6bd57')
