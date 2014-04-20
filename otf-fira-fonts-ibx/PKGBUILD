@@ -11,6 +11,7 @@ arch=('any')
 license=('Apache')
 groups=('infinality-bundle-fonts-extra')
 source=(git://github.com/mozilla-b2g/moztt.git)
+md5sums=('SKIP')
 
 package_otf-fira-sans-ibx() {
   pkgdesc="A sans-serif typeface designed for the Firefox OS."
@@ -34,4 +35,3 @@ package_otf-fira-mono-ibx() {
     "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
 
-md5sums=('SKIP')
