@@ -12,6 +12,7 @@ groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-junicode')
 install=$pkgname.install
 source=(http://downloads.sourceforge.net/project/junicode/junicode/junicode-0-7-8/junicode-0-7-8.zip)
+sha1sums=('492946ca18c3e23febd7c77221ff438ad85d2147')
 
 package(){
   cd "${srcdir}"/junicode/fonts
@@ -19,7 +20,4 @@ package(){
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
-
-md5sums=('6ed38ad9b8217b4eb371a72a60c99389')
-
 
