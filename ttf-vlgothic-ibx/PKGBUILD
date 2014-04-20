@@ -1,17 +1,18 @@
 # Maintainer: bohoomil <@zoho.com>
 
-pkgname=ttf-vlgothic-ib
+pkgname=ttf-vlgothic-ibx
 pkgver=2.108
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Japanese VL Gothic font family."
 url="http://vlgothic.dicey.org/"
 arch=('any')
-groups=('infinality-bundle-fonts')
+groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-vlgothic')
 license=('Custom')
 install=$pkgname.install
 source=(http://dl.sourceforge.jp/vlgothic/58961/VLGothic-20130607.tar.xz)
+sha1sums=('cac4efd27cc3c01337f38b48660e0ea9f275fdc9')
 
 package(){
   cd "${srcdir}"/VLGothic
@@ -31,4 +32,3 @@ package(){
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
-md5sums=('c3e016b4b489d49bf9812e566c28fb06')
