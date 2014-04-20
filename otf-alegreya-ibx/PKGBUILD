@@ -2,25 +2,25 @@
 
 pkgname=otf-alegreya-ibx
 pkgver=1.003
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="Alegreya is a serif typeface originally intended for literature."
 url="http://www.fontsquirrel.com/fonts/alegreya"
 arch=('any')
 groups=('infinality-bundle-fonts-extra')
+conflicts=('otf-alegreya-sans-ht-ibx')
+replaces=('otf-alegreya-sans-ht-ibx')
 license=('OFL-1.1')
 install=$pkgname.install
-source=(http://www.fontsquirrel.com/fonts/download/alegreya)
+source=(http://mirrors.ctan.org/fonts/alegreya.zip)
+sha1sums=('81381e9ac9b3b19fca01f82fc92b347819545b7e')
 
 package(){
-  cd "${srcdir}"
+  cd "${srcdir}"/alegreya
 
   install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 'SIL Open Font License.txt' \
-    "${pkgdir}"/usr/share/licenses/"${pkgname}"/OFL.txt
+  install -m644 doc/OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
-  install -Dm644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -Dm644 opentype/*.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
-
-md5sums=('bda0d276b1f80cebd657a6a6cf7566a3')
