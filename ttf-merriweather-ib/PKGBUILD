@@ -24,13 +24,12 @@ package(){
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
-
-md5sums=('07eb35c9ffe83721dee7ef3fc5e13c55'
-         '6bd0d773d701259858b00ff9ce70d7e4'
-         '972b5c1e71f6199afa2bf159484be9a3'
-         '7a2d68bcc300c56e32acd9dbd0df5903'
-         '5fc48d74b300883624f0ac527911f0fe'
-         '2378259da6333bc02fbdf558118cca9b'
-         'acf733b27d6983e644407533ca2a4577'
-         'f2e4a31c9defd3f77e1711031ece8cf8'
-         '94465cd192bbf13008a6e735ca0bdf6f')
+sha1sums=('92a57aba516c68ed181d27997e9aba376151a7cc'
+          '0bb5c7fcc3f30ecbe02ac3efc8772881066ec344'
+          '4b1a0e5b5a94517d3164976e58c869740ae6cacf'
+          '782b6026c8fab7303ec5a9a35be8f9258250a510'
+          'a83fdf6a28fa98c18555ab19dc558af5cceeda6c'
+          'e3155c4613b4d7af5f39283be5ff8023c858fd9b'
+          '67026d43d5f6fd0b6bad407dabffa8eec44bf02a'
+          'c3e1012c068735613ee6a8894344cacba39cc2d6'
+          'c679131a0101fa1cc8f2bd6e7c8a9827ea70cb6d')
