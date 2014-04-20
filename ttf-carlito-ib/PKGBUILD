@@ -10,8 +10,9 @@ url="https://code.google.com/p/chromium/issues/detail?id=280557"
 arch=('any')
 groups=('infinality-bundle-fonts')
 license=('OFL-1.1')
-source=(http://commondatastorage.googleapis.com/chromeos-localmirror/distfiles/${_tarname}-${pkgver}.tar.gz)
 install=$pkgname.install
+source=(http://commondatastorage.googleapis.com/chromeos-localmirror/distfiles/${_tarname}-${pkgver}.tar.gz)
+sha1sums=('65ceb1377897a4d5a404134423728592aea6eb13')
 
 package(){
   cd "${srcdir}"/"${_tarname}"-"${pkgver}"
@@ -20,4 +21,3 @@ package(){
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
 
-md5sums=('c74b7223abe75949b4af367942d96c7a')
