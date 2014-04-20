@@ -13,6 +13,7 @@ replaces=('t1-inconsolata-zi4-ibx' 'otf-inconsolatazi4-ib')
 conflicts=('t1-inconsolata-zi4' 't1-inconsolata-zi4-ibx' 'ttf-inconsolata' 'ttf-inconsolata-g' 'ttf-inconsolata-dz' 'otf-inconsolata' 'otf-inconsolatazi4-ib')
 install=$pkgname.install
 source=("http://mirrors.ctan.org/fonts/inconsolata.zip")
+sha1sums=('33f60ff231e768aad05bd24537230a40f74e9cdb')
 
 package(){
   cd "${srcdir}"/inconsolata
@@ -24,4 +25,3 @@ package(){
   install -m644 opentype/*.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
 
-md5sums=('272853e4fb34a4c84fcafe226c9b9d82')
