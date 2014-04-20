@@ -1,0 +1,62 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=sorts-mill-goudy-ibx
+pkgname=('otf-sorts-mill-goudy-ibx' 'ttf-sorts-mill-goudy-ibx')
+pkgver=3.1
+pkgrel=1
+depends=('fontconfig')
+pkgdesc="A modern revival of Goudy Oldstyle and Italic."
+url="http://crudfactory.com/"
+arch=('any')
+groups=('infinality-bundle-fonts-extra')
+license=('OFL-1.1')
+source=("http://sortsmill.googlecode.com/files/goudy-3.1.zip"
+        '90-non-tt-sorts-mill-goudy.conf'
+        '90-tt-sorts-mill-goudy.conf')
+sha1sums=('6a4f2878c1dbd5a995351e555c02a66cc8decb74'
+          'e78fc470838e16141a81179793fc4e0b48af861b'
+          '6a6ed744ea7ab59357e32fc41d829028b1af61f8')
+
+package_otf-sorts-mill-goudy-ibx(){
+  pkgdesc="A modern revival of Goudy Oldstyle and Italic. OpenType version."
+  conflicts=('ttf-sortsmillgoudy' 'ttf-sorts-mill-goudy-ibx')
+  install=$pkgname.install
+
+  cd "${srcdir}"
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 COPYING "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 90-non-tt-sorts-mill-goudy.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-sorts-mill-goudy.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/90-non-tt-sorts-mill-goudy.conf .
+}
+
+package_ttf-sorts-mill-goudy-ibx(){
+  pkgdesc="A modern revival of Goudy Oldstyle and Italic. TrueType version."
+  conflicts=('ttf-sortsmillgoudy' 'otf-sorts-mill-goudy-ibx')
+  install=$pkgname.install
+
+  cd "${srcdir}"
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 COPYING "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 90-tt-sorts-mill-goudy.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-sorts-mill-goudy.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/90-tt-sorts-mill-goudy.conf .
+}
