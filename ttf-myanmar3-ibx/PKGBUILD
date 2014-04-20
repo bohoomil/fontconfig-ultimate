@@ -1,23 +1,22 @@
 # Maintainer: bohoomil <@zoho.com>
 
-pkgname=ttf-myanmar3-ib
+pkgname=ttf-myanmar3-ibx
 pkgver=1.358
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Font for Myanmar/Burmese script."
 url="http://myanmar3source.googlecode.com/"
 arch=('any')
-groups=('infinality-bundle-fonts')
+groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-myanmar3')
 license=('OFL-1.1')
 install=$pkgname.install
 source=("http://myanmar3source.googlecode.com/files/mm3-multi-os%2816-08-2011%29.ttf")
+sha1sums=('fa3faaef571b36731c68f955fb159d42ee3c7f55')
 
-package(){
+package() {
   cd "${srcdir}"
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
-
-md5sums=('9db1fa231d9e330dfb54dc7ecb364705')
