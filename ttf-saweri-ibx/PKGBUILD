@@ -1,16 +1,17 @@
 # Maintainer: bohoomil <@zoho.com>
 
-pkgname=ttf-saweri-ib
+pkgname=ttf-saweri-ibx
 pkgver=1.0
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Saweri support for Buginese alphabet."
 url="https://sites.google.com/site/niariot87/"
 arch=('any')
-groups=('infinality-bundle-fonts')
+groups=('infinality-bundle-fonts-extra')
 license=('GPL')
 install=$pkgname.install
 source=("https://sites.google.com/site/niariot87/SaweriV2.rar")
+sha1sums=('d2651dcceccb9f3696689bfa37c9c3ed635d352a')
 
 package(){
   cd "${srcdir}"
@@ -18,5 +19,3 @@ package(){
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
-
-md5sums=('0e7240863dcb1f291d9689ac7d95ae2e')
