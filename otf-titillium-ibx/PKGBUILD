@@ -1,0 +1,37 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=otf-titillium-ibx
+pkgver=2.0
+pkgrel=1
+depends=('fontconfig')
+pkgdesc="Titillium is an elegant sans-serif typeface created at Accademia di Belle Arti di Urbino."
+url="http://www.campivisivi.net/titillium/"
+arch=('any')
+groups=('infinality-bundle-fonts-extra')
+conflicts=('otf-titillium')
+license=('OFL-1.1')
+install=$pkgname.install
+source=(http://www.campivisivi.net/titillium/download/Titillium_roman_upright_italic_2_0_OT.zip)
+sha1sums=('f4dd29ce864df4c418b6c944e8747fe6b090f750')
+
+package() {
+  cd "${srcdir}"/Titillium_roman_upright_italic_2_0_OT
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 OFL-titillium.txt \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
+  install -m644 OFL-FAQ.txt \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"/OFL-FAQ
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 Titillium-Black.otf \
+    "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 Titillium-Bold{,Italic,Upright}.otf \
+    "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 Titillium-Light{,Italic,Upright}.otf \
+    "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 Titillium-Regular{,Italic,Upright}.otf \
+    "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 Titillium-Semibold{,Italic,Upright}.otf \
+    "${pkgdir}"/usr/share/fonts/"${pkgname}"
+}
