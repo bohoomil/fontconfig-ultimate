@@ -12,6 +12,7 @@ conflicts=('ttf-courier-prime')
 license=('OFL-1.1')
 install=$pkgname.install
 source=(http://quoteunquoteapps.com/downloads/courier-prime.zip)
+sha1sums=('05e3c5fb937d44f8b2dd9b5705df98812ed73711')
 
 package(){
   cd "${srcdir}/Courier Prime"
@@ -25,4 +26,3 @@ package(){
     "${pkgdir}"/usr/share/fonts/"${pkgname}" \;
 }
 
-md5sums=('cf79336ce1cf439560a5364ab7856738')
