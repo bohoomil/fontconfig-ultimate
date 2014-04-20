@@ -12,8 +12,8 @@ groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-gentium-basic' 'ttf-gentium-plus' 'ttf-gentium')
 replaces=('ttf-gentium')
 install=$pkgname.install
-
 source=(http://mirrors.ctan.org/fonts/gentium-tug.zip)
+sha1sums=('66b6a3d4c03d9ac7057d4121b62c0fa678a734a4')
 
 package_ttf-gentium-tug-ibx(){
   cd "${srcdir}"/gentium-tug
@@ -25,5 +25,3 @@ package_ttf-gentium-tug-ibx(){
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 truetype/*.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
-
-md5sums=('5e0fbb0767df5da6dceaedb72630d726')
