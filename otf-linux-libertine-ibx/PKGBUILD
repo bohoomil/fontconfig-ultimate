@@ -12,9 +12,11 @@ license=('GPL' 'OFL')
 groups=('infinality-bundle-fonts-extra')
 replaces=('t1-libertine-ibx' 'otf-libertine-ibx')
 conflicts=('ttf-linux-libertine' 'ttf-linux-libertine-g' 'texlive-libertine-type1' 'texlive-biolinum-type1' 'ttf-libertine-ibx' 't1-libertine-ibx')
+install=${pkgname}.install
 source=("http://mirrors.ctan.org/fonts/libertine.zip"
         90-non-tt-linux-libertine.conf)
-install=${pkgname}.install
+sha1sums=('e1e3d9e0eff1258d34fc4a5ee4e2dcef8720fb28'
+          '1c443c4aca2b0b6c9b6f8ee1ba9ecc14d4b09a0d')
 
 package() {
   cd "${srcdir}"/libertine
@@ -34,5 +36,3 @@ package() {
   ln -s ../conf.avail/90-non-tt-linux-libertine.conf .
 }
 
-md5sums=('ea5b97d6abb300fc2a4d6e1503bbfc0c'
-         'aad4a9be1683fc01c881d7517e074412')
