@@ -2,7 +2,7 @@
 
 pkgname=ibfonts-meta-extended
 pkgver=1
-pkgrel=12
+pkgrel=13
 arch=('any')
 url="https://github.com/bohoomil/fontconfig-ultimate"
 license=('GPL')
@@ -10,13 +10,11 @@ pkgdesc="infinality-bundle-fonts extended collection meta package"
 depends=('ibfonts-meta-base'
          'otf-cantarell-ib'
          'otf-cantoraone-ib'
-         'otf-libre-baskerville-ib'
          'otf-melthofonts-ib'
          'otf-oswald-ib'
          'otf-quintessential-ib'
          'otf-signika-family-ib'
          'otf-tex-gyre-ib'
-         't1-paratype-ib'
          't1-urw-fonts-ib'
          't1-xorg-fonts-meta-ib'
          'ttf-caladea-ib'
@@ -24,22 +22,19 @@ depends=('ibfonts-meta-base'
          'ttf-courier-prime-ib'
          'ttf-ddc-uchen-ib'
          'ttf-droid-ib'
-         'ttf-droid-monovar-ib'
-         'ttf-dzongkha-ib'
          'ttf-gelasio-ib'
+         'ttf-ipafont-ib'
          'ttf-liberastika-ib'
          'ttf-lklug-ib'
          'ttf-lohit-oriya-ib'
          'ttf-lohit-punjabi-ib'
+         'ttf-nanum-fonts-ib'
          'ttf-merriweather-ib'
          'ttf-merriweather-sans-ib'
          'ttf-mph-2b-damase-ib'
-         'ttf-myanmar3-ib'
          'ttf-noto-sans-multilang-ib'
          'ttf-noto-serif-multilang-ib'
          'ttf-opensans-ib'
-         'ttf-sawarabi-ib'
-         'ttf-saweri-ib'
+         'ttf-tharlon-ib'
          'ttf-ubuntu-font-family-ib'
-         'ttf-unfonts-core-ib'
-         'ttf-vlgothic-ib')
+         'ttf-wqy-microhei-ib')
