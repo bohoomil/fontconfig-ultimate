@@ -2,7 +2,7 @@
 
 pkgname=t1-source-code-pro-ibx
 pkgver=2.2
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="A set of mono-spaced OpenType fonts designed for coding environments. Type 1."
 url="http://sourceforge.net/projects/sourcecodepro.adobe/"
@@ -13,6 +13,7 @@ replaces=('adobe-source-code-pro-fonts')
 conflicts=('adobe-source-code-pro-fonts' 'ttf-source-code-pro' 'source-code-pro-fonts' 'otf-source-code-pro')
 install=$pkgname.install
 source=("http://mirrors.ctan.org/fonts/sourcecodepro.zip")
+sha1sums=('e9e0103cd63652eba1e150042a571af09b0680d2')
 
 prepare(){
   cd "${srcdir}"/sourcecodepro/fonts
@@ -26,7 +27,7 @@ package(){
   install -m644 doc/LICENSE.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
-  install -m644 fonts/*.{pfb,afm} "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 fonts/SourceCodePro-{Black,Bold,Light,Regular,Medium,Semibold}.{pfb,afm} \
+    "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
 
-md5sums=('0a013f6e78585b85be9c01e33b8782d0')
