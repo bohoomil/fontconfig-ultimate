@@ -12,6 +12,7 @@ license=('OFL-1.1')
 groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-impallari-libre-caslon-text')
 source=("http://mirrors.ctan.org/fonts/librecaslon.zip")
+sha1sums=('4c808087219955382c9ef7376471f130344c1b05')
 
 prepare(){
   cd "${srcdir}"/librecaslon/type1
@@ -46,5 +47,3 @@ package_otf-libre-caslon-ibx(){
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 opentype/*.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
-
-md5sums=('284eb63659c008f70d8c4c7a62d92d4e')
