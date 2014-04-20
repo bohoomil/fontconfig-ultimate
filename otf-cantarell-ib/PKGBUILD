@@ -1,0 +1,32 @@
+# Contributor: Jan Alexander Steffens (heftig) <jan.steffens@gmail.com>
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=otf-cantarell-ib
+_name=cantarell-fonts
+pkgver=0.0.15
+pkgrel=1
+pkgdesc="Cantarell font family."
+arch=('any')
+url="http://abattis.org/cantarell/"
+license=('GPL2')
+depends=('fontconfig')
+conflicts=('t1-cantarell-ib' 'cantarell-fonts')
+replaces=('t1-cantarell-ib' 'cantarell-fonts')
+provides=('cantarell-fonts')
+install=$pkgname.install
+source=(http://download.gnome.org/sources/$_name/${pkgver::3}/$_name-${pkgver}.tar.xz)
+sha1sums=('bff3325e5f2fedcfab833f8f8e4c80966a0beb7a')
+
+build() {
+  cd $_name-$pkgver
+  ./configure --prefix=/usr \
+    --with-fontdir=/usr/share/fonts/$pkgname \
+    --with-configdir=/etc/fonts/conf.avail
+  make
+}
+
+package() {
+  cd $_name-$pkgver
+  make DESTDIR="${pkgdir}" install
+}
+
