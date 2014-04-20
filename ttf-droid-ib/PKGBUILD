@@ -1,27 +1,31 @@
-# Maintainer: Jelle van der Waa <jelle@vdwaa.nl>
+# Contributor: Jelle van der Waa <jelle@vdwaa.nl>
 # Contributor: Urs Wolfer <uwolfer @ fwo.ch>
-# Contributor: bohoomil <@zoho.com>
+# Mainainer: bohoomil <@zoho.com>
 
 pkgname=ttf-droid-ib
 pkgver=20121017
-pkgrel=3
-pkgdesc="General-purpose fonts released by Google as part of Android. Part of infinality-bundle-fonts."
+pkgrel=5
+pkgdesc="General-purpose fonts released by Google as part of Android. Includes additional monospaced variants with dotted and slashed zeros."
 arch=('any')
 license=('apache')
 url="http://code.google.com/android/"
 depends=('fontconfig')
 groups=('infinality-bundle-fonts')
-replaces=('ttf-droid')
+conflicts=('ttf-droid' 'ttf-droid-monovar' 'ttf-droid-monovar-ib')
+replaces=('ttf-droid' 'ttf-droid-monovar' 'ttf-droid-monovar-ib')
 provides=('ttf-font' 'ttf-droid')
 install=$pkgname.install
 source=(ftp://ftp.archlinux.org/other/community/ttf-droid/ttf-droid-20121017.tar.xz
+        http://www.cosmix.org/software/files/DroidSansMonoSlashed.zip
+        http://www.cosmix.org/software/files/DroidSansMonoDotted.zip
         65-ttf-droid-serif.conf
         65-ttf-droid-sans.conf)
 
 package(){
   cd "${srcdir}"/google-droid-fonts-"${pkgver}"
-  install -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -d -m755 "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m 644 ../*.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
   cd "${srcdir}"
   install -d "${pkgdir}"/etc/fonts/conf.avail
@@ -33,7 +37,9 @@ package(){
   ln -s ../conf.avail/65-ttf-droid-sans.conf .
   ln -s ../conf.avail/65-ttf-droid-serif.conf .
 }
+sha1sums=('4190b9c3a75766df2e4a8a1a38c4c1722c63e41b'
+          '50c4ea8f89e9559086e63389eee2da8c8636500e'
+          '842a341b1b79119418d26f406662a18d2264862e'
+          '1d540e1d02740a3e2cfe56c6197dad8d317193ef'
+          'b53ad7770419d48ecab18934e1cfef75f4357741')
 
-md5sums=('0fa20eb63d7d05b23be955777bb52a5d'
-         'c77c95a047aeefbcfb2106a8d28d21d9'
-         '31ac9de85b3b94d833c06a09ad440003')
