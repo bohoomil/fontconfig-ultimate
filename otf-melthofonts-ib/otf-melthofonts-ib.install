@@ -1,7 +1,13 @@
 post_install() {
-  echo -n "Updating font cache... "
-  fc-cache -f > /dev/null
+  fc-cache -s /usr/share/fonts/otf-melthofonts-ib > /dev/null
   echo "Done."
+
+  cat << _EOF
+
+  If you need the entire Meltho collection,
+  please install otf-melthofonts-ext-ibx, too.
+  
+_EOF
 }
 
 post_upgrade() {
@@ -9,5 +15,11 @@ post_upgrade() {
 }
 
 post_remove() {
-  post_install $1
+  fc-cache -sf > /dev/null
+  echo "Done."
 }
+
+op=$1
+shift
+$op $*
+

@@ -2,9 +2,9 @@
 
 pkgname=otf-melthofonts-ib
 pkgver=1.21
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
-pkgdesc="Font for Syriac script."
+pkgdesc="Font for Syriac script (includes Estrangelo Edessa only)."
 url="http://www.bethmardutho.org/index.php/resources/fonts.html"
 arch=('any')
 groups=('infinality-bundle-fonts')
@@ -12,7 +12,7 @@ conflicts=('ttf-meltho')
 license=('Custom')
 install=$pkgname.install
 source=(http://www.bethmardutho.org/images/fonts/melthofonts-1.21.zip)
-
+sha1sums=('6cc98545cf346ff151809f638665b42f3cf8adb8')
 
 package(){
   cd "${srcdir}"/melthofonts-"${pkgver}"
@@ -21,7 +21,5 @@ package(){
   install -m644 license.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
-  install -m644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 SyrCOMEdessa.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
-
-md5sums=('f6f8cb92c4ee2e95bf6018fc78086269')
