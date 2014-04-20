@@ -11,6 +11,7 @@ groups=('infinality-bundle-fonts-extra')
 license=('OFL-1.1')
 install=$pkgname.install
 source=(http://www.fontsquirrel.com/fonts/download/andada)
+sha1sums=('cefbb28f9bc1482131fec699c4f57f0e69290883')
 
 package(){
   cd "${srcdir}"
@@ -22,5 +23,3 @@ package(){
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -Dm644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
-
-md5sums=('6408517f856822dcf891363f9b3e7ef3')
