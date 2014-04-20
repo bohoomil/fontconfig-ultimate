@@ -11,6 +11,7 @@ groups=('infinality-bundle-fonts-extra')
 license=('Apache')
 install=$pkgname.install
 source=(http://www.fontsquirrel.com/fonts/download/amble)
+sha1sums=('e7fc545f82dc2d94a3fed24d1c703b080d6980f1')
 
 package(){
   cd "${srcdir}"
@@ -23,4 +24,3 @@ package(){
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
 
-md5sums=('f40d245fcc919c4ea699ad892092d8fd')
