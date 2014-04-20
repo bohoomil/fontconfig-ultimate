@@ -30,4 +30,3 @@ package_otf-latin-modern-ibx(){
     "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
 
-md5sums=('63fa72236a23cefab41f622fec97be1a')
