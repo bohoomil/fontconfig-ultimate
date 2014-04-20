@@ -14,6 +14,9 @@ install=$pkgname.install
 source=("http://mirrors.ctan.org/fonts/opensans.zip"
         https://googlefontdirectory.googlecode.com/hg/apache/opensanscondensed/OpenSans-CondBold.ttf
         90-tt-opensans.conf)
+sha1sums=('79c265672b434a7a3a4ab2c2a4909d2cf7019090'
+          'd83d1764f2bd9b8eb80c446272dbe3842782887c'
+          '4051822d645ac1be70da1e71b9da466267c5494d')
 
 package(){
   cd "${srcdir}"/opensans
@@ -38,6 +41,3 @@ package(){
   ln -s ../conf.avail/90-tt-opensans.conf .
 }
 
-md5sums=('a75921555ee86a1c1bfa3b7f150a3f4c'
-         'c28df5d67b8e0fd14ff07235537b1c77'
-         'd621af38611790b93b753aca83037104')
