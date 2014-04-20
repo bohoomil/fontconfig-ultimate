@@ -1,0 +1,30 @@
+# Contributor: ponsfoot <cabezon dot hashimoto at gmail dot com>
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=ttf-ipafont-ib
+pkgver=003.03
+_pkgver=${pkgver/./}
+pkgrel=1
+pkgdesc="Japanese outline (P)Mincho and (P)Gothic fonts."
+arch=('any')
+url="http://ossipedia.ipa.go.jp/ipamjfont/"
+license=('custom')
+depends=('fontconfig')
+groups=('infinality-bundle-fonts')
+conflicts=('otf-ipafont' 'otf-ipaexfont')
+replaces=('otf-ipafont' 'otf-ipaexfont')
+provides=('otf-ipafont')
+install=${pkgname}.install
+source=("http://download.forest.impress.co.jp/pub/library/i/ipafont/10483/IPAfont${_pkgver}.zip")
+sha1sums=('9d7558a84b2dac7bcd1aa650f59b4af9cb4d0ea9')
+
+package() {
+  cd "IPAfont${_pkgver}"
+
+  install -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 IPA_Font_License_Agreement_v1.0.txt \
+    Readme_IPAfont"${_pkgver}".txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+}
