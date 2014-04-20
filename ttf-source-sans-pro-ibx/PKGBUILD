@@ -1,0 +1,27 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=ttf-source-sans-pro-ibx
+pkgver=1.050
+pkgrel=1
+depends=('fontconfig')
+pkgdesc="A set of OpenType fonts designed for user interfaces. TrueType version."
+url="http://sourceforge.net/projects/sourcesans.adobe/"
+arch=('any')
+license=('OFL-1.1')
+groups=('infinality-bundle-fonts-extra')
+replaces=('adobe-source-sans-pro-fonts')
+conflicts=('adobe-source-sans-pro-fonts' 'otf-source-sans-pro' 'ttf-source-sans-pro' 't1-source-sans-pro-ibx')
+install=$pkgname.install
+source=("http://downloads.sourceforge.net/project/sourcesans.adobe/SourceSansPro_FontsOnly-${pkgver}.zip")
+sha1sums=('f3af1201c80a86f1dd6e045a565c96bdd12d445f')
+
+package(){
+  cd "${srcdir}"/SourceSansPro_FontsOnly-${pkgver}
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 LICENSE.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 TTF/SourceSansPro-{Black,BlackIt,Bold,BoldIt,It,Light,LightIt,Regular,Semibold,SemiboldIt}.ttf \
+    "${pkgdir}"/usr/share/fonts/"${pkgname}"
+}

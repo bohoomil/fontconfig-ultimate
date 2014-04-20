@@ -1,0 +1,27 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=ttf-source-code-pro-ibx
+pkgver=1.017
+pkgrel=1
+depends=('fontconfig')
+pkgdesc="A set of OpenType fonts designed for user interfaces. TrueType version."
+url="http://sourceforge.net/projects/sourcecodepro.adobe/"
+arch=('any')
+license=('OFL-1.1')
+groups=('infinality-bundle-fonts-extra')
+replaces=('adobe-source-sans-pro-fonts')
+conflicts=('adobe-source-sans-pro-fonts' 'otf-source-sans-pro' 'ttf-source-sans-pro' 't1-source-code-pro-ibx')
+install=$pkgname.install
+source=("http://downloads.sourceforge.net/project/sourcecodepro.adobe/SourceCodePro_FontsOnly-${pkgver}.zip")
+sha1sums=('c0e3f6f8e25b434c0e28a817539632f8a5ecb9e5')
+
+package(){
+  cd "${srcdir}"/SourceCodePro_FontsOnly-${pkgver}
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 LICENSE.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 TTF/SourceCodePro-{Black,Bold,Light,Medium,Regular,Semibold}.ttf \
+    "${pkgdir}"/usr/share/fonts/"${pkgname}"
+}
