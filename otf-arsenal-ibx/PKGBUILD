@@ -1,0 +1,21 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=otf-arsenal-ibx
+pkgver=1.00
+pkgrel=1
+depends=('fontconfig')
+pkgdesc="Arsenal is a semi-grotesque typeface with extensive language support."
+url="http://www.ukrainian-type.com/fontarsenal/"
+arch=('any')
+groups=('infinality-bundle-fonts-extra')
+license=('OFL-1.1')
+install=$pkgname.install
+source=(http://www.ukrainian-type.com/arsenal_font.zip)
+sha1sums=('0c700b49ef55c697609a3677329244474472c13f')
+
+package(){
+  cd "${srcdir}"/arsenal_font
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+}
