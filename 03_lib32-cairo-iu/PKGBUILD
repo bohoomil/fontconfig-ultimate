@@ -6,9 +6,9 @@
 _pkgbasename=cairo
 pkgname=lib32-$_pkgbasename-infinality-ultimate
 pkgver=1.12.16
-pkgrel=4
+pkgrel=5
 groups=('infinality-bundle')
-pkgdesc="Cairo vector graphics library with respect-fontconfig, expose and Ubuntu patches (32-bit, infinality-bundle)"
+pkgdesc="Cairo vector graphics library with respect-fontconfig and Ubuntu patches (32-bit, infinality-bundle)"
 arch=('x86_64')
 url="https://launchpad.net/ubuntu/precise/+source/cairo"
 groups=('infinality-bundle-multilib')
@@ -23,7 +23,6 @@ conflicts=('lib32-cairo' 'lib32-cairo-ubuntu')
 options=('!libtool')
 source=(http://cairographics.org/releases/$_pkgbasename-$pkgver.tar.xz
         cairo-respect-fontconfig.patch
-        cairo-1.12.8-expose_snapshot-1.patch
         http://archive.ubuntu.com/ubuntu/pool/main/c/cairo/cairo_1.12.16-0ubuntu2.debian.tar.gz)
 
 prepare() {
@@ -34,7 +33,6 @@ prepare() {
   done
 
   patch -Np1 -i $srcdir/cairo-respect-fontconfig.patch
-  patch -Np1 -i $srcdir/cairo-1.12.8-expose_snapshot-1.patch
   
   sed '20 aAM_PROG_AR' -i $srcdir/$_pkgbasename-$pkgver/configure.ac
 }
