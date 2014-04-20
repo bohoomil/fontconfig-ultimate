@@ -9,8 +9,9 @@ url="http://users.teilar.gr/~g1951d/"
 arch=('any')
 groups=('infinality-bundle-fonts')
 license=('Custom')
-source=(http://users.teilar.gr/~g1951d/Symbola.ttf)
 install=$pkgname.install
+source=(http://users.teilar.gr/~g1951d/Symbola.ttf)
+sha1sums=('4f1a440c4f4119aaf845329f9058a6f7d79931f5')
 
 package(){
   cd "${srcdir}"
@@ -18,5 +19,3 @@ package(){
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 Symbola.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
-
-md5sums=('75cd76e3c3ee09ec854b71eb5a19bdb3')
