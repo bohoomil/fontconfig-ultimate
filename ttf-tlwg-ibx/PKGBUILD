@@ -1,0 +1,33 @@
+# Contributor: Gaetan Bisson <bisson@archlinux.org>
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=ttf-tlwg-ibx
+_src_pkg=ttf-tlwg
+pkgver=0.5.1
+pkgrel=1
+pkgdesc='Collection of scalable Thai fonts.'
+url='http://linux.thai.net/projects/fonts-tlwg'
+arch=('any')
+license=('GPL' 'custom')
+depends=('fontconfig')
+conflicts=('ttf-tlwg')
+replaces=('ttf-tlwg')
+install=$pkgname.install
+source=("ftp://linux.thai.net/pub/thailinux/software/thai-ttf/${_src_pkg}-${pkgver}.tar.xz"
+        'LICENSE')
+sha1sums=('0848d2c7fa18c1f01daa2aef9c964471952b159b'
+          '39a8c3eb83856f9dff63a3493f891a702d3fa802')
+
+package() {
+  cd "${srcdir}/${_src_pkg}-${pkgver}"
+
+  install -m775 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 ../LICENSE "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
+  install -m775 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  
+  install -m775 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m644 etc/fonts/conf.avail/*.conf \
+    "${pkgdir}"/etc/fonts/conf.avail
+}
