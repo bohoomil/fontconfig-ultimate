@@ -1,0 +1,23 @@
+# Contributor: Firmicus <francois.archlinux.org>
+# Contributor: Damir Perisa <damir.perisa@bluewin.ch>
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=ttf-khmer-os-ibx
+pkgver=5.0
+pkgrel=1
+pkgdesc="TTFont collection for Khmer (Cambodia)."
+arch=('any')
+license=('LGPL')
+url='http://www.khmeros.info/drupal612/en/taxonomy/term/53'
+depends=('fontconfig')
+conflicts=('ttf-khmer')
+replaces=('ttf-khmer')
+install=${pkgname}.install
+source=("http://downloads.sourceforge.net/sourceforge/khmer/All_KhmerOS_${pkgver}.zip")
+md5sums=('dc1ddeb526ccbc06603da880d1e89e7b')
+
+package() {
+  cd "${srcdir}"/All_KhmerOS_"${pkgver}"
+  install -dm755 "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+}
