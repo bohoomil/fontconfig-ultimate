@@ -1,11 +1,10 @@
-# $Id: PKGBUILD 82253 2013-01-13 15:02:45Z foutrelis $
-# Maintainer: Lukas Fleischer <archlinux at cryptocrack dot de>
+# Contributor: Lukas Fleischer <archlinux at cryptocrack dot de>
 # Contributor: Ronald van Haren <ronald.archlinux.org>
 # Contributor: Roman Kyrylych <Roman.Kyrylych@gmail.com>
 # Contributor: Andreas Zwinkau
 # Contributor: rabyte <rabyte__gmail>
 # Contributor: Stefan Husmann < stefan-husmann@t-online.de>
-# Contributor: bohoomil <@zoho.com>
+# Maintainer: bohoomil <@zoho.com>
 
 pkgname=ttf-liberation-ib
 pkgver=2.00.1
@@ -50,10 +49,9 @@ package() {
   install -Dm644 "${srcdir}/liberation-fonts-ttf-${pkgver}/LICENSE" \
     "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 }
-
-md5sums=('5c781723a0d9ed6188960defba8e91cf'
-         'b3174b11c2b6a341f5c99b31088bd67b'
-         '6ac8f757e8e77bf3f58a957637d87562'
-         'bda9b7b1c25aa27c224f254c3b7d672d'
-         'a01d43319c3abac796e99812975bf0a1'
-         '6bbc90661e1867881027a07624dc9244')
+sha1sums=('84b40d7f8bb0cd085dd70b3abed197133d761557'
+          '24be509eaf38cef0b13fa32c1213be4f0d91c26a'
+          '032b28f94d2a5d19a4339f691815f324e4f81d2d'
+          'c867c50c152b5853b8c518ad4b5fb6be39f43509'
+          '6a4c8a790024acb920ca70748f6654db29f1ff07'
+          '8a53a47004b2b441a1fc80f1d8b583fcdc2a06ff')
