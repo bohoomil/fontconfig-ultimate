@@ -14,6 +14,8 @@ replaces=('t1-tex-gyre-ib')
 install=$pkgname.install
 source=("http://www.gust.org.pl/projects/e-foundry/tex-gyre/whole/tg-${pkgver}otf.zip"
         GFL.txt)
+sha1sums=('beba3be8c9ed56327dafd80455baaa51aa0b1406'
+          '7e9b02d3f480aeeebe30e9a88a671beff2ffde7b')
 
 package(){
   cd "${srcdir}"
@@ -25,5 +27,3 @@ package(){
   install -m644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
 
-md5sums=('3774af603b5a13d374bf4668967bff57'
-         '5a4927a17baba16dcab8b3a6a3bb0165')
