@@ -6,6 +6,29 @@ CHANGELOG
 ---------
 
 
+2014-04-18
+~~~~~~~~~~
+
+##### fontconfig-infinality-ultimate, rev. 2.11.1-7
+
+* `XDG_HOME_CONFIG/fontconfig` support for per-user customizations has been improved (issue [#3](https://github.com/bohoomil/fontconfig-ultimate/issues/3)). It is now possible to alter default font replacement rules on a per-user basis, which previously was reserved for system wide configuration (via `35-repl-custom.conf`).
+* Updated per-user configuration files.
+* Removed obsolete replacement rule for `@font-face:Roboto` from `37-repl-global.conf` (issue [#18](https://github.com/bohoomil/fontconfig-ultimate/issues/18)).
+* `37-repl-global-foo.conf` configuration files have been revised and updated.
+* Fixed Arial rendering.
+
+##### infinality-bundle-fonts
+
+* `ttf-dejavu-ib` has been set default for `ibfonts-meta-base`.
+* Sorts Mill Goudy (OTF & TTF) has been added to the collection.
+
+2014-04-10
+~~~~~~~~~~
+
+##### fontconfig-infinality-ultimate, rev. 2.11.1-6
+
+* Fixing issue [#14](https://github.com/bohoomil/fontconfig-ultimate/issues/14).
+
 2014-04-10
 ~~~~~~~~~~
 
@@ -186,70 +209,71 @@ Miscellaneous changes:
 2013-11-28
 ~~~~~~~~~~
 
-* fontconfig-infinality-ultimate
-** splitting OpenSans T1 & TTF settings
-** added OpenSans TTF to the collection
+##### fontconfig-infinality-ultimate, rev. 2.11.0-14
+
+* splitting OpenSans T1 & TTF settings
+* added OpenSans TTF to the collection
 
 2013-11-26
 ~~~~~~~~~~
 
-* fontconfig-infinality-ultimate
-** fixed bitmap to outline replacement rules
-   and split `38-repl-tt-traced-bitmap.conf` (issue #8)
-** fixed Liberation Sans Bold & Regular < 13px
-** swapping Heuristica T1 for OTF (bug in T1 Unicode encoding)
+##### fontconfig-infinality-ultimate, rev. 2.11.0-13
 
-* freetype2-infinality-ultimate
-** upstream version upgrade to 2.5.1
-** revised and regenerated Infinality patchset
+* fixed bitmap to outline replacement rules and split `38-repl-tt-traced-bitmap.conf` (issue #8)
+* fixed Liberation Sans Bold & Regular < 13px
+* swapping Heuristica T1 for OTF (bug in T1 Unicode encoding)
+
+##### freetype2-infinality-ultimate, rev. 2.5.1-2
+* upstream version upgrade to 2.5.1
+* revised and regenerated Infinality patchset
 
 2013-11-09
 ~~~~~~~~~~
 
-* fontconfig-infinality-ultimate 2.11.0-7
-** `fc-presets`: re-run the main loop after disabling all presets
-** new replacements:
-   - Cambria => Caladea
-   - Candara => Linux Biolinum
+##### fontconfig-infinality-ultimate, rev. 2.11.0-7
 
-* infinality-bundle-fonts
-** added ttf-caladea-ib
-** ttf-droid-ib: fixed fontconfig configuration files
-** meta packages for base and extended collections
+* `fc-presets`: re-run the main loop after disabling all presets
+* new replacements:
+    - Cambria => Caladea
+    - Candara => Linux Biolinum
+
+##### infinality-bundle-fonts
+
+* added ttf-caladea-ib
+* ttf-droid-ib: fixed fontconfig configuration files
+* meta packages for base and extended collections
 
 2013-11-08
 ~~~~~~~~~~
 
-* fontconfig-infinality-ultimate 2.11.0-6
-** `fc-presets` reworked:
-   - new `reset` option
-   - added new sanity checks and improved old ones
-   - extended help and basic troubleshooting FAQ included
-** `37-repl-global-free.conf`: added replacements for
-   @font-face:Lora and @font-face:Autonym
-** `92-selective-rendering.conf`: minor fixes to
-   Noto Sans and Liberation Sans
-** fonts.conf: 72 dpi option added fixing Chrome issues
+##### fontconfig-infinality-ultimate, rev. 2.11.0-6
 
-* infinality-bundle-fonts
-** added otf-latin-modern-ibx
-** splitting xorg-fonts-type1 from [extra] to 4 independent packages:
-   - t1-adobe-utopia-ib
-   - t1-bh-ib
-   - t1-cursor-ib
-   - t1-ibm-courier-ib
-** removed Bitstream Type 1 fonts (as per xorg-fonts-type1):
-   - Bitstream Charter
-   - Courier 10 pitch
-** added remaining font packages from [extra] and [community]
-   to [infinality-bundle-fonts{-extra}]:
-   - ttf-droid-ib
-   - ttf-liberation-ib
-   - ttf-mph-2b-damase-ib
-   - ttf-ubuntu-font-family-ibx
-** added gsfonts from [extra]: t1-urw-fonts-ib
-** added prebuilt ttf-droid-monovar from AUR to
-   [infinality-bundle-fonts-extra]
+* `fc-presets` reworked:
+    - new `reset` option
+    - added new sanity checks and improved old ones
+    - extended help and basic troubleshooting FAQ included
+* `37-repl-global-free.conf`: added replacements for `@font-face:Lora` and `@font-face:Autonym`
+* `92-selective-rendering.conf`: minor fixes to Noto Sans and Liberation Sans
+* fonts.conf: 72 dpi option added fixing Chrome issues
+
+##### infinality-bundle-fonts
+
+* added `otf-latin-modern-ibx`
+* splitting `xorg-fonts-type1` from `[extra]` to 4 independent packages:
+    - t1-adobe-utopia-ib
+    - t1-bh-ib
+    - t1-cursor-ib
+    - t1-ibm-courier-ib
+* removed Bitstream Type 1 fonts (as per `xorg-fonts-type1`):
+    - Bitstream Charter
+    - Courier 10 pitch
+* added remaining font packages from `[extra]` and `[community]` to `infinality-bundle-fonts{-extra}`:
+    - ttf-droid-ib
+    - ttf-liberation-ib
+    - ttf-mph-2b-damase-ib
+    - ttf-ubuntu-font-family-ibx
+* added gsfonts from `[extra]`: t1-urw-fonts-ib
+* added prebuilt ttf-droid-monovar from AUR to `infinality-bundle-fonts-extra`
 
 2013-10-25
 ~~~~~~~~~~
