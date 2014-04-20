@@ -1,6 +1,5 @@
-# $Id: PKGBUILD 150376 2012-02-17 09:55:00Z allan $
-# Maintainer: Jan de Groot <jgc@archlinux.org>
-# Contributor: bohoomil <@zoho.com>
+# Contributor: Jan de Groot <jgc@archlinux.org>
+# Maintainer: bohoomil <@zoho.com>
 
 pkgname=t1-bh-ib
 pkgver=1.0.1
@@ -13,7 +12,7 @@ license=('custom')
 url="http://xorg.freedesktop.org/"
 install=$pkgname.install
 source=(${url}/releases/individual/font/font-bh-type1-1.0.1.tar.bz2)
-md5sums=('374d954c61363206c93d1ce7e9445c31')
+sha1sums=('b960d8523b02d4401dc6e1257f68dc120761ee4b')
 
 build() {
   cd "${srcdir}"
