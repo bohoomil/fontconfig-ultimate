@@ -1,19 +1,21 @@
 # Maintainer: bohoomil <@zoho.com>
 
-pkgname=ttf-unfonts-core-ib
+pkgname=ttf-unfonts-core-ibx
 _basename=un-fonts-core
 pkgver=1.0.2
 _pkgrev=080608
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Un Core family of Korean TrueType fonts."
 url="http://kldp.net/projects/unfonts/"
 arch=('any')
-groups=('infinality-bundle-fonts')
-conflicts=('ttf-unfonts-core')
+groups=('infinality-bundle-fonts-extra')
+conflicts=('ttf-unfonts-core' 'ttf-unfontscore')
+replaces=('ttf-unfonts-core' 'ttf-unfontscore')
 license=('Custom')
 install=$pkgname.install
 source=(http://kldp.net/frs/download.php/4695/$_basename-$pkgver-$_pkgrev.tar.gz)
+sha1sums=('4245d08649a0acc26d8c73e707b61371b9370e7a')
 
 package(){
   cd "${srcdir}"/un-fonts
@@ -27,4 +29,3 @@ package(){
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
 
-md5sums=('87edeb65586b85d4ce10c1fab4f1e1aa')
