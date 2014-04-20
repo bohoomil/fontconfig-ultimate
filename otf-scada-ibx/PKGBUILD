@@ -11,6 +11,10 @@ groups=('infinality-bundle-fonts-extra')
 license=('OFL-1.1')
 install=$pkgname.install
 source=(https://googlefontdirectory.googlecode.com/hg/ofl/scada/src/Scada-{Bold,BoldItalic,Italic,Regular}.otf)
+sha1sums=('ccdd6edea9031e251b1a35451c2b7c8da6d02196'
+          '15ae0bb65754ef1c8539cb41553a8885cc82ec84'
+          'ae96217b32105942edaa748dee8e1875ef7ce922'
+          'f892b3a3a7401b05212730a88f287f508823ffd7')
 
 package(){
   cd "${srcdir}"
@@ -19,7 +23,3 @@ package(){
   install -Dm644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
 
-md5sums=('2cb60f72f8aa79c48e4e1dd95a801bc4'
-         '5ad2c8df3d8aba1c0a37a45f08334bb9'
-         '7bd8dcc5c2ee35d30336a1f4f5aa1cd9'
-         '7600dfa5469d08797e4967cfa72c9146')
