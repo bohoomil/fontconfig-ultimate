@@ -1,5 +1,5 @@
 post_install() {
-  fc-cache -f /usr/share/fonts/otf-ebgaramond-ibx >/dev/null
+  fc-cache -f /usr/share/fonts/ttf-ebgaramond-ibx >/dev/null
   echo "Done."
 }
 
