@@ -1,0 +1,26 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=ttf-lohit-fonts-meta-ib
+pkgver=2.5.94
+pkgrel=3
+pkgdesc="The collection of all Indic fonts from Fedora Project."
+url="https://fedorahosted.org/lohit/"
+arch=('any')
+conflicts=('lohit-fonts')
+replaces=('lohit-fonts' 'ttf-lohit-fonts-ib')
+provides=('lohit-fonts')
+groups=('infinality-bundle-fonts')
+license=('OFL-1.1')
+depends=('ttf-lohit-assamese-ib'
+         'ttf-lohit-bengali-ib'
+         'ttf-lohit-devanagari-ib'
+         'ttf-lohit-gujarati-ib'
+         'ttf-lohit-gurmukhi-ib'
+         'ttf-lohit-kannada-ib'
+         'ttf-lohit-malayalam-ib'
+         'ttf-lohit-marathi-ib'
+         'ttf-lohit-nepali-ib'
+         'ttf-lohit-odia-ib'
+         'ttf-lohit-punjabi-ib'
+         'ttf-lohit-tamil-ib'
+         'ttf-lohit-telugu-ib')

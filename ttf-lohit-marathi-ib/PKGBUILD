@@ -1,11 +1,11 @@
 # Maintainer: bohoomil <@zoho.com>
 
-pkgname=ttf-lohit-punjabi-ib
-_src_pkg=lohit-punjabi-ttf
-pkgver=2.5.3
-pkgrel=3
+pkgname=ttf-lohit-marathi-ib
+_src_pkg=lohit-marathi-ttf
+pkgver=2.93.0
+pkgrel=2
 depends=('fontconfig')
-pkgdesc="Lohit Punjabi font."
+pkgdesc="Lohit Marathi font."
 url="https://fedorahosted.org/lohit/"
 arch=('any')
 conflicts=('lohit-fonts')
@@ -13,9 +13,9 @@ groups=('infinality-bundle-fonts')
 license=('OFL-1.1')
 install=$pkgname.install
 source=("https://fedorahosted.org/releases/l/o/lohit/${_src_pkg}-${pkgver}.tar.gz"
-        '66-lohit-punjabi.conf')
-sha1sums=('c43c7c9a3ef24b78187bd157ee9ac46559816959'
-          '17279c29802330ccc3a1d264d26a24adc3c250d0')
+        '66-lohit-marathi.conf')
+sha1sums=('729bbd3062a23ed3692734c408bc69b2e57ed968'
+          '4aa22bb2447ef624de1ec435a763afa529a05a15')
 
 package(){
   cd "${srcdir}"/"${_src_pkg}-${pkgver}"
@@ -28,9 +28,9 @@ package(){
 
   install -dm755 "${pkgdir}"/etc/fonts/conf.avail
   install -dm755 "${pkgdir}"/etc/fonts/conf.d
-  install -m644 ../66-lohit-punjabi.conf \
-    "${pkgdir}"/etc/fonts/conf.avail/66-lohit-punjabi.conf
+  install -m644 ../66-lohit-marathi.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/66-lohit-marathi.conf
 
   cd "${pkgdir}"/etc/fonts/conf.d
-  ln -s ../conf.avail/66-lohit-punjabi.conf .
+  ln -s ../conf.avail/66-lohit-marathi.conf .
 }

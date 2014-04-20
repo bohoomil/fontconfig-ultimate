@@ -1,11 +1,11 @@
 # Maintainer: bohoomil <@zoho.com>
 
-pkgname=ttf-lohit-punjabi-ib
-_src_pkg=lohit-punjabi-ttf
-pkgver=2.5.3
-pkgrel=3
+pkgname=ttf-lohit-gujarati-ib
+_src_pkg=lohit-gujarati-ttf
+pkgver=2.92.2
+pkgrel=2
 depends=('fontconfig')
-pkgdesc="Lohit Punjabi font."
+pkgdesc="Lohit Gujarati font."
 url="https://fedorahosted.org/lohit/"
 arch=('any')
 conflicts=('lohit-fonts')
@@ -13,9 +13,9 @@ groups=('infinality-bundle-fonts')
 license=('OFL-1.1')
 install=$pkgname.install
 source=("https://fedorahosted.org/releases/l/o/lohit/${_src_pkg}-${pkgver}.tar.gz"
-        '66-lohit-punjabi.conf')
-sha1sums=('c43c7c9a3ef24b78187bd157ee9ac46559816959'
-          '17279c29802330ccc3a1d264d26a24adc3c250d0')
+        '66-lohit-gujarati.conf')
+sha1sums=('34d0bd184f4e204ad7f19ec7eec66092ef109bc4'
+          '8c59bed8d47b54b770e7bae75189952edcaf0cb4')
 
 package(){
   cd "${srcdir}"/"${_src_pkg}-${pkgver}"
@@ -28,9 +28,9 @@ package(){
 
   install -dm755 "${pkgdir}"/etc/fonts/conf.avail
   install -dm755 "${pkgdir}"/etc/fonts/conf.d
-  install -m644 ../66-lohit-punjabi.conf \
-    "${pkgdir}"/etc/fonts/conf.avail/66-lohit-punjabi.conf
+  install -m644 ../66-lohit-gujarati.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/66-lohit-gujarati.conf
 
   cd "${pkgdir}"/etc/fonts/conf.d
-  ln -s ../conf.avail/66-lohit-punjabi.conf .
+  ln -s ../conf.avail/66-lohit-gujarati.conf .
 }
