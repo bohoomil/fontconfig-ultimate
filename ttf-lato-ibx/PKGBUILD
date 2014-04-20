@@ -13,6 +13,7 @@ conflicts=('ttf-lato' 't1-lato-ibx' 'otf-lato-ib')
 replaces=('t1-lato-ibx' 'otf-lato-ib')
 install=$pkgname.install
 source=("http://www.latofonts.com/download/Lato2OFL.zip")
+sha1sums=('a66cda6cef79d80a9266eefb65d0da88eaa8c09c')
 
 package(){
   cd "${srcdir}"/Lato2OFL
@@ -28,5 +29,3 @@ package(){
   install -m644 Lato-{Regular,Italic}.ttf \
     "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
-
-md5sums=('3508b3c86c5c560cf8cd472850d4130c')
