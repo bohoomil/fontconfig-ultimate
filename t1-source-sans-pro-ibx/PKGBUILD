@@ -2,7 +2,7 @@
 
 pkgname=t1-source-sans-pro-ibx
 pkgver=2.3
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="A set of OpenType fonts designed for user interfaces. Type 1 version."
 url="http://sourceforge.net/projects/sourcesans.adobe/"
@@ -13,6 +13,7 @@ replaces=('adobe-source-sans-pro-fonts')
 conflicts=('adobe-source-sans-pro-fonts' 'otf-source-sans-pro' 'ttf-source-sans-pro')
 install=$pkgname.install
 source=("http://mirrors.ctan.org/fonts/sourcesanspro.zip")
+sha1sums=('61619da5968980e4592c117109ecd6c81d6608a7')
 
 prepare(){
   cd "${srcdir}"/sourcesanspro/fonts
@@ -26,7 +27,7 @@ package(){
   install -m644 doc/LICENSE.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
-  install -m644 fonts/*.{pfb,afm} "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 fonts/SourceSansPro-{Black,BlackIt,Bold,BoldIt,It,Light,LightIt,Regular,Semibold,SemiboldIt}.{pfb,afm} \
+    "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
 
-md5sums=('5ea342afed69e9f2fbc38d7c75f01e93')
