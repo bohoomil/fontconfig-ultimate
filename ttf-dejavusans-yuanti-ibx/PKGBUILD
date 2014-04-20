@@ -15,6 +15,7 @@ license=(custom:Copyleft)
 groups=('infinality-bundle-fonts-extra')
 noextract=('dejavusansyuanti.7z')
 source=("http://qinsdisk.googlecode.com/files/dejavusansyuanti.7z")
+sha1sums=('2c03a6a38c8b8de93c7abeae512ba4449ab339bb')
 
 prepare() {
   7z e "${srcdir}"/dejavusansyuanti.7z
@@ -53,4 +54,3 @@ package_ttf-dejavusans-yuanti-mono-ibx() {
     "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
 
-md5sums=('c96df2210e55fecccd8a1c1407766f0e')
