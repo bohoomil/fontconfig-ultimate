@@ -1,29 +1,31 @@
-# $Id: PKGBUILD 193626 2013-08-26 08:21:28Z jgc $
-# Maintainer:
 # Contributor: Jan de Groot <jgc@archlinux.org>
 # Contributor: Michal Krenek <mikos@sg1.cz>
-# Contributor: bohoomil <@zoho.com>
+# Maintainer: bohoomil <@zoho.com>
 
 pkgname=dejavu-ib
-pkgname=('t1-dejavu-ib' 'ttf-dejavu-ibx')
+pkgname=('t1-dejavu-ib' 'ttf-dejavu-ib')
 pkgver=2.34
-pkgrel=5
+pkgrel=6
 pkgdesc="Font family based on the Bitstream Vera Fonts with a wider range of characters. Re-packed for infinality-bundle-fonts."
 arch=('any')
 url="http://dejavu-fonts.org/wiki/Main_Page"
 license=('custom')
 depends=('fontconfig')
-provides=('ttf-font' 'ttf-dejavu')
-replaces=('ttf-dejavu')
 source=(http://mirrors.ctan.org/fonts/dejavu.zip
         http://downloads.sourceforge.net/project/dejavu/dejavu/${pkgver}/dejavu-fonts-ttf-${pkgver}.tar.bz2
         90-non-tt-dejavu.conf
         90-tt-dejavu.conf)
+sha1sums=('f77232e447079a269dae426ea00460849a68634e'
+          '33fa825aa1dd44ce23a11af92b3078e978ff513d'
+          '70d711684394e0d76779f4f7bf8c577f17db09f8'
+          'd561a687ff81e60516b691698af64aba44a44f41')
 
 package_t1-dejavu-ib() {
   pkgdesc="Font family based on the Bitstream Vera Fonts with a wider range of characters. Re-packed for infinality-bundle-fonts. Type 1 version."
   groups=('infinality-bundle-fonts')
-  conflicts=('ttf-dejavu' 'ttf-dejavu-ibx')
+  conflicts=('ttf-dejavu' 'ttf-dejavu-ib')
+  provides=('ttf-font' 'ttf-dejavu' 'dejavu-ib')
+  replaces=('ttf-dejavu')
   install=${pkgname}.install
 
   cd "${srcdir}"/dejavu
@@ -44,10 +46,12 @@ package_t1-dejavu-ib() {
   ln -s ../conf.avail/90-non-tt-dejavu.conf .
 }
 
-package_ttf-dejavu-ibx() {
+package_ttf-dejavu-ib() {
   pkgdesc="Font family based on the Bitstream Vera Fonts with a wider range of characters. Re-packed for infinality-bundle-fonts. TrueType version."
-  groups=('infinality-bundle-fonts-extra')
+  groups=('infinality-bundle-fonts')
   conflicts=('ttf-dejavu' 't1-dejavu-ib')
+  provides=('ttf-font' 'ttf-dejavu' 'dejavu-ib')
+  replaces=('ttf-dejavu')
   install=${pkgname}.install
 
   cd "${srcdir}"/dejavu-fonts-ttf-${pkgver}
@@ -65,7 +69,3 @@ package_ttf-dejavu-ibx() {
   ln -s ../conf.avail/90-tt-dejavu.conf .
 }
 
-md5sums=('c5a9d02952dce3792e34d29134f1d991'
-         '161462de16e2ca79873bc2b0d2e6c74c'
-         '0c498a66a13928e01d36362e0206d61b'
-         '1cf1231685f5fb61dacad979268c7a53')

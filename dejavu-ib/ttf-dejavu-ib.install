@@ -1,5 +1,5 @@
 post_install() {
-  fc-cache -f /usr/share/fonts/t1-dejavu-ib > /dev/null
+  fc-cache -f /usr/share/fonts/ttf-dejavu-ib > /dev/null
   echo "Done."
 }
 
