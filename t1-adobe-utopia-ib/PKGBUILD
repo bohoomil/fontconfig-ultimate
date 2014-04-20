@@ -1,6 +1,5 @@
-# $Id: PKGBUILD 150376 2012-02-17 09:55:00Z allan $
-# Maintainer: Jan de Groot <jgc@archlinux.org>
-# Contributor: bohoomil <@zoho.com>
+# Contributor: Jan de Groot <jgc@archlinux.org>
+# Maintainer: bohoomil <@zoho.com>
 
 pkgname=t1-adobe-utopia-ib
 pkgver=1.0.2
@@ -13,8 +12,7 @@ depends=('fontconfig')
 groups=('infinality-bundle-fonts')
 install=$pkgname.install
 source=(${url}/releases/individual/font/font-adobe-utopia-type1-1.0.2.tar.bz2)
-
-md5sums=('ad945b19b2db64dec3a19507848ff63b')
+sha1sums=('565cb66523f59f02da02aa9e74604634a2113643')
 
 build() {
   cd "${srcdir}"
