@@ -11,6 +11,7 @@ groups=('infinality-bundle-fonts')
 license=('OFL-1.1')
 install=$pkgname.install
 source=(http://www.dzongkha.gov.bt/IT/download/fonts/DDC_Uchen.ttf)
+sha1sums=('82b6129f846419503a69e969fbd442949fa949ba')
 
 package(){
   cd "${srcdir}"
@@ -19,4 +20,3 @@ package(){
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
 
-md5sums=('3c6b29f025ed9e9f8904181fb96c3722')
