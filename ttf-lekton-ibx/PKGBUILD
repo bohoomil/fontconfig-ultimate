@@ -24,8 +24,7 @@ package(){
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
-
-md5sums=('e1d92ee2e37166e9efc0a76de0ef8fe3'
-         'eb2bec254fb2dcb802d38ced4d5d6318'
-         '27568f60335a1ca91a2c9c9c855d68a5'
-         '41b987cb3bc00551c062be8a7cba73bb')
+sha1sums=('1d1a400ad0e84ec7a71dd6c586466902c5892c92'
+          '24cda7c46be6303454b943e3eb86deb2ab0ebacf'
+          'e4a1e6b15ae1df6d47328d5a7531df9b0d02e369'
+          'c679131a0101fa1cc8f2bd6e7c8a9827ea70cb6d')
