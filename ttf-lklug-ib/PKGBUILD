@@ -2,9 +2,9 @@
 
 pkgname=ttf-lklug-ib
 pkgver=0.6
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
-pkgdesc="Font for Syriac script."
+pkgdesc="Font for Sinhala script."
 url="http://sinhala.sourceforge"
 arch=('any')
 groups=('infinality-bundle-fonts')
@@ -12,7 +12,7 @@ conflicts=('ttf-lklug')
 license=('GPL')
 install=$pkgname.install
 source=(http://sinhala.sourceforge.net/files/lklug.ttf)
-
+sha1sums=('209f5a91c85efba898347fdaa032549d889e7722')
 
 package(){
   cd "${srcdir}"
@@ -20,5 +20,3 @@ package(){
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
-
-md5sums=('3bfe4e498d6daa90a4ed956daaa10fef')
