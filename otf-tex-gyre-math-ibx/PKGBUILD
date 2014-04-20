@@ -3,9 +3,10 @@
 pkgname=otf-tex-gyre-math-ibx
 pkgver=2.005
 pkgrel=1
-depends=('fontconfig' 'otf-tex-gyre-ib')
 pkgdesc="The TeX Gyre (TG) Math Fonts."
+depends=('fontconfig' 'otf-tex-gyre-ib')
 groups=('infinality-bundle-fonts-extra')
+conflicts=('otf-texgyre-pagella-math')
 url="http://www.gust.org.pl/projects/e-foundry/tex-gyre/"
 arch=('any')
 license=('GFL')
@@ -14,6 +15,10 @@ source=(http://www.gust.org.pl/projects/e-foundry/tg-math/download/texgyrebonum-
         http://www.gust.org.pl/projects/e-foundry/tg-math/download/texgyrepagella-math-1605.zip
         http://www.gust.org.pl/projects/e-foundry/tg-math/download/texgyretermes-math-1502.zip
         GFL.txt)
+sha1sums=('84ea30638f23eb3b99cdffe58bb9fdb1e5e1520f'
+          '3ec77fd9d1c687cad5f0274903c2b8148f370b32'
+          '48cf34bf7e678d021226584eb76cff37620099d9'
+          '7e9b02d3f480aeeebe30e9a88a671beff2ffde7b')
 
 package(){
   cd "${srcdir}"
@@ -34,7 +39,3 @@ package(){
     "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
 
-md5sums=('80bcf13d94f17c24b40424aa173ad7f4'
-         '48f1b1074f03edf0d5374cec85b96223'
-         '8789344272ff29e6282e80e90fd1418a'
-         '5a4927a17baba16dcab8b3a6a3bb0165')
