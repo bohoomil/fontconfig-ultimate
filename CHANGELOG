@@ -5,6 +5,26 @@ infinality-bundle+fonts
 CHANGELOG
 ---------
 
+2014-05-03
+~~~~~~~~~~
+
+##### cairo-infinality-ultimate
+
+* Package update.
+
+##### fontconfig-infinality-ultimate
+
+* Fixed Droid Sans Mono and IPA Gothic rendering.
+* Added support for new fonts.
+
+##### infinality-bundle-fonts
+
+The following font packages were added to the repository:
+
+* Berenis ADF Pro
+* Charis SIL
+* Istok
+* UmePlus Gothic (Japanese script)
 
 2014-04-18
 ~~~~~~~~~~
