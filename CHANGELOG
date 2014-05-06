@@ -5,14 +5,28 @@ infinality-bundle+fonts
 CHANGELOG
 ---------
 
+2014-05-06
+~~~~~~~~~~
+
+##### infinality-bundle-fonts
+
+New fonts in the repository:
+
+* WeblySleek UI
+* Overpass
+
+##### fontconfig-infinality-ultimate, rev. 2.11.1-9
+
+* Added support for new fonts.
+
 2014-05-03
 ~~~~~~~~~~
 
-##### cairo-infinality-ultimate
+##### cairo-infinality-ultimate, rev. 1.12.16-5
 
 * Package update.
 
-##### fontconfig-infinality-ultimate
+##### fontconfig-infinality-ultimate, rev. 2.11.1-8
 
 * Fixed Droid Sans Mono and IPA Gothic rendering.
 * Added support for new fonts.
