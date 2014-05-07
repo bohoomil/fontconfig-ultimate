@@ -1,0 +1,10 @@
+ftypes - font types
+--------------------
+
+Many font families are released in more than one format (TrueType, OpenType and
+Type 1 being the most popular). In this folder you should place basic fontconfig
+rules for the _exact_ version you are using and symlink them from
+/etc/fonts/conf.d, e.g.
+
+  # ln -s ../conf.avail.infinality/ftypes/90-tt-foo.conf .
+

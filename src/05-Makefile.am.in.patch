@@ -1,0 +1,40 @@
+--- a/Makefile.am	2014-01-20 09:14:19.000000000 +0100
++++ b/Makefile.am	2014-03-24 22:44:54.753635442 +0100
+@@ -23,7 +23,7 @@
+
+ SUBDIRS=fontconfig fc-case fc-lang fc-glyphname src \
+ 	fc-cache fc-cat fc-list fc-match fc-pattern fc-query fc-scan \
+-	fc-validate conf.d test
++	fc-validate conf.d conf.d.infinality test
+ if ENABLE_DOCS
+ SUBDIRS += doc
+ endif
+--- a/Makefile.in	2014-05-07 01:57:34.026809850 +0200
++++ b/Makefile.in	2014-05-07 02:05:09.976819480 +0200
+@@ -209,7 +209,7 @@ CTAGS = ctags
+ CSCOPE = cscope
+ DIST_SUBDIRS = fontconfig fc-case fc-lang fc-glyphname src fc-cache \
+ 	fc-cat fc-list fc-match fc-pattern fc-query fc-scan \
+-	fc-validate conf.d test doc
++	fc-validate conf.d conf.d.infinality test doc
+ DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
+ distdir = $(PACKAGE)-$(VERSION)
+ top_distdir = $(distdir)
+@@ -349,7 +349,7 @@ SED = @SED@
+ SET_MAKE = @SET_MAKE@
+ SHELL = @SHELL@
+ STRIP = @STRIP@
+-TEMPLATEDIR = @TEMPLATEDIR@
++TEMPLATEINFDIR = @TEMPLATEINFDIR@
+ VERSION = @VERSION@
+ WARN_CFLAGS = @WARN_CFLAGS@
+ XMLDIR = @XMLDIR@
+@@ -411,7 +411,7 @@ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+ SUBDIRS = fontconfig fc-case fc-lang fc-glyphname src fc-cache fc-cat \
+ 	fc-list fc-match fc-pattern fc-query fc-scan fc-validate \
+-	conf.d test $(am__append_1)
++	conf.d conf.d.infinality test $(am__append_1)
+ ACLOCAL_AMFLAGS = -I m4
+ EXTRA_DIST = fontconfig.pc.in fonts.conf.in fonts.dtd \
+ 	fontconfig.spec.in fontconfig.spec fontconfig-zip.in \
