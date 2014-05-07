@@ -1,5 +1,5 @@
 
-#### freetype2-infinality-ultimate-dev
+#### fontconfig-infinality-ultimate-dev
 
-freetype2-git branch + infinality patchset
+fontconfig-git branch + ultimate patches
 
