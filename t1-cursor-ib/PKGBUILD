@@ -3,7 +3,7 @@
 
 pkgname=t1-cursor-ib
 pkgver=1.0.2
-pkgrel=2
+pkgrel=3
 pkgdesc="Coursor font. Type 1 version."
 arch=(any)
 license=('custom')
