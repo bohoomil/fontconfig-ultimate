@@ -2,7 +2,7 @@
 
 pkgname=t1-paratype-ibx
 pkgver=2013.05.21
-pkgrel=4
+pkgrel=5
 depends=('fontconfig')
 pkgdesc="Paratype font family. Type 1 version."
 groups=('infinality-bundle-fonts-extra')
