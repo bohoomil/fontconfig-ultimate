@@ -4,7 +4,7 @@
 pkgbase=ttf-dejavu-yuanti-ibx
 pkgname=('ttf-dejavusans-yuanti-basic-ibx' 'ttf-dejavusans-yuanti-condensed-ibx' 'ttf-dejavusans-yuanti-mono-ibx')
 pkgver=20110101
-pkgrel=2
+pkgrel=3
 pkgdesc="Chinese Yuan Ti family based on DejaVu Sans fonts."
 arch=(any)
 depends=('fontconfig')
@@ -25,7 +25,7 @@ package_ttf-dejavusans-yuanti-basic-ibx() {
   pkgdesc="Chinese Yuan Ti family based on DejaVu Sans fonts (basic sans-serif variant)."
   conflicts=('ttf-dejavusans-yuanti')
   install=${pkgname}.install
-  
+
   cd "${srcdir}"
   install -d -m755 "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 DejaVuSansYuanTi-*.ttf \
