@@ -2,7 +2,7 @@
 
 pkgname=ttf-lekton-ibx
 pkgver=34.0
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="Lekton monospace font from Accademia di Belle Arti di Urbino."
 url="http://code.google.com/p/googlefontdirectory/"
@@ -27,4 +27,4 @@ package(){
 sha1sums=('1d1a400ad0e84ec7a71dd6c586466902c5892c92'
           '24cda7c46be6303454b943e3eb86deb2ab0ebacf'
           'e4a1e6b15ae1df6d47328d5a7531df9b0d02e369'
-          'c679131a0101fa1cc8f2bd6e7c8a9827ea70cb6d')
+          '39160c1fe404f8d884bb41f9891f24387b8d828b')
