@@ -3,7 +3,7 @@
 pkgname=ttf-lohit-gurmukhi-ib
 _src_pkg=lohit-gurmukhi-ttf
 pkgver=2.91.0
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Lohit Gurmukhi font."
 url="https://fedorahosted.org/lohit/"
