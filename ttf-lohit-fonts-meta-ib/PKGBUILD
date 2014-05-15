@@ -2,7 +2,7 @@
 
 pkgname=ttf-lohit-fonts-meta-ib
 pkgver=2.5.94
-pkgrel=3
+pkgrel=4
 pkgdesc="The collection of all Indic fonts from Fedora Project."
 url="https://fedorahosted.org/lohit/"
 arch=('any')
