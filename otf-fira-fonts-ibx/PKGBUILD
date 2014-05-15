@@ -2,7 +2,7 @@
 
 pkgbase=otf-fira-fonts
 pkgver=2.001
-pkgrel=2
+pkgrel=3
 pkgname=('otf-fira-sans-ibx' 'otf-fira-mono-ibx')
 depends=('fontconfig')
 pkgdesc="Mozilla font family designed for the Firefox OS."
@@ -17,7 +17,7 @@ package_otf-fira-sans-ibx() {
   pkgdesc="A sans-serif typeface designed for the Firefox OS."
   conflicts=('ttf-fira-sans' 'otf-fira-sans')
   install=${pkgname}.install
-  
+
   cd "${srcdir}"/moztt
   install -d -m755 "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 FiraSans-"${pkgver}"/*.otf \
