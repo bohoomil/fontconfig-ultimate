@@ -2,7 +2,7 @@
 
 pkgname=ttf-lklug-ib
 pkgver=0.6
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="Font for Sinhala script."
 url="http://sinhala.sourceforge"
