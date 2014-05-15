@@ -2,7 +2,7 @@
 
 pkgname=t1-source-code-pro-ibx
 pkgver=2.2
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="A set of mono-spaced OpenType fonts designed for coding environments. Type 1."
 url="http://sourceforge.net/projects/sourcecodepro.adobe/"
