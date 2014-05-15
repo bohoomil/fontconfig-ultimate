@@ -2,7 +2,7 @@
 
 pkgname=otf-signika-family-ib
 pkgver=1.0001
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Signika is a sans-serif with a gentle character, developed for wayfinding, signage, and other media where clarity of information is required."
 url="http://fontfabric.com/signika-font/"
@@ -32,5 +32,5 @@ sha1sums=('156f3b074e578e87133c2d754dc52fb5edfe6965'
           'c4674d0e79cee5885cce01ec6575a959ddf96be4'
           '33a50a8bbefab77627325e984280b659c86c55b2'
           '1b93936c21557678f4eb959fea30367a5d3c906d'
-          'c679131a0101fa1cc8f2bd6e7c8a9827ea70cb6d')
+          '7b4f6d175af92e1f112f227bead331981d2e70e5')
 
