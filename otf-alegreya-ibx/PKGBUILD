@@ -2,7 +2,7 @@
 
 pkgname=otf-alegreya-ibx
 pkgver=1.003
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Alegreya is a serif typeface originally intended for literature."
 url="http://www.fontsquirrel.com/fonts/alegreya"
