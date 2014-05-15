@@ -4,7 +4,7 @@
 
 pkgname=ttf-nanumgothic-coding-ibx
 pkgver=2.0
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="The monospaced version of NanumGothic."
 url="http://hangeul.naver.com/"
