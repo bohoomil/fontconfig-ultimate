@@ -2,7 +2,7 @@
 
 pkgname=ttf-source-code-pro-ibx
 pkgver=1.017
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="A set of OpenType fonts designed for user interfaces. TrueType version."
 url="http://sourceforge.net/projects/sourcecodepro.adobe/"
