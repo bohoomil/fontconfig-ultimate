@@ -3,7 +3,7 @@
 pkgname=libre-baskerville-ibx
 pkgname=('t1-libre-baskerville-ibx' 'otf-libre-baskerville-ibx')
 pkgver=2013.09.20
-pkgrel=2
+pkgrel=3
 pkgdesc="Libre Baskerville font designed by Pablo Impallari."
 url="http://www.impallari.com/"
 depends=('fontconfig')
