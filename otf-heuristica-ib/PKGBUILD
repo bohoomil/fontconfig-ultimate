@@ -2,7 +2,7 @@
 
 pkgname=otf-heuristica-ib
 pkgver=1.0.1
-pkgrel=4
+pkgrel=5
 depends=('fontconfig')
 pkgdesc="Heuristica is an extended version of Adobe Utopia font."
 url="http://code.google.com/p/evristika/"
