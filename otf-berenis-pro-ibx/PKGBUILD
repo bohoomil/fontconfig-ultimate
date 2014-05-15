@@ -1,0 +1,24 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=otf-berenis-pro-ibx
+_src_name=Berenis-Pro
+pkgver=20120228
+pkgrel=1
+pkgdesc="Berenis ADF is a serif family designed as a substitute for Bodoni or Didot."
+arch=('any')
+url="http://arkandis.tuxfamily.org"
+license=('GPL2')
+depends=('fontconfig')
+install=$pkgname.install
+source=("http://arkandis.tuxfamily.org/fonts/${_src_name}-${pkgver}.zip")
+sha1sums=('df8637b9c75df5a8e58f6f22f037b3a1ab0d1e26')
+
+package () {
+  cd "${srcdir}/${_src_name}-${pkgver}"
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 COPYING "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+}
+
