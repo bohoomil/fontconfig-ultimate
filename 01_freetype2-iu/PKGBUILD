@@ -5,7 +5,7 @@
 # Installation order: freetype2-iu, fontconfig-iu, cairo-iu
 pkgname=freetype2-infinality-ultimate
 pkgver=2.5.3
-pkgrel=4
+pkgrel=5
 pkgdesc="TrueType font rendering library with Infinality patches and custom settings by bohoomil (infinality-bundle)."
 arch=(i686 x86_64)
 license=('GPL' 'MIT')
@@ -17,27 +17,27 @@ provides=("freetype2=$pkgver" 'freetype2-infinality' 'freetype2-infinality-ultim
 install='infinality.install'
 backup=('etc/profile.d/infinality-settings.sh')
 source=(http://downloads.sourceforge.net/sourceforge/freetype/freetype-${pkgver}.tar.bz2
-        freetype-2.5.3-enable-valid.patch
-        freetype-2.5.3-pkgconfig.patch
-        infinality-2.5.3.patch
         infinality-settings.sh
-        fix_segfault_with_harfbuzz.diff)
+        freetype-2.5.3-enable-valid.patch
+        upstream-15.05.2014.patch
+        infinality-2.5.3.patch)
+sha1sums=('d3c26cc17ec7fe6c36f4efc02ef92ab6aa3f4b46'
+          '8c15e24f37a3c0f74e5f901190247dc566cac79b'
+          'abf7a8f726ad6359533651a8942636880febf9f6'
+          '06cc4283cb797fbdc9c4dcef9730e9b41f45078f'
+          'cff259cd69dba17e4b284619cf8f0adccd6af0ed')
 
 prepare() {
   cd "${srcdir}/freetype-${pkgver}"
 
   patches=(freetype-2.5.3-enable-valid.patch
-           freetype-2.5.3-pkgconfig.patch
+           upstream-15.05.2014.patch
            infinality-2.5.3.patch)
 
   # infinality & post release fixes
   for patch in "${patches[@]}"; do
     patch -Np1 -i ${srcdir}/${patch}
   done
-
-  # fix segfaults # https://bugs.archlinux.org/task/39365
-  # http://git.savannah.gnu.org/cgit/freetype/freetype2.git/commit/?id=23367ff97f33ef6a2b7e1fced1157c87a46d9596
-  patch -Np1 -i ${srcdir}/fix_segfault_with_harfbuzz.diff
 }
 
 build() {
@@ -59,9 +59,3 @@ package() {
   install -D -T "${srcdir}/infinality-settings.sh" "${pkgdir}/etc/profile.d/infinality-settings.sh"
 }
 
-md5sums=('d6b60f06bfc046e43ab2a6cbfd171d65'
-         'aa55f7eae584dec7463930ab71ad3dc2'
-         'c16dcaa5fb0fe00d303b9fd819a390ef'
-         'c9e1b03f6460e4fad1c1514052bea1cf'
-         'e89d92fafcefa232cff482acbc2d41a4'
-         '58adb4c2ecf7a060e56341f236445cc4')
