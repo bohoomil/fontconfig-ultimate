@@ -2,7 +2,7 @@
 
 pkgname=ttf-junicode-ibx
 pkgver=0.7.8
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="Junicode is a serif typeface for medievalists with many OpenType features."
 url="http://junicode.sourceforge.net/"
