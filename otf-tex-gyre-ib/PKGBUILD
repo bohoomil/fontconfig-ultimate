@@ -2,7 +2,7 @@
 
 pkgname=otf-tex-gyre-ib
 pkgver=2.005
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="The TeX Gyre (TG) Collection of Fonts."
 groups=('infinality-bundle-fonts')
