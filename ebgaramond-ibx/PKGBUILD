@@ -3,7 +3,7 @@
 pkgname=ebgaramond-ibx
 pkgname=('otf-ebgaramond-ibx' 't1-ebgaramond-ibx' 'ttf-ebgaramond-ibx')
 pkgver=0.15
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="EB Garamond is a revival by Georg Duffner of the 16th century fonts designed by Claude Garamond."
 url="http://www.georgduffner.at/ebgaramond/"
