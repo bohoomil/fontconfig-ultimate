@@ -2,7 +2,7 @@
 
 pkgname=ttf-opensans-ib
 pkgver=1.2
-pkgrel=8
+pkgrel=9
 depends=('fontconfig')
 pkgdesc="Open Sans is a humanist sans serif typeface designed by Steve Matteson, Type Director of Ascender Corp."
 url="http://opensans.com/"
