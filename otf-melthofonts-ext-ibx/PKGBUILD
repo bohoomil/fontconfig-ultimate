@@ -3,7 +3,7 @@
 pkgname=otf-melthofonts-ext-ibx
 _inst_dir=otf-melthofonts-ib
 pkgver=1.21
-pkgrel=3
+pkgrel=4
 depends=('fontconfig' "otf-melthofonts-ib=$pkgver-$pkgrel")
 pkgdesc="Font for Syriac script (extended set)."
 url="http://www.bethmardutho.org/index.php/resources/fonts.html"
