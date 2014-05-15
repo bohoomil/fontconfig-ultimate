@@ -2,7 +2,7 @@
 
 pkgname=otf-arsenal-ibx
 pkgver=1.00
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="Arsenal is a semi-grotesque typeface with extensive language support."
 url="http://www.ukrainian-type.com/fontarsenal/"
