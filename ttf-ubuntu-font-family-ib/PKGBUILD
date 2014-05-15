@@ -4,7 +4,7 @@
 
 pkgname=ttf-ubuntu-font-family-ib
 pkgver=0.80
-pkgrel=7
+pkgrel=8
 pkgdesc="Ubuntu font family. Part of infinality-bundle-fonts."
 arch=('any')
 url="http://font.ubuntu.com/"
