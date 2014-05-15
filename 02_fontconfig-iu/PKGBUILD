@@ -8,7 +8,7 @@ pkgdesc="A library for configuring and customizing font access (includes generic
 url=('http://www.fontconfig.org/release/')
 license=('custom' 'MIT')
 pkgver=2.11.1
-pkgrel=7
+pkgrel=10
 arch=('i686' 'x86_64')
 changelog=CHANGELOG
 groups=('infinality-bundle')
@@ -27,6 +27,8 @@ backup=('etc/fonts/fonts.conf'
 install=fontconfig-ultimate.install
 source=(http://www.fontconfig.org/release/${_basename}-${pkgver}.tar.bz2
         git://github.com/bohoomil/fontconfig-ultimate.git#branch=master)
+sha1sums=('08565feea5a4e6375f9d8a7435dac04e52620ff2'
+          'SKIP')
 
 # a nice page to test font matching:
 # http://zipcon.net/~swhite/docs/computers/browsers/fonttest.html
@@ -119,5 +121,3 @@ package() {
   find "${pkgdir}" -type d -name .git -exec rm -r '{}' +
 }
 
-md5sums=('824d000eb737af6e16c826dd3b2d6c90'
-         'SKIP')

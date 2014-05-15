@@ -17,7 +17,7 @@ post_install() {
   If you are going to use either a custom font collection or core
   Microsoft families, set the appropriate presets using
   fc-presets command.
-  
+
 _EOF
 
   pushd etc/fonts/conf.d > /dev/null
@@ -45,15 +45,15 @@ _EOF
 }
 
 post_upgrade() {
-  pushd etc/fonts/conf.d > /dev/null
-  echo -e "Removing redundant symlinks ..."
-  for bit in "${redundant[@]}"; do
-    if [ -f ${bit} ]; then
-      rm -f ${bit}
-    fi
-  done
-  popd > /dev/null
-  echo -e "Done."
+  #pushd etc/fonts/conf.d > /dev/null
+  #echo -e "Removing redundant symlinks ..."
+  #for bit in "${redundant[@]}"; do
+    #if [ -f ${bit} ]; then
+      #rm -f ${bit}
+    #fi
+  #done
+  #popd > /dev/null
+  #echo -e "Done."
 
   echo -e "Updating font cache... "
   /usr/bin/fc-cache -f
@@ -73,8 +73,8 @@ post_remove() {
   cat << _EOF
 
   fontconfig-infinality-ultimate-git has been removed.
-  Check for dead symlinks and leftover files 
+  Check for dead symlinks and leftover files
   in /etc/fonts/conf.d/
-  
+
 _EOF
 }

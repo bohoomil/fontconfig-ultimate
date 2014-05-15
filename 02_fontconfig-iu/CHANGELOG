@@ -6,6 +6,59 @@ CHANGELOG
 ---------
 
 
+2014-05-15
+~~~~~~~~~~
+
+##### freetype2-infinality-ultimate, rev. 2.5.3-5 (incl. multilib)
+
+* Semi-major upgrade, introducing most changes and fixes present in the development branch of the upstream `freetype2`.
+
+##### fontconfig-infinality-ultimate, rev. 2.11.1-10
+
+* Multiple minor bugs have been fixed.
+
+##### infinality-bundle-fonts
+
+New fonts in the repository:
+
+* Aboriginal Sans (TTF)
+* Aboriginal Serif (TTF)
+
+2014-05-06
+~~~~~~~~~~
+
+##### infinality-bundle-fonts
+
+New fonts in the repository:
+
+* WeblySleek UI
+* Overpass
+
+##### fontconfig-infinality-ultimate, rev. 2.11.1-9
+
+* Added support for new fonts.
+
+2014-05-03
+~~~~~~~~~~
+
+##### cairo-infinality-ultimate, rev. 1.12.16-5
+
+* Package update.
+
+##### fontconfig-infinality-ultimate, rev. 2.11.1-8
+
+* Fixed Droid Sans Mono and IPA Gothic rendering.
+* Added support for new fonts.
+
+##### infinality-bundle-fonts
+
+The following font packages were added to the repository:
+
+* Berenis ADF Pro
+* Charis SIL
+* Istok
+* UmePlus Gothic (Japanese script)
+
 2014-04-18
 ~~~~~~~~~~
 
