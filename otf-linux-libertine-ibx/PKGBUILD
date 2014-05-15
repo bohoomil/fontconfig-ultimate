@@ -3,7 +3,7 @@
 
 pkgname=otf-linux-libertine-ibx
 pkgver=5.3.0
-pkgrel=3
+pkgrel=4
 pkgdesc="Linux Libertine and Linux Biolinum fonts."
 depends=('fontconfig')
 arch=(any)
