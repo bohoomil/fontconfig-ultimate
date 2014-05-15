@@ -1,0 +1,34 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=ttf-aboriginal-serif-ibx
+pkgver=9.606
+pkgrel=1
+depends=('fontconfig')
+pkgdesc="Aboriginal Serif typeface by Christopher Harvey for Syllabics, Cherokee, and Latin script."
+url="http://www.languagegeek.com/"
+arch=('any')
+groups=('infinality-bundle-fonts-extra')
+conflicts=('ttf-aboriginal-serif')
+replaces=('ttf-aboriginal-serif')
+license=('PD')
+install=$pkgname.install
+source=(http://www.languagegeek.com/font/AboriginalSerif.zip
+        90-tt-aboriginal-serif.conf)
+sha1sums=('dc1f9ab1b897d65c5f84228adcf38e03b07fafbf'
+          'f1856880b3f9da7f118fd64767472f620d70c2cd')
+
+package(){
+  cd "${srcdir}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m644 90-tt-aboriginal-serif.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-aboriginal-serif.conf
+
+  pushd "${pkgdir}"/etc/fonts/conf.d >/dev/null
+  ln -s ../conf.avail/90-tt-aboriginal-serif.conf .
+  popd >/dev/null
+}
