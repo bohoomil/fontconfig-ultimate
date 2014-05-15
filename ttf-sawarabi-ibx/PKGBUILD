@@ -2,7 +2,7 @@
 
 pkgname=ttf-sawarabi-ibx
 pkgver=0.0045
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="Sawarabi font family for Japanese script."
 url="http://sawarabi-fonts.sourceforge.jp/en/"
