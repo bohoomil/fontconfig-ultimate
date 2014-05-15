@@ -2,7 +2,7 @@
 
 pkgname=ttf-courier-prime-ib
 pkgver=1.203
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="A free, improved, classical monospaced typeface."
 url="http://quoteunquoteapps.com/courierprime/"
