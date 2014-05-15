@@ -2,7 +2,7 @@
 
 pkgname=otf-latin-modern-ibx
 pkgver=2.004
-pkgrel=1
+pkgrel=2
 pkgdesc="The Latin Modern (LM) Family of Fonts. OpenType version."
 url="http://www.gust.org.pl/projects/e-foundry/latin-modern"
 depends=('fontconfig')
@@ -30,3 +30,4 @@ package_otf-latin-modern-ibx(){
     "${pkgdir}"/usr/share/fonts/"${pkgname}"
 }
 
+sha1sums=('79ecd6cb8fc8b8d4e29239f235bb983181ef34a5')
