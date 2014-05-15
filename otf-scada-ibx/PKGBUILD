@@ -2,7 +2,7 @@
 
 pkgname=otf-scada-ibx
 pkgver=3.005
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="Scada is a sans serif font designed by Jovanny Lemonad."
 url="http://www.scada.lv/en/company/scada-font"
