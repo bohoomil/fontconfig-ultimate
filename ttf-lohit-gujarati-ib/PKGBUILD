@@ -3,7 +3,7 @@
 pkgname=ttf-lohit-gujarati-ib
 _src_pkg=lohit-gujarati-ttf
 pkgver=2.92.2
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Lohit Gujarati font."
 url="https://fedorahosted.org/lohit/"
