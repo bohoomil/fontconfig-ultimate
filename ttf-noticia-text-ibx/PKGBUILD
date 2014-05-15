@@ -2,7 +2,7 @@
 
 pkgname=ttf-noticia-text-ibx
 pkgver=1.003
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="Noticia Text is a contemporary humanist slab serif typeface designed to be used for running text on digital newspapers (both on websites and mobile apps)."
 url="http://jmsole.cl/"
@@ -11,7 +11,7 @@ groups=('infinality-bundle-fonts-extra')
 license=('OFL-1.1')
 install=$pkgname.install
 source=(http://www.fontsquirrel.com/fonts/download/noticia-text)
-sha1sums=('06213993d52681851d88066be9c6aacc1c39711f')
+sha1sums=('b7f6eb05229ed542f0df8e5e6882d9c18a3f117f')
 
 package(){
   cd "${srcdir}"
