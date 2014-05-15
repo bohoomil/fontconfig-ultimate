@@ -2,7 +2,7 @@
 
 pkgname=otf-inconsolatazi4-ibx
 pkgver=1.04
-pkgrel=4
+pkgrel=5
 depends=('fontconfig')
 pkgdesc="Monospace font for pretty code listings and for the terminal."
 url="http://www.levien.com/type/myfonts/inconsolata.html"
