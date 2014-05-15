@@ -3,7 +3,7 @@
 pkgname=sorts-mill-goudy-ibx
 pkgname=('otf-sorts-mill-goudy-ibx' 'ttf-sorts-mill-goudy-ibx')
 pkgver=3.1
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="A modern revival of Goudy Oldstyle and Italic."
 url="http://crudfactory.com/"
