@@ -4,7 +4,7 @@
 pkgname=otf-cantarell-ib
 _name=cantarell-fonts
 pkgver=0.0.15
-pkgrel=1
+pkgrel=2
 pkgdesc="Cantarell font family."
 arch=('any')
 url="http://abattis.org/cantarell/"
