@@ -2,7 +2,7 @@
 
 pkgname=ttf-symbola-ib
 pkgver=7.12
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="Symbola is a free symbol-type font."
 url="http://users.teilar.gr/~g1951d/"
