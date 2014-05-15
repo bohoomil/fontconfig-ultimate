@@ -2,7 +2,7 @@
 
 pkgname=ttf-merriweather-sans-ib
 pkgver=1.003
-pkgrel=4
+pkgrel=5
 depends=('fontconfig')
 pkgdesc="Merriweather Sans-Serif font family by Eben Sorkin."
 url="http://sorkintype.com"
@@ -32,4 +32,4 @@ sha1sums=('cb4ff3d7cc8286d986d623fffe8449bdc7b8462b'
           'a8b0774b5221d5c1180dba6372af6976036bb563'
           '5528127785870d5d7631751991c9cfa84ddc5e9b'
           '2874cc397a1fb10ca8c6d8666a148ae9b968c741'
-          'c679131a0101fa1cc8f2bd6e7c8a9827ea70cb6d')
+          '7b4f6d175af92e1f112f227bead331981d2e70e5')
