@@ -1,5 +1,5 @@
 post_install() {
-  fc-cache -f /usr/share/fonts/ttf-ipamjfont-ib >/dev/null
+  fc-cache -f /usr/share/fonts/ttf-ipamjfont-ibx >/dev/null
   echo "Done."
 }
 
