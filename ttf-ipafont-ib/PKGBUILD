@@ -4,7 +4,7 @@
 pkgname=ttf-ipafont-ib
 pkgver=003.03
 _pkgver=${pkgver/./}
-pkgrel=1
+pkgrel=2
 pkgdesc="Japanese outline (P)Mincho and (P)Gothic fonts."
 arch=('any')
 url="http://ossipedia.ipa.go.jp/ipamjfont/"
