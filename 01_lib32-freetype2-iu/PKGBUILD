@@ -6,29 +6,38 @@
 _pkgbasename=freetype2
 pkgname=lib32-$_pkgbasename-infinality-ultimate
 pkgver=2.5.3
-pkgrel=2
+pkgrel=5
 pkgdesc="TrueType font rendering library with Infinality patches and custom settings by bohoomil (32-bit, infinality-bundle)."
 arch=(x86_64)
 license=('GPL' 'MIT')
 url="http://freetype.sourceforge.net"
 groups=('infinality-bundle-multilib')
+depends=('lib32-zlib' 'lib32-bzip2' 'lib32-libpng' 'lib32-harfbuzz' $_pkgbasename-infinality-ultimate)
 makedepends=(gcc-multilib)
 conflicts=('lib32-freetype2' 'lib32-freetype2-infinality' 'lib32-freetype2-git-infinality' 'lib32-freetype2-ubuntu')
 provides=('lib32-freetype2' 'lib32-freetype2-infinality')
 options=('!libtool')
 source=(http://download.savannah.gnu.org/releases/freetype/freetype-${pkgver}.tar.bz2
         freetype-2.5.3-enable-valid.patch
-        freetype-2.5.3-pkgconfig.patch
+        upstream-15.05.2014.patch
         infinality-2.5.3.patch)
+sha1sums=('d3c26cc17ec7fe6c36f4efc02ef92ab6aa3f4b46'
+          'abf7a8f726ad6359533651a8942636880febf9f6'
+          '06cc4283cb797fbdc9c4dcef9730e9b41f45078f'
+          'cff259cd69dba17e4b284619cf8f0adccd6af0ed')
 
-prepare(){
+prepare() {
   cd "${srcdir}/freetype-${pkgver}"
 
-  patch -Np1 -i "${srcdir}/freetype-2.5.3-enable-valid.patch"
-  patch -Np1 -i "${srcdir}/freetype-2.5.3-pkgconfig.patch"
-  patch -Np1 -i "${srcdir}/infinality-2.5.3.patch"
-}
+  patches=(freetype-2.5.3-enable-valid.patch
+           upstream-15.05.2014.patch
+           infinality-2.5.3.patch)
 
+  # infinality & post release fixes
+  for patch in "${patches[@]}"; do
+    patch -Np1 -i ${srcdir}/${patch}
+  done
+}
 
 build() {
   export CC="gcc -m32"
@@ -44,14 +53,8 @@ build() {
 }
 
 package() {
-  depends=('lib32-zlib' 'lib32-bzip2' 'lib32-libpng' $_pkgbasename-infinality-ultimate)
-
   cd "${srcdir}/freetype-${pkgver}"
   make DESTDIR="${pkgdir}" install
   rm -rf "${pkgdir}"/usr/{include,share,bin}
 }
 
-md5sums=('d6b60f06bfc046e43ab2a6cbfd171d65'
-         'aa55f7eae584dec7463930ab71ad3dc2'
-         'c16dcaa5fb0fe00d303b9fd819a390ef'
-         'c9e1b03f6460e4fad1c1514052bea1cf')
