@@ -8,7 +8,7 @@
 
 pkgname=ttf-liberation-ib
 pkgver=2.00.1
-pkgrel=4
+pkgrel=5
 pkgdesc='Red Hats Liberation fonts for infinality-bundle-fonts (inc. Liberation Sans Narrow).'
 arch=('any')
 license=('custom:OFL')
