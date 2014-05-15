@@ -2,7 +2,7 @@
 
 pkgname=t1-source-sans-pro-ibx
 pkgver=2.3
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="A set of OpenType fonts designed for user interfaces. Type 1 version."
 url="http://sourceforge.net/projects/sourcesans.adobe/"
