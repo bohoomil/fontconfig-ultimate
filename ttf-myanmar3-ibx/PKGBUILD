@@ -2,7 +2,7 @@
 
 pkgname=ttf-myanmar3-ibx
 pkgver=1.358
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="Font for Myanmar/Burmese script."
 url="http://myanmar3source.googlecode.com/"
