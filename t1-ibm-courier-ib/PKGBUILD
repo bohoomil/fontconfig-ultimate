@@ -3,7 +3,7 @@
 
 pkgname=t1-ibm-courier-ib
 pkgver=1.0.1
-pkgrel=2
+pkgrel=3
 pkgdesc="Courier family by IBM. Type 1 version."
 arch=(any)
 license=('custom')
