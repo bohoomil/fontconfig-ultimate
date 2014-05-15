@@ -3,7 +3,7 @@
 
 pkgname=t1-bh-ib
 pkgver=1.0.1
-pkgrel=2
+pkgrel=3
 pkgdesc="Luxi Sans, Serif and Mono families by Bigelow & Holmes. Type 1 version."
 arch=(any)
 depends=('fontconfig')
