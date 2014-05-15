@@ -2,7 +2,7 @@
 
 pkgname=ttf-noto-serif-multilang-ib
 pkgver=1.04
-pkgrel=2
+pkgrel=3
 depends=('fontconfig' 'ttf-noto-serif-ib')
 pkgdesc="Noto Serif family: extended Non-Latin set."
 url="http://code.google.com/p/googlefontdirectory/"
