@@ -3,7 +3,7 @@
 pkgname=ttf-lohit-assamese-ib
 _src_pkg=lohit-assamese-ttf
 pkgver=2.5.3
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Lohit Assamese font."
 url="https://fedorahosted.org/lohit/"
