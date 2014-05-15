@@ -2,7 +2,7 @@
 
 pkgname=otf-melthofonts-ib
 pkgver=1.21
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="Font for Syriac script (includes Estrangelo Edessa only)."
 url="http://www.bethmardutho.org/index.php/resources/fonts.html"
