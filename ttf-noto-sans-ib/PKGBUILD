@@ -2,7 +2,7 @@
 
 pkgname=ttf-noto-sans-ib
 pkgver=1.04
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Noto Sans family: extended Latin set and UI."
 url="http://code.google.com/p/googlefontdirectory/"
