@@ -5,7 +5,7 @@
 pkgname=dejavu-ib
 pkgname=('t1-dejavu-ib' 'ttf-dejavu-ib')
 pkgver=2.34
-pkgrel=6
+pkgrel=7
 pkgdesc="Font family based on the Bitstream Vera Fonts with a wider range of characters. Re-packed for infinality-bundle-fonts."
 arch=('any')
 url="http://dejavu-fonts.org/wiki/Main_Page"
