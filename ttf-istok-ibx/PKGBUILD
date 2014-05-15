@@ -1,0 +1,24 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=ttf-istok-ibx
+pkgver=1.0.1
+pkgrel=1
+depends=('fontconfig')
+pkgdesc="Istok is a sans-serif typeface designed by Andrey Panov."
+url="https://code.google.com/p/istok/"
+arch=('any')
+license=('GPL')
+groups=('infinality-bundle-fonts-extra')
+install=$pkgname.install
+source=(https://istok.googlecode.com/files/istok-ttf-${pkgver}.tar.xz)
+sha1sums=('1100899ff2963b9391f2797fce4df1055760e91f')
+
+package() {
+  cd "${srcdir}"
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 COPYING "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+}
