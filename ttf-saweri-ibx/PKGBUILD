@@ -2,7 +2,7 @@
 
 pkgname=ttf-saweri-ibx
 pkgver=1.0
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="Saweri support for Buginese alphabet."
 url="https://sites.google.com/site/niariot87/"
