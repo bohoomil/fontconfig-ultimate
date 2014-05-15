@@ -4,7 +4,7 @@
 pkgname=ttf-tlwg-ibx
 _src_pkg=ttf-tlwg
 pkgver=0.5.1
-pkgrel=1
+pkgrel=2
 pkgdesc='Collection of scalable Thai fonts.'
 url='http://linux.thai.net/projects/fonts-tlwg'
 arch=('any')
@@ -26,7 +26,7 @@ package() {
 
   install -m775 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
-  
+
   install -m775 -d "${pkgdir}"/etc/fonts/conf.avail
   install -m644 etc/fonts/conf.avail/*.conf \
     "${pkgdir}"/etc/fonts/conf.avail
