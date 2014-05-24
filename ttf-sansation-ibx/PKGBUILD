@@ -1,0 +1,37 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=ttf-sansation-ibx
+pkgver=1.31
+pkgrel=1
+depends=('fontconfig')
+pkgdesc="Sansation is a sans-serif typeface by Bernd Montag, perfect both for headings and paragraphs."
+url="http://www.dafont.com/"
+arch=('any')
+groups=('infinality-bundle-fonts-extra')
+conflicts=('ttf-sansation')
+replaces=('ttf-sansation')
+license=('Custom:Freeware')
+install=$pkgname.install
+source=(sansation.zip
+        90-tt-sansation.conf)
+sha1sums=('3bfebc294ec791c0d3921f1ef17bab9c4898a17c'
+          '8eccbc4af4ac8b19be4cf7a013ae355bf650a9e1')
+
+package(){
+  cd "${srcdir}"/
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 "Sansation_1.31_ReadMe.txt" \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 90-tt-sansation.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-sansation.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/90-tt-sansation.conf .
+}
