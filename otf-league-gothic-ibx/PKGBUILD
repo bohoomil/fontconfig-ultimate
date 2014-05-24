@@ -1,0 +1,38 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=otf-league-gothic-ibx
+pkgver=1.560
+pkgrel=1
+_src_rel=64c3ede
+depends=('fontconfig')
+pkgdesc="League Gothic is a revival of an old classic, and one of our favorite typefaces, Alternate Gothic #1."
+url="https://www.theleagueofmoveabletype.com/league-gothic"
+arch=('any')
+groups=('infinality-bundle-fonts-extra')
+conflicts=('otf-league-gothic')
+replaces=('otf-league-gothic')
+license=('OFL-1.1')
+install=$pkgname.install
+source=(https://www.theleagueofmoveabletype.com/league-gothic/download
+        90-non-tt-league-gothic.conf)
+sha1sums=('06b3c3d133ee74fe1a0a4ce5760aa50e78783d58'
+          '6e20aa468eb5e33e6af16aa7b753d348d41f2423')
+
+package(){
+  cd "${srcdir}"/theleagueof-league-gothic-"${_src_rel}"
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 "Open Font License.markdown" \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 "${srcdir}"/90-non-tt-league-gothic.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-league-gothic.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/90-non-tt-league-gothic.conf .
+}
