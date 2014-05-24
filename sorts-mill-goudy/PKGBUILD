@@ -3,13 +3,13 @@
 pkgname=sorts-mill-goudy-ibx
 pkgname=('otf-sorts-mill-goudy-ibx' 'ttf-sorts-mill-goudy-ibx')
 pkgver=3.1
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="A modern revival of Goudy Oldstyle and Italic."
 url="http://crudfactory.com/"
 arch=('any')
 groups=('infinality-bundle-fonts-extra')
-license=('OFL-1.1')
+license=('MIT')
 source=("http://sortsmill.googlecode.com/files/goudy-3.1.zip"
         '90-non-tt-sorts-mill-goudy.conf'
         '90-tt-sorts-mill-goudy.conf')
