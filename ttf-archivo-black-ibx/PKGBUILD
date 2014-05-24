@@ -1,0 +1,34 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=ttf-archivo-black-ibx
+pkgver=1.002
+pkgrel=1
+depends=('fontconfig')
+pkgdesc="Archivo from Omnibus-Type is a grotesque sans-serif typeface family derived from Chivo. Black style."
+url="http://omnibus-type.com/"
+arch=('any')
+groups=('infinality-bundle-fonts-extra')
+license=('OFL-1.1')
+install=$pkgname.install
+source=(Archivo_Black.zip
+        90-tt-archivo-black.conf)
+sha1sums=('648bfa7726b25202c93de60f9011fdb2c34f8335'
+          '88732d923a93ce88e375945c51a81d3d2f702e33')
+
+package(){
+  cd "${srcdir}"/
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 90-tt-archivo-black.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-archivo-black.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/90-tt-archivo-black.conf .
+}
