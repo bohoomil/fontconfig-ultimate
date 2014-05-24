@@ -1,0 +1,34 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=otf-linden-hill-ibx
+pkgver=1.2
+pkgrel=1
+depends=('fontconfig')
+pkgdesc="Linden Hill is a digital version of Frederic Goudy’s Deepdene created by Barry Schwartz."
+url="http://crudfactory.com/"
+arch=('any')
+groups=('infinality-bundle-fonts-extra')
+license=('MIT')
+install=$pkgname.install
+source=(http://sortsmill.googlecode.com/files/lindenhill-1.2.zip
+        90-non-tt-linden-hill.conf)
+sha1sums=('fc36b347bbb62d1332d14b904cf225afc6ef6b93'
+          '032dd670a0e6ed11e6590eb329d6b23f874b2941')
+
+package(){
+  cd "${srcdir}"/
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 COPYING "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 90-non-tt-linden-hill.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-linden-hill.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/90-non-tt-linden-hill.conf .
+}
