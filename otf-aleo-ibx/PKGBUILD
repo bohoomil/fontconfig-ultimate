@@ -1,0 +1,40 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=otf-aleo-ibx
+pkgver=1.1
+pkgrel=1
+depends=('fontconfig')
+pkgdesc="Alessio Laiso's Aleo Free Font is a contemporary typeface designed as the slab serif companion to the Lato font by Łukasz Dziedzic."
+url="http://fontfabric.com"
+arch=('any')
+license=('OFL-1.1')
+groups=('infinality-bundle-fonts-extra')
+source=("http://fontfabric.com/downfont/aleo.zip"
+        45-aleo.conf
+        90-non-tt-aleo.conf)
+install=${pkgname}.install
+sha1sums=('f9477e623f4d98087677150e4b3631cf31829209'
+          'c78d56790918d39bc03b04539e9763898cebd40a'
+          'cce312d5d704002f006a0ba03f6128a3b71fe64e')
+
+package() {
+  cd "${srcdir}"
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 'SIL Open Font License 1.1.txt' \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-aleo.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-aleo.conf
+  install -m644 90-non-tt-aleo.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-aleo.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-aleo.conf .
+  ln -s ../conf.avail/90-non-tt-aleo.conf .
+}

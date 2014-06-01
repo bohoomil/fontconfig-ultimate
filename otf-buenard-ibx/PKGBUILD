@@ -1,0 +1,40 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=otf-buenard-ibx
+pkgver=1.001
+pkgrel=1
+depends=('fontconfig')
+pkgdesc="Buenard is a contemporary serif typeface, originally created for artistic and literary texts."
+url="http://www.fontfuror.com"
+arch=('any')
+license=('OFL-1.1')
+groups=('infinality-bundle-fonts-extra')
+# http://www.ffonts.net
+source=(Buenard.zip
+        45-buenard.conf
+        90-non-tt-buenard.conf)
+install=${pkgname}.install
+sha1sums=('1d43587ceabb2c82a1b66031f5c3258449ac7960'
+          '5ec95d2744b3805040cdb9b8d673b1a7abf6a8ac'
+          '9a6053bf2a76d4c34b839fa8622a5c8201371418')
+
+package() {
+  cd "${srcdir}"/buenard/src
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 ../OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
+  install -d -m755 "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 ../../45-buenard.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-buenard.conf
+  install -m644 ../../90-non-tt-buenard.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-buenard.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-buenard.conf .
+  ln -s ../conf.avail/90-non-tt-buenard.conf .
+}
+

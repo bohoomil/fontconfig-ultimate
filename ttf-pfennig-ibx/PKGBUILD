@@ -1,0 +1,40 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=ttf-pfennig-ibx
+pkgver=20120410
+pkgrel=1
+depends=('fontconfig')
+pkgdesc="Pfennig is a humanist sans-serif font with support for Latin, Cyrillic, Greek and Hebrew character sets."
+url="http://openfontlibrary.org/"
+arch=('any')
+license=('OFL-1.1')
+groups=('infinality-bundle-fonts-extra')
+source=("http://openfontlibrary.org/assets/downloads/pfennig/8b5fa73ca4cf4cfa42d21b9f73f6060b/pfennig.zip"
+        45-pfennig.conf
+        90-tt-pfennig.conf)
+install=${pkgname}.install
+sha1sums=('6aca5abbf1015497c83df9500992c0c8e151cb60'
+          '792e6469cabb840a6b3958c7ea95ba778602ec51'
+          '3c43ada0c6a32e73e4fe40a33ffe743f4a6bef62')
+
+package() {
+  cd "${srcdir}"
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
+
+  install -d -m755 "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-pfennig.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-pfennig.conf
+  install -m644 90-tt-pfennig.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-pfennig.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-pfennig.conf .
+  ln -s ../conf.avail/90-tt-pfennig.conf .
+}
+

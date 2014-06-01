@@ -1,0 +1,41 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=otf-aileron-ibx
+pkgver=0.101
+pkgrel=1
+depends=('fontconfig')
+pkgdesc="Aileron is a high quality sans serif font designed by Sora Sagano."
+url="http://dotcolon.net/"
+arch=('any')
+license=('Custom:Public Domain')
+groups=('infinality-bundle-fonts-extra')
+source=("http://dotcolon.net/DL/font/aileron.zip"
+        COPYING
+        45-aileron.conf
+        90-non-tt-aileron.conf)
+install=${pkgname}.install
+sha1sums=('ffd6dcff4d5f476837e5aed77bee8c5045e5da45'
+          '07fde791308bad26de4578a05716e7a5fde3d8af'
+          '0b66d2ae456c6eaa6be5ee55168fc78c8bf8931c'
+          '6652c75fa2706847a4ba89578b6c8fcc6662e00c')
+
+package() {
+  cd "${srcdir}"
+  install -d -m755 "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 COPYING "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-aileron.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-aileron.conf
+  install -m644 90-non-tt-aileron.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-aileron.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-aileron.conf .
+  ln -s ../conf.avail/90-non-tt-aileron.conf .
+}
+

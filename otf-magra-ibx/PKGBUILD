@@ -1,0 +1,40 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=otf-magra-ibx
+pkgver=1.001
+pkgrel=1
+depends=('fontconfig')
+pkgdesc="Magra is a beautiful sans-serif typeface with a humanist feel, perfect for tables and charts."
+url="http://www.fontfuror.com"
+arch=('any')
+license=('OFL-1.1')
+groups=('infinality-bundle-fonts-extra')
+# http://www.ffonts.net
+source=(Magra.zip
+        45-magra.conf
+        90-non-tt-magra.conf)
+install=${pkgname}.install
+sha1sums=('c14ae67e3320c1c76f66cd95c1a1334cc4c1d2d9'
+          '4ae03f90035fa24bac65799789489f0147537c54'
+          'ca9b821fd1a5d59534837c1b2bf4510fdf49b239')
+
+package() {
+  cd "${srcdir}"/magra/src
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 ../OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
+  install -d -m755 "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 ../../45-magra.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-magra.conf
+  install -m644 ../../90-non-tt-magra.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-magra.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-magra.conf .
+  ln -s ../conf.avail/90-non-tt-magra.conf .
+}
+
