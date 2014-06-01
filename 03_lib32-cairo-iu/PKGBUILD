@@ -6,7 +6,7 @@
 _pkgbasename=cairo
 pkgname=lib32-$_pkgbasename-infinality-ultimate
 pkgver=1.12.16
-pkgrel=6
+pkgrel=7
 groups=('infinality-bundle')
 pkgdesc="Cairo vector graphics library with respect-fontconfig and Ubuntu patches (32-bit, infinality-bundle)"
 arch=('x86_64')
@@ -22,22 +22,39 @@ provides=("lib32-cairo=$pkgver")
 conflicts=('lib32-cairo' 'lib32-cairo-ubuntu')
 options=('!libtool')
 source=(http://cairographics.org/releases/$_pkgbasename-$pkgver.tar.xz
+        cairo-1.12.16-lto-optional.patch
         cairo-respect-fontconfig_pb.patch
         http://archive.ubuntu.com/ubuntu/pool/main/c/cairo/cairo_1.12.16-0ubuntu2.debian.tar.gz)
 sha1sums=('4f6e337d5d3edd7ea79d1426f575331552b003ec'
+          '80883e44a57942762995aea2f136701b1fa54568'
           'db7bd3e7f3cbb30dafe4ed6604ade944163fbfbe'
           '95d873fda436a1cc29cda1310f155ef0e3258c05')
 
 prepare() {
   cd $srcdir/$_pkgbasename-$pkgver
 
-  for _f in $(cat $srcdir/debian/patches/series) ; do
-    patch -Np1 -i $srcdir/debian/patches/$_f
-  done
+  #for _f in $(cat $srcdir/debian/patches/series) ; do
+  #  patch -Np1 -i $srcdir/debian/patches/$_f
+  #done
 
+  patch -Np1 -i $srcdir/cairo-1.12.16-lto-optional.patch
   patch -Np1 -i $srcdir/cairo-respect-fontconfig_pb.patch
 
+  patches=(01_build_perf_utils.patch
+           02_am-maintainer-mode.patch
+           03_export-symbols.patch
+           06_hurd-map-noreserve.patch
+           pdf-output-avoid-transparency.patch
+           pdf-output-mime-data-embedding.patch
+           server_side_gradients.patch)
+
+  for patch in "${patches[@]}"; do
+    patch -Np1 -i "${srcdir}"/debian/patches/"${patch}"
+  done
+
   sed '20 aAM_PROG_AR' -i $srcdir/$_pkgbasename-$pkgver/configure.ac
+
+  autoreconf -vif
 }
 
 build() {
@@ -46,8 +63,6 @@ build() {
   export PKG_CONFIG_PATH="/usr/lib32/pkgconfig"
 
   cd $srcdir/$_pkgbasename-$pkgver
-
-  autoreconf -if
 
   # configure options
   # --enable-svg
@@ -61,6 +76,7 @@ build() {
     --sysconfdir=/etc \
     --localstatedir=/var \
     --disable-static \
+    --disable-lto \
     --enable-tee \
     --enable-gl \
     --enable-egl
@@ -72,4 +88,3 @@ package() {
   make DESTDIR=$pkgdir install
   rm -rf ${pkgdir}/usr/{bin,include,share}
 }
-
