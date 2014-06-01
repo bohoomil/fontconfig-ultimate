@@ -6,6 +6,42 @@ CHANGELOG
 ---------
 
 
+2014-06-01
+~~~~~~~~~~
+
+### infinality-bundle-fonts
+
+New fonts in the repository:
+
+* Aileron (`otf-aileron-ibx`)
+* Alef (`ttf-alef-ibx`, Hebrew script)
+* Aleo (`otf-aleo-ibx`)
+* Arev Sans (`ttf-arev-sans-ibx`)
+* Amiri (`ttf-amiri-ibx`, Arabic script)
+* Buenard (`otf-buenard-ibx`)
+* Enriqueta (`otf-enriqueta-ibx`)
+* Lora (`ttf-lora-ibx`)
+* Magra (`otf-magra-ibx`)
+* Pfennig (`ttf-pfennig-ibx`)
+* Raleway (`ttf-raleway-ibx`)
+* Vera Humana 95 (`ttf-vera-humana-95-ibx`)
+* Yanone Kaffeesatz (`ttf-yanone-kaffeesatz-ibx`)
+
+Updated font packages:
+
+* Alegreya (`otf-alegreya-ibx`) and  Alegreya Sans (`otf-alegreya-sans-ibx`) were split into separate packages.
+* Fira Mono (`otf-fira-mono-ibx`) and Fira Sans (`otf-fira-sans-ibx`) were updated to version 3.106.
+
+### fontconfig-infinality-ultimate, rev. 2.11.1-12
+
+* Fixed Source Code Pro and Source Sans Pro renedring  for < 14.5px.
+* Support for new fonts was added.
+* Font information and rendering settings for families from `infinality-bundle-fonts-extra` group was split from global configuration files and added to font packages.
+
+### cairo-infinality-ultimate, rev. 1.12.16-6 (incl. multilib)
+
+* Package update.
+
 2014-05-24
 ~~~~~~~~~~
 
