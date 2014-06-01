@@ -1,0 +1,48 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=libre-baskerville-ibx
+pkgname=('t1-libre-baskerville-ibx' 'otf-libre-baskerville-ibx')
+pkgver=2013.09.20
+pkgrel=3
+pkgdesc="Libre Baskerville font designed by Pablo Impallari."
+url="http://www.impallari.com/"
+depends=('fontconfig')
+arch=('any')
+license=('OFL-1.1')
+source=("http://mirrors.ctan.org/fonts/librebaskerville.zip")
+sha1sums=('2283bd9ccc03cbabdb8865e3f6d62acad7d5aa49')
+
+prepare(){
+  cd "${srcdir}"/librebaskerville/type1
+  type1afm *.pfb
+}
+
+package_t1-libre-baskerville-ibx(){
+  pkgdesc="Libre Baskerville font designed by Pablo Impallari. Type 1 version."
+  conflicts=('ttf-impallari-libre-baskerville' 'ttf-librebaskerville' 'otf-libre-baskerville-ib' 'otf-libre-baskerville-ibx')
+  groups=('infinality-bundle-fonts-extra')
+  install=${pkgname}.install
+  cd "${srcdir}"/librebaskerville
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 doc/OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 type1/*.{pfb,afm} "${pkgdir}"/usr/share/fonts/"${pkgname}"
+}
+
+package_otf-libre-baskerville-ibx(){
+  pkgdesc="Libre Baskerville font designed by Pablo Impallari. OpenType version."
+  conflicts=('ttf-impallari-libre-baskerville' 'ttf-librebaskerville' 't1-libre-baskerville-ib')
+  groups=('infinality-bundle-fonts')
+  install=${pkgname}.install
+
+  cd "${srcdir}"/librebaskerville
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 doc/OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 opentype/*.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+}
