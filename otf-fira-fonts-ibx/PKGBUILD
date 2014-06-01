@@ -1,8 +1,8 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgbase=otf-fira-fonts
-pkgver=2.001
-pkgrel=3
+pkgver=3.106
+pkgrel=1
 pkgname=('otf-fira-sans-ibx' 'otf-fira-mono-ibx')
 depends=('fontconfig')
 pkgdesc="Mozilla font family designed for the Firefox OS."
@@ -10,28 +10,63 @@ url="https://www.mozilla.org/en-US/styleguide/products/firefox-os/typeface/"
 arch=('any')
 license=('Apache')
 groups=('infinality-bundle-fonts-extra')
-source=(git://github.com/mozilla-b2g/moztt.git)
-md5sums=('SKIP')
+source=("http://dev.carrois.com/wordpress/wp-content/uploads/downloads/fira_3_1/FiraSans3106.zip"
+        "http://dev.carrois.com/wordpress/wp-content/uploads/downloads/fira_3_1/FiraMono3106.zip"
+        45-fira-sans.conf
+        45-fira-mono.conf
+        90-non-tt-fira-sans.conf
+        90-non-tt-fira-mono.conf)
+sha1sums=('385ad600a3f20a3b89b15b82e1dc309f9e8e848b'
+          '9f2e2f862f96d5ae5b63476f38f0d5cc0ca7a939'
+          '9d4cd8d7ad3de15e9e7aae3f39af32e562d55cf0'
+          'e14045305cd77ef599a65e5b7784045f84e021eb'
+          'b8b611f52a520e9146f34c6f0bfa3df2228cc18d'
+          '29e6b63abb1b34b39335519504bb4c6d914024c0')
 
 package_otf-fira-sans-ibx() {
   pkgdesc="A sans-serif typeface designed for the Firefox OS."
   conflicts=('ttf-fira-sans' 'otf-fira-sans')
+  replaces=('otf-fira-sans')
   install=${pkgname}.install
 
-  cd "${srcdir}"/moztt
+  cd "${srcdir}"/FiraSans3106/OTF
   install -d -m755 "${pkgdir}"/usr/share/fonts/"${pkgname}"
-  install -m644 FiraSans-"${pkgver}"/*.otf \
+  install -m644 FiraSans-{Bold,BoldItalic,Book,BookItalic,ExtraBold,ExtraBoldItalic,ExtraLight,ExtraLightItalic,Heavy,HeavyItalic,Italic,Light,LightItalic,Medium,MediumItalic,Regular,SemiBold,SemiBoldItalic,Ultra,UltraItalic,UltraLight,UltraLightItalic}.otf \
     "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  cd "${srcdir}"
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-fira-sans.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-fira-sans.conf
+  install -m644 90-non-tt-fira-sans.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-fira-sans.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/90-non-tt-fira-sans.conf .
+  ln -s ../conf.avail/45-fira-sans.conf .
 }
 
 package_otf-fira-mono-ibx() {
   pkgdesc="A monospace typeface designed for the Firefox OS."
   conflicts=('ttf-fira-mono' 'otf-fira-mono')
+  replaces=('otf-fira-mono')
   install=${pkgname}.install
 
-  cd "${srcdir}"/moztt
+  cd "${srcdir}"/FiraMono3106/OTF
   install -d -m755 "${pkgdir}"/usr/share/fonts/"${pkgname}"
-  install -m644 FiraMono-"${pkgver}"/*.otf \
-    "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  cd "${srcdir}"
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-fira-mono.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-fira-mono.conf
+  install -m644 90-non-tt-fira-mono.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-fira-mono.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/90-non-tt-fira-mono.conf .
+  ln -s ../conf.avail/45-fira-mono.conf .
 }
 
