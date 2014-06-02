@@ -6,6 +6,25 @@ CHANGELOG
 ---------
 
 
+2014-06-03
+~~~~~~~~~~
+
+### infinality-bundle-fonts
+
+New fonts in the repository:
+
+* CamingoCode (`ttf-camingocode-ibx`)
+* UnB Pro (`otf-unb-pro-ibx`)
+
+Updated font packages:
+
+* Koruri, rev. 20140524 (`ttf-koruri-ibx`)
+
+### fontconfig-infinality-ultimate, rev. 2.11.1-13
+
+* Fixed Lato rendering < 17.5px (issue #25)
+* Splitting Koruri rendering settings to the font package.
+
 2014-06-01
 ~~~~~~~~~~
 
