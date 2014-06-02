@@ -47,10 +47,6 @@ For more information, see:
 Last but not least, don't forget to copy custom `infinality-settings.sh` from `/usr/share/doc/fontconfig-infinality-ultimate-git/freetype` to `/etc/profile.d` and replace the one that came with the non-bundle `freetype2-infinality`.
 
 
-> **NOTE**
-> You will need `freetype2-infinality` at least version `2.5.2`.
-
-
 #### Further customization and misc options
 
 * Many changes to the global `fontconfig-ultimate` settings can be introduced on a per-user ground in a local `$HOME/.config/fontconfig` directory. Please, consult `/usr/share/doc/fontconfig-infinality-ultimate{-git}/ fontconfig` for examples and templates you will need to start tweaking.
