@@ -1,0 +1,41 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=otf-unb-pro-ibx
+pkgver=1.0
+pkgrel=1
+depends=('fontconfig')
+pkgdesc="UnB Pro is based on Liberation Sans family and was developed especially for the new visual identity system of UnB."
+url="http://www.fontfuror.com"
+arch=('any')
+license=('OFL-1.1')
+groups=('infinality-bundle-fonts-extra')
+# http://www.ffonts.net
+source=("http://www.marca.unb.br/arquivosdigitais/files/fontes/UnB_Pro_v1.0.zip"
+        45-unb-pro.conf
+        90-non-tt-unb-pro.conf)
+install=${pkgname}.install
+sha1sums=('f345fac35a31f04e4af6980d4d84fcff7cbf195a'
+          'cd2dfed05d523d1bb6bd78752b74dac8b83b004a'
+          '4f09fc0a2b13a886c4271722ea3b9a8f78ae09ed')
+
+package() {
+  cd "${srcdir}/UnB_Pro_v1.0"
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 COPYING.txt \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
+
+  install -d -m755 "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 ../../45-unb-pro.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-unb-pro.conf
+  install -m644 ../../90-non-tt-unb-pro.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-unb-pro.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-unb-pro.conf .
+  ln -s ../conf.avail/90-non-tt-unb-pro.conf .
+}
+
