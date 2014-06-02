@@ -1,0 +1,41 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=ttf-camingocode-ibx
+pkgver=1.0
+pkgrel=1
+depends=('fontconfig')
+pkgdesc="CamingoCode by Jan Fromm is designed for source-code editors."
+url="http://www.janfromm.de"
+arch=('any')
+groups=('infinality-bundle-fonts-extra')
+license=('CC-BY-ND')
+install=$pkgname.install
+source=(http://www.janfromm.de/_data/downloads/get-camingocode.php
+        45-camingocode.conf
+        90-tt-camingocode.conf)
+sha1sums=('1809ebc624e2cfdc1f7109e9c13413b335770494'
+          '2ead06d5a13f79becdb7313c5513208bef580d73'
+          '40e36eb5c465f16adb915562501a024771062a85')
+
+package(){
+  cd "${srcdir}"
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 readme.txt \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-camingocode.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-camingocode.conf
+  install -m644 90-tt-camingocode.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-camingocode.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-camingocode.conf .
+  ln -s ../conf.avail/90-tt-camingocode.conf .
+}
+
