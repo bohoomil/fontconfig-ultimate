@@ -29,7 +29,6 @@ CONF_LINKS = \
 	10-base-rendering.conf    \
 	28-user.conf		\
 	29-local.conf		\
-	31-fix-cantarell.conf   \
 	35-repl-custom.conf		\
 	40-non-latin.conf    \
 	45-latin.conf   \
@@ -61,7 +60,6 @@ templateinf_DATA =				\
 	10-scale-bitmap-fonts.conf	\
 	28-user.conf		\
 	29-local.conf		\
-	31-fix-cantarell.conf   \
 	35-repl-custom.conf		\
 	36-repl-missing-glyphs.conf  \
 	38-repl-proggy-bitmap.conf   \
