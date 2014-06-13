@@ -2,7 +2,7 @@
 
 pkgname=ttf-amble-ibx
 pkgver=1.0
-pkgrel=2
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="A free, screen-optimized sans-serif font from Punchcut."
 url="http://punchcut.com/"
@@ -10,8 +10,12 @@ arch=('any')
 groups=('infinality-bundle-fonts-extra')
 license=('Apache')
 install=$pkgname.install
-source=(http://www.fontsquirrel.com/fonts/download/amble)
-sha1sums=('d34338d2b4eb3e2e2ecaaa96cd6817289aa0b778')
+source=(http://www.fontsquirrel.com/fonts/download/amble
+        45-amble.conf
+        90-tt-amble.conf)
+sha1sums=('dd1bf16454fe81aa6e9ae05ea7d051ef553e7d24'
+          '3dd5fcbbaee2bcfe18d6f7a4a035e4b7898a3ea9'
+          'b67daac566134738e9600f549f0b23fa0f78f219')
 
 package(){
   cd "${srcdir}"
@@ -22,5 +26,15 @@ package(){
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
-}
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-amble.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-amble.conf
+  install -m644 90-tt-amble.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-amble.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-amble.conf .
+  ln -s ../conf.avail/90-tt-amble.conf .
+}

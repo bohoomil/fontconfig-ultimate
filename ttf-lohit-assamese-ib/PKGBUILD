@@ -3,7 +3,7 @@
 pkgname=ttf-lohit-assamese-ib
 _src_pkg=lohit-assamese-ttf
 pkgver=2.5.3
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="Lohit Assamese font."
 url="https://fedorahosted.org/lohit/"
@@ -13,9 +13,13 @@ groups=('infinality-bundle-fonts')
 license=('OFL-1.1')
 install=$pkgname.install
 source=("https://fedorahosted.org/releases/l/o/lohit/${_src_pkg}-${pkgver}.tar.gz"
-        '66-lohit-assamese.conf')
+        40-lohit-assamese.conf
+        66-lohit-assamese.conf
+        90-tt-lohit-assamese.conf)
 sha1sums=('c6db744b895bec13e8e29cafe91a37366b0418a9'
-          '1de5d0f346d653d4c765000a67c8917920aaf1cc')
+          'baae0cc8902bb5d516fd39248ea946cf7c4c57d3'
+          '5ff2c7e3e8da1de242263f146811d7ef07fb7050'
+          'e112688f0922a409a8071059aadc7f5ed82273ec')
 
 package(){
   cd "${srcdir}"/"${_src_pkg}-${pkgver}"
@@ -26,11 +30,17 @@ package(){
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -dm755 "${pkgdir}"/etc/fonts/conf.avail
-  install -dm755 "${pkgdir}"/etc/fonts/conf.d
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 ../40-lohit-assamese.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/40-lohit-assamese.conf
   install -m644 ../66-lohit-assamese.conf \
     "${pkgdir}"/etc/fonts/conf.avail/66-lohit-assamese.conf
+  install -m644 ../90-tt-lohit-assamese.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-lohit-assamese.conf
 
   cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/40-lohit-assamese.conf .
   ln -s ../conf.avail/66-lohit-assamese.conf .
+  ln -s ../conf.avail/90-tt-lohit-assamese.conf .
 }

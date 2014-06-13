@@ -2,7 +2,7 @@
 
 pkgname=ttf-noto-sans-multilang-ib
 pkgver=1.04
-pkgrel=4
+pkgrel=5
 depends=('fontconfig' 'ttf-noto-sans-ib')
 pkgdesc="Noto Sans family: extended Non-Latin set and UI."
 url="http://code.google.com/p/googlefontdirectory/"
@@ -11,12 +11,10 @@ groups=('infinality-bundle-fonts')
 conflicts=('ttf-noto' 'ttf-noto-svn' 'ttf-google-webfonts-git')
 license=('Apache')
 install=$pkgname.install
-source=(65-ttf-noto-sans-ui.conf
-        65-ttf-noto-sans.conf
-        https://googlefontdirectory.googlecode.com/hg/apache/notosansarmenian/LICENSE.txt
+source=(https://googlefontdirectory.googlecode.com/hg/apache/notosansarmenian/LICENSE.txt
         https://googlefontdirectory.googlecode.com/hg/apache/notosansarmenian/NotoSansArmenian-{Bold,Regular}.ttf
         https://googlefontdirectory.googlecode.com/hg/apache/notosansavestan/NotoSansAvestan-Regular.ttf
-        https://googlefontdirectory.googlecode.com/hg/apache/notosansbengali/NotoSansBengali-{Bold,Regular}.ttf 
+        https://googlefontdirectory.googlecode.com/hg/apache/notosansbengali/NotoSansBengali-{Bold,Regular}.ttf
         https://googlefontdirectory.googlecode.com/hg/apache/notosansbrahmi/NotoSansBrahmi-Regular.ttf
         https://googlefontdirectory.googlecode.com/hg/apache/notosanscarian/NotoSansCarian-Regular.ttf
         https://googlefontdirectory.googlecode.com/hg/apache/notosanscherokee/NotoSansCherokee-Regular.ttf
@@ -74,21 +72,9 @@ package(){
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
-
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m644  65-ttf-noto-sans.conf \
-    "${pkgdir}"/etc/fonts/conf.avail/65-ttf-noto-sans.conf
-  install -m644 65-ttf-noto-sans-ui.conf \
-    "${pkgdir}"/etc/fonts/conf.avail/65-ttf-noto-sans-ui.conf
-  cd "${pkgdir}"/etc/fonts/conf.d
-  ln -s ../conf.avail/65-ttf-noto-sans.conf .
-  ln -s ../conf.avail/65-ttf-noto-sans-ui.conf .
 }
 
-sha1sums=('26ad25aa49bf5b8b7c3d62c2cc339f5f686bf1b2'
-          '62abc13503f3f1b0a1c73927af0dfb9093519399'
-          '2b8b815229aa8a61e483fb4ba0588b8b6c491890'
+sha1sums=('2b8b815229aa8a61e483fb4ba0588b8b6c491890'
           '84c40ee325f9b9c5f24b24ee2cf2fd5d56e2f1e9'
           '0294aa5d098a970299eafc8a641e201908b83b1d'
           '6a369ecf1988fbce33a416e8291ba8bd7526f227'
@@ -123,10 +109,10 @@ sha1sums=('26ad25aa49bf5b8b7c3d62c2cc339f5f686bf1b2'
           '0773725b6413f921a7223685cf7d3c01d17e3c60'
           '3fd01e2617b3dbf5d7bcfcb2efe4b1e558eff19b'
           'bd7d7576066a0ef100506c8a791b958dd874ad6b'
-          '7c00c920ef284586f49f0430cd2601a32cc018cd'
-          'e7e41625597bc99f303edabb9d2041876f251a2c'
-          '4a77d8101050dd2e8322d0370fb40110c8981c59'
-          'd68e5e6586a158fe30dbc238527c990754fdeadb'
+          '378da546e4308518ba1e28cb67346876ceafadff'
+          '59dd791bb06e56481e277d72bd20b390efcfbec0'
+          '49a43b8e5083b7a44a0472f8dd92015abee6fcaa'
+          'f67bee56151256f15244230b317953423c62fdbd'
           '5a9c73d3129d6e7d8a064858e0ee162e25cb5543'
           '273087d8db3513e754c9de8aa96852dfb81278e9'
           '14d055bf37b7ee63605b4dade16e4df7195c7b11'

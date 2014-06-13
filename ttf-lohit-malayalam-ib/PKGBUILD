@@ -3,7 +3,7 @@
 pkgname=ttf-lohit-malayalam-ib
 _src_pkg=lohit-malayalam-ttf
 pkgver=2.92.0
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="Lohit Malayalam font."
 url="https://fedorahosted.org/lohit/"
@@ -13,9 +13,13 @@ groups=('infinality-bundle-fonts')
 license=('OFL-1.1')
 install=$pkgname.install
 source=("https://fedorahosted.org/releases/l/o/lohit/${_src_pkg}-${pkgver}.tar.gz"
-        '66-lohit-malayalam.conf')
+        40-lohit-malayalam.conf
+        66-lohit-malayalam.conf
+        90-tt-lohit-malayalam.conf)
 sha1sums=('5e3fa0c79f9c1f33c83a6e6216698628d43fb225'
-          'd00d870df0086d7edbaa09105b5f565ef4be93aa')
+          '1e4e01ba6230c63e2b4ba75c71972c7549a10efd'
+          'ad0910c2693deeff96f719123a2f6415d59c70b8'
+          '4a2ed533c2281d697cc01bd0be14434077aa5c6b')
 
 package(){
   cd "${srcdir}"/"${_src_pkg}-${pkgver}"
@@ -26,11 +30,17 @@ package(){
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -dm755 "${pkgdir}"/etc/fonts/conf.avail
-  install -dm755 "${pkgdir}"/etc/fonts/conf.d
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 ../40-lohit-malayalam.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/40-lohit-malayalam.conf
   install -m644 ../66-lohit-malayalam.conf \
     "${pkgdir}"/etc/fonts/conf.avail/66-lohit-malayalam.conf
+  install -m644 ../90-tt-lohit-malayalam.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-lohit-malayalam.conf
 
   cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/40-lohit-malayalam.conf .
   ln -s ../conf.avail/66-lohit-malayalam.conf .
+  ln -s ../conf.avail/90-tt-lohit-malayalam.conf .
 }

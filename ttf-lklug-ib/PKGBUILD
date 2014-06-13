@@ -2,7 +2,7 @@
 
 pkgname=ttf-lklug-ib
 pkgver=0.6
-pkgrel=4
+pkgrel=5
 depends=('fontconfig')
 pkgdesc="Font for Sinhala script."
 url="http://sinhala.sourceforge"
@@ -11,12 +11,27 @@ groups=('infinality-bundle-fonts')
 conflicts=('ttf-lklug')
 license=('GPL')
 install=$pkgname.install
-source=(http://sinhala.sourceforge.net/files/lklug.ttf)
-sha1sums=('209f5a91c85efba898347fdaa032549d889e7722')
+source=(http://sinhala.sourceforge.net/files/lklug.ttf
+        40-lklug.conf
+        90-tt-lklug.conf)
+sha1sums=('209f5a91c85efba898347fdaa032549d889e7722'
+          'b7ba8a6ef5c4f2b4efae971fc94edccb5470e8eb'
+          'f392cc78fb7f40fbabedae4be09b5ef986081453')
 
 package(){
   cd "${srcdir}"
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 40-lklug.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/40-lklug.conf
+  install -m644 90-tt-lklug.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-lklug.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/40-lklug.conf .
+  ln -s ../conf.avail/90-tt-lklug.conf .
 }

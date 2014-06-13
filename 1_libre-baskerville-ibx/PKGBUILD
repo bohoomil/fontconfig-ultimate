@@ -1,48 +1,72 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=libre-baskerville-ibx
-pkgname=('t1-libre-baskerville-ibx' 'otf-libre-baskerville-ibx')
-pkgver=2013.09.20
-pkgrel=3
+pkgname=('otf-libre-baskerville-ibx' 'ttf-libre-baskerville-ibx')
+pkgver=1.0
+pkgrel=5
 pkgdesc="Libre Baskerville font designed by Pablo Impallari."
 url="http://www.impallari.com/"
 depends=('fontconfig')
 arch=('any')
 license=('OFL-1.1')
-source=("http://mirrors.ctan.org/fonts/librebaskerville.zip")
-sha1sums=('2283bd9ccc03cbabdb8865e3f6d62acad7d5aa49')
-
-prepare(){
-  cd "${srcdir}"/librebaskerville/type1
-  type1afm *.pfb
-}
-
-package_t1-libre-baskerville-ibx(){
-  pkgdesc="Libre Baskerville font designed by Pablo Impallari. Type 1 version."
-  conflicts=('ttf-impallari-libre-baskerville' 'ttf-librebaskerville' 'otf-libre-baskerville-ib' 'otf-libre-baskerville-ibx')
-  groups=('infinality-bundle-fonts-extra')
-  install=${pkgname}.install
-  cd "${srcdir}"/librebaskerville
-
-  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 doc/OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
-
-
-  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
-  install -m644 type1/*.{pfb,afm} "${pkgdir}"/usr/share/fonts/"${pkgname}"
-}
+source=("http://www.impallari.com/media/uploads/prosources/update-86-source.zip"
+        45-libre-baskerville.conf
+        90-non-tt-libre-baskerville.conf
+        90-tt-libre-baskerville.conf)
+sha1sums=('e866f713cf022769eaa13287f7a088a8bb873110'
+          '502d5f64b28f00d48a76646f846a77f76a86930a'
+          'd5a73f5a954efd07f3949d33b7ed379fe4e4c5fa'
+          'a3738d76626e5363e8b98865c02d626e165f5fa7')
 
 package_otf-libre-baskerville-ibx(){
   pkgdesc="Libre Baskerville font designed by Pablo Impallari. OpenType version."
-  conflicts=('ttf-impallari-libre-baskerville' 'ttf-librebaskerville' 't1-libre-baskerville-ib')
-  groups=('infinality-bundle-fonts')
+  conflicts=('ttf-impallari-libre-baskerville' 'ttf-librebaskerville' 't1-libre-baskerville-ibx' 'ttf-libre-baskerville-ibx' 'otf-libre-baskerville-ibx')
+  replaces=('t1-libre-baskerville-ibx')
+  groups=('infinality-bundle-fonts-extra')
   install=${pkgname}.install
 
-  cd "${srcdir}"/librebaskerville
+  cd "${srcdir}"/"Libre Baskerville v1.0"
 
   install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 doc/OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
-  install -m644 opentype/*.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 src/*.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 ../45-libre-baskerville.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-libre-baskerville.conf
+  install -m644 ../90-non-tt-libre-baskerville.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-libre-baskerville.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-libre-baskerville.conf .
+  ln -s ../conf.avail/90-non-tt-libre-baskerville.conf .
+}
+
+package_ttf-libre-baskerville-ibx(){
+  pkgdesc="Libre Baskerville font designed by Pablo Impallari. TrueType version."
+  conflicts=('ttf-impallari-libre-baskerville' 'ttf-librebaskerville' 't1-libre-baskerville-ibx' 'otf-libre-baskerville-ibx')
+  groups=('infinality-bundle-fonts-extra')
+  install=${pkgname}.install
+
+  cd "${srcdir}"/"Libre Baskerville v1.0"
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 ../45-libre-baskerville.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-libre-baskerville.conf
+  install -m644 ../90-tt-libre-baskerville.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-libre-baskerville.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-libre-baskerville.conf .
+  ln -s ../conf.avail/90-tt-libre-baskerville.conf .
 }

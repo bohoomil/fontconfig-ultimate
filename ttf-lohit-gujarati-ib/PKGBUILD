@@ -3,7 +3,7 @@
 pkgname=ttf-lohit-gujarati-ib
 _src_pkg=lohit-gujarati-ttf
 pkgver=2.92.2
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="Lohit Gujarati font."
 url="https://fedorahosted.org/lohit/"
@@ -13,9 +13,13 @@ groups=('infinality-bundle-fonts')
 license=('OFL-1.1')
 install=$pkgname.install
 source=("https://fedorahosted.org/releases/l/o/lohit/${_src_pkg}-${pkgver}.tar.gz"
-        '66-lohit-gujarati.conf')
+        40-lohit-gujarati.conf
+        66-lohit-gujarati.conf
+        90-tt-lohit-gujarati.conf)
 sha1sums=('34d0bd184f4e204ad7f19ec7eec66092ef109bc4'
-          '8c59bed8d47b54b770e7bae75189952edcaf0cb4')
+          'f3170a05045c66b594bf1c4837076679f51a401f'
+          '6ae78282dbcee751ff181bcc2f1b81142a45b3ca'
+          '5204480778c33c92735ace78a3b79443a657c9c1')
 
 package(){
   cd "${srcdir}"/"${_src_pkg}-${pkgver}"
@@ -26,11 +30,17 @@ package(){
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -dm755 "${pkgdir}"/etc/fonts/conf.avail
-  install -dm755 "${pkgdir}"/etc/fonts/conf.d
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 ../40-lohit-gujarati.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/40-lohit-gujarati.conf
   install -m644 ../66-lohit-gujarati.conf \
     "${pkgdir}"/etc/fonts/conf.avail/66-lohit-gujarati.conf
+  install -m644 ../90-tt-lohit-gujarati.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-lohit-gujarati.conf
 
   cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/40-lohit-gujarati.conf .
   ln -s ../conf.avail/66-lohit-gujarati.conf .
+  ln -s ../conf.avail/90-tt-lohit-gujarati.conf .
 }

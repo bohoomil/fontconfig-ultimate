@@ -2,7 +2,7 @@
 
 pkgname=otf-latin-modern-ibx
 pkgver=2.004
-pkgrel=2
+pkgrel=3
 pkgdesc="The Latin Modern (LM) Family of Fonts. OpenType version."
 url="http://www.gust.org.pl/projects/e-foundry/latin-modern"
 depends=('fontconfig')
@@ -11,7 +11,12 @@ groups=('infinality-bundle-fonts-extra')
 arch=('any')
 license=('Custom')
 install=${pkgname}.install
-source=("http://mirrors.ctan.org/fonts/lm.zip")
+source=("http://mirrors.ctan.org/fonts/lm.zip"
+        45-latin-modern.conf
+        90-non-tt-latin-modern.conf)
+sha1sums=('79ecd6cb8fc8b8d4e29239f235bb983181ef34a5'
+          'eb3ee434b034c52025394a6bc7698a9f36775f97'
+          '37ab6fbe0d7935cc868302d2e9fd452ce59aa6eb')
 
 package_otf-latin-modern-ibx(){
   cd "${srcdir}"/lm
@@ -28,6 +33,15 @@ package_otf-latin-modern-ibx(){
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 fonts/opentype/public/lm/*.otf \
     "${pkgdir}"/usr/share/fonts/"${pkgname}"
-}
 
-sha1sums=('79ecd6cb8fc8b8d4e29239f235bb983181ef34a5')
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 ../45-latin-modern.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-latin-modern.conf
+  install -m644 ../90-non-tt-latin-modern.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-latin-modern.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-latin-modern.conf .
+  ln -s ../conf.avail/90-non-tt-latin-modern.conf .
+}

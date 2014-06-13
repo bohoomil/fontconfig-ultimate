@@ -2,7 +2,7 @@
 
 pkgname=ttf-lato-ibx
 pkgver=2.007
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="Lato is a sanserif type­face family designed in the Summer 2010 by Warsaw-based designer Łukasz Dziedzic."
 url="http://www.latofonts.com/"
@@ -12,8 +12,12 @@ license=('OFL-1.1')
 conflicts=('ttf-lato' 't1-lato-ibx' 'otf-lato-ib')
 replaces=('t1-lato-ibx' 'otf-lato-ib')
 install=$pkgname.install
-source=("http://www.latofonts.com/download/Lato2OFL.zip")
-sha1sums=('a66cda6cef79d80a9266eefb65d0da88eaa8c09c')
+source=("http://www.latofonts.com/download/Lato2OFL.zip"
+        45-lato.conf
+        90-tt-lato.conf)
+sha1sums=('a66cda6cef79d80a9266eefb65d0da88eaa8c09c'
+          '86f9ff2da81ba10f64e6747fdd8d27231da28d2b'
+          'daf4ea3ee6bc55a6fa13b77eba8013af1f260a93')
 
 package(){
   cd "${srcdir}"/Lato2OFL
@@ -28,4 +32,15 @@ package(){
     "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 Lato-{Regular,Italic}.ttf \
     "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 ../45-lato.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-lato.conf
+  install -m644 ../90-tt-lato.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-lato.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-lato.conf .
+  ln -s ../conf.avail/90-tt-lato.conf .
 }

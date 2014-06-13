@@ -2,7 +2,7 @@
 
 pkgname=ttf-nanum-fonts-ib
 pkgver=3.020
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="The Nanum fonts are unicode fonts designed especially for the Korean-language script."
 url="http://hangeul.naver.com/"
@@ -12,8 +12,12 @@ license=('OFL-1.1')
 conflicts=('ttf-nanum' 'otf-nanum' 'ttf-nanum-gothic-ibx' 'ttf-unfonts-core-ib')
 replaces=('ttf-nanum-gothic-ibx' 'ttf-unfonts-core-ib')
 install=$pkgname.install
-source=(http://cdn.naver.com/naver/NanumFont/fontfiles/NanumFont_TTF_ALL.zip)
-sha1sums=('5844913066dd85615966ea4b0a3a4735451400b2')
+source=(http://cdn.naver.com/naver/NanumFont/fontfiles/NanumFont_TTF_ALL.zip
+        40-nanum-fonts.conf
+        90-tt-nanum-fonts.conf)
+sha1sums=('5844913066dd85615966ea4b0a3a4735451400b2'
+          'd3395bd7351e0f42e05e988f78345b9ad6389ac9'
+          'c64de4c9c8c4ce572d93bf68405669c92c8c3e06')
 
 package(){
   cd "${srcdir}"
@@ -21,4 +25,15 @@ package(){
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf \
     "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 40-nanum-fonts.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/40-nanum-fonts.conf
+  install -m644 90-tt-nanum-fonts.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-nanum-fonts.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/40-nanum-fonts.conf .
+  ln -s ../conf.avail/90-tt-nanum-fonts.conf .
 }

@@ -2,7 +2,7 @@
 
 pkgname=otf-aleo-ibx
 pkgver=1.1
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="Alessio Laiso's Aleo Free Font is a contemporary typeface designed as the slab serif companion to the Lato font by Łukasz Dziedzic."
 url="http://fontfabric.com"
@@ -15,7 +15,7 @@ source=("http://fontfabric.com/downfont/aleo.zip"
 install=${pkgname}.install
 sha1sums=('f9477e623f4d98087677150e4b3631cf31829209'
           'c78d56790918d39bc03b04539e9763898cebd40a'
-          'cce312d5d704002f006a0ba03f6128a3b71fe64e')
+          '9e28ff2c2665c2bee8ed92f6559da3a0ddc1e8b4')
 
 package() {
   cd "${srcdir}"

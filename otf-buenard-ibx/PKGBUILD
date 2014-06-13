@@ -2,7 +2,7 @@
 
 pkgname=otf-buenard-ibx
 pkgver=1.001
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="Buenard is a contemporary serif typeface, originally created for artistic and literary texts."
 url="http://www.fontfuror.com"
@@ -16,7 +16,7 @@ source=(Buenard.zip
 install=${pkgname}.install
 sha1sums=('1d43587ceabb2c82a1b66031f5c3258449ac7960'
           '5ec95d2744b3805040cdb9b8d673b1a7abf6a8ac'
-          '9a6053bf2a76d4c34b839fa8622a5c8201371418')
+          '7f8ed7fdaf00cf7a95ff174ac1b62ef128b42c13')
 
 package() {
   cd "${srcdir}"/buenard/src

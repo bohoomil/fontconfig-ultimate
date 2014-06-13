@@ -1,0 +1,77 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=andada-ibx
+pkgname=('otf-andada-ibx' 'ttf-andada-ibx')
+pkgver=1.003
+pkgrel=4
+depends=('fontconfig')
+pkgdesc="Andada is a text font with an organic-slab serif, hybrid style, a solid design of medium stroke contrast."
+url="http://www.huertatipografica.com/"
+arch=('any')
+groups=('infinality-bundle-fonts-extra')
+license=('OFL-1.1')
+install=$pkgname.install
+# http://www.fontsquirrel.com (otf)
+# http://www.fontsc.com (ttf)
+source=(andada_otf.zip
+        andada.zip
+        andada_sc.zip
+        45-andada.conf
+        90-non-tt-andada.conf
+        90-tt-andada.conf)
+sha1sums=('97e80bfd3df758ead7d4906fca4cc02d48cbc219'
+          '4b66b558ae04dcffe49175613cb3a538eeab97e9'
+          '236d2ecd67eea9bad0284dc799517882eb17c8e9'
+          'cb3f7a353211156a65e22c2c4d6113fb3179a300'
+          '684d4b6c2fc234285935ee8b6a8a7dfa18d5be94'
+          '4cad6f8517b17de69be6d082eb62d44e049bf981')
+
+package_otf-andada-ibx(){
+  pkgdesc="Andada is a text font with an organic-slab serif, hybrid style, a solid design of medium stroke contrast. OpenType version."
+  conflicts=('ttf-andada-ibx')
+  install=$pkgname.install
+
+  cd "${srcdir}"
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-andada.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-andada.conf
+  install -m644 90-non-tt-andada.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-andada.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-andada.conf .
+  ln -s ../conf.avail/90-non-tt-andada.conf .
+}
+
+package_ttf-andada-ibx(){
+  pkgdesc="Andada is a text font with an organic-slab serif, hybrid style, a solid design of medium stroke contrast. TrueType version."
+  conflicts=('otf-andada-ibx')
+  install=$pkgname.install
+
+  cd "${srcdir}"
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-andada.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-andada.conf
+  install -m644 90-tt-andada.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-andada.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-andada.conf .
+  ln -s ../conf.avail/90-tt-andada.conf .
+}

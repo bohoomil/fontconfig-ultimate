@@ -1,0 +1,86 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=otf-alegreya-fonts-ibx
+pkgname=('otf-alegreya-ibx' 'otf-alegreya-sans-ibx')
+pkgver=1.003
+pkgrel=6
+depends=('fontconfig')
+pkgdesc="Alegreya and Alegreya Sans are modern font families designed by Juan Pablo del Peral."
+url="http://www.huertatipografica.com/"
+arch=('any')
+groups=('infinality-bundle-fonts-extra')
+license=('OFL-1.1')
+install=$pkgname.install
+# http://www.huertatipografica.com/free_download/23
+# http://fedoraproject.org/wiki/Alegreya_font
+source=(alegreya-sans-ht-full-pack-otf.zip
+        Alegreya.zip
+        45-alegreya.conf
+        45-alegreya-sans.conf
+        90-non-tt-alegreya.conf
+        90-non-tt-alegreya-sans.conf)
+sha1sums=('eed2bc0de9d2f52a96e8492065a62a70335130e0'
+          'f07b6a4f97c278050f1fab0061c80b19e54a65d9'
+          'db08107ef08332b400ba3fcc5eb78fe0cd8ebebe'
+          '8454c43dce5f6df1ed2bc7fa8c1a1aa8223766a5'
+          '42f97e187b6fb91e6dcb5f6823f42a3856e99759'
+          '5570da44818e8cf11f4fabf0b7bf39530251f361')
+
+package_otf-alegreya-ibx(){
+  pkgdesc="Alegreya is a serif typeface originally intended for literature. OpenType version."
+  conflicts=('ttf-alegreya-ibx')
+  install=$pkgname.install
+
+  cd "${srcdir}"
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -Dm644 Alegreya-{Black,BlackItalic,Bold,BoldItalic,Italic,Regular}.otf \
+    "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -Dm644 AlegreyaSC-{Black,BlackItalic,Bold,BoldItalic,Italic,Regular}.otf \
+    "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-alegreya.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-alegreya.conf
+  install -m644 90-non-tt-alegreya.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-alegreya.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-alegreya.conf .
+  ln -s ../conf.avail/90-non-tt-alegreya.conf .
+}
+
+package_otf-alegreya-sans-ibx(){
+  pkgdesc="Alegreya Sans is a humanist sans serif family with a calligraphic feeling that conveys a dynamic and varied rhythm. OpenType version."
+  conflicts=('ttf-alegreya-sans-ibx')
+  install=$pkgname.install
+
+  cd "${srcdir}"
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -Dm644 AlegreyaSans-{Black,BlackItalic,Bold,BoldItalic,ExtraBold,ExtraBoldItalic,Italic,Light,LightItalic,Medium,MediumItalic,Regular,Thin,ThinItalic}.otf \
+    "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -Dm644 AlegreyaSansSC-{Black,BlackItalic,Bold,BoldItalic,ExtraBold,ExtraBoldItalic,Italic,Light,LightItalic,Medium,MediumItalic,Regular,Thin,ThinItalic}.otf \
+    "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-alegreya-sans.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-alegreya-sans.conf
+  install -m644 90-non-tt-alegreya-sans.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-alegreya-sans.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-alegreya-sans.conf .
+  ln -s ../conf.avail/90-non-tt-alegreya-sans.conf .
+}

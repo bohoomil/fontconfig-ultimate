@@ -4,7 +4,7 @@ pkgname=ttf-lohit-tamil-ib
 _src_pkg_1=lohit-tamil-ttf
 _src_pkg_2=lohit-tamil-classical-ttf
 pkgver=2.5.3
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="Lohit Tamil fonts."
 url="https://fedorahosted.org/lohit/"
@@ -15,10 +15,14 @@ license=('OFL-1.1')
 install=$pkgname.install
 source=("https://fedorahosted.org/releases/l/o/lohit/${_src_pkg_1}-${pkgver}.tar.gz"
         "https://fedorahosted.org/releases/l/o/lohit/${_src_pkg_2}-${pkgver}.tar.gz"
-        '66-lohit-tamil.conf')
+        40-lohit-tamil.conf
+        66-lohit-tamil.conf
+        90-tt-lohit-tamil.conf)
 sha1sums=('6e2f24dd49b31618108989bdb8d61db769ceae48'
           'eec360e6d7d85818932b84e04f431e9da5f79bd7'
-          '237665611fc6cdb208fb8971628800ce2091ff85')
+          '1c88f2ca79793ab22670778914dc92eef63fd8b9'
+          'd22d0aaf30dd7b1a6e5bdccfad50f7629f289930'
+          'c1b9f730ea11a6548421a10095b35df9e0ecd0cb')
 
 package(){
   cd "${srcdir}"/"${_src_pkg_1}-${pkgver}"
@@ -31,11 +35,17 @@ package(){
   cd "${srcdir}"/"${_src_pkg_2}-${pkgver}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -dm755 "${pkgdir}"/etc/fonts/conf.avail
-  install -dm755 "${pkgdir}"/etc/fonts/conf.d
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 ../40-lohit-tamil.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/40-lohit-tamil.conf
   install -m644 ../66-lohit-tamil.conf \
     "${pkgdir}"/etc/fonts/conf.avail/66-lohit-tamil.conf
+  install -m644 ../90-tt-lohit-tamil.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-lohit-tamil.conf
 
   cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/40-lohit-tamil.conf .
   ln -s ../conf.avail/66-lohit-tamil.conf .
+  ln -s ../conf.avail/90-tt-lohit-tamil.conf .
 }

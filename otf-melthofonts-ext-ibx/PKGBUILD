@@ -3,7 +3,7 @@
 pkgname=otf-melthofonts-ext-ibx
 _inst_dir=otf-melthofonts-ib
 pkgver=1.21
-pkgrel=4
+pkgrel=5
 depends=('fontconfig' "otf-melthofonts-ib=$pkgver-$pkgrel")
 pkgdesc="Font for Syriac script (extended set)."
 url="http://www.bethmardutho.org/index.php/resources/fonts.html"
@@ -21,5 +21,4 @@ package(){
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${_inst_dir}"
   install -m644 SyrCOM{Adiabene,Antioch,Batnan,BatnanBold,Ctesiphon,Jerusalem,JerusalemBold,JerusalemItalic,JerusalemOutline,Kharput,Malankara,Mardin,MardinBold,Midyat,Nisibin,NisibinOutline,QenNeshrin,Talada,TurAbdin,Urhoy,UrhoyBold}.otf  \
     "${pkgdir}"/usr/share/fonts/"${_inst_dir}"
-
 }

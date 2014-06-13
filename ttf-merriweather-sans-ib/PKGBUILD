@@ -2,7 +2,7 @@
 
 pkgname=ttf-merriweather-sans-ib
 pkgver=1.003
-pkgrel=5
+pkgrel=6
 depends=('fontconfig')
 pkgdesc="Merriweather Sans-Serif font family by Eben Sorkin."
 url="http://sorkintype.com"
@@ -12,8 +12,13 @@ conflicts=('ttf-google-webfonts-git' 'ttf-merriweather-sans')
 replaces=('ttf-merriweather-sans')
 license=('OFL-1.1')
 install=$pkgname.install
-source=(https://googlefontdirectory.googlecode.com/hg/ofl/merriweathersans/MerriweatherSans-{Bold,BoldItalic,ExtraBold,ExtraBoldItalic,Italic,Light,LightItalic,Regular}.ttf
-        https://googlefontdirectory.googlecode.com/hg/ofl/merriweathersans/OFL.txt)
+#http://www.google.com/fonts/
+source=(Merriweather_Sans.zip
+        45-merriweather-sans.conf
+        90-tt-merriweather-sans.conf)
+sha1sums=('3bd344160ceb5cace6f2e9941e0a9b6f984cf2b1'
+          'cf1094eea5008854b8368a39fb5545f218498ced'
+          '08f7befaeb43458a4f8024f0a216de44e99841ce')
 
 package(){
   cd "${srcdir}"
@@ -23,13 +28,15 @@ package(){
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-merriweather-sans.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-merriweather-sans.conf
+  install -m644 90-tt-merriweather-sans.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-merriweather-sans.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-merriweather-sans.conf .
+  ln -s ../conf.avail/90-tt-merriweather-sans.conf .
 }
-sha1sums=('cb4ff3d7cc8286d986d623fffe8449bdc7b8462b'
-          '230a83d2c219e2be34c617db60c3bdedc020dcf1'
-          'b8e71400925eb44937ce1eede2cb6b722e4a4260'
-          'c1b68263fbd7e85be22a71ebba94e98e142266a0'
-          '167286c2b48567b3a6c9cf6a4aabca1a76f43aeb'
-          'a8b0774b5221d5c1180dba6372af6976036bb563'
-          '5528127785870d5d7631751991c9cfa84ddc5e9b'
-          '2874cc397a1fb10ca8c6d8666a148ae9b968c741'
-          '7b4f6d175af92e1f112f227bead331981d2e70e5')

@@ -2,7 +2,7 @@
 
 pkgname=ttf-consola-mono-ibx
 pkgver=2.001
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="Consola Mono is a legible, programming font by Wojciech Kalinowski."
 url="http://openfontlibrary.org"
@@ -13,9 +13,11 @@ replaces=('ttf-consolamono')
 license=('OFL-1.1')
 install=$pkgname.install
 source=("http://openfontlibrary.org/assets/downloads/consolamono/61cc2afcc4eca96efe7c6ebf178d39df/consolamono.zip"
+        45-consola-mono.conf
         90-tt-consola-mono.conf)
 sha1sums=('ba66ce10f62e9fee112631c6b2752fb68099fd76'
-          '3e10afd0b956bd287922fcad6d896c0c27b0cae5')
+          'ba4bc92d00a222f8c35a1f4bd53515dea4626d5a'
+          '503e1a589600d8eb24392cbdbe67a621e0b90ee1')
 
 package(){
   cd "${srcdir}"/'Consola Mono'
@@ -29,9 +31,12 @@ package(){
 
   install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
   install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 "${srcdir}"/45-consola-mono.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-consola-mono.conf
   install -m644 "${srcdir}"/90-tt-consola-mono.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-consola-mono.conf
 
   cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-consola-mono.conf .
   ln -s ../conf.avail/90-tt-consola-mono.conf .
 }

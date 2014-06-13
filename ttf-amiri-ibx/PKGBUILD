@@ -2,7 +2,7 @@
 
 pkgname=ttf-amiri-ibx
 pkgver=0.107
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="Amiri is a high quality classical Arabic typeface in Naskh style for typesetting books and other running text."
 url="http://www.amirifont.org/"
@@ -15,7 +15,7 @@ source=("http://downloads.sourceforge.net/project/amiri/amiri-0.107.zip"
 install=${pkgname}.install
 sha1sums=('9588b5961958a24a8210b208b3967c92e2dddabb'
           '2e03da2a69ffdf2e81614531a9f867f69c435d06'
-          '22d7f92ab487e9c0559ae0df5d4cfbe7ef29e4dd')
+          '10193b73345ac2c01ccb792630f55d77e33d1b24')
 
 package() {
   cd "${srcdir}"/"amiri-${pkgver}"

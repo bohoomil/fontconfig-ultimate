@@ -2,7 +2,7 @@
 
 pkgname=ttf-lekton-ibx
 pkgver=34.0
-pkgrel=4
+pkgrel=5
 depends=('fontconfig')
 pkgdesc="Lekton monospace font from Accademia di Belle Arti di Urbino."
 url="http://code.google.com/p/googlefontdirectory/"
@@ -13,8 +13,15 @@ replaces=('ttf-lekton')
 license=('OFL-1.1')
 install=$pkgname.install
 source=(https://googlefontdirectory.googlecode.com/hg/ofl/lekton/Lekton-{Bold,Italic,Regular}.ttf
-        https://googlefontdirectory.googlecode.com/hg/ofl/lekton/OFL.txt)
-
+        https://googlefontdirectory.googlecode.com/hg/ofl/lekton/OFL.txt
+        45-lekton.conf
+        90-tt-lekton.conf)
+sha1sums=('1d1a400ad0e84ec7a71dd6c586466902c5892c92'
+          '24cda7c46be6303454b943e3eb86deb2ab0ebacf'
+          'e4a1e6b15ae1df6d47328d5a7531df9b0d02e369'
+          '62f9cce0b7e68a956086a037278e93acaf84c703'
+          'edf100f3d775f391e9ce664dde31e984fed6db19'
+          'd7e9faa5cc91b85ef6dab0832b243a9e607d17d3')
 package(){
   cd "${srcdir}"
 
@@ -23,8 +30,16 @@ package(){
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-lekton.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-lekton.conf
+  install -m644 90-tt-lekton.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-lekton.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-lekton.conf .
+  ln -s ../conf.avail/90-tt-lekton.conf .
 }
-sha1sums=('1d1a400ad0e84ec7a71dd6c586466902c5892c92'
-          '24cda7c46be6303454b943e3eb86deb2ab0ebacf'
-          'e4a1e6b15ae1df6d47328d5a7531df9b0d02e369'
-          '39160c1fe404f8d884bb41f9891f24387b8d828b')
+

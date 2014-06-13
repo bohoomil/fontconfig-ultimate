@@ -2,7 +2,7 @@
 
 pkgname=ttf-noto-serif-ib
 pkgver=1.02
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="Noto Serif family: extended Latin set."
 url="http://code.google.com/p/googlefontdirectory/"
@@ -12,12 +12,16 @@ groups=('infinality-bundle-fonts')
 license=('Apache')
 install=$pkgname.install
 source=(https://googlefontdirectory.googlecode.com/hg/apache/notoserif/LICENSE.txt
-        https://googlefontdirectory.googlecode.com/hg/apache/notoserif/NotoSerif-{Bold,BoldItalic,Italic,Regular}.ttf)
+        https://googlefontdirectory.googlecode.com/hg/apache/notoserif/NotoSerif-{Bold,BoldItalic,Italic,Regular}.ttf
+        65-noto-serif.conf
+        90-tt-noto-serif.conf)
 sha1sums=('2b8b815229aa8a61e483fb4ba0588b8b6c491890'
           'ee116aee0acfe164d400e25a1e29048b90e8e751'
           'a7396a51dfa5566d9e9c6d37f47bf0ef70d69805'
           '8d1c28d0c6ad6f06575b5b4c3b9026fcfd74afbb'
-          '53e621c09b13232176bbed30dfe37b1d47170ff6')
+          '53e621c09b13232176bbed30dfe37b1d47170ff6'
+          'a25859d668dd09df03231ff37ebed32a4d23b5e1'
+          '6362c2ead0475866ebc86aecd2b20dc1bccd6a0a')
 
 package(){
   cd "${srcdir}"
@@ -27,5 +31,16 @@ package(){
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m644 65-noto-serif.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/65-noto-serif.conf
+  install -m644 90-tt-noto-serif.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-noto-serif.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/65-noto-serif.conf .
+  ln -s ../conf.avail/90-tt-noto-serif.conf .
 }
 

@@ -3,7 +3,7 @@
 pkgname=ttf-lohit-punjabi-ib
 _src_pkg=lohit-punjabi-ttf
 pkgver=2.5.3
-pkgrel=4
+pkgrel=5
 depends=('fontconfig')
 pkgdesc="Lohit Punjabi font."
 url="https://fedorahosted.org/lohit/"
@@ -13,9 +13,13 @@ groups=('infinality-bundle-fonts')
 license=('OFL-1.1')
 install=$pkgname.install
 source=("https://fedorahosted.org/releases/l/o/lohit/${_src_pkg}-${pkgver}.tar.gz"
-        '66-lohit-punjabi.conf')
+        40-lohit-punjabi.conf
+        66-lohit-punjabi.conf
+        90-tt-lohit-punjabi.conf)
 sha1sums=('c43c7c9a3ef24b78187bd157ee9ac46559816959'
-          '17279c29802330ccc3a1d264d26a24adc3c250d0')
+          '7ac5786dd5f78bf71f492b4e93fb77b471f1256c'
+          '29107f30f462a7d3c5d7fadcceedb15660620314'
+          'c4878968c17dab5fa06af6c0cf50a22a9742d9bd')
 
 package(){
   cd "${srcdir}"/"${_src_pkg}-${pkgver}"
@@ -26,11 +30,17 @@ package(){
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -dm755 "${pkgdir}"/etc/fonts/conf.avail
-  install -dm755 "${pkgdir}"/etc/fonts/conf.d
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 ../40-lohit-punjabi.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/40-lohit-punjabi.conf
   install -m644 ../66-lohit-punjabi.conf \
     "${pkgdir}"/etc/fonts/conf.avail/66-lohit-punjabi.conf
+  install -m644 ../90-tt-lohit-punjabi.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-lohit-punjabi.conf
 
   cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/40-lohit-punjabi.conf .
   ln -s ../conf.avail/66-lohit-punjabi.conf .
+  ln -s ../conf.avail/90-tt-lohit-punjabi.conf .
 }

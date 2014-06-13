@@ -2,7 +2,7 @@
 
 pkgname=otf-fanwood-ibx
 pkgver=1.1
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="Based on Bitstream's Transitional 551 and reworked by Barry Schwartz, Fanwood is an OpenType serif typeface mainly suited for paragraphs."
 url="http://crudfactory.com/"
@@ -13,9 +13,11 @@ replaces=('otf-fanwood')
 license=('MIT')
 install=$pkgname.install
 source=(http://sortsmill.googlecode.com/files/fanwood-1.1.zip
+        45-fanwood.conf
         90-non-tt-fanwood.conf)
 sha1sums=('f79b817d438ec1fe898c254b5dbf773d6717dc9e'
-          '21fa77091e9c1fb24c5fd947559e8ae91f1d8468')
+          '099a03aaf4393bd3606081838bb8466d27920207'
+          '10062b7432caa3074fd3e5cdb3d7ff4e0b194c62')
 
 package(){
   cd "${srcdir}"/
@@ -28,9 +30,12 @@ package(){
 
   install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
   install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-fanwood.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-fanwood.conf
   install -m644 90-non-tt-fanwood.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-fanwood.conf
 
   cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-fanwood.conf .
   ln -s ../conf.avail/90-non-tt-fanwood.conf .
 }

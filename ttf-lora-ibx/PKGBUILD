@@ -2,7 +2,7 @@
 
 pkgname=ttf-lora-ibx
 pkgver=1.014
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="Lora is a well-balanced contemporary serif with roots in calligraphy. It is a text typeface with moderate contrast well suited for body text."
 url="http://www.cyreal.org/"
@@ -13,9 +13,9 @@ source=("http://www.google.com/webfonts/download?kit=iwrHM7FQEcKgsUvDuXxrPg"
         45-lora.conf
         90-tt-lora.conf)
 install=${pkgname}.install
-sha1sums=('bb968deeedca3601cbcada3653bc43f9d8451018'
+sha1sums=('b6b6082f217511c1de7cf6edc3980df2fcb3808e'
           'c0fb0a61c994c2f57730a80f68a28014622e3e5f'
-          '22d7f92ab487e9c0559ae0df5d4cfbe7ef29e4dd')
+          'f22b6afa5d3fbcbf48728ceb83d7884065279efd')
 
 package() {
   cd "${srcdir}"

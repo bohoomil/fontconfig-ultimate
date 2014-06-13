@@ -1,0 +1,74 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=source-sans-pro-ibx
+pkgname=('otf-source-sans-pro-ibx' 'ttf-source-sans-pro-ibx')
+pkgver=1.050
+pkgrel=4
+depends=('fontconfig')
+pkgdesc="A set of OpenType fonts designed for user interfaces."
+url="http://www.adobe.com/"
+arch=('any')
+license=('OFL-1.1')
+groups=('infinality-bundle-fonts-extra')
+source=("http://downloads.sourceforge.net/project/sourcesans.adobe/SourceSansPro_FontsOnly-${pkgver}.zip"
+        45-source-sans-pro.conf
+        90-tt-source-sans-pro.conf
+        90-non-tt-source-sans-pro.conf)
+sha1sums=('f3af1201c80a86f1dd6e045a565c96bdd12d445f'
+          'f692d46268b32bc62cb5a4dc515f9a427daf3d8c'
+          '05d9f0f6dc24fc03c60f511d89e30dbad875d27f'
+          '5dc78c30e7ba06aaae72b80241e93fc857e2c9ec')
+
+package_otf-source-sans-pro-ibx(){
+  pkgdesc="A set of OpenType fonts designed for user interfaces. OpenType version."
+  conflicts=('adobe-source-sans-pro-fonts' 'otf-source-sans-pro' 'ttf-source-sans-pro' 't1-source-sans-pro-ibx' 'ttf-source-sans-pro-ibx')
+  install=$pkgname.install
+
+  cd "${srcdir}"/SourceSansPro_FontsOnly-${pkgver}
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 LICENSE.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 OTF/SourceSansPro-{Black,BlackIt,Bold,BoldIt,It,Light,LightIt,Regular,Semibold,SemiboldIt}.otf \
+    "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  cd "${srcdir}"
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-source-sans-pro.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-source-sans-pro.conf
+  install -m644 90-non-tt-source-sans-pro.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-source-sans-pro.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-source-sans-pro.conf .
+  ln -s ../conf.avail/90-non-tt-source-sans-pro.conf .
+}
+
+package_ttf-source-sans-pro-ibx(){
+  pkgdesc="A set of OpenType fonts designed for user interfaces. TrueType version."
+  conflicts=('adobe-source-sans-pro-fonts' 'otf-source-sans-pro' 'ttf-source-sans-pro' 't1-source-sans-pro-ibx' 'otf-source-sans-pro-ibx')
+  install=$pkgname.install
+
+  cd "${srcdir}"/SourceSansPro_FontsOnly-${pkgver}
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 LICENSE.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 TTF/SourceSansPro-{Black,BlackIt,Bold,BoldIt,It,Light,LightIt,Regular,Semibold,SemiboldIt}.ttf \
+    "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  cd "${srcdir}"
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-source-sans-pro.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-source-sans-pro.conf
+  install -m644 90-tt-source-sans-pro.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-source-sans-pro.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-source-sans-pro.conf .
+  ln -s ../conf.avail/90-tt-source-sans-pro.conf .
+}

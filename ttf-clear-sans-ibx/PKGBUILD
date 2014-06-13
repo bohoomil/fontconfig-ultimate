@@ -3,7 +3,7 @@
 pkgname=ttf-clear-sans-ibx
 _archname=clearsans
 pkgver=1.00
-pkgrel=4
+pkgrel=5
 depends=('fontconfig')
 pkgdesc="Clear Sans is a versatile OpenType font for screen, print, and Web."
 url="https://01.org/clear-sans"
@@ -13,8 +13,12 @@ groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-clear-sans')
 replaces=('ttf-clear-sans')
 install=$pkgname.install
-source=("https://01.org/sites/default/files/downloads/${_archname}-${pkgver}.zip")
-sha1sums=('092c5d8e19621d78cb7e14a7eac02c29415d3e0c')
+source=("https://01.org/sites/default/files/downloads/${_archname}-${pkgver}.zip"
+        45-clear-sans.conf
+        90-tt-clear-sans.conf)
+sha1sums=('092c5d8e19621d78cb7e14a7eac02c29415d3e0c'
+          '5c02ab84d2a78b97dd893db9f0b71d81a0a77cd7'
+          'b762b740ae18899d4924505d0e92e200b743c1e8')
 
 package(){
   cd "${srcdir}"/TTF
@@ -22,5 +26,15 @@ package(){
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 ClearSans-{Bold,BoldItalic,Italic,Light,Medium,MediumItalic,Regular}.ttf \
     "${pkgdir}"/usr/share/fonts/"${pkgname}"
-}
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 ../../45-clear-sans.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-clear-sans.conf
+  install -m644 ../../90-tt-clear-sans.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-clear-sans.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-clear-sans.conf .
+  ln -s ../conf.avail/90-tt-clear-sans.conf .
+}

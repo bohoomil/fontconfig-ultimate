@@ -2,7 +2,7 @@
 
 pkgname=otf-unb-pro-ibx
 pkgver=1.0
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="UnB Pro is based on Liberation Sans family and was developed especially for the new visual identity system of UnB."
 url="http://www.fontfuror.com"
@@ -16,7 +16,7 @@ source=("http://www.marca.unb.br/arquivosdigitais/files/fontes/UnB_Pro_v1.0.zip"
 install=${pkgname}.install
 sha1sums=('f345fac35a31f04e4af6980d4d84fcff7cbf195a'
           'cd2dfed05d523d1bb6bd78752b74dac8b83b004a'
-          '4f09fc0a2b13a886c4271722ea3b9a8f78ae09ed')
+          '5a2bc8cdb4cf01b08dbef86537cc60fede60d826')
 
 package() {
   cd "${srcdir}/UnB_Pro_v1.0"

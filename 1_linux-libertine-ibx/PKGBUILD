@@ -1,0 +1,74 @@
+# Contributor: Rick W. Chen <stuffcorpse@archlinux.us>
+# Contributor: bohoomil <@zoho.com>
+
+pkgname=otf-linux-libertine-ibx
+pkgname=('otf-linux-libertine-ibx' 'ttf-linux-libertine-ibx')
+pkgver=5.3.0
+pkgrel=7
+pkgdesc="Linux Libertine and Linux Biolinum fonts."
+depends=('fontconfig')
+arch=(any)
+url="http://www.linuxlibertine.org/"
+license=('GPL')
+groups=('infinality-bundle-fonts-extra')
+source=("http://mirrors.ctan.org/fonts/libertine.zip"
+        "http://downloads.sourceforge.net/project/linuxlibertine/linuxlibertine/${pkgver}/LinLibertineTTF_${pkgver}_2012_07_02.tgz"
+        45-linux-libertine-o.conf
+        45-linux-libertine.conf
+        90-non-tt-linux-libertine.conf
+        90-tt-linux-libertine.conf)
+sha1sums=('e1e3d9e0eff1258d34fc4a5ee4e2dcef8720fb28'
+          '3e83241395446dcf00c7831b8b587fd55e7a7eda'
+          '7e65f87878e50a2f88724b2a3481e3198d8ca32f'
+          '128c87f7502b6e55799aab276af3aec6bfe7ed8b'
+          'd317e58659e1eb25b2e7116304724159fbc26cc5'
+          'a656dab57d8343e768e27ac9e6b6fdb00de74e1c')
+
+package_otf-linux-libertine-ibx() {
+  pkgdesc="Linux Libertine and Linux Biolinum fonts. OpenType version."
+  conflicts=('ttf-linux-libertine' 'ttf-linux-libertine-g' 'ttf-linux-libertine-ibx')
+  install=${pkgname}.install
+
+  cd "${srcdir}"/libertine
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 doc/LICENCE.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
+  install -d -m755 "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 opentype/*.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 ../45-linux-libertine-o.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-linux-libertine-o.conf
+  install -m644 ../90-non-tt-linux-libertine.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-linux-libertine.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-linux-libertine-o.conf .
+  ln -s ../conf.avail/90-non-tt-linux-libertine.conf .
+}
+
+package_ttf-linux-libertine-ibx(){
+  pkgdesc="Linux Libertine and Linux Biolinum fonts. TrueType version."
+  conflicts=('ttf-linux-libertine' 'ttf-linux-libertine-g' 'otf-linux-libertine-ibx')
+  install=$pkgname.install
+
+  cd "${srcdir}"
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 LICENCE.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -Dm644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-linux-libertine.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-linux-libertine.conf
+  install -m644 90-tt-linux-libertine.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-linux-libertine.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-linux-libertine.conf .
+  ln -s ../conf.avail/90-tt-linux-libertine.conf .
+}

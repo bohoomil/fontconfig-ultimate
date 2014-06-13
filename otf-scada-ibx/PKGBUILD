@@ -2,7 +2,7 @@
 
 pkgname=otf-scada-ibx
 pkgver=3.005
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Scada is a sans serif font designed by Jovanny Lemonad."
 url="http://www.scada.lv/en/company/scada-font"
@@ -10,16 +10,30 @@ arch=('any')
 groups=('infinality-bundle-fonts-extra')
 license=('OFL-1.1')
 install=$pkgname.install
-source=(https://googlefontdirectory.googlecode.com/hg/ofl/scada/src/Scada-{Bold,BoldItalic,Italic,Regular}.otf)
+source=(https://googlefontdirectory.googlecode.com/hg/ofl/scada/src/Scada-{Bold,BoldItalic,Italic,Regular}.otf
+        45-scada.conf
+        90-non-tt-scada.conf)
 sha1sums=('ccdd6edea9031e251b1a35451c2b7c8da6d02196'
           '15ae0bb65754ef1c8539cb41553a8885cc82ec84'
           'ae96217b32105942edaa748dee8e1875ef7ce922'
-          'f892b3a3a7401b05212730a88f287f508823ffd7')
+          'f892b3a3a7401b05212730a88f287f508823ffd7'
+          '52a3ba75d1deb319bddab3715175e202b230e2f5'
+          '0385ce2e54e6adede831c782b884e14e4c8030a9')
 
 package(){
   cd "${srcdir}"
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -Dm644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
-}
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-scada.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-scada.conf
+  install -m644 90-non-tt-scada.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-scada.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-scada.conf .
+  ln -s ../conf.avail/90-non-tt-scada.conf .
+}

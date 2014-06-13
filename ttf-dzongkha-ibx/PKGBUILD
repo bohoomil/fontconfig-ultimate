@@ -2,7 +2,7 @@
 
 pkgname=ttf-dzongkha-ibx
 pkgver=1.0
-pkgrel=4
+pkgrel=5
 depends=('fontconfig')
 makedep=('unzip')
 pkgdesc="Dzongkha fonts."
@@ -11,8 +11,12 @@ arch=('any')
 groups=('infinality-bundle-fonts-extra')
 license=('Custom')
 install=$pkgname.install
-source=("http://www.dit.gov.bt/sites/default/files/dzongkhafonts.zip")
-sha1sums=('ff080d37846ae4d0130a59b38f3783faf3f4f2a1')
+source=("http://www.dit.gov.bt/sites/default/files/dzongkhafonts.zip"
+        40-dzongkha.conf
+        90-tt-dzongkha.conf)
+sha1sums=('ff080d37846ae4d0130a59b38f3783faf3f4f2a1'
+          '40adb7ec028eb6b502264046d5c25c409ce46e92'
+          '6b28e373de2e8b65f1bb872acc56ab8e53b06ffe')
 
 prepare(){
   cd "${srcdir}"
@@ -26,4 +30,15 @@ package(){
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 40-dzongkha.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/40-dzongkha.conf
+  install -m644 90-tt-dzongkha.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-dzongkha.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/40-dzongkha.conf .
+  ln -s ../conf.avail/90-tt-dzongkha.conf .
 }

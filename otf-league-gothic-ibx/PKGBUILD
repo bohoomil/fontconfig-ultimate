@@ -2,7 +2,7 @@
 
 pkgname=otf-league-gothic-ibx
 pkgver=1.560
-pkgrel=1
+pkgrel=2
 _src_rel=64c3ede
 depends=('fontconfig')
 pkgdesc="League Gothic is a revival of an old classic, and one of our favorite typefaces, Alternate Gothic #1."
@@ -14,9 +14,11 @@ replaces=('otf-league-gothic')
 license=('OFL-1.1')
 install=$pkgname.install
 source=(https://www.theleagueofmoveabletype.com/league-gothic/download
+        45-league-gothic.conf
         90-non-tt-league-gothic.conf)
 sha1sums=('06b3c3d133ee74fe1a0a4ce5760aa50e78783d58'
-          '6e20aa468eb5e33e6af16aa7b753d348d41f2423')
+          '9ea3874e8d2f3785a6ac8f393fd2d88b8bd00a44'
+          '27a908ce0b28cbe6af40247e6a6c8f826d5e8f38')
 
 package(){
   cd "${srcdir}"/theleagueof-league-gothic-"${_src_rel}"
@@ -30,9 +32,12 @@ package(){
 
   install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
   install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 "${srcdir}"/45-league-gothic.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-league-gothic.conf
   install -m644 "${srcdir}"/90-non-tt-league-gothic.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-league-gothic.conf
 
   cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-league-gothic.conf .
   ln -s ../conf.avail/90-non-tt-league-gothic.conf .
 }

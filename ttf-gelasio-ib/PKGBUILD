@@ -2,7 +2,7 @@
 
 pkgname=ttf-gelasio-ib
 pkgver=1.00
-pkgrel=2
+pkgrel=3
 _hgrev=325e7174147acd060cb6dfe982cf57594a180d53
 depends=('fontconfig')
 pkgdesc="Gelasio serif family by Eben Sorkin."
@@ -12,7 +12,17 @@ groups=('infinality-bundle-fonts')
 license=('OFL-1.1')
 install=$pkgname.install
 source=(https://googlefontdirectory.googlecode.com/hg-history/${_hgrev}/ofl/gelasio/Gelasio-{Bold,BoldItalic,Italic,Regular}.ttf
-        https://googlefontdirectory.googlecode.com/hg-history/${_hgrev}/ofl/gelasio/OFL.txt)
+        https://googlefontdirectory.googlecode.com/hg-history/${_hgrev}/ofl/gelasio/OFL.txt
+        45-gelasio.conf
+        90-tt-gelasio.conf)
+
+sha1sums=('ac1662f8f95e59e2dc1536dd01cd500be2bb7e46'
+          '2e1e3b6cf233cc337da991f4ab94af088eae9f0e'
+          'bffe2fb3c360a4f4ac310bcfa591379c8a682a3d'
+          '17081ba3c5b026074014699996fbd15d4c28aefc'
+          '62f9cce0b7e68a956086a037278e93acaf84c703'
+          '67fc5c8d7ebcd96a5a368c2cc220e9568776d05d'
+          'a47f4ceec5140538a0b0f652e0b799bb89d25753')
 
 package(){
   cd "${srcdir}"
@@ -22,9 +32,15 @@ package(){
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-gelasio.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-gelasio.conf
+  install -m644 90-tt-gelasio.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-gelasio.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-gelasio.conf .
+  ln -s ../conf.avail/90-tt-gelasio.conf .
 }
-sha1sums=('ac1662f8f95e59e2dc1536dd01cd500be2bb7e46'
-          '2e1e3b6cf233cc337da991f4ab94af088eae9f0e'
-          'bffe2fb3c360a4f4ac310bcfa591379c8a682a3d'
-          '17081ba3c5b026074014699996fbd15d4c28aefc'
-          '7b4f6d175af92e1f112f227bead331981d2e70e5')

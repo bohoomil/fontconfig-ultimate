@@ -2,7 +2,7 @@
 
 pkgname=ttf-noto-serif-multilang-ib
 pkgver=1.04
-pkgrel=3
+pkgrel=4
 depends=('fontconfig' 'ttf-noto-serif-ib')
 pkgdesc="Noto Serif family: extended Non-Latin set."
 url="http://code.google.com/p/googlefontdirectory/"
@@ -11,14 +11,12 @@ conflicts=('ttf-google-webfonts-git')
 groups=('infinality-bundle-fonts')
 license=('Apache')
 install=$pkgname.install
-source=(65-ttf-noto-serif.conf
-        https://googlefontdirectory.googlecode.com/hg/apache/notoserifarmenian/LICENSE.txt
+source=(https://googlefontdirectory.googlecode.com/hg/apache/notoserifarmenian/LICENSE.txt
         https://googlefontdirectory.googlecode.com/hg/apache/notoserifarmenian/NotoSerifArmenian-{Bold,Regular}.ttf
         https://googlefontdirectory.googlecode.com/hg/apache/notoserifgeorgian/NotoSerifGeorgian-{Bold,Regular}.ttf
         https://googlefontdirectory.googlecode.com/hg/apache/notoseriflao/NotoSerifLao-{Bold,Regular}.ttf
         https://googlefontdirectory.googlecode.com/hg/apache/notoserifthai/NotoSerifThai-{Bold,Regular}.ttf)
-sha1sums=('a25859d668dd09df03231ff37ebed32a4d23b5e1'
-          '2b8b815229aa8a61e483fb4ba0588b8b6c491890'
+sha1sums=('2b8b815229aa8a61e483fb4ba0588b8b6c491890'
           'a60ccd5c84ebcbc2a63b9a73ddacb71cf4de9a93'
           'e7c8a10634a9181a35bb275041a3c90870de0f1d'
           '27956f440c34195af1ae4adfa929df0429358f48'
@@ -36,11 +34,4 @@ package(){
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
-
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m644 65-ttf-noto-serif.conf "${pkgdir}"/etc/fonts/conf.avail/65-ttf-noto-serif.conf
-  cd "${pkgdir}"/etc/fonts/conf.d
-  ln -s ../conf.avail/65-ttf-noto-serif.conf .
 }
-

@@ -2,13 +2,10 @@
 
 pkgname=ttf-lohit-fonts-meta-ib
 pkgver=2.5.94
-pkgrel=4
+pkgrel=5
 pkgdesc="The collection of all Indic fonts from Fedora Project."
 url="https://fedorahosted.org/lohit/"
 arch=('any')
-conflicts=('lohit-fonts')
-replaces=('lohit-fonts' 'ttf-lohit-fonts-ib')
-provides=('lohit-fonts')
 groups=('infinality-bundle-fonts')
 license=('OFL-1.1')
 depends=('ttf-lohit-assamese-ib'

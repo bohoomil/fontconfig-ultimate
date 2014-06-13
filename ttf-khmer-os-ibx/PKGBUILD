@@ -4,7 +4,7 @@
 
 pkgname=ttf-khmer-os-ibx
 pkgver=5.0
-pkgrel=2
+pkgrel=3
 pkgdesc="TTFont collection for Khmer (Cambodia)."
 arch=('any')
 license=('LGPL')
@@ -13,11 +13,27 @@ depends=('fontconfig')
 conflicts=('ttf-khmer')
 replaces=('ttf-khmer')
 install=${pkgname}.install
-source=("http://downloads.sourceforge.net/sourceforge/khmer/All_KhmerOS_${pkgver}.zip")
-md5sums=('dc1ddeb526ccbc06603da880d1e89e7b')
+source=("http://downloads.sourceforge.net/sourceforge/khmer/All_KhmerOS_${pkgver}.zip"
+        40-khmer-os.conf
+        90-tt-khmer-os.conf)
+md5sums=('dc1ddeb526ccbc06603da880d1e89e7b'
+         '08b543512b735388faa0f7b88c8ed11c'
+         'a27e1a042575d70c0d70b46ecf27484d')
 
 package() {
   cd "${srcdir}"/All_KhmerOS_"${pkgver}"
+
   install -dm755 "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 ../40-khmer-os.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/40-khmer-os.conf
+  install -m644 ../90-tt-khmer-os.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-khmer-os.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/40-khmer-os.conf .
+  ln -s ../conf.avail/90-tt-khmer-os.conf .
 }

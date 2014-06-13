@@ -3,7 +3,7 @@
 pkgname=ttf-umeplus-ibx
 _src_name=umeplus-fonts
 pkgver=20140427
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="UmePlus fonts are modified Ume and M+ fonts for Japanese."
 url="http://www.geocities.jp/ep3797/modified_fonts_01.html"
@@ -12,8 +12,12 @@ groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-umeplus')
 license=('Custom:Freeware')
 install=$pkgname.install
-source=(http://downloads.sourceforge.net/project/mdk-ut/30-source/source/${_src_name}-${pkgver}.tar.lzma)
-sha1sums=('4b03557093258f0965bbf2eafd7deb5c49239b5e')
+source=(http://downloads.sourceforge.net/project/mdk-ut/30-source/source/${_src_name}-${pkgver}.tar.lzma
+        40-umeplus.conf
+        90-tt-umeplus.conf)
+sha1sums=('4b03557093258f0965bbf2eafd7deb5c49239b5e'
+          '0114cbd18c3d3e748f9a0fc224fe96479b72660e'
+          '72a8075bd2aee68a65366bd39f0c87306814ebdc')
 
 package(){
   cd "${srcdir}"/"${_src_name}-${pkgver}"
@@ -26,4 +30,15 @@ package(){
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 ../40-umeplus.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/40-umeplus.conf
+  install -m644 ../90-tt-umeplus.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-umeplus.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/40-umeplus.conf .
+  ln -s ../conf.avail/90-tt-umeplus.conf .
 }

@@ -2,7 +2,7 @@
 
 pkgname=ttf-aboriginal-serif-ibx
 pkgver=9.606
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="Aboriginal Serif typeface by Christopher Harvey for Syllabics, Cherokee, and Latin script."
 url="http://www.languagegeek.com/"
@@ -13,9 +13,11 @@ replaces=('ttf-aboriginal-serif')
 license=('PD')
 install=$pkgname.install
 source=(http://www.languagegeek.com/font/AboriginalSerif.zip
+        45-aboriginal-serif.conf
         90-tt-aboriginal-serif.conf)
 sha1sums=('dc1f9ab1b897d65c5f84228adcf38e03b07fafbf'
-          'f1856880b3f9da7f118fd64767472f620d70c2cd')
+          '2a1874a60e1245be153991c33d5052fe68f9bc1e'
+          'f8246ce822987a51fc366e73c8c5443f61a8a715')
 
 package(){
   cd "${srcdir}"
@@ -25,10 +27,13 @@ package(){
 
   install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m644 45-aboriginal-serif.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-aboriginal-serif.conf
   install -m644 90-tt-aboriginal-serif.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-aboriginal-serif.conf
 
   pushd "${pkgdir}"/etc/fonts/conf.d >/dev/null
+  ln -s ../conf.avail/45-aboriginal-serif.conf .
   ln -s ../conf.avail/90-tt-aboriginal-serif.conf .
   popd >/dev/null
 }

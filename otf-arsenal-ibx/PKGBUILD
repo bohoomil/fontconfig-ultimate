@@ -2,7 +2,7 @@
 
 pkgname=otf-arsenal-ibx
 pkgver=1.00
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Arsenal is a semi-grotesque typeface with extensive language support."
 url="http://www.ukrainian-type.com/fontarsenal/"
@@ -10,12 +10,27 @@ arch=('any')
 groups=('infinality-bundle-fonts-extra')
 license=('OFL-1.1')
 install=$pkgname.install
-source=(http://www.ukrainian-type.com/arsenal_font.zip)
-sha1sums=('0c700b49ef55c697609a3677329244474472c13f')
+source=(http://www.ukrainian-type.com/arsenal_font.zip
+        45-arsenal.conf
+        90-non-tt-arsenal.conf)
+sha1sums=('0c700b49ef55c697609a3677329244474472c13f'
+          '61f75e77463d3e6e196896da3a4dab60739a57f0'
+          '2c5bf1231cb47c4eeaa2ca565fafe78227a98d5b')
 
 package(){
   cd "${srcdir}"/arsenal_font
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 ../45-arsenal.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-arsenal.conf
+  install -m644 ../90-non-tt-arsenal.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-arsenal.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-arsenal.conf .
+  ln -s ../conf.avail/90-non-tt-arsenal.conf .
 }

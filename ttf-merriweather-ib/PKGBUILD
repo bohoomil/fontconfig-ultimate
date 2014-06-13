@@ -2,7 +2,7 @@
 
 pkgname=ttf-merriweather-ib
 pkgver=1.003
-pkgrel=5
+pkgrel=6
 depends=('fontconfig')
 pkgdesc="Merriweather Serif font family by Eben Sorkin."
 url="http://sorkintype.com"
@@ -12,24 +12,32 @@ groups=('infinality-bundle-fonts')
 arch=('any')
 license=('OFL-1.1')
 install=$pkgname.install
-source=(https://googlefontdirectory.googlecode.com/hg/ofl/merriweather/Merriweather-{Black,Bold,BoldItalic,HeavyItalic,Italic,Light,LightItalic,Regular}.ttf
-        https://googlefontdirectory.googlecode.com/hg/ofl/merriweather/OFL.txt)
+#http://www.fontspace.com/
+#http://www.google.com/fonts/
+source=(merriweather_ib.tar.xz
+        45-merriweather.conf
+        90-tt-merriweather.conf)
+sha1sums=('f6a05c1fbbbdba5ddb781b3f5a39c0d51e838389'
+          '336f79b1fa27cabbd05223e034afac03dee59876'
+          'fa311917b40d8b399e4ae76e8ef2a02af9bcd91d')
 
 package(){
-  cd "${srcdir}"
+  cd "${srcdir}"/merriweather_ib
 
   install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
   install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 ../45-merriweather.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-merriweather.conf
+  install -m644 ../90-tt-merriweather.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-merriweather.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-merriweather.conf .
+  ln -s ../conf.avail/90-tt-merriweather.conf .
 }
-sha1sums=('92a57aba516c68ed181d27997e9aba376151a7cc'
-          '0bb5c7fcc3f30ecbe02ac3efc8772881066ec344'
-          '4b1a0e5b5a94517d3164976e58c869740ae6cacf'
-          '782b6026c8fab7303ec5a9a35be8f9258250a510'
-          'a83fdf6a28fa98c18555ab19dc558af5cceeda6c'
-          'e3155c4613b4d7af5f39283be5ff8023c858fd9b'
-          '67026d43d5f6fd0b6bad407dabffa8eec44bf02a'
-          'c3e1012c068735613ee6a8894344cacba39cc2d6'
-          '7b4f6d175af92e1f112f227bead331981d2e70e5')

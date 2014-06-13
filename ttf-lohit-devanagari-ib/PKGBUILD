@@ -3,7 +3,7 @@
 pkgname=ttf-lohit-devanagari-ib
 _src_pkg=lohit-devanagari-ttf
 pkgver=2.94.0
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="Lohit Devanagari font."
 url="https://fedorahosted.org/lohit/"
@@ -13,9 +13,13 @@ groups=('infinality-bundle-fonts')
 license=('OFL-1.1')
 install=$pkgname.install
 source=("https://fedorahosted.org/releases/l/o/lohit/${_src_pkg}-${pkgver}.tar.gz"
-        '66-lohit-devanagari.conf')
+        40-lohit-devanagari.conf
+        66-lohit-devanagari.conf
+        90-tt-lohit-devanagari.conf)
 sha1sums=('4804f810215d60ec5334b7192ee965f39bfdac38'
-          '989fad2a40345f1f8e53ebc076eb4b683a884ba1')
+          'ec03746a621de6456c0a412f392f762a3bea92e1'
+          '2682411eefea9016663af2028196c22f89a18513'
+          '3bd004a6eefef9eae20dbf2d2cb2d65e816ead30')
 
 package(){
   cd "${srcdir}"/"${_src_pkg}-${pkgver}"
@@ -26,11 +30,17 @@ package(){
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -dm755 "${pkgdir}"/etc/fonts/conf.avail
-  install -dm755 "${pkgdir}"/etc/fonts/conf.d
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 ../40-lohit-devanagari.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/40-lohit-devanagari.conf
   install -m644 ../66-lohit-devanagari.conf \
     "${pkgdir}"/etc/fonts/conf.avail/66-lohit-devanagari.conf
+  install -m644 ../90-tt-lohit-devanagari.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-lohit-devanagari.conf
 
   cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/40-lohit-devanagari.conf .
   ln -s ../conf.avail/66-lohit-devanagari.conf .
+  ln -s ../conf.avail/90-tt-lohit-devanagari.conf .
 }

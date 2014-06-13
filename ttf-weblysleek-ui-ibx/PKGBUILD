@@ -2,7 +2,7 @@
 
 pkgname=ttf-weblysleek-ui-ibx
 pkgver=0.10
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="WeblySleek UI was created by Mat Douglas for UI Webdesign layouts."
 url="http://www.dafont.com/mat-douglas.d4101"
@@ -10,12 +10,27 @@ arch=('any')
 groups=('infinality-bundle-fonts-extra')
 license=('GPL' 'PD' 'OFL-1.1')
 install=$pkgname.install
-source=(weblysleek-ui.zip)
-sha1sums=('01732074b4067d3dd2931039efca15b82af90860')
+source=(weblysleek-ui.zip
+        45-weblysleek-ui.conf
+        90-tt-weblysleek-ui.conf)
+sha1sums=('01732074b4067d3dd2931039efca15b82af90860'
+          '9bf5bbb49427f68df5098f3dd49f56cbe0f3741b'
+          'dd4098ec70033cb4b5e876cafca3b40b561dd78b')
 
 package(){
   cd "${srcdir}"
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-weblysleek-ui.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-weblysleek-ui.conf
+  install -m644 90-tt-weblysleek-ui.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-weblysleek-ui.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-weblysleek-ui.conf .
+  ln -s ../conf.avail/90-tt-weblysleek-ui.conf .
 }

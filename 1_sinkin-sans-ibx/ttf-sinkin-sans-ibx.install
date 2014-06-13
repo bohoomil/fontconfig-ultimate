@@ -1,5 +1,5 @@
 post_install() {
-  fc-cache -s /usr/share/fonts/ttf-sinkin-sans-ibx > /dev/null
+  fc-cache -f /usr/share/fonts/ttf-sinkin-sans-ibx > /dev/null
   echo "Done."
 }
 

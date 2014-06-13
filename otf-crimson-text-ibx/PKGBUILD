@@ -1,0 +1,66 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=crimson-text-ibx
+pkgname=('otf-crimson-text-ibx' 'ttf-crimson-text-ibx')
+_gitname=Crimson
+pkgver=0.8
+pkgrel=5
+depends=('fontconfig')
+pkgdesc="Crimson Text is an open source serif font family in the tradition of beautiful oldstyle typefaces."
+url="http://aldusleaf.org/"
+arch=('any')
+groups=('infinality-bundle-fonts-extra')
+license=('Custom')
+source=(git+https://github.com/skosch/Crimson.git
+        45-crimson-text.conf
+        90-non-tt-crimson-text.conf
+        90-tt-crimson-text.conf)
+md5sums=('SKIP'
+         '5e549238466293c0800ac4fbf8a2d4d7'
+         'e7a59e4bea1ce1db7941f10a79a0f0f0'
+         '25ce399912728d3c0e34a77b91531463')
+
+package_otf-crimson-text-ibx(){
+  pkgdesc="Crimson Text is an open source serif font family in the tradition of beautiful oldstyle typefaces. OpenType version."
+  conflicts=('otf-crimson-text' 'ttf-crimson-text-ibx')
+  replaces=('otf-crimson-text')
+  install=$pkgname.install
+
+	cd "${srcdir}"/"Crimson/Desktop Fonts"
+
+	install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -Dm644 OTF/*.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 ../../45-crimson-text.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-crimson-text.conf
+  install -m644 ../../90-non-tt-crimson-text.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-crimson-text.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-crimson-text.conf .
+  ln -s ../conf.avail/90-non-tt-crimson-text.conf .
+}
+
+package_ttf-crimson-text-ibx(){
+  pkgdesc="Crimson Text is an open source serif font family in the tradition of beautiful oldstyle typefaces. TrueType version."
+  conflicts=('otf-crimson-text' 'otf-crimson-text-ibx')
+  install=$pkgname.install
+
+  cd "${srcdir}"/"Crimson/Desktop Fonts"
+
+	install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -Dm644 TTF/*.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 ../../45-crimson-text.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-crimson-text.conf
+  install -m644 ../../90-tt-crimson-text.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-crimson-text.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-crimson-text.conf .
+  ln -s ../conf.avail/90-tt-crimson-text.conf .
+}

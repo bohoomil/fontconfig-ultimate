@@ -1,0 +1,90 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=signika-family-ib
+pkgname=('otf-signika-family-ib' 'ttf-signika-family-ibx')
+pkgver=1.0001
+pkgrel=4
+depends=('fontconfig')
+pkgdesc="Signika is a sans-serif with a gentle character, developed for wayfinding, signage, and other media where clarity of information is required."
+url="http://fontfabric.com/signika-font/"
+arch=('any')
+license=('OFL-1.1')
+source=(http://googlefontdirectory.googlecode.com/hg/ofl/signika/src/Signika-{Regular,Bold,Light,Semibold}.otf
+        http://googlefontdirectory.googlecode.com/hg/ofl/signikanegative/src/SignikaNegative-{Regular,Bold,Light,Semibold}.otf
+        http://googlefontdirectory.googlecode.com/hg/ofl/signika/Signika-{Regular,Bold,Light,Semibold}.ttf
+        http://googlefontdirectory.googlecode.com/hg/ofl/signikanegative/SignikaNegative-{Regular,Bold,Light,Semibold}.ttf
+        http://googlefontdirectory.googlecode.com/hg/ofl/signika/OFL.txt
+        45-signika.conf
+        90-non-tt-signika.conf
+        90-tt-signika.conf)
+sha1sums=('156f3b074e578e87133c2d754dc52fb5edfe6965'
+          'e620380027d4d0ca6b504d93e72a22f95a3fb84f'
+          '4f4828fa24a63296ff37e3e50aa51b015d47bdea'
+          '7642c2efc02890b67e822b5dd313098c16aa1ea4'
+          '0d4ae4064e70c01c2325cb2603a5bb89741da9f6'
+          'c4674d0e79cee5885cce01ec6575a959ddf96be4'
+          '33a50a8bbefab77627325e984280b659c86c55b2'
+          '1b93936c21557678f4eb959fea30367a5d3c906d'
+          'e4fe3ff787b5a3264308ce9f7d6b2f79d665348e'
+          '044a6904cf1a527bb598615bde3cadb46ce9c65f'
+          '3e52815406b49e5d2c432979fa415e6c32c7d3e7'
+          '87c9de7403daca5b19f1c739008e8a4588b61e6f'
+          '9d5082702f12410b1b9c886f6695a7cacb4c5af0'
+          '14935bbf486ae146a5a8d86748fbaca2b3a731f5'
+          'd2ca9a627076346e717c8a71c28930d03e77e185'
+          '0bb2da51eb4d82471080d9c8d3540e9eff946bf1'
+          '62f9cce0b7e68a956086a037278e93acaf84c703'
+          '9cb4a27053a347bd10e117874ca126e4901e469e'
+          'c49e94e096f477832ec451166a84958c5b061b32'
+          '7bfd2dd96b1b23984b468bbf2d11f8a5844171b0')
+
+package_otf-signika-family-ib(){
+  pkgdesc="Signika is a sans-serif with a gentle character, developed for wayfinding, signage, and other media where clarity of information is required. OpenType version."
+  conflicts=('ttf-google-webfonts-git' 'ttf-signika-family-ibx')
+  groups=('infinality-bundle-fonts')
+  install=$pkgname.install
+  cd "${srcdir}"
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-signika.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-signika.conf
+  install -m644 90-non-tt-signika.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-signika.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-signika.conf .
+  ln -s ../conf.avail/90-non-tt-signika.conf .
+}
+
+package_ttf-signika-family-ibx(){
+  pkgdesc="Signika is a sans-serif with a gentle character, developed for wayfinding, signage, and other media where clarity of information is required. TrueType version."
+  conflicts=('ttf-google-webfonts-git' 'otf-signika-family-ib')
+  groups=('infinality-bundle-fonts-extra')
+  install=$pkgname.install
+  cd "${srcdir}"
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-signika.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-signika.conf
+  install -m644 90-tt-signika.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-signika.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-signika.conf .
+  ln -s ../conf.avail/90-tt-signika.conf .
+}
+

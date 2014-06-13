@@ -2,7 +2,7 @@
 
 pkgname=otf-exo2-ibx
 pkgver=2.0
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="Exo is a geometric sans serif font with a technological feel."
 url="http://ndiscovered.com"
@@ -13,9 +13,11 @@ replaces=('otf-exo')
 license=('OFL-1.1')
 install=$pkgname.install
 source=(http://www.ndiscovered.com/downloads/exo2/EXO_2_OTF.zip
+        45-exo2.conf
         90-non-tt-exo2.conf)
 sha1sums=('1b27bdb6db0062a679193724bdde89a39e0bf025'
-          '7115d0f9c4da0cfefaaaebddec49d083ca86b8d8')
+          '6e2b7cc9db2e6e17e8d55587002a13f052ff067e'
+          'bea80b16d4ecb2db0ae230d5b2c724bc9adb3980')
 
 package(){
   cd "${srcdir}"/
@@ -26,9 +28,12 @@ package(){
 
   install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
   install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-exo2.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-exo2.conf
   install -m644 90-non-tt-exo2.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-exo2.conf
 
   cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-exo2.conf .
   ln -s ../conf.avail/90-non-tt-exo2.conf .
 }

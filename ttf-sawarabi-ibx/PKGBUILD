@@ -2,7 +2,7 @@
 
 pkgname=ttf-sawarabi-ibx
 pkgver=0.0045
-pkgrel=4
+pkgrel=5
 depends=('fontconfig')
 pkgdesc="Sawarabi font family for Japanese script."
 url="http://sawarabi-fonts.sourceforge.jp/en/"
@@ -12,9 +12,13 @@ conflicts=('ttf-sawarabi-gothic' 'ttf-sawarabi-mincho')
 license=('Custom')
 install=$pkgname.install
 source=(http://dl.sourceforge.jp/sawarabi-fonts/59501/sawarabi-gothic-20130915.tar.gz
-        http://dl.sourceforge.jp/sawarabi-fonts/59500/sawarabi-mincho-20130915.tar.gz)
+        http://dl.sourceforge.jp/sawarabi-fonts/59500/sawarabi-mincho-20130915.tar.gz
+        40-sawarabi.conf
+        90-non-tt-sawarabi.conf)
 sha1sums=('596715690bf1dd94a8440cdd55e781cc5bb62b60'
-          '6fc58ef69ecedd587d7dc0548f90528097e1b25b')
+          '6fc58ef69ecedd587d7dc0548f90528097e1b25b'
+          '865aea2ca089068f9d74e9e2d5636657100fe162'
+          '7091fc08a2d828761de47dacd74f589c73f64986')
 
 package(){
   cd "${srcdir}"
@@ -24,5 +28,15 @@ package(){
     "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 sawarabi-mincho/sawarabi-mincho-medium.ttf \
     "${pkgdir}"/usr/share/fonts/"${pkgname}"
-}
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 40-sawarabi.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/40-sawarabi.conf
+  install -m644 90-non-tt-sawarabi.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-sawarabi.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/40-sawarabi.conf .
+  ln -s ../conf.avail/90-non-tt-sawarabi.conf .
+}

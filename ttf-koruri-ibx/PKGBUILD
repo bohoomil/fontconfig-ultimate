@@ -3,7 +3,7 @@
 
 pkgname=ttf-koruri-ibx
 pkgver=20140524
-pkgrel=1
+pkgrel=2
 pkgdesc="Japanese TrueType font obtained by mixing M+ and Open Sans (fixed base family name)."
 arch=('any')
 url="http://sourceforge.jp/projects/koruri"
@@ -19,7 +19,7 @@ source=(http://${_mirror}.dl.sourceforge.jp/koruri/61231/Koruri-${pkgver}.tar.xz
         90-tt-koruri.conf)
 sha1sums=('3ba04ef04d25ed2a75dd3e34de2554d55618bc5b'
           '9fdc5ef0e988112ce19cc2b20b1bbc22ca13c901'
-          'a8cc1e2261a35327c11594eda73f34572e420d64')
+          '77b2c5db3a06982e192c0a41354da4dcf3fdd65d')
 
 package() {
   cd "${srcdir}/Koruri-${pkgver}"

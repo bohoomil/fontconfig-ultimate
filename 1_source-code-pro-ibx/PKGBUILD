@@ -1,0 +1,74 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=source-code-pro-ibx
+pkgname=('otf-source-code-pro-ibx' 'ttf-source-code-pro-ibx')
+pkgver=1.017
+pkgrel=4
+depends=('fontconfig')
+pkgdesc="A set of OpenType fonts designed for user interfaces. TrueType version."
+url="http://www.adobe.com/"
+arch=('any')
+license=('OFL-1.1')
+groups=('infinality-bundle-fonts-extra')
+source=("http://downloads.sourceforge.net/project/sourcecodepro.adobe/SourceCodePro_FontsOnly-${pkgver}.zip"
+        45-source-code-pro.conf
+        90-non-tt-source-code-pro.conf
+        90-tt-source-code-pro.conf)
+sha1sums=('c0e3f6f8e25b434c0e28a817539632f8a5ecb9e5'
+          'd20feb494116f95e4a35ad40f625a94f9a3bbcb2'
+          '287ef2255289182912eb2daa16810bd87d7100b1'
+          '823777372374eff5c5619bd5e99af94570b3a1f0')
+
+package_otf-source-code-pro-ibx(){
+  pkgdesc="A set of OpenType fonts designed for user interfaces. OpenType version."
+  conflicts=('adobe-source-sans-pro-fonts' 'otf-source-sans-pro' 'ttf-source-sans-pro' 't1-source-code-pro-ibx' 'ttf-source-code-pro')
+  install=$pkgname.install
+
+  cd "${srcdir}"/SourceCodePro_FontsOnly-${pkgver}
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 LICENSE.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 OTF/SourceCodePro-{Black,Bold,Light,Medium,Regular,Semibold}.otf \
+    "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  cd "${srcdir}"
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-source-code-pro.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-source-code-pro.conf
+  install -m644 90-non-tt-source-code-pro.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-source-code-pro.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-source-code-pro.conf .
+  ln -s ../conf.avail/90-non-tt-source-code-pro.conf .
+}
+
+package_ttf-source-code-pro-ibx(){
+  pkgdesc="A set of OpenType fonts designed for user interfaces. TrueType version."
+  conflicts=('adobe-source-sans-pro-fonts' 'otf-source-sans-pro' 'ttf-source-sans-pro' 't1-source-code-pro-ibx' 'otf-source-code-pro-ibx')
+  install=$pkgname.install
+
+  cd "${srcdir}"/SourceCodePro_FontsOnly-${pkgver}
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 LICENSE.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 TTF/SourceCodePro-{Black,Bold,Light,Medium,Regular,Semibold}.ttf \
+    "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  cd "${srcdir}"
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-source-code-pro.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-source-code-pro.conf
+  install -m644 90-tt-source-code-pro.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-source-code-pro.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-source-code-pro.conf .
+  ln -s ../conf.avail/90-tt-source-code-pro.conf .
+}

@@ -2,7 +2,7 @@
 
 pkgname=otf-oswald-ib
 pkgver=3.0
-pkgrel=4
+pkgrel=5
 depends=('fontconfig')
 pkgdesc="Oswald is a reworking of the classic Gothic and Grotesque type styles."
 url="http://oswaldfont.com"
@@ -11,8 +11,12 @@ groups=('infinality-bundle-fonts')
 conflicts=('ttf-google-webfonts-git')
 license=('OFL-1.1')
 install=$pkgname.install
-source=(git+https://github.com/vernnobile/OswaldFont.git)
-md5sums=('SKIP')
+source=(git+https://github.com/vernnobile/OswaldFont.git
+        45-oswald.conf
+        90-non-tt-oswald.conf)
+md5sums=('SKIP'
+         '3abe7ce6d6444a06b49735ac94523666'
+         '68374ff2058339aac6235774abc1134f')
 
 package(){
   cd "${srcdir}"/OswaldFont/3.0
@@ -23,5 +27,15 @@ package(){
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 Italic/[3-8]00/src/*.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 Roman/[3-8]00/src/*.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
-}
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 ../../45-oswald.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-oswald.conf
+  install -m644 ../../90-non-tt-oswald.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-oswald.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-oswald.conf .
+  ln -s ../conf.avail/90-non-tt-oswald.conf .
+}

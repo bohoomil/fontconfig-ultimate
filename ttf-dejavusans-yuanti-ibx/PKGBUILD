@@ -3,8 +3,8 @@
 
 pkgbase=ttf-dejavu-yuanti-ibx
 pkgname=('ttf-dejavusans-yuanti-basic-ibx' 'ttf-dejavusans-yuanti-condensed-ibx' 'ttf-dejavusans-yuanti-mono-ibx')
-pkgver=20110101
-pkgrel=3
+pkgver=2.32
+pkgrel=4
 pkgdesc="Chinese Yuan Ti family based on DejaVu Sans fonts."
 arch=(any)
 depends=('fontconfig')
@@ -14,8 +14,20 @@ conflicts=('ttf-dejavusans-yuanti')
 license=(custom:Copyleft)
 groups=('infinality-bundle-fonts-extra')
 noextract=('dejavusansyuanti.7z')
-source=("http://qinsdisk.googlecode.com/files/dejavusansyuanti.7z")
-sha1sums=('2c03a6a38c8b8de93c7abeae512ba4449ab339bb')
+source=("http://qinsdisk.googlecode.com/files/dejavusansyuanti.7z"
+        40-dejavusans-yuanti.conf
+        40-dejavusans-yuanti-condensed.conf
+        40-dejavusans-yuanti-mono.conf
+        90-tt-dejavusans-yuanti.conf
+        90-tt-dejavusans-yuanti-condensed.conf
+        90-tt-dejavusans-yuanti-mono.conf)
+sha1sums=('2c03a6a38c8b8de93c7abeae512ba4449ab339bb'
+          '8db022ae073514764df0a8faf673c523699a567e'
+          '17996353f59975137cacc4d85fb4a2d81177a7e0'
+          '92ef6cc9915a7f2bf30186215a0d7ede49fbd70f'
+          '788a51be89b63fda2eac593e0a7dbe7285de44ac'
+          'aa85567dbafc21818c7e42efb2626e64861c6d56'
+          '2167100b47e4f4c1206ef20496f47ddf166d8ba4')
 
 prepare() {
   7z e "${srcdir}"/dejavusansyuanti.7z
@@ -30,6 +42,17 @@ package_ttf-dejavusans-yuanti-basic-ibx() {
   install -d -m755 "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 DejaVuSansYuanTi-*.ttf \
     "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 40-dejavusans-yuanti.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/40-dejavusans-yuanti.conf
+  install -m644 90-tt-dejavusans-yuanti.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-dejavusans-yuanti.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/40-dejavusans-yuanti.conf .
+  ln -s ../conf.avail/90-tt-dejavusans-yuanti.conf .
 }
 
 package_ttf-dejavusans-yuanti-condensed-ibx() {
@@ -41,6 +64,17 @@ package_ttf-dejavusans-yuanti-condensed-ibx() {
   install -d -m755 "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 DejaVuSansYuanTiCondensed-*.ttf \
     "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 40-dejavusans-yuanti-condensed.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/40-dejavusans-yuanti-condensed.conf
+  install -m644 90-tt-dejavusans-yuanti-condensed.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-dejavusans-yuanti-condensed.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/40-dejavusans-yuanti-condensed.conf .
+  ln -s ../conf.avail/90-tt-dejavusans-yuanti-condensed.conf .
 }
 
 package_ttf-dejavusans-yuanti-mono-ibx() {
@@ -52,5 +86,15 @@ package_ttf-dejavusans-yuanti-mono-ibx() {
   install -d -m755 "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 DejaVuSansYuanTiMono-*.ttf \
     "${pkgdir}"/usr/share/fonts/"${pkgname}"
-}
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 40-dejavusans-yuanti-mono.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/40-dejavusans-yuanti-mono.conf
+  install -m644 90-tt-dejavusans-yuanti-mono.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-dejavusans-yuanti-mono.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/40-dejavusans-yuanti-mono.conf .
+  ln -s ../conf.avail/90-tt-dejavusans-yuanti-mono.conf .
+}

@@ -2,7 +2,7 @@
 
 pkgbase=otf-fira-fonts
 pkgver=3.106
-pkgrel=1
+pkgrel=2
 pkgname=('otf-fira-sans-ibx' 'otf-fira-mono-ibx')
 depends=('fontconfig')
 pkgdesc="Mozilla font family designed for the Firefox OS."
@@ -20,8 +20,8 @@ sha1sums=('385ad600a3f20a3b89b15b82e1dc309f9e8e848b'
           '9f2e2f862f96d5ae5b63476f38f0d5cc0ca7a939'
           '9d4cd8d7ad3de15e9e7aae3f39af32e562d55cf0'
           'e14045305cd77ef599a65e5b7784045f84e021eb'
-          'b8b611f52a520e9146f34c6f0bfa3df2228cc18d'
-          '29e6b63abb1b34b39335519504bb4c6d914024c0')
+          'c3c69f0a9a443c26f5bd67797e636c46d1c15945'
+          'b7398a81894386e6036324ae1784683c223f8618')
 
 package_otf-fira-sans-ibx() {
   pkgdesc="A sans-serif typeface designed for the Firefox OS."

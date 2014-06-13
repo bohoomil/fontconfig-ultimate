@@ -4,7 +4,7 @@
 
 pkgname=ttf-ubuntu-font-family-ib
 pkgver=0.80
-pkgrel=8
+pkgrel=9
 pkgdesc="Ubuntu font family. Part of infinality-bundle-fonts."
 arch=('any')
 url="http://font.ubuntu.com/"
@@ -15,8 +15,12 @@ conflicts=('ttf-ubuntu-font-family')
 provides=('ttf-font' 'ttf-ubuntu-font-family')
 replaces=('ttf-ubuntu-font-family' 'ttf-ubuntu-font-family-ibx')
 install=$pkgname.install
-source=(http://font.ubuntu.com/download/ubuntu-font-family-$pkgver.zip)
-sha1sums=('88276ba9d38d75b33a9640efa15cd80979cb21e2')
+source=(http://font.ubuntu.com/download/ubuntu-font-family-$pkgver.zip
+        45-ubuntu.conf
+        90-tt-ubuntu.conf)
+sha1sums=('88276ba9d38d75b33a9640efa15cd80979cb21e2'
+          '5089359e856cb621d24746f79f64e85e53ce35c8'
+          '84621f30da3c9dbdcdf11a6bbf947188eb703e04')
 
 package() {
   cd "${srcdir}"/ubuntu-font-family-"${pkgver}"
@@ -25,4 +29,15 @@ package() {
   install -m644 UbuntuMono-*.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
   install -D -m644 LICENCE.txt "${pkgdir}/usr/share/licenses/${pkgname}/LICENCE"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 ../45-ubuntu.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-ubuntu.conf
+  install -m644 ../90-tt-ubuntu.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-ubuntu.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-ubuntu.conf .
+  ln -s ../conf.avail/90-tt-ubuntu.conf .
 }

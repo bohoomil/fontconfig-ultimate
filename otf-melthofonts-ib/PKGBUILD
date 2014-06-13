@@ -2,7 +2,7 @@
 
 pkgname=otf-melthofonts-ib
 pkgver=1.21
-pkgrel=4
+pkgrel=5
 depends=('fontconfig')
 pkgdesc="Font for Syriac script (includes Estrangelo Edessa only)."
 url="http://www.bethmardutho.org/index.php/resources/fonts.html"
@@ -11,8 +11,12 @@ groups=('infinality-bundle-fonts')
 conflicts=('ttf-meltho')
 license=('Custom')
 install=$pkgname.install
-source=(http://www.bethmardutho.org/images/fonts/melthofonts-1.21.zip)
-sha1sums=('6cc98545cf346ff151809f638665b42f3cf8adb8')
+source=(http://www.bethmardutho.org/images/fonts/melthofonts-1.21.zip
+        40-melthofonts.conf
+        90-non-tt-melthofonts.conf)
+sha1sums=('6cc98545cf346ff151809f638665b42f3cf8adb8'
+          '4e1585670d723afd7fb72f997d24ada894821c83'
+          'ece152d9db97b63d6bdb049c633fb5dcb5f15bbe')
 
 package(){
   cd "${srcdir}"/melthofonts-"${pkgver}"
@@ -22,4 +26,15 @@ package(){
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 SyrCOMEdessa.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 ../40-melthofonts.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/40-melthofonts.conf
+  install -m644 ../90-non-tt-melthofonts.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-melthofonts.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/40-melthofonts.conf .
+  ln -s ../conf.avail/90-non-tt-melthofonts.conf .
 }

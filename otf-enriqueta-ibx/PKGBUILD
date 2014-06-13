@@ -2,7 +2,7 @@
 
 pkgname=otf-enriqueta-ibx
 pkgver=1.001
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="Enriqueta is a serif typeface with distinctive glyphs, mainly intended for screen."
 url="http://www.fontfuror.com"
@@ -16,7 +16,7 @@ source=(Enriqueta.zip
 install=${pkgname}.install
 sha1sums=('8e2ad4cc29121ea15b979d1999d4dd4e3aa90875'
           '01da730b80efe9472db4697c250d57253011c526'
-          '2e46b1cd8f3e0580b57a06848db297e2dd4b7499')
+          'f7de9ce11b529fc1ce96ede7e453a66dad484a55')
 
 package() {
   cd "${srcdir}"/enriqueta/src

@@ -2,7 +2,7 @@
 
 pkgname=ttf-myanmar3-ibx
 pkgver=1.358
-pkgrel=4
+pkgrel=5
 depends=('fontconfig')
 pkgdesc="Font for Myanmar/Burmese script."
 url="http://myanmar3source.googlecode.com/"
@@ -11,12 +11,27 @@ groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-myanmar3')
 license=('OFL-1.1')
 install=$pkgname.install
-source=("http://myanmar3source.googlecode.com/files/mm3-multi-os%2816-08-2011%29.ttf")
-sha1sums=('fa3faaef571b36731c68f955fb159d42ee3c7f55')
+source=("http://myanmar3source.googlecode.com/files/mm3-multi-os%2816-08-2011%29.ttf"
+        40-myanmar3.conf
+        90-tt-myanmar3.conf)
+sha1sums=('fa3faaef571b36731c68f955fb159d42ee3c7f55'
+          '6308415aa55d1dec515374cf44af1aef2e397b61'
+          '9308c7fe71b2e467c87caeb0110a448434a95fce')
 
 package() {
   cd "${srcdir}"
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 40-myanmar3.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/40-myanmar3.conf
+  install -m644 90-tt-myanmar3.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-myanmar3.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/40-myanmar3.conf .
+  ln -s ../conf.avail/90-tt-myanmar3.conf .
 }

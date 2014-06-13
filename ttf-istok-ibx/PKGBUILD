@@ -2,7 +2,7 @@
 
 pkgname=ttf-istok-ibx
 pkgver=1.0.1
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="Istok is a sans-serif typeface designed by Andrey Panov."
 url="https://code.google.com/p/istok/"
@@ -10,8 +10,12 @@ arch=('any')
 license=('GPL')
 groups=('infinality-bundle-fonts-extra')
 install=$pkgname.install
-source=(https://istok.googlecode.com/files/istok-ttf-${pkgver}.tar.xz)
-sha1sums=('1100899ff2963b9391f2797fce4df1055760e91f')
+source=(https://istok.googlecode.com/files/istok-ttf-${pkgver}.tar.xz
+        45-istok.conf
+        90-tt-istok.conf)
+sha1sums=('1100899ff2963b9391f2797fce4df1055760e91f'
+          'bcb3fa1467a220414a8c4b4cb84857c32353bad6'
+          'b05069565e1a6b85d5ce0456c3968905683c8761')
 
 package() {
   cd "${srcdir}"
@@ -21,4 +25,15 @@ package() {
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-istok.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-istok.conf
+  install -m644 90-tt-istok.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-istok.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-istok.conf .
+  ln -s ../conf.avail/90-tt-istok.conf .
 }

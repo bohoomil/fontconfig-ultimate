@@ -2,21 +2,41 @@
 # Contributor: bohoomil <@zoho.com>
 
 pkgname=otf-vollkorn-ibx
-pkgdesc="Vollkorn typeface by Friedrich Althausen (OpenType)"
+pkgdesc="Vollkorn typeface by Friedrich Althausen. OpenType version."
 url=('http://vollkorn-typeface.com/')
 license=('custom:SIL Open Font License')
-pkgver=3.001
-pkgrel=3
+pkgver=3.005
+pkgrel=1
 depends=('fontconfig')
 groups=('infinality-bundle-fonts-extra')
+conflicts=('otf-vollkorn')
 arch=('any')
 install=$pkgname.install
-source=(http://vollkorn-typeface.com/download/vollkorn-${pkgver//./-}.zip)
-sha1sums=('5e122bd1f10b8a0237bee3b854fc17d273afc2eb')
+source=(http://vollkorn-typeface.com/download/vollkorn-${pkgver//./-}.zip
+        45-vollkorn.conf
+        90-non-tt-vollkorn.conf)
+sha1sums=('d65b1a5f61c9d84ef52e68ff699304351444e794'
+          'df82e0351eeae835feed489dc3394d0250d7b338'
+          '4b15801cb6369a9c2f880c0c5d72b6ed8a96aa96')
 
 package() {
-  install -d "${pkgdir}/usr/share/fonts/${pkgname}"
-  install -m644 "${srcdir}/PS-OTF/"*.otf "${pkgdir}/usr/share/fonts/${pkgname}"
-  install -D -m644 "${srcdir}/OpenFontLicense.txt" "${pkgdir}/usr/share/licenses/${pkgname}/OpenFontLicense.txt"
-  install -D -m644 "${srcdir}/Fontlog.txt" "${pkgdir}/usr/share/doc/${pkgname}/Fontlog.txt"
+  cd "${srcdir}"
+
+  install -D -m644 "OpenFontLicense.txt" \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -D -m644 "Fontlog.txt" \
+    "${pkgdir}"/usr/share/doc/"${pkgname}"
+  install -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 PS-OTF/*.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-vollkorn.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-vollkorn.conf
+  install -m644 90-non-tt-vollkorn.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-vollkorn.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-vollkorn.conf .
+  ln -s ../conf.avail/90-non-tt-vollkorn.conf .
 }

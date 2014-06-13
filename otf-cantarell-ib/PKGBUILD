@@ -4,21 +4,25 @@
 pkgname=otf-cantarell-ib
 _name=cantarell-fonts
 pkgver=0.0.15
-pkgrel=2
+pkgrel=3
 pkgdesc="Cantarell font family."
 arch=('any')
 url="http://abattis.org/cantarell/"
 license=('GPL2')
 depends=('fontconfig')
 conflicts=('t1-cantarell-ib' 'cantarell-fonts')
-replaces=('t1-cantarell-ib' 'cantarell-fonts')
+replaces=('cantarell-fonts')
 provides=('cantarell-fonts')
 install=$pkgname.install
-source=(http://download.gnome.org/sources/$_name/${pkgver::3}/$_name-${pkgver}.tar.xz)
-sha1sums=('bff3325e5f2fedcfab833f8f8e4c80966a0beb7a')
+source=(http://download.gnome.org/sources/$_name/${pkgver::3}/$_name-${pkgver}.tar.xz
+        45-cantarell.conf
+        90-non-tt-cantarell.conf)
+sha1sums=('bff3325e5f2fedcfab833f8f8e4c80966a0beb7a'
+          'c2fc52ab73d8b543bdf0d5b178e9e1b0fbdf3503'
+          '273a7f5c56d16f88b1c907c8614a67013cda622f')
 
 build() {
-  cd $_name-$pkgver
+  cd "$_name-$pkgver"
   ./configure --prefix=/usr \
     --with-fontdir=/usr/share/fonts/$pkgname \
     --with-configdir=/etc/fonts/conf.avail
@@ -26,7 +30,19 @@ build() {
 }
 
 package() {
-  cd $_name-$pkgver
-  make DESTDIR="${pkgdir}" install
-}
+  cd "$_name-$pkgver"
 
+  make DESTDIR="${pkgdir}" install
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 ../45-cantarell.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-cantarell.conf
+  install -m644 ../90-non-tt-cantarell.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-cantarell.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/31-cantarell.conf .
+  ln -s ../conf.avail/45-cantarell.conf .
+  ln -s ../conf.avail/90-non-tt-cantarell.conf .
+}

@@ -3,17 +3,21 @@
 pkgname=ttf-charis-sil-ibx
 _src_name=CharisSIL
 pkgver=4.114
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="Charis SIL is a serif typeface providing a comprehensive inventory of glyphs for almost any Roman- or Cyrilic-based writing system."
-url="http://opensans.com/"
+url="http://www.sil.org/"
 arch=('any')
 license=('OFL-1.1')
 conflicts=('ttf-charis')
 groups=('infinality-bundle-fonts-extra')
 install=$pkgname.install
-source=(http://ftp.freebsd.org/pub/FreeBSD/ports/local-distfiles/bf/${_src_name}-${pkgver}.zip)
-sha1sums=('d0fbd177612ff843645af8b9755118251b89598b')
+source=("${_src_name}-${pkgver}.zip"
+        45-charis-sil.conf
+        90-tt-charis-sil.conf)
+sha1sums=('d0fbd177612ff843645af8b9755118251b89598b'
+          '415235a6b837bb94f0aeec3ec21b040782020076'
+          'dc3ba28b19a6cd9bc4010dab21d71ea99c0a60c7')
 
 package(){
   cd "${srcdir}/${_src_name}-${pkgver}"
@@ -27,5 +31,15 @@ package(){
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
-}
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 ../45-charis-sil.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-charis-sil.conf
+  install -m644 ../90-tt-charis-sil.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-charis-sil.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-charis-sil.conf .
+  ln -s ../conf.avail/90-tt-charis-sil.conf .
+}

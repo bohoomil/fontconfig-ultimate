@@ -3,7 +3,7 @@
 pkgname=sinkin-sans-ibx
 pkgname=('otf-sinkin-sans-ibx' 'ttf-sinkin-sans-ibx')
 pkgver=1.1
-pkgrel=1
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Sinkin Sans is a simple, pleasant, luxuriously proportioned and easy to read sans-serif."
 url="http://www.k-type.com/"
@@ -11,11 +11,13 @@ arch=('any')
 groups=('infinality-bundle-fonts-extra')
 license=('Apache')
 source=(http://www.k-type.com/freefonts/SINKIN_SANS_FAMILY.zip
+        45-sinkin-sans.conf
         90-non-tt-sinkin-sans.conf
         90-tt-sinkin-sans.conf)
 sha1sums=('e95495df31674a2bcb7622dd7a7050f0e8a94aed'
-          '15563aba47b75eeafcb0d70a4fa1601939313ce6'
-          '88a76572e8d2f1c4b13b6c0ff8a473025b82ce4e')
+          '974fa6222711f8788db6a8511239fb6ce2cb6caf'
+          'fc8ccb8b451b1d0fa9e8bb28abaf68c63270aac4'
+          'eadcb74136b13a2c68f53a93fed2801747d5e339')
 
 package_otf-sinkin-sans-ibx(){
   pkgdesc="Sinkin Sans is a simple, pleasant, luxuriously proportioned and easy to read sans-serif. OTF version."
@@ -34,10 +36,13 @@ package_otf-sinkin-sans-ibx(){
 
   install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
   install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 "${srcdir}"/45-sinkin-sans.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-sinkin-sans.conf
   install -m644 "${srcdir}"/90-non-tt-sinkin-sans.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-sinkin-sans.conf
 
   cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-sinkin-sans.conf .
   ln -s ../conf.avail/90-non-tt-sinkin-sans.conf .
 }
 
@@ -58,9 +63,12 @@ package_ttf-sinkin-sans-ibx(){
 
   install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
   install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 "${srcdir}"/45-sinkin-sans.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-sinkin-sans.conf
   install -m644 "${srcdir}"/90-tt-sinkin-sans.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-sinkin-sans.conf
 
   cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-sinkin-sans.conf .
   ln -s ../conf.avail/90-tt-sinkin-sans.conf .
 }

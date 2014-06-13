@@ -2,7 +2,7 @@
 
 pkgname=ttf-symbola-ib
 pkgver=7.12
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Symbola is a free symbol-type font."
 url="http://users.teilar.gr/~g1951d/"
@@ -10,12 +10,27 @@ arch=('any')
 groups=('infinality-bundle-fonts')
 license=('Custom')
 install=$pkgname.install
-source=(http://users.teilar.gr/~g1951d/Symbola.ttf)
-sha1sums=('4f1a440c4f4119aaf845329f9058a6f7d79931f5')
+source=(http://users.teilar.gr/~g1951d/Symbola.ttf
+        45-symbola.conf
+        90-tt-symbola.conf)
+sha1sums=('4f1a440c4f4119aaf845329f9058a6f7d79931f5'
+          'bece6c5f6f1c869264d2d7d8aaf53b27970b09f7'
+          '8e4188a1fdf980afc7b9dc8c030ac78d724b8034')
 
 package(){
   cd "${srcdir}"
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 Symbola.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-symbola.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-symbola.conf
+  install -m644 90-tt-symbola.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-symbola.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-symbola.conf .
+  ln -s ../conf.avail/90-tt-symbola.conf .
 }

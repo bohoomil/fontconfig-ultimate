@@ -2,7 +2,7 @@
 
 pkgname=ttf-croscore-fonts-ibx
 pkgver=1.23
-pkgrel=6
+pkgrel=7
 depends=('fontconfig')
 pkgdesc="Google Chrome OS core fonts."
 url="http://code.google.com/p/chromium-os/issues/detail?id=5287"
@@ -15,17 +15,9 @@ install=$pkgname.install
 source=(http://googlefontdirectory.googlecode.com/hg/apache/arimo/Arimo-{Bold,BoldItalic,Italic,Regular}.ttf
         http://googlefontdirectory.googlecode.com/hg/apache/cousine/Cousine-{Bold,BoldItalic,Italic,Regular}.ttf
         http://googlefontdirectory.googlecode.com/hg/apache/tinos/Tinos-{Bold,BoldItalic,Italic,Regular}.ttf
-        http://googlefontdirectory.googlecode.com/hg/apache/tinos/LICENSE.txt)
-
-package(){
-  cd "${srcdir}"
-
-  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 LICENSE.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
-
-  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
-  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
-}
+        http://googlefontdirectory.googlecode.com/hg/apache/tinos/LICENSE.txt
+        45-croscore-fonts.conf
+        90-tt-croscore-fonts.conf)
 sha1sums=('301e3a72da338e2e90515ca17fba21dacb6dc9a6'
           'b5fb77ecf84eb7fe4bacd85dfe8c106955f04a35'
           'd0146d0cb341e23b42b5e7b42b99a2952272e978'
@@ -38,5 +30,27 @@ sha1sums=('301e3a72da338e2e90515ca17fba21dacb6dc9a6'
           '52e64469dbddbb8eb52b1323de0ffe2d5738e395'
           '574aac8a30909abb28686470ba41737e318af003'
           '9cb8c892e66a52d0950265296f7e468da4f65414'
-          '2b8b815229aa8a61e483fb4ba0588b8b6c491890')
+          '2b8b815229aa8a61e483fb4ba0588b8b6c491890'
+          '23410520226bc33f24a7b0ce315fd3f42aa13bee'
+          'be36dc3573b0e2de5a3e451c2e32eedca876b67a')
 
+package(){
+  cd "${srcdir}"
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 LICENSE.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-croscore-fonts.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-croscore-fonts.conf
+  install -m644 90-tt-croscore-fonts.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-croscore-fonts.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-croscore-fonts.conf .
+  ln -s ../conf.avail/90-tt-croscore-fonts.conf .
+}

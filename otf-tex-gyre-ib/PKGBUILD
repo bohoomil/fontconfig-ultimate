@@ -2,7 +2,7 @@
 
 pkgname=otf-tex-gyre-ib
 pkgver=2.005
-pkgrel=4
+pkgrel=5
 depends=('fontconfig')
 pkgdesc="The TeX Gyre (TG) Collection of Fonts."
 groups=('infinality-bundle-fonts')
@@ -13,9 +13,13 @@ conflicts=('otf-texgyre' 'tex-gyre-fonts' 't1-tex-gyre-ib')
 replaces=('t1-tex-gyre-ib')
 install=$pkgname.install
 source=("http://www.gust.org.pl/projects/e-foundry/tex-gyre/whole/tg-${pkgver}otf.zip"
-        GFL.txt)
+        GFL.txt
+        45-tex-gyre.conf
+        90-non-tt-tex-gyre.conf)
 sha1sums=('beba3be8c9ed56327dafd80455baaa51aa0b1406'
-          '7e9b02d3f480aeeebe30e9a88a671beff2ffde7b')
+          '7e9b02d3f480aeeebe30e9a88a671beff2ffde7b'
+          '9938b2724132a0c2c1255e2a759b7751f718e4ba'
+          'f3836f50c845a86e31d140c095ccc39b74f979ee')
 
 package(){
   cd "${srcdir}"
@@ -25,5 +29,15 @@ package(){
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
-}
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-tex-gyre.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-tex-gyre.conf
+  install -m644 90-non-tt-tex-gyre.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-tex-gyre.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-tex-gyre.conf .
+  ln -s ../conf.avail/90-non-tt-tex-gyre.conf .
+}

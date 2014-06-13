@@ -3,7 +3,7 @@
 pkgname=ttf-lohit-gurmukhi-ib
 _src_pkg=lohit-gurmukhi-ttf
 pkgver=2.91.0
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="Lohit Gurmukhi font."
 url="https://fedorahosted.org/lohit/"
@@ -13,9 +13,13 @@ groups=('infinality-bundle-fonts')
 license=('OFL-1.1')
 install=$pkgname.install
 source=("https://fedorahosted.org/releases/l/o/lohit/${_src_pkg}-${pkgver}.tar.gz"
-        '66-lohit-gurmukhi.conf')
+        40-lohit-gurmukhi.conf
+        66-lohit-gurmukhi.conf
+        90-tt-lohit-gurmukhi.conf)
 sha1sums=('7e1fdcde744d779dfa792cfcd880c608a5d1f026'
-          'c11d3759dfdaece4fab10d3ec71ffb015c880273')
+          '987978152b954a4b5892089e7f53886fae21353d'
+          'b30ae976b91f081de5363ccb321c75bac863fef4'
+          '72f6a1e2cc68b61e11174d366fe7d762c554cd4c')
 
 package(){
   cd "${srcdir}"/"${_src_pkg}-${pkgver}"
@@ -26,11 +30,17 @@ package(){
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -dm755 "${pkgdir}"/etc/fonts/conf.avail
-  install -dm755 "${pkgdir}"/etc/fonts/conf.d
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 ../40-lohit-gurmukhi.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/40-lohit-gurmukhi.conf
   install -m644 ../66-lohit-gurmukhi.conf \
     "${pkgdir}"/etc/fonts/conf.avail/66-lohit-gurmukhi.conf
+  install -m644 ../90-tt-lohit-gurmukhi.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-lohit-gurmukhi.conf
 
   cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/40-lohit-gurmukhi.conf .
   ln -s ../conf.avail/66-lohit-gurmukhi.conf .
+  ln -s ../conf.avail/90-tt-lohit-gurmukhi.conf .
 }

@@ -2,42 +2,44 @@
 
 pkgname=ttf-opensans-ib
 pkgver=1.2
-pkgrel=9
+pkgrel=11
 depends=('fontconfig')
 pkgdesc="Open Sans is a humanist sans serif typeface designed by Steve Matteson, Type Director of Ascender Corp."
 url="http://opensans.com/"
 arch=('any')
-license=('OFL-1.1')
+license=('Apache')
 conflicts=('t1-opensans-ib' 'ttf-opensans')
+provides=('ttf-opensans')
 groups=('infinality-bundle-fonts')
 install=$pkgname.install
-source=("http://mirrors.ctan.org/fonts/opensans.zip"
-        https://googlefontdirectory.googlecode.com/hg/apache/opensanscondensed/OpenSans-CondBold.ttf
+source=(open-sans.zip
+        open-sans-condensed.zip
+        45-opensans.conf
         90-tt-opensans.conf)
-sha1sums=('79c265672b434a7a3a4ab2c2a4909d2cf7019090'
-          'd83d1764f2bd9b8eb80c446272dbe3842782887c'
-          '4051822d645ac1be70da1e71b9da466267c5494d')
+sha1sums=('b708b3e056d5d612c47c2d163aa274cd2fd23c33'
+          '281be1d16cbf8890079c5cee3a1ac6e5046dae79'
+          'e2cccbc4c5d9552430fe158351de374e2aa3b889'
+          '49da585a56fec80fa7a1b38edbb2a4d90a01c7cc')
 
 package(){
-  cd "${srcdir}"/opensans
+  cd "${srcdir}"
 
-  install -m755 -d "${pkgdir}"/usr/share/doc/"${pkgname}"
-  install -m644 doc/fonts/opensans/README "${pkgdir}"/usr/share/doc/"${pkgname}"
-  install -m644 doc/fonts/opensans/CHANGES "${pkgdir}"/usr/share/doc/"${pkgname}"
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 'Apache License.txt' \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
-  install -m644 fonts/truetype/public/opensans/*.ttf \
-    "${pkgdir}"/usr/share/fonts/"${pkgname}"
-  cd "${srcdir}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  cd "${srcdir}"
   install -dm755 "${pkgdir}"/etc/fonts/conf.avail
   install -dm755 "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-opensans.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-opensans.conf
   install -m644 90-tt-opensans.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-opensans.conf
 
   cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-opensans.conf .
   ln -s ../conf.avail/90-tt-opensans.conf .
 }
 
