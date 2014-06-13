@@ -6,6 +6,111 @@ CHANGELOG
 ---------
 
 
+2014-06-12
+~~~~~~~~~~
+
+### infinality-bundle-fonts
+
+About 150 font packages were updated. Rendering settings were revised, simplified where possible and standardized. Redundant and duplicated settings were removed on a per-family basis.
+
+The following packages were added to the repository:
+
+* Heuristica (`ttf-heuristica-ibx`)
+* Paratype (`ttf-paratype-ibx`)
+* Raleway (`otf-raleway-ibx`)
+* Signika & Signika Negative (`ttf-signika-ibx`)
+* Source Code Pro (`otf-source-code-pro-ibx`)
+* Source Sans Pro (`otf-source-sans-pro-ibx`)
+* Source Serif Pro (`otf-source-serif-pro-ibx`)
+* Luxi family (`ttf-bh-ib`)
+
+The following packages were upgraded:
+
+* `otf-heuristica-ib`, v.1.0.2
+* `ttf-liberastika-ib`, v1.1.4
+* `otf-vollkorn-ibx`, v3.005
+
+The following packages were removed:
+
+* `t1-adobe-utopia-ib` (replaced by `otf-heuristica-ib`)
+* `t1-ibm-courier-ibx` (replaced by `ttf-courier-prime-ib`)
+
+**Updates requiring user intervention:**
+
+* The Chinese branch of DejaVu family, DejaVu Sans YuanTi, needs to be downgraded due to the change in version numbering. The following packages are affected:
+
+    * `ttf-dejavusans-yuanti-basic`
+    * `ttf-dejavusans-yuanti-condensed`
+    * `ttf-dejavusans-yuanti-mono`
+
+* `ttf-pfeffer-mediaeval-ibx` was correctly renamed to `otf-pfeffer-mediaeval-ibx`. In order to upgrade, remove the `ttf` package and install the new one then.
+
+### fontconfig-infinality-ultimate, rev. 2.11.1-15
+
+Rendering instructions for all packaged font families were split to individual packages. The benefits of such a solution are the following:
+
+* Simpler maintenance: leaving only global settings to `fontconfig-iu` and most per-family instructions to individual font packages allows for easier debugging and code updates to both.
+* Reduced size and easier accessibility of generic `fontconfig-iu` config files.
+* Greater font configuration flexibility and lesser probability of interference between settings crafted for `infinality-bundle-fonts` families and fonts installed from third-party sources, i.e. relevant rendering instructions are added when a font package is installed and removed when the font is no longer present in the system.
+
+Users who do not use `infinality-bundle-fonts` and install fonts either from official Arch Linux repositories, the AUR or random sources can still take advantage of per-family rendering instructions included in the packages. In order to add support to preconfigured fonts, they will need to create symbolic links to fontconfig settings provided in `/usr/share/doc/fontconfig-infinality-ultimate/font-settings/`, e.g.
+
+    # cd /usr/share/doc/fontconfig-infinality-ultimate/font-settings
+    # ls *amble*
+    45-amble.conf  90-tt-amble.conf
+    # ln -sr *amble.conf /etc/fonts/conf.d/
+
+In case of multiple configuration files (e.g. `90-non-tt-signika.conf` and `90-tt-signika.conf`) it is necessary to choose the correct one depending on the format to be used, i.e. `90-tt-foo.conf` for TrueType fonts and `90-non-tt-foo.conf` for OpenType/Type 1.
+
+For unsupported fonts new settings should be created, otherwise they will be rendered using the default auto-hinter. If this is the case, a user can either file a bug report on GitHub or open a pull request and submit her/his custom configuration files.
+
+
+2014-06-08
+~~~~~~~~~~
+
+### infinality-bundle-fonts
+
+New fonts in the repository:
+
+* Alegreya (SC) (`ttf-alegreya-ibx`)
+* Alegreya Sans (SC) (`ttf-alegreya-sans-ibx`)
+* Libre Baskerville (`ttf-libre-baskerville-ibx`)
+* Libre Caslon Text (`ttf-libre-caslon-ibx`)
+* Linux Libertine (`ttf-linux-libertine-ibx`)
+* Yanone Kaffeesatz (`otf-yanone-kaffeesatz-ibx`)
+
+Updated font packages:
+
+* Alegreya (SC) (`otf-alegreya-ibx`)
+* Alegreya Sans (SC) (`otf-alegreya-sans-ibx`)
+* DejaVu (`t1-dejavu-ibx`, `ttf-dejavu-ib`)
+* EB Garamond (`otf-ebgaramond-ibx`, `ttf-ebgaramond-ibx`)
+* Libre Baskerville (`otf-libre-baskerville-ibx`)
+* Libre Caslon Text (`otf-libre-caslon-ibx`)
+
+> **NOTE** In order to upgrade `otf-libre-baskerville-ibx`
+> and `otf-libre-baskerville-ibx`, first remove the old versions from
+> the system and then install the new one. This is necessary intervention
+> due to the change in version numbering.
+
+* Linux Libertine (`otf-linux-libertine-ibx`)
+* Sinkin Sans (`otf-sinkin-sans-ibx`, `ttf-sinkin-sans-ibx`)
+* Sorts Mill Goudy (`otf-sorts-mill-goudy-ibx`, `ttf-sorts-mill-goudy-ibx`)
+* VL Gothic (`ttf-vlgothic-ibx`)
+* Yanone Kaffeesatz (`ttf-yanone-kaffeesatz-ibx`)
+
+Packages removed from the repository:
+
+* `t1-libre-baskerville-ibx` (replaced by OTF version)
+* `t1-libre-caslon-ibx` (replaced by OTF version)
+* `t1-ebgaramond-ibx` (replaced by OTF version)
+
+### fontconfig-infinality-ultimate, rev. 2.11.1-14
+
+* Splitting rendering settings to the font packages.
+* Removing obsolete entries.
+* Minor bug fixes and tweaks.
+
 2014-06-03
 ~~~~~~~~~~
 
