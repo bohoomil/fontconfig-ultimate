@@ -14,7 +14,7 @@ Xft.hinting:    1
 Xft.hintstyle:  hintfull
 Xft.lcdfilter:  lcddefault
 Xft.rgba:       rgb
-" 
+"
 
 echo "$XFT_SETTINGS" | xrdb -merge > /dev/null 2>&1
 
