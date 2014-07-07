@@ -8,7 +8,7 @@ pkgdesc="A library for configuring and customizing font access (includes generic
 url=('http://www.fontconfig.org/release/')
 license=('custom' 'MIT')
 pkgver=2.11.1
-pkgrel=15
+pkgrel=16
 arch=('i686' 'x86_64')
 changelog=CHANGELOG
 groups=('infinality-bundle')
@@ -64,8 +64,6 @@ prepare() {
   # http://lists.freedesktop.org/archives/fontconfig-bugs/2014-April/000835.html
   patch -Np1 -i fc-cache.c.patch
 
-  # make sure there's no rpath trouble and sane .so versioning -
-  # FC and Gentoo do this as well
   aclocal
   libtoolize -f
   automake --add-missing -fi
