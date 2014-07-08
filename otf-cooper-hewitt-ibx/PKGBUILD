@@ -1,0 +1,43 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=otf-cooper-hewitt-ibx
+pkgver=1.0
+pkgrel=1
+depends=('fontconfig')
+pkgdesc="Cooper Hewitt is a contemporary sans serif with characters composed of modified-geometric curves and arches."
+url="http://www.cooperhewitt.org/"
+arch=('any')
+groups=('infinality-bundle-fonts-extra')
+license=('MIT')
+install=$pkgname.install
+# http://uh8yh30l48rpize52xh0q1o6i.wpengine.netdna-cdn.com/wp-content/uploads/fonts/CooperHewitt-OTF-public.zip (need fixing weight class)
+source=(CooperHewitt-OTF-fixed.zip
+        45-cooper-hewitt.conf
+        90-non-tt-cooper-hewitt.conf)
+sha1sums=('a1dfbecfbe028a9a8c8e820d1f637fd1b7203bdf'
+          '8a9fc2d8074f4e3156bd0b25a26da2f9d70fa8a2'
+          '9b31d968517c3a7a2206a1a7496619953fd53147')
+
+package(){
+  cd "${srcdir}"/
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 "OFL-201406.txt" \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"/OFL.txt
+  install -m644 "OFL-FAQ.txt" \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"/OFL-FAQ.txt
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-cooper-hewitt.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-cooper-hewitt.conf
+  install -m644 90-non-tt-cooper-hewitt.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-cooper-hewitt.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-cooper-hewitt.conf .
+  ln -s ../conf.avail/90-non-tt-cooper-hewitt.conf .
+}
