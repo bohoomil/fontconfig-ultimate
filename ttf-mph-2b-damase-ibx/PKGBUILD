@@ -2,15 +2,15 @@
 # Contributor: Gaetan Bisson <bisson@archlinux.org>
 # Maintainer: bohoomil <@zoho.com>
 
-pkgname=ttf-mph-2b-damase-ib
+pkgname=ttf-mph-2b-damase-ibx
 pkgver=002.000
-pkgrel=7
+pkgrel=8
 pkgdesc='Unicode font covering full plane 1, and numerous scripts. Part of infinality-bundle-fonts.'
 url="http://packages.debian.org/unstable/x11/ttf-mph-2b-damase"
 license=('custom:Public_Domain')
 arch=('any')
 depends=('fontconfig')
-groups=('infinality-bundle-fonts')
+groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-mph-2b-damase')
 provides=('ttf-mph-2b-damase')
 replaces=('ttf-mph-2b-damase')
