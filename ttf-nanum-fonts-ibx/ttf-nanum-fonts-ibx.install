@@ -1,5 +1,5 @@
 post_install() {
-  fc-cache -f /usr/share/fonts/ttf-nanum-fonts-ib > /dev/null
+  fc-cache -f /usr/share/fonts/ttf-nanum-fonts-ibx > /dev/null
   echo "Done."
 }
 
