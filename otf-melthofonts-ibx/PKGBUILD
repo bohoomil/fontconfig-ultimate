@@ -1,13 +1,13 @@
 # Maintainer: bohoomil <@zoho.com>
 
-pkgname=otf-melthofonts-ib
+pkgname=otf-melthofonts-ibx
 pkgver=1.21
-pkgrel=5
+pkgrel=6
 depends=('fontconfig')
-pkgdesc="Font for Syriac script (includes Estrangelo Edessa only)."
+pkgdesc="Fonts for Syriac script."
 url="http://www.bethmardutho.org/index.php/resources/fonts.html"
 arch=('any')
-groups=('infinality-bundle-fonts')
+groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-meltho')
 license=('Custom')
 install=$pkgname.install
@@ -25,7 +25,7 @@ package(){
   install -m644 license.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
-  install -m644 SyrCOMEdessa.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
   install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
   install -m755 -d "${pkgdir}"/etc/fonts/conf.d
