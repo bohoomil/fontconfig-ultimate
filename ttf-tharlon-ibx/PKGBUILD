@@ -1,13 +1,13 @@
 # Maintainer: bohoomil <@zoho.com>
 
-pkgname=ttf-tharlon-ib
+pkgname=ttf-tharlon-ibx
 pkgver=1.002
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="TharLon is an authentic Myanmar typeface which covers several languages."
 url="https://kippt.com/aung/myanmar-fonts/clips/8988942"
 arch=('any')
-groups=('infinality-bundle-fonts')
+groups=('infinality-bundle-fonts-extra')
 license=('Custom')
 install=$pkgname.install
 source=(https://tharlon-font.googlecode.com/files/Tharlon-Regular.ttf
