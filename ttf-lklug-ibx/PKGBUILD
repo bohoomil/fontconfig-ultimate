@@ -1,13 +1,13 @@
 # Maintainer: bohoomil <@zoho.com>
 
-pkgname=ttf-lklug-ib
+pkgname=ttf-lklug-ibx
 pkgver=0.6
-pkgrel=5
+pkgrel=6
 depends=('fontconfig')
 pkgdesc="Font for Sinhala script."
 url="http://sinhala.sourceforge"
 arch=('any')
-groups=('infinality-bundle-fonts')
+groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-lklug')
 license=('GPL')
 install=$pkgname.install
