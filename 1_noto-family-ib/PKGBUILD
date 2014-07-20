@@ -1,0 +1,140 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=ttf-noto-family-ib
+pkgname=('ttf-noto-sans-ib' 'ttf-noto-sans-multilang-ib' 'ttf-noto-serif-ib' 'ttf-noto-serif-multilang-ib')
+pkgver=2014.07
+pkgrel=1
+pkgdesc="Noto Sans family."
+url="http://www.google.com/get/noto/"
+arch=('any')
+groups=('infinality-bundle-fonts')
+license=('Apache')
+source=(http://www.google.com/get/noto/pkgs/Noto-hinted.zip
+        NotoSansKhmer-Bold_fixed.ttf
+        NotoSansKhmer-Regular_fixed.ttf
+        40-noto-arabic.conf
+        45-noto-sans.conf
+        45-noto-serif.conf
+        90-non-tt-noto-sans-cjk.conf
+        90-tt-noto-sans.conf
+        90-tt-noto-serif.conf)
+sha1sums=('07a296d0ebb3358dbb8f053f30bd9350ce942eda'
+          '00546fa8ef612640b4722f66e61570362c83f1e3'
+          '5a9fbe054b1021b1a3d4747ab2fd94c4f1aa7430'
+          '926c11b9f0b3b6271079aedcacfeae9900a933f6'
+          '4abf4162d461ae9f14970fd9480ef6edcae5a4bc'
+          'e20c836813721d8bf53e07f6fced4a4639a3c238'
+          'c168452c543abc496bb0a53833fc8019c7f09d22'
+          '97b73fc0ea295ad04b89f2e97b475d4284a8d480'
+          'd73acfd5daf4514232f6f05274476ba0b366d74d')
+
+package_ttf-noto-sans-ib() {
+  pkgdesc="Noto Sans family: Latin and basic non-Latin set."
+  depends=('fontconfig')
+  conflicts=('ttf-noto' 'ttf-noto-svn' 'ttf-google-webfonts-git')
+  install=$pkgname.install
+
+  cd "${srcdir}"
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 LICENSE "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
+
+  _sans=(NotoSans-Bold.ttf NotoSans-BoldItalic.ttf NotoSans-Italic.ttf NotoSans-Regular.ttf)
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  for fnt in "${_sans[@]}"; do
+    install -m644 "$fnt" "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  done
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m644 45-noto-sans.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-noto-sans.conf
+  install -m644 90-tt-noto-sans.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-noto-sans.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-noto-sans.conf .
+  ln -s ../conf.avail/90-tt-noto-sans.conf .
+}
+
+package_ttf-noto-sans-multilang-ib() {
+  pkgdesc="Noto Sans family: non-Latin extension."
+  conflicts=('ttf-noto' 'ttf-noto-svn' 'ttf-google-webfonts-git' 'ttf-noto-arabic' 'ttf-noto-hebrew' 'otf-noto-japanese' 'otf-noto-korean' 'otf-noto-simplified-chinese' 'otf-noto-traditional-chinese')
+  depends=('fontconfig' 'ttf-noto-sans-ib')
+  install=$pkgname.install
+
+  cd "${srcdir}"
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 LICENSE "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
+
+  _sans_multi=(NotoKufiArabic-Bold.ttf NotoKufiArabic-Regular.ttf NotoNaskhArabic-Bold.ttf NotoNaskhArabic-Regular.ttf NotoSansArmenian-Bold.ttf NotoSansArmenian-Regular.ttf NotoSansAvestan-Regular.ttf NotoSansBalinese-Regular.ttf NotoSansBamum-Regular.ttf NotoSansBatak-Regular.ttf NotoSansBengali-Bold.ttf NotoSansBengali-Regular.ttf NotoSansBrahmi-Regular.ttf NotoSansBuginese-Regular.ttf NotoSansBuhid-Regular.ttf NotoSansCanadianAboriginal-Regular.ttf NotoSansCarian-Regular.ttf NotoSansCham-Bold.ttf NotoSansCham-Regular.ttf NotoSansCherokee-Regular.ttf NotoSansCoptic-Regular.ttf NotoSansCypriot-Regular.ttf NotoSansDeseret-Regular.ttf NotoSansDevanagari-Bold.ttf NotoSansDevanagari-Regular.ttf NotoSansEgyptianHieroglyphs-Regular.ttf NotoSansEthiopic-Bold.ttf NotoSansEthiopic-Regular.ttf NotoSansGeorgian-Bold.ttf NotoSansGeorgian-Regular.ttf NotoSansGlagolitic-Regular.ttf NotoSansGothic-Regular.ttf NotoSansGujarati-Bold.ttf NotoSansGujarati-Regular.ttf NotoSansGurmukhi-Bold.ttf NotoSansGurmukhi-Regular.ttf NotoSansHans-Black.otf NotoSansHans-Bold.otf NotoSansHans-DemiLight.otf NotoSansHans-Light.otf NotoSansHans-Medium.otf NotoSansHans-Regular.otf NotoSansHans-Thin.otf NotoSansHant-Black.otf NotoSansHant-Bold.otf NotoSansHant-DemiLight.otf NotoSansHant-Light.otf NotoSansHant-Medium.otf NotoSansHant-Regular.otf NotoSansHant-Thin.otf NotoSansHanunoo-Regular.ttf NotoSansHebrew-Bold.ttf NotoSansHebrew-Regular.ttf NotoSansImperialAramaic-Regular.ttf NotoSansJP-Black.otf NotoSansJP-Bold.otf NotoSansJP-DemiLight.otf NotoSansJP-Light.otf NotoSansJP-Medium.otf NotoSansJP-Regular.otf NotoSansJP-Thin.otf NotoSansJavanese-Regular.ttf NotoSansKR-Black.otf NotoSansKR-Bold.otf NotoSansKR-DemiLight.otf NotoSansKR-Light.otf NotoSansKR-Medium.otf NotoSansKR-Regular.otf NotoSansKR-Thin.otf NotoSansKaithi-Regular.ttf NotoSansKannada-Bold.ttf NotoSansKannada-Regular.ttf NotoSansKayahLi-Regular.ttf NotoSansKharoshthi-Regular.ttf NotoSansKhmer-Bold_fixed.ttf NotoSansKhmer-Regular_fixed.ttf NotoSansLao-Bold.ttf NotoSansLao-Regular.ttf NotoSansLepcha-Regular.ttf NotoSansLimbu-Regular.ttf NotoSansLinearB-Regular.ttf NotoSansLisu-Regular.ttf NotoSansLycian-Regular.ttf NotoSansLydian-Regular.ttf NotoSansMalayalam-Bold.ttf NotoSansMalayalam-Regular.ttf NotoSansMandaic-Regular.ttf NotoSansMeeteiMayek-Regular.ttf NotoSansMongolian-Regular.ttf NotoSansMyanmar-Bold.ttf NotoSansMyanmar-Regular.ttf NotoSansNKo-Regular.ttf NotoSansNewTaiLue-Regular.ttf NotoSansOgham-Regular.ttf NotoSansOlChiki-Regular.ttf NotoSansOldItalic-Regular.ttf NotoSansOldPersian-Regular.ttf NotoSansOldSouthArabian-Regular.ttf NotoSansOldTurkic-Regular.ttf NotoSansOsmanya-Regular.ttf NotoSansPahlavi-Regular.ttf NotoSansParthian-Regular.ttf NotoSansPhagsPa-Regular.ttf NotoSansPhoenician-Regular.ttf NotoSansRejang-Regular.ttf NotoSansRunic-Regular.ttf NotoSansSamaritan-Regular.ttf NotoSansSaurashtra-Regular.ttf NotoSansShavian-Regular.ttf NotoSansSinhala-Bold.ttf NotoSansSinhala-Regular.ttf NotoSansSumeroAkkadianCuneiform-Regular.ttf NotoSansSundanese-Regular.ttf NotoSansSylotiNagri-Regular.ttf NotoSansSymbols-Regular.ttf NotoSansSyriacEastern-Regular.ttf NotoSansSyriacEstrangela-Regular.ttf NotoSansSyriacWestern-Regular.ttf NotoSansTagalog-Regular.ttf NotoSansTagbanwa-Regular.ttf NotoSansTaiLe-Regular.ttf NotoSansTaiTham-Regular.ttf NotoSansTaiViet-Regular.ttf NotoSansTamil-Bold.ttf NotoSansTamil-Regular.ttf NotoSansTelugu-Bold.ttf NotoSansTelugu-Regular.ttf NotoSansThai-Bold.ttf NotoSansThai-Regular.ttf NotoSansTifinagh-Regular.ttf NotoSansUgaritic-Regular.ttf NotoSansVai-Regular.ttf NotoSansYi-Regular.ttf)
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  for fnt in "${_sans_multi[@]}"; do
+    install -m644 "$fnt" "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  done
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m644 40-noto-arabic.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/40-noto-arabic.conf
+  install -m644 90-non-tt-noto-sans-cjk.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-noto-sans-cjk.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/40-noto-arabic.conf .
+  ln -s ../conf.avail/90-non-tt-noto-sans-cjk.conf .
+}
+
+package_ttf-noto-serif-ib() {
+  pkgdesc="Noto Serif family: Latin and basic non-Latin set."
+  depends=('fontconfig')
+  install=$pkgname.install
+
+  cd "${srcdir}"
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 LICENSE "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
+
+  _serif=(NotoSerif-Bold.ttf NotoSerif-BoldItalic.ttf NotoSerif-Italic.ttf NotoSerif-Regular.ttf)
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  for fnt in "${_serif[@]}"; do
+    install -m644 "$fnt" "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  done
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m644 45-noto-serif.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-noto-serif.conf
+  install -m644 90-tt-noto-serif.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-noto-serif.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-noto-serif.conf .
+  ln -s ../conf.avail/90-tt-noto-serif.conf .
+}
+
+package_ttf-noto-serif-multilang-ib() {
+  pkgdesc="Noto Serif family: non-Latin extension."
+  depends=('fontconfig' 'ttf-noto-serif-ib')
+  install=$pkgname.install
+
+  cd "${srcdir}"
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 LICENSE "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
+
+  _serif_multi=(NotoSerifArmenian-Bold.ttf NotoSerifArmenian-Regular.ttf NotoSerifGeorgian-Bold.ttf NotoSerifGeorgian-Regular.ttf NotoSerifKhmer-Bold.ttf NotoSerifKhmer-Regular.ttf NotoSerifLao-Bold.ttf NotoSerifLao-Regular.ttf NotoSerifThai-Bold.ttf NotoSerifThai-Regular.ttf)
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  for fnt in "${_serif_multi[@]}"; do
+    install -m644 "$fnt" "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  done
+}

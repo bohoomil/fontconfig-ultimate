@@ -1,0 +1,146 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=source-han-sans-ibx
+pkgname=('otf-source-han-sans-cn-ibx' 'otf-source-han-sans-jp-ibx' 'otf-source-han-sans-kr-ibx' 'otf-source-han-sans-twhk-ibx')
+pkgver=1.000
+pkgrel=1
+depends=('fontconfig')
+pkgdesc="A set of Pan-CJK fonts designed to complement Source Sans Pro."
+url="http://www.adobe.com/"
+arch=('any')
+license=('OFL-1.1')
+groups=('infinality-bundle-fonts-extra' 'source-han-sans-cjk')
+source=(http://downloads.sourceforge.net/project/source-han-sans.adobe/SourceHanSansCN-${pkgver}.zip
+        http://downloads.sourceforge.net/project/source-han-sans.adobe/SourceHanSansJP-${pkgver}.zip
+        http://downloads.sourceforge.net/project/source-han-sans.adobe/SourceHanSansKR-${pkgver}.zip
+        http://downloads.sourceforge.net/project/source-han-sans.adobe/SourceHanSansTWHK-${pkgver}.zip
+        http://downloads.sourceforge.net/project/source-han-sans.adobe/LICENSE.txt
+        40-source-han-sans-cn.conf
+        40-source-han-sans-jp.conf
+        40-source-han-sans-kr.conf
+        40-source-han-sans-twhk.conf
+        90-non-tt-source-han-sans-cn.conf
+        90-non-tt-source-han-sans-jp.conf
+        90-non-tt-source-han-sans-kr.conf
+        90-non-tt-source-han-sans-twhk.conf)
+sha1sums=('997ccee4a92f3969a39643ea9f58ebdbd0e70ece'
+          'ef5f6d5d09dc6d8b90a5139dbe63ffd502f75e0d'
+          'd96d0b07c092ed3440a5877ab8179a749255e502'
+          '209ff0f5bf61fd3300e25b03d83a5ed275c80fb0'
+          '2b8b815229aa8a61e483fb4ba0588b8b6c491890'
+          'be6b17996b615b9c7128156aed3a707418bc8fa8'
+          'd5c81173f619c304e15e8b3a2f40f7be18badd5f'
+          'b88863775b2c30cbe8932e0d53a9d1894e96a163'
+          '68d04e7d70c2c29a65f32569ecc3212242900e25'
+          '26c2e070827f912965b0054f94edaab5808fefc8'
+          '35fea512dd4ad75001da524942b97cb0c92d9278'
+          '672e4defaed9da4b4da4cda152e9b3c7ff89de40'
+          '9fd899e5f16dba39d1e35e17054b81b41b37635a')
+
+package_otf-source-han-sans-cn-ibx(){
+  pkgdesc="A set of Pan-CJK fonts designed to complement Source Sans Pro. Simplified Chinese."
+  conflicts=('adobe-source-han-sans-cn-fonts' 'adobe-source-han-sans-fonts-cn')
+  install=$pkgname.install
+
+  cd "${srcdir}"/SourceHanSansCN-${pkgver}
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 ../LICENSE.txt \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  cd "${srcdir}"
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 ../40-source-han-sans-cn.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/40-source-han-sans-cn.conf
+  install -m644 ../90-non-tt-source-han-sans-cn.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-source-han-sans-cn.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/40-source-han-sans-cn.conf .
+  ln -s ../conf.avail/90-non-tt-source-han-sans-cn.conf .
+}
+
+package_otf-source-han-sans-jp-ibx(){
+  pkgdesc="A set of Pan-CJK fonts designed to complement Source Sans Pro. Japanese."
+  conflicts=('adobe-source-han-sans-jp-fonts' 'adobe-source-han-sans-fonts-jp')
+  install=$pkgname.install
+
+  cd "${srcdir}"/SourceHanSansJP-${pkgver}
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 ../LICENSE.txt \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  cd "${srcdir}"
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 ../40-source-han-sans-jp.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/40-source-han-sans-jp.conf
+  install -m644 ../90-non-tt-source-han-sans-jp.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-source-han-sans-jp.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/40-source-han-sans-jp.conf .
+  ln -s ../conf.avail/90-non-tt-source-han-sans-jp.conf .
+}
+
+package_otf-source-han-sans-kr-ibx(){
+  pkgdesc="A set of Pan-CJK fonts designed to complement Source Sans Pro. Korean."
+  conflicts=('adobe-source-han-sans-kr-fonts' 'adobe-source-han-sans-fonts-kr')
+  install=$pkgname.install
+
+  cd "${srcdir}"/SourceHanSansKR-${pkgver}
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 ../LICENSE.txt \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  cd "${srcdir}"
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 ../40-source-han-sans-kr.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/40-source-han-sans-kr.conf
+  install -m644 ../90-non-tt-source-han-sans-kr.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-source-han-sans-kr.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/40-source-han-sans-kr.conf .
+  ln -s ../conf.avail/90-non-tt-source-han-sans-kr.conf .
+}
+
+package_otf-source-han-sans-twhk-ibx(){
+  pkgdesc="A set of Pan-CJK fonts designed to complement Source Sans Pro. Traditional Chinese."
+  conflicts=('adobe-source-han-sans-twhk-fonts' 'adobe-source-han-sans-fonts-twhk')
+  install=$pkgname.install
+
+  cd "${srcdir}"/SourceHanSansTWHK-${pkgver}
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 ../LICENSE.txt \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  cd "${srcdir}"
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 ../40-source-han-sans-twhk.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/40-source-han-sans-twhk.conf
+  install -m644 ../90-non-tt-source-han-sans-twhk.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-source-han-sans-twhk.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/40-source-han-sans-twhk.conf .
+  ln -s ../conf.avail/90-non-tt-source-han-sans-twhk.conf .
+}
