@@ -2,14 +2,14 @@
 # Contributor: Philacorns <opuspace@gmail.com>
 # Maintainer: bohoomil <@zoho.com>
 
-pkgname=ttf-wqy-microhei-ib
+pkgname=ttf-wqy-microhei-ibx
 _src_pkg=wqy-microhei
 pkgver=0.2.0_beta
-pkgrel=8
+pkgrel=9
 pkgdesc="A Sans-Serif style high quality CJK outline font."
 arch=('any')
 license=('GPL3' 'APACHE' 'custom:"font embedding exception"')
-groups=('infinality-bundle-fonts')
+groups=('infinality-bundle-fonts-extra')
 install=${pkgname}.install
 url="http://wenq.org"
 depends=('fontconfig')
