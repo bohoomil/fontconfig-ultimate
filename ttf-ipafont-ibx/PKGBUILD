@@ -1,10 +1,10 @@
 # Contributor: ponsfoot <cabezon dot hashimoto at gmail dot com>
 # Maintainer: bohoomil <@zoho.com>
 
-pkgname=ttf-ipafont-ib
+pkgname=ttf-ipafont-ibx
 pkgver=003.03
 _pkgver=${pkgver/./}
-pkgrel=3
+pkgrel=4
 pkgdesc="Japanese outline (P)Mincho and (P)Gothic fonts."
 arch=('any')
 url="http://ossipedia.ipa.go.jp/ipamjfont/"
