@@ -22,6 +22,8 @@ Noto family packages were upgraded to the most recent upstream release, bringing
 
 Unless needed, they can be safely uninstalled from the system.
 
+Non-Latin font families were split from `ttf-droid-ib` in order to eliminate potential interference with higher quality Noto fonts. The extra Droid typefaces are available as `ttf-droid-nonlatin-ib` and can still be installed if necessary.
+
 A new dependency, Faruma (`ttf-faruma-ib`) was added to `ibfonts-meta-extended` for proper Thaana script support.
 
 Besides, the following fonts were added to the repository:
