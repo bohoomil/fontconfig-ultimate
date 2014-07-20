@@ -5,6 +5,89 @@ infinality-bundle+fonts
 CHANGELOG
 ---------
 
+2014-07-20
+~~~~~~~~~~
+
+### infinality-bundle-fonts
+
+Noto family packages were upgraded to the most recent upstream release, bringing extensive support for many additional non-Latin languages. Consequently, the following font families were moved to the `extra` collection and removed from the `ibfonts-meta-extended` meta package:
+
+* `otf-melthofonts-ibx`
+* `ttf-ipafont-ibx`
+* `ttf-lklug-ibx`
+* `ttf-nanum-fonts-ibx`
+* `ttf-mph-2b-damase-ibx`
+* `ttf-tharlon-ibx`
+* `ttf-wqy-microhei-ibx`
+
+Unless needed, they can be safely uninstalled from the system.
+
+A new dependency, Faruma (`ttf-faruma-ib`) was added to `ibfonts-meta-extended` for proper Thaana script support.
+
+Besides, the following fonts were added to the repository:
+
+* `otf-source-han-sans-cn-ibx`
+* `otf-source-han-sans-jp-ibx`
+* `otf-source-han-sans-kr-ibx`
+* `otf-source-han-sans-twhk-ibx`
+
+The packages can be installed either individually, or all in one shot using `source-han-sans-cjk` group name.
+
+### fontconfig-infinality-ultimate, rev. 2.11.1-17
+
+* The library was updated in accordance with the changes to the `infinality-bundle-fonts` repository.
+* Additional templates, which can be used to customize default aliases globally, were added to `35-repl-custom.conf`. GNU Emacs users may want to uncomment the sans-serif entry to set Liberation Sans as a safe alias for their editor.
+
+2014-07-16
+~~~~~~~~~~
+
+### infinality-bundle-fonts
+
+* Oxygen family (`ttf-oxygen-ibx`) was added to the repository.
+* Source Sans Pro (`otf-source-sans-pro-ibx`, `ttf-source-sans-pro-ibx`) was upgraded to version 2.0.10 (roman variants).
+
+2014-07-09
+~~~~~~~~~~
+
+### infinality-bundle-fonts
+
+* Cooper Hewitt family (`otf-cooper-hewitt-ibx`) was added to the repository.
+* Roboto family (`ttf-roboto-ibx`) was upgraded to version 2.0 (a.k.a 2014).
+
+Both font sets come with fixed weight metrics.
+
+2014-07-08
+~~~~~~~~~~
+
+### freetype2-infinality-ultimate, rev. 2.5.3-8 (incl. multilib)
+
+* Merging with most recent upstream commits.
+* Updating Infinality patchset accordingly.
+
+2014-07-01
+~~~~~~~~~~
+
+### infinality-bundle-fonts
+
+* Permian family (`otf-permian-family-ibx`), including sans, serif and slab variants, was added to the repository.
+
+### fontconfig-infinality-ultimate, rev. 2.11.1-16
+
+* New aliases were added to the `free` preset (enhancement #27).
+* Changes to the `combi` preset:
+    * Basic aliases (sans-serif, serif, monospace, fantasy & cursive) are based on default `free` seetings.
+    * No major font family, free or proprietary, is replaced by alternative typefaces and is identified by its generic name.
+
+2014-06-18
+~~~~~~~~~~
+
+### infinality-bundle-fonts
+
+* Roboto family (`ttf-roboto-ibx`) including Condensed and Slab variants, was added to the repository.
+* Vollkorn (`ttf-vollkorn-ibx`) was added to the repository.
+* Minor change to Droid Mono family was introduced, fixing the inconsistency between the regular weight and synthetic emboldening.
+* Font names in `ttf-himalaya-fonts-ibx` were corrected.
+* Minor tweaks to `ttf-khmer-os-ibx` config files were introduced.
 
 2014-06-12
 ~~~~~~~~~~
