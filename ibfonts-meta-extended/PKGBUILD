@@ -2,13 +2,14 @@
 
 pkgname=ibfonts-meta-extended
 pkgver=1
-pkgrel=15
+pkgrel=16
 arch=('any')
 url="https://github.com/bohoomil/fontconfig-ultimate"
 license=('GPL')
 pkgdesc="infinality-bundle-fonts extended collection meta package"
 depends=('ibfonts-meta-extended-lt'
          'ttf-ddc-uchen-ib'
+         'ttf-faruma-ib'
          'ttf-lohit-odia-ib'
          'ttf-lohit-punjabi-ib'
          'ttf-noto-sans-multilang-ib'
