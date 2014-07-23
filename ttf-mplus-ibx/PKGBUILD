@@ -1,0 +1,43 @@
+# Contributor: noonov <noonov@gmail.com>
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=ttf-mplus-ibx
+pkgver=TESTFLIGHT_058
+_pkgver=${pkgver/_/-}
+pkgrel=1
+pkgdesc="M+ family of Japanese, sans-serif and monospaced outline fonts."
+arch=('any')
+url="http://mplus-fonts.sourceforge.jp/"
+license=('custom')
+depends=('fontconfig')
+groups=('infinality-bundle-fonts-extra')
+conflicts=('ttf-mplus')
+install=${pkgname}.install
+_mirror="jaist" # keihanna, jaist, iij, osdn
+source=(http://${_mirror}.dl.sourceforge.jp/mplus-fonts/6650/mplus-${_pkgver}.tar.xz
+        40-mplus.conf
+        90-non-tt-mplus.conf)
+md5sums=('6b61cbf898e3690b192b490c9fa6204d'
+         '4d6570bdd11b9038dacd650f4ccf60e9'
+         'f09f57c5231acdceeb2dd9ac67e53a69')
+
+package() {
+  cd "${srcdir}"/mplus-"${_pkgver}"
+
+  install -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -D -m644 LICENSE_E \
+    "${pkgdir}"/usr/share/licenses/${pkgname}/COPYING
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 ../40-mplus.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/40-mplus.conf
+  install -m644 ../90-non-tt-mplus.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-mplus.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/40-mplus.conf .
+  ln -s ../conf.avail/90-non-tt-mplus.conf .
+}
