@@ -6,8 +6,8 @@
 _pkgbasename=freetype2
 pkgname=lib32-$_pkgbasename-infinality-ultimate
 pkgver=2.5.3
-pkgrel=7
-_patchrel=2014.07.07
+pkgrel=9
+_patchrel=2014.07.28
 pkgdesc="TrueType font rendering library with Infinality patches and custom settings by bohoomil (32-bit, infinality-bundle)."
 arch=(x86_64)
 license=('GPL' 'MIT')
