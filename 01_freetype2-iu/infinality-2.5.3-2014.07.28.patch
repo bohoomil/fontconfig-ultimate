@@ -3,16 +3,16 @@
 @@ -13,6 +13,8 @@
  # Call the `configure' script located in `builds/unix'.
  #
- 
+
 +export LDFLAGS="$LDFLAGS -lm"
 +
  rm -f config.mk builds/unix/unix-def.mk builds/unix/unix-cc.mk
- 
+
  # respect GNUMAKE environment variable for backwards compatibility
 --- a/devel/ftoption.h	2013-12-21 21:39:04.000000000 +0100
 +++ b/devel/ftoption.h	2014-03-07 19:21:57.066654119 +0100
 @@ -609,6 +609,17 @@ FT_BEGIN_HEADER
- 
+
    /*************************************************************************/
    /*                                                                       */
 +  /* Define FT_CONFIG_OPTION_INFINALITY_PATCHSET if you want to enable     */
@@ -38,8 +38,8 @@
    /*                                                                       */
 -/* #define FT_CONFIG_OPTION_SUBPIXEL_RENDERING */
 +#define FT_CONFIG_OPTION_SUBPIXEL_RENDERING
- 
- 
+
+
    /*************************************************************************/
 @@ -604,11 +604,22 @@ FT_BEGIN_HEADER
    /*   This option requires TT_CONFIG_OPTION_BYTECODE_INTERPRETER to be    */
@@ -47,8 +47,8 @@
    /*                                                                       */
 -/* #define TT_CONFIG_OPTION_SUBPIXEL_HINTING */
 +#define TT_CONFIG_OPTION_SUBPIXEL_HINTING
- 
- 
+
+
    /*************************************************************************/
    /*                                                                       */
 +  /* Define FT_CONFIG_OPTION_INFINALITY_PATCHSET if you want to enable     */
@@ -73,18 +73,18 @@
  #include "aflatin.h"
  #include "aferrors.h"
 +#include "strings.h"
- 
- 
+
+
  #ifdef AF_CONFIG_OPTION_USE_WARPER
 @@ -892,8 +893,33 @@
      FT_Pos        delta;
      AF_LatinAxis  axis;
      FT_UInt       nn;
-+#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET 
++#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
 +    int checked_adjust_heights_env = 0;
 +    FT_Bool adjust_heights         = FALSE;
- 
- 
+
+
 +    if ( checked_adjust_heights_env == 0 )
 +    {
 +      char *adjust_heights_env =
@@ -116,7 +116,7 @@
        AF_LatinBlue  blue = NULL;
 -
 +      int threshold = 40;
- 
+
        for ( nn = 0; nn < Axis->blue_count; nn++ )
        {
 @@ -930,7 +956,12 @@
@@ -134,11 +134,11 @@
        {
          FT_Pos   scaled;
 @@ -1049,7 +1080,13 @@
- 
+
          /* a blue zone is only active if it is less than 3/4 pixels tall */
          dist = FT_MulFix( blue->ref.org - blue->shoot.org, scale );
 +
-+#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET 
++#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
 +        /* Do at low ppems ( ~< 200 ), in order to prevent fringes */
 +        if ( dist <= 256 && dist >= -256 )
 +#else
@@ -149,23 +149,23 @@
            FT_Pos  delta1;
 @@ -1100,7 +1137,12 @@
              delta2 = -delta2;
- 
+
            blue->ref.fit   = FT_PIX_ROUND( blue->ref.cur );
-+#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET 
++#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
 +          /* Round to prevent fringes */
 +          blue->shoot.fit = FT_PIX_ROUND( blue->ref.fit - delta2 );
 +#else
            blue->shoot.fit = blue->ref.fit - delta2;
 +#endif /* FT_CONFIG_OPTION_INFINALITY_PATCHSET */
- 
+
  #endif
- 
+
 @@ -1916,7 +1958,10 @@
                dist = edge->fpos - blue->shoot.org;
                if ( dist < 0 )
                  dist = -dist;
 -
-+#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET 
++#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
 +              /* round down to pixels */
 +              /*dist = FT_MulFix( dist, scale ) & ~63;*/
 +#endif
@@ -176,7 +176,7 @@
      FT_Pos           dist     = width;
      FT_Int           sign     = 0;
      FT_Int           vertical = ( dim == AF_DIMENSION_VERT );
-+#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET 
++#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
 +    FT_Int           infinality_dist = 0;
 +    FT_UInt          autohint_snap_stem_height = 0;
 +    FT_UInt          checked_autohint_snap_stem_height = 0;
@@ -184,13 +184,13 @@
 +
 +    if ( checked_autohint_snap_stem_height == 0 )
 +    {
-+      char *autohint_snap_stem_height_env = 
++      char *autohint_snap_stem_height_env =
 +        getenv( "INFINALITY_FT_AUTOHINT_SNAP_STEM_HEIGHT" );
 +      if ( autohint_snap_stem_height_env != NULL )
 +      {
 +        sscanf ( autohint_snap_stem_height_env, "%u",
 +                 &autohint_snap_stem_height );
- 
+
 +        if ( autohint_snap_stem_height > 100 )
 +          autohint_snap_stem_height = 100;
 +        else if ( autohint_snap_stem_height < 0 )
@@ -198,7 +198,7 @@
 +      }
 +      checked_autohint_snap_stem_height = 1;
 +    }
- 
+
 +    if ( autohint_snap_stem_height == 0 )
 +#endif /* FT_CONFIG_OPTION_INFINALITY_PATCHSET */
      if ( !AF_LATIN_HINTS_DO_STEM_ADJUST( hints ) ||
@@ -208,13 +208,13 @@
        dist = -width;
        sign = 1;
      }
-+#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET 
++#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
 +    /* Calculate snap value differently than standard freetype */
 +    if ( autohint_snap_stem_height > 0                              &&
 +         ( ( vertical && !AF_LATIN_HINTS_DO_VERT_SNAP( hints ) )  ||
 +           ( !vertical && !AF_LATIN_HINTS_DO_HORZ_SNAP( hints ) ) ) )
 +    {
-+      infinality_dist = af_latin_snap_width( axis->widths, 
++      infinality_dist = af_latin_snap_width( axis->widths,
 +                                             axis->width_count, dist );
 +
 +      if ( metrics->root.scaler.face->size->metrics.x_ppem > 9 &&
@@ -254,7 +254,7 @@
 +            infinality_dist = 254;
 +          else infinality_dist = ( infinality_dist + 16 ) & ~63;
 +        }
- 
+
 -    if ( (  vertical && !AF_LATIN_HINTS_DO_VERT_SNAP( hints ) ) ||
 +      }
 +      if ( infinality_dist < 52 )
@@ -278,7 +278,7 @@
 +#endif /* FT_CONFIG_OPTION_INFINALITY_PATCHSET */
      {
        /* smooth hinting process: very lightly quantize the stem width */
- 
+
 @@ -2155,6 +2287,9 @@
        }
      }
@@ -288,14 +288,14 @@
 +#endif /* FT_CONFIG_OPTION_INFINALITY_PATCHSET */
      {
        /* strong hinting process: snap the stem width to integer pixels */
- 
+
 @@ -2162,7 +2297,10 @@
- 
- 
+
+
        dist = af_latin_snap_width( axis->widths, axis->width_count, dist );
 -
 +#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
-+      if ( autohint_snap_stem_height > 0 ) 
++      if ( autohint_snap_stem_height > 0 )
 +        goto Done_Width;
 +#endif /* FT_CONFIG_OPTION_INFINALITY_PATCHSET */
        if ( vertical )
@@ -303,9 +303,9 @@
          /* in the case of vertical hinting, always round */
 @@ -2225,6 +2363,32 @@
      }
- 
+
    Done_Width:
-+#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET 
++#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
 +    if ( axis->widths[0].cur > 42 )
 +      /* weighted average */
 +      dist = (dist * ( 100 - autohint_snap_stem_height )
@@ -333,29 +333,29 @@
 +#endif /* FT_CONFIG_OPTION_INFINALITY_PATCHSET */
      if ( sign )
        dist = -dist;
- 
+
 @@ -2247,6 +2411,8 @@
                               (AF_Edge_Flags)base_edge->flags,
                               (AF_Edge_Flags)stem_edge->flags );
- 
+
 +/* if fitted_width causes stem_edge->pos to land basically on top of an existing
 + * stem_edge->pos, then add or remove 64.  Need to figure out a way to do this */
- 
+
      stem_edge->pos = base_edge->pos + fitted_width;
- 
+
 @@ -2810,8 +2976,32 @@
      int       dim;
- 
+
      AF_LatinAxis  axis;
-+#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET 
++#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
 +    FT_Int    emboldening_strength = 0;
 +    FT_Bool   checked_use_various_tweaks_env = FALSE;
 +    FT_Bool   use_various_tweaks = FALSE;
- 
+
 -
 +    if ( !checked_use_various_tweaks_env )
 +    {
-+      char *use_various_tweaks_env = 
++      char *use_various_tweaks_env =
 +        getenv( "INFINALITY_FT_USE_VARIOUS_TWEAKS" );
 +      if ( use_various_tweaks_env != NULL )
 +      {
@@ -379,14 +379,14 @@
        goto Exit;
 @@ -2877,7 +3067,17 @@
      }
- 
+
      af_glyph_hints_save( hints, outline );
 +#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
 +    {
 +      /* Save this width for use in ftsmooth.c.  This is a shameful hack */
 +      const char* c1 = "CUR_WIDTH";
 +      char        c2[8];
- 
+
 +
 +      snprintf( c2, 8, "%ld", metrics->axis->widths[0].cur );
 +      setenv( c1, c2, 1 );
@@ -400,13 +400,13 @@
 @@ -23,6 +23,9 @@
  #include FT_IMAGE_H
  #include FT_INTERNAL_OBJECTS_H
- 
+
 +#include <math.h>
 +#include <string.h>
 +#include <strings.h>
- 
+
  #ifdef FT_CONFIG_OPTION_SUBPIXEL_RENDERING
- 
+
 @@ -290,10 +293,53 @@
                              { 0x00, 0x55, 0x56, 0x55, 0x00 };
      /* the values here sum up to a value larger than 256, */
@@ -414,16 +414,16 @@
 -    static const FT_Byte  default_filter[5] =
 +    static FT_Byte  default_filter[5] =
                              { 0x10, 0x40, 0x70, 0x40, 0x10 };
-+#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET 
++#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
 +    int checked_filter_params_env = 0;
- 
+
 +    if ( checked_filter_params_env == 0 )
 +    {
 +      char *filter_params = getenv( "INFINALITY_FT_FILTER_PARAMS" );
 +      if ( filter_params != NULL && strcmp( filter_params, "" ) != 0 )
 +      {
 +        float f1, f2, f3, f4, f5;
- 
+
 +        if ( strcasecmp( filter_params, "default" ) != 0 )
 +        {
 +          int args_assigned = 0;
@@ -461,24 +461,24 @@
 +#endif
      if ( !library )
        return FT_THROW( Invalid_Argument );
- 
+
 --- a/src/base/ftobjs.c	2014-02-08 13:51:31.000000000 +0100
 +++ b/src/base/ftobjs.c	2014-03-07 19:21:57.073320788 +0100
 @@ -67,6 +67,10 @@
- 
+
  #define GRID_FIT_METRICS
- 
+
 +#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
 +#include <strings.h>
 +#include <stdlib.h>
 +#endif
- 
+
    FT_BASE_DEF( FT_Pointer )
    ft_service_list_lookup( FT_ServiceDesc  service_descriptors,
 @@ -538,6 +542,25 @@
    ft_lookup_glyph_renderer( FT_GlyphSlot  slot );
- 
- 
+
+
 +#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
 +  static void
 +  ft_glyphslot_enlarge_metrics( FT_GlyphSlot slot,
@@ -506,7 +506,7 @@
      FT_Module     hinter;
      TT_Face       ttface = (TT_Face)face;
 +#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
- 
+
 +    int checked_use_various_tweaks_env = FALSE;
 +    FT_Bool use_various_tweaks = FALSE;
 +
@@ -531,7 +531,7 @@
 +      }
 +      checked_use_various_tweaks_env = 1;
 +    }
- 
+
 +    /* Force autohint if no tt instructions */
 +    /* NOTE:  NEEDS TO BE RUN LATER IN CODE???? */
 +    /*if ( use_various_tweaks                             &&
@@ -541,11 +541,11 @@
 +#endif
      if ( !face || !face->size || !face->glyph )
        return FT_THROW( Invalid_Face_Handle );
- 
+
 @@ -685,6 +740,18 @@
      {
        FT_AutoHinter_Interface  hinting;
- 
+
 +#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
 +      if ( use_various_tweaks )
 +      {
@@ -558,7 +558,7 @@
 +        /*printf("%d ", load_flags);*/
 +      }
 +#endif
- 
+
        /* try to load embedded bitmaps first if available            */
        /*                                                            */
 @@ -723,6 +790,10 @@
@@ -575,7 +575,7 @@
 @@ -730,6 +801,18 @@
        if ( error )
          goto Exit;
- 
+
 +#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
 +      setenv ( c1, c2, 1 );
 +
@@ -598,10 +598,10 @@
      FT_Vector   v_prev, v_first, v_next, v_cur;
      FT_Int      c, n, first;
      FT_Int      orientation;
-+#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET 
++#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
 +    int checked_use_various_tweaks_env = 0;
 +    FT_Bool use_various_tweaks = FALSE;
- 
+
 +    if ( checked_use_various_tweaks_env == 0 )
 +    {
 +      char *use_various_tweaks_env
@@ -626,7 +626,7 @@
 +    if ( use_various_tweaks )
 +      ystrength = FT_PIX_FLOOR ( ystrength );
 +#endif
- 
+
      if ( !outline )
        return FT_THROW( Invalid_Argument );
 
@@ -636,10 +636,10 @@
      FT_Face     face    = slot->face;
      FT_Error    error;
      FT_Pos      xstr, ystr;
-+#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET 
++#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
 +    int checked_use_various_tweaks_env = 0;
 +    FT_Bool use_various_tweaks = FALSE;
-+ 
++
 +    if ( checked_use_various_tweaks_env == 0 )
 +    {
 +      char *use_various_tweaks_env
@@ -657,16 +657,16 @@
 +          else if ( strcasecmp(use_various_tweaks_env, "yes" ) == 0 )
 +            use_various_tweaks = TRUE;
 +        }
- 
+
 +      }
 +      checked_use_various_tweaks_env = 1;
 +    }
 +#endif
- 
+
      if ( slot->format != FT_GLYPH_FORMAT_OUTLINE &&
           slot->format != FT_GLYPH_FORMAT_BITMAP  )
 @@ -101,6 +126,13 @@
- 
+
      if ( slot->format == FT_GLYPH_FORMAT_OUTLINE )
      {
 +#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
@@ -680,7 +680,7 @@
        (void)FT_Outline_EmboldenXY( &slot->outline, xstr, ystr );
      }
 @@ -141,6 +173,9 @@
- 
+
      slot->metrics.width        += xstr;
      slot->metrics.height       += ystr;
 +#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
@@ -693,9 +693,9 @@
 --- a/src/smooth/ftsmooth.c	2013-06-05 12:12:47.000000000 +0200
 +++ b/src/smooth/ftsmooth.c	2014-03-07 19:21:57.079987455 +0100
 @@ -26,6 +26,17 @@
- 
+
  #include "ftsmerrs.h"
- 
+
 +#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
 +#include <math.h>
 +#include "../../include/ftbitmap.h"
@@ -707,13 +707,13 @@
 +#define STVALUES if (verbose) \
 +  printf ( "scale:%f translate:%ld ", *scale_value, *translate_value );
 +#endif /* FT_CONFIG_OPTION_INFINALITY_PATCHSET */
- 
+
    /* initialize renderer -- init its raster */
    static FT_Error
 @@ -93,6 +104,2994 @@
        FT_Outline_Get_CBox( &slot->outline, cbox );
    }
- 
+
 +#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
 +  static FT_Fixed FT_FixedFromFloat(float f)
 +  {
@@ -3311,7 +3311,7 @@
 +               < stems[main_stem].width * 2                            )
 +        {
 +          /* Possibly use 2 only when compatible widths is on? */
-+          FT_Int mod_factor = 2;  
++          FT_Int mod_factor = 2;
 +
 +          if ( verbose )
 +            printf ( "USING M CONTROL ");
@@ -3330,7 +3330,7 @@
 +            new_distance = distance_ceiling;
 +          /* NEED TO FIGURE OUT A WAY TO DETERMINE WHETHER
 +             THAT NUDGE IS UP OR DOWN */
-+          else if ( stem_distance + one_pixel * 2.6 >= advance_width && 
++          else if ( stem_distance + one_pixel * 2.6 >= advance_width &&
 +            stem_width < one_pixel * 1.25                            )
 +            new_distance = distance_ceiling;
 +
@@ -3382,7 +3382,7 @@
 +                    < stems[main_stem].width * 2                        )
 +        {
 +          /* Possibly use 2 only when compatible widths is on? */
-+          FT_Int mod_factor = 2;   
++          FT_Int mod_factor = 2;
 +
 +          if ( verbose )
 +            printf ("USING M CONTROL ");
@@ -3702,7 +3702,7 @@
 +  }
 +
 +#endif
- 
+
    /* convert a slot's glyph image into a bitmap */
    static FT_Error
 @@ -104,8 +3103,9 @@
@@ -3719,7 +3719,7 @@
 @@ -123,6 +3123,483 @@
      FT_Bool  have_outline_shifted   = FALSE;
      FT_Bool  have_buffer            = FALSE;
- 
+
 +#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
 +    FT_Matrix    scaleMat;
 +    FT_Long      translate_value = 0;
@@ -4197,13 +4197,13 @@
 +    /*if (fitting_strength == 100) scale_value = 1.1;*/
 +
 +#endif
- 
+
      /* check glyph image format */
      if ( slot->format != render->glyph_format )
 @@ -138,9 +3615,105 @@
        goto Exit;
      }
- 
+
 +#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
 +RERENDER:
 +    if ( align_called == 1 )
@@ -4279,7 +4279,7 @@
 +
 +      FT_Outline_Copy( outline, outline_orig );
 +    }
- 
+
      /* translate the outline to the new origin if needed */
 +    if ( align_called == 0 )
 +    {
@@ -4311,7 +4311,7 @@
      cbox.xMax = FT_PIX_CEIL( cbox.xMax );
      cbox.yMax = FT_PIX_CEIL( cbox.yMax );
 +#endif
- 
+
      if ( cbox.xMin < 0 && cbox.xMax > FT_INT_MAX + cbox.xMin )
      {
 @@ -227,6 +3801,9 @@
@@ -4321,23 +4321,23 @@
 +#endif
 +#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
 +    }
- 
+
  #endif
- 
+
 @@ -251,6 +3828,9 @@
      bitmap->pitch      = pitch;
- 
+
      /* translate outline to render it into the bitmap */
 +#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
 +    if ( align_called == 0 )
 +#endif
      FT_Outline_Translate( outline, -x_shift, -y_shift );
      have_outline_shifted = TRUE;
- 
+
 @@ -306,9 +3886,153 @@
      if ( error )
        goto Exit;
- 
+
 +#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
 +    if ( ppem <= MAX_PPEM && ppem >= MIN_PPEM )
 +    {
@@ -4436,7 +4436,7 @@
 +            /* Adjust brightness / contrast automatically based on stem width */
 +            if ( cur_width != 0 && cur_width < 30 )
 +              cur_width = 30;
-+ 
++
 +            if ( cur_width >= 30 && cur_width <= 60 )
 +            {
 +              float ppem_factor       = sliding_scale ( 5, 11, 0.0, 1.0, ppem );
@@ -4483,10 +4483,10 @@
 +#else
      if ( slot->library->lcd_filter_func )
        slot->library->lcd_filter_func( bitmap, mode, slot->library );
- 
+
 +#endif /* FT_CONFIG_OPTION_INFINALITY_PATCHSET */
  #else /* !FT_CONFIG_OPTION_SUBPIXEL_RENDERING */
- 
+
      /* render outline into bitmap */
 
 --- a/src/truetype/ttinterp.c	2014-02-08 13:48:27.000000000 +0100
@@ -4494,7 +4494,7 @@
 @@ -4882,6 +4882,10 @@
      CUR.sph_in_func_flags = 0x0000;
  #endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
- 
+
 +#ifdef TT_CONFIG_OPTION_SUBPIXEL_HINTING
 +    CUR.sph_in_func_flags = 0x0000;
 +#endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
@@ -4505,7 +4505,7 @@
 @@ -6227,6 +6231,12 @@
                     ( CUR.sph_in_func_flags & SPH_FDEF_INLINE_DELTA_2 ) ) )
                goto Skip;
- 
+
 +            /* skip post-iup deltas */
 +            if ( CUR.iup_called                                          &&
 +                 ( ( CUR.sph_in_func_flags & SPH_FDEF_INLINE_DELTA_1 ) ||
@@ -4524,9 +4524,9 @@
        minimum_distance = 0;
  #endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
 @@ -8374,6 +8385,34 @@
- 
+
  #endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
- 
+
 +#ifdef TT_CONFIG_OPTION_SUBPIXEL_HINTING
 +      for ( i = 0; i < opcode_patterns; i++ )
 +      {
@@ -4556,5 +4556,5 @@
 +#endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
 +
  #ifdef TT_CONFIG_OPTION_INTERPRETER_SWITCH
- 
+
        {

@@ -383,10 +383,10 @@ The following packages have been moved to the `extra` group (they can be install
 * `otf-libre-baskerville-ib`
 * `t1-cantarell-ib`
 * `t1-paratype-ib`
-* `ttf-himalaya-fonts-ib` 
-* `ttf-myanmar3-ib` 
+* `ttf-himalaya-fonts-ib`
+* `ttf-myanmar3-ib`
 * `ttf-sawarabi-ib`
-* `ttf-unfonts-core-ib` 
+* `ttf-unfonts-core-ib`
 * `ttf-vlgothic-ib`
 
 Unless needed, they can be safely removed from the system.
@@ -401,7 +401,7 @@ Miscellaneous changes:
 * `otf-melthofonts-ib` has been split into two packages, with the base one providing Estrangelo Edessa only. `otf-melthofonts-ext-ibx`, supposed to be installed on demand, offers additional fonts from the Meltho family.
 * An additional meta package -- `ibfonts-meta-extended-lt` -- was added for users who want to install extended collection of fonts without support for non-Latin language scripts.
 
- 
+
 ### fontconfig-infinality-ultimate, rev. 2.11.1-3
 
 * `93-final-lang-spec-foo.conf` config files have been deprecated.
@@ -446,7 +446,7 @@ Miscellaneous changes:
    * non-latin scripts are based on customized `ms` collection
 ** updated `fc-presets`:
    * added a postjob function for free & ms collection to set
-     `35-repl-custom.conf` for custom tweaks (not needed with the `combi` 
+     `35-repl-custom.conf` for custom tweaks (not needed with the `combi`
      collection)
 ** modified naming convention for `ftypes` config files
 ** added support for new font families
@@ -483,7 +483,7 @@ Miscellaneous changes:
 ** added `30-metric-aliases-foo.conf` for each font collection
    (should improve document portability depending on the default font set)
 ** updated fc-presetsg
-** added support for Gelasio font (TTF), the new metrically compatible 
+** added support for Gelasio font (TTF), the new metrically compatible
    replacement for Georgia
 ** removing Inconsolata-zi4 (Type 1) and added support for Inconsolatazi4 (OTF)
 ** multiple update to several fontconfig `*.config` files
@@ -639,7 +639,7 @@ Miscellaneous changes:
 
 * upstream version upgrade: fontconfig 2.11.0
 * fontconfig-infinality-bundle 2.11.0-3
-** optimized support for 3 different font collections: `free` (default), 
+** optimized support for 3 different font collections: `free` (default),
    `ms` (Microsoft font families) and `custom`
 ** `fc-presets` rev. 0.2 included
 
@@ -745,7 +745,7 @@ Miscellaneous changes:
 
 * Default Serif, Sans-Serif and Monospace faces are now set hierarchically in
   `/etc/fonts/conf.d/60-latin.conf`. In order to override these settings, the
-  user is supposed to create a custom file in the local, XDG compliant 
+  user is supposed to create a custom file in the local, XDG compliant
   fontconfig directory (a relevant example has been provided). Once
   custom settings have been created, they will be honored by applications.
 

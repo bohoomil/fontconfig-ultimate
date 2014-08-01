@@ -22,9 +22,9 @@ index a4e583d..df77d96 100644
  # particular, how to modify compilation and linking parameters.
  #
 @@ -39,6 +44,14 @@ cmake_minimum_required(VERSION 2.6)
- 
+
  project(freetype)
- 
+
 +if (BUILD_FRAMEWORK)
 +  if (NOT "${CMAKE_GENERATOR}" STREQUAL "Xcode")
 +    message(FATAL_ERROR "You should use Xcode generator with BUILD_FRAMEWORK enabled")
@@ -38,13 +38,13 @@ index a4e583d..df77d96 100644
  set(VERSION_PATCH "3")
 @@ -51,22 +64,27 @@ add_definitions(-DFT2_BUILD_LIBRARY)
  include_directories("${PROJECT_SOURCE_DIR}/include")
- 
+
  # Create the configuration file
 -message(STATUS "Creating directory, ${PROJECT_BINARY_DIR}/include.")
 -file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/include)
 +message(STATUS "Creating directory, ${PROJECT_BINARY_DIR}/include/freetype2.")
 +file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/include/freetype2)
- 
+
  # For the auto-generated ftconfig.h file
 -include_directories("${PROJECT_BINARY_DIR}/include")
 -message(STATUS "Creating ${PROJECT_BINARY_DIR}/include/ftconfig.h.")
@@ -56,7 +56,7 @@ index a4e583d..df77d96 100644
 -  OUTPUT_FILE ${PROJECT_BINARY_DIR}/include/ftconfig.h
 +  OUTPUT_FILE ${PROJECT_BINARY_DIR}/include/freetype2/ftconfig.h
  )
- 
+
 +file(GLOB PUBLIC_HEADERS "include/*.h")
 +file(GLOB PUBLIC_CONFIG_HEADERS "include/config/*.h")
 +file(GLOB PRIVATE_HEADERS "include/internal/*.h")
@@ -72,7 +72,7 @@ index a4e583d..df77d96 100644
 @@ -125,7 +143,31 @@ include_directories("src/raster")
  include_directories("src/psaux")
  include_directories("src/psnames")
- 
+
 -add_library(freetype ${BASE_SRCS})
 +if (BUILD_FRAMEWORK)
 +  set(BASE_SRCS
@@ -99,7 +99,7 @@ index a4e583d..df77d96 100644
 +    XCODE_ATTRIBUTE_INSTALL_PATH "@rpath"
 +  )
 +endif ()
- 
+
  # Installations
  # Note the trailing slash in the argument to the `DIRECTORY' directive
 @@ -137,6 +179,7 @@ install(TARGETS freetype
@@ -108,7 +108,7 @@ index a4e583d..df77d96 100644
    ARCHIVE DESTINATION lib
 +  FRAMEWORK DESTINATION Library/Frameworks
  )
- 
+
  # Packaging
 diff --git a/ChangeLog b/ChangeLog
 index ea1eb4a..30626ce 100644
@@ -163,7 +163,7 @@ index ea1eb4a..30626ce 100644
 +	Reported by Wojciech Mamrak <wmamrak@gmail.com>.
 +
 +	* src/autofit/afglobal.c (af_face_globals_compute_style_coverage),
-+	src/autofit/afmodule.c (af_property_set): Fix `signed' vs. 
++	src/autofit/afmodule.c (af_property_set): Fix `signed' vs.
 +	`unsigned' issues.
 +
 +	* src/autofit/aflatin.c (af_latin_metrics_init_blues): Make compiler
@@ -538,7 +538,7 @@ index ea1eb4a..30626ce 100644
 +	* src/sfnt/ttcmap.c (tt_face_build_cmaps): Remove clang warning.
 +
  2014-03-06  Werner Lemberg  <wl@gnu.org>
- 
+
  	* Version 2.5.3 released.
 diff --git a/builds/mac/freetype-Info.plist b/builds/mac/freetype-Info.plist
 new file mode 100644
@@ -597,35 +597,35 @@ index dd7e576..8a17ffe 100644
          libpng_libpriv=`libpng-config --static --ldflags`
 @@ -656,7 +656,7 @@ else
  fi
- 
- 
+
+
 -# Whether to use FileManager which is deprecated since Mac OS X 10.4.
 +# Whether to use FileManager, which is deprecated since Mac OS X 10.4.
- 
+
  AC_ARG_WITH([fsspec],
    AS_HELP_STRING([--with-fsspec],
 @@ -765,7 +765,7 @@ elif test x$with_old_mac_fonts = xyes -a x$with_fsref != x; then
  fi
- 
- 
+
+
 -# Whether to use QuickDraw API in ToolBox which is deprecated since
 +# Whether to use QuickDraw API in ToolBox, which is deprecated since
  # Mac OS X 10.4.
- 
+
  AC_ARG_WITH([quickdraw-toolbox],
 @@ -807,7 +807,7 @@ elif test x$with_old_mac_fonts = xyes -a x$with_quickdraw_toolbox != x; then
  fi
- 
- 
+
+
 -# Whether to use QuickDraw API in Carbon which is deprecated since
 +# Whether to use QuickDraw API in Carbon, which is deprecated since
  # Mac OS X 10.4.
- 
+
  AC_ARG_WITH([quickdraw-carbon],
 @@ -937,21 +937,6 @@ LIBS_PRIVATE=`echo "$LIBS_PRIVATE"  \
                      -e 's/  *$//'   \
                      -e 's/  */ /g'`
- 
+
 -LIBS_CONFIG="-lfreetype      \
 -             $ZLIB_LIBS      \
 -             $BZIP2_LIBS     \
@@ -650,7 +650,7 @@ index dd7e576..8a17ffe 100644
  AC_SUBST([LIBS_PRIVATE])
 -AC_SUBST([LIBS_CONFIG])
  AC_SUBST([LIBSSTATIC_CONFIG])
- 
+
  AC_SUBST([hardcode_libdir_flag_spec])
 diff --git a/builds/unix/freetype-config.in b/builds/unix/freetype-config.in
 index 41c3a88..ebc311f 100644
@@ -658,7 +658,7 @@ index 41c3a88..ebc311f 100644
 +++ b/builds/unix/freetype-config.in
 @@ -142,7 +142,7 @@ if test "$echo_cflags" = "yes" ; then
  fi
- 
+
  if test "$echo_libs" = "yes" ; then
 -  libs="%LIBS_CONFIG%"
 +  libs="-lfreetype"
@@ -678,7 +678,7 @@ index 6e7fb10..a488d96 100644
 +exec_prefix=%exec_prefix%
 +libdir=%libdir%
 +includedir=%includedir%/freetype2
- 
+
  Name: FreeType 2
  URL: http://freetype.org
 diff --git a/builds/unix/freetype2.m4 b/builds/unix/freetype2.m4
@@ -700,17 +700,17 @@ index 3d0ecb3..3a806d9 100644
  #
 -# serial 3
 +# serial 4
- 
+
  # AC_CHECK_FT2([MINIMUM-VERSION [, ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]]])
  # Test for FreeType 2, and define FT2_CFLAGS and FT2_LIBS.
 @@ -61,7 +61,7 @@ AC_DEFUN([AC_CHECK_FT2],
     fi
- 
+
     if test "x$FT2_CONFIG" = x ; then
 -     AC_PATH_PROG([FT2_CONFIG], [freetype-config], [no])
 +     AC_PATH_TOOL([FT2_CONFIG], [freetype-config], [no])
     fi
- 
+
     min_ft_version=m4_if([$1], [], [7.0.1], [$1])
 diff --git a/builds/unix/unix-def.in b/builds/unix/unix-def.in
 index 35ea9c8..4c06a05 100644
@@ -725,7 +725,7 @@ index 35ea9c8..4c06a05 100644
  build_libtool_libs := @build_libtool_libs@
  ft_version         := @ft_version@
 @@ -102,8 +101,7 @@ NO_OUTPUT := 2> /dev/null
- 
+
  $(OBJ_BUILD)/freetype-config: $(TOP_DIR)/builds/unix/freetype-config.in
  	rm -f $@ $@.tmp
 -	sed -e 's|%LIBS_CONFIG%|$(LIBS_CONFIG)|'               \
@@ -737,7 +737,7 @@ index 35ea9c8..4c06a05 100644
 @@ -116,16 +114,29 @@ $(OBJ_BUILD)/freetype-config: $(TOP_DIR)/builds/unix/freetype-config.in
  	chmod a-w $@.tmp
  	mv $@.tmp $@
- 
+
 +# To support directory names with spaces (as might easily happen on Windows
 +# platforms), the right solution would be to surround the pkg-variables in
 +# `freetype2.pc' with double quotes.  However, doing so ironically disables
@@ -773,7 +773,7 @@ index 803f02d..51b829c 100644
 --- a/docs/CHANGES
 +++ b/docs/CHANGES
 @@ -1,11 +1,40 @@
- 
+
 +CHANGES BETWEEN 2.5.3 and 2.5.4
 +
 +  I. IMPORTANT BUG FIXES
@@ -804,27 +804,27 @@ index 803f02d..51b829c 100644
 +======================================================================
 +
  CHANGES BETWEEN 2.5.2 and 2.5.3
- 
+
    I. IMPORTANT BUG FIXES
- 
+
 -    - A vulnerability was  identified and fixed in the  new CFF driver
 -      (cf. http://savannah.nongnu.org/bugs/?41697;  it doesn't  have a
 -      CVE number yet).  All users should upgrade.
 +    - A vulnerability (CVE-2014-2240) was  identified and fixed in the
 +      new  CFF  driver  (cf.  http://savannah.nongnu.org/bugs/?41697).
 +      All users should upgrade.
- 
+
      - More  bug  fixes related  to  correct  positioning of  composite
        glyphs.
 @@ -261,6 +290,9 @@ CHANGES BETWEEN 2.4.12 and 2.5
        it accepts a new command line  option `-H' to select the hinting
        engine.
- 
+
 +    - `ftdump's verbose option has been renamed to `-V'.  For all demo
 +      programs, `-v' now shows version information.
 +
      - Another round of TrueType subpixel hinting fixes.
- 
+
      - The `apinames' tool can now create an import file for NetWare.
 diff --git a/include/freetype.h b/include/freetype.h
 index fb62b62..9ab843c 100644
@@ -863,13 +863,13 @@ index 76c7b9e..99b2fad 100644
 --- a/include/fterrdef.h
 +++ b/include/fterrdef.h
 @@ -31,218 +31,218 @@
- 
+
    /* generic errors */
- 
+
 -  FT_NOERRORDEF_( Ok,                                        0x00, \
 +  FT_NOERRORDEF_( Ok,                                        0x00,
                    "no error" )
- 
+
 -  FT_ERRORDEF_( Cannot_Open_Resource,                        0x01, \
 +  FT_ERRORDEF_( Cannot_Open_Resource,                        0x01,
                  "cannot open resource" )
@@ -906,9 +906,9 @@ index 76c7b9e..99b2fad 100644
 -  FT_ERRORDEF_( Missing_Property,                            0x0C, \
 +  FT_ERRORDEF_( Missing_Property,                            0x0C,
                  "missing property" )
- 
+
    /* glyph/character errors */
- 
+
 -  FT_ERRORDEF_( Invalid_Glyph_Index,                         0x10, \
 +  FT_ERRORDEF_( Invalid_Glyph_Index,                         0x10,
                  "invalid glyph index" )
@@ -933,9 +933,9 @@ index 76c7b9e..99b2fad 100644
 -  FT_ERRORDEF_( Invalid_Pixel_Size,                          0x17, \
 +  FT_ERRORDEF_( Invalid_Pixel_Size,                          0x17,
                  "invalid pixel size" )
- 
+
    /* handle errors */
- 
+
 -  FT_ERRORDEF_( Invalid_Handle,                              0x20, \
 +  FT_ERRORDEF_( Invalid_Handle,                              0x20,
                  "invalid object handle" )
@@ -963,27 +963,27 @@ index 76c7b9e..99b2fad 100644
 -  FT_ERRORDEF_( Invalid_Stream_Handle,                       0x28, \
 +  FT_ERRORDEF_( Invalid_Stream_Handle,                       0x28,
                  "invalid stream handle" )
- 
+
    /* driver errors */
- 
+
 -  FT_ERRORDEF_( Too_Many_Drivers,                            0x30, \
 +  FT_ERRORDEF_( Too_Many_Drivers,                            0x30,
                  "too many modules" )
 -  FT_ERRORDEF_( Too_Many_Extensions,                         0x31, \
 +  FT_ERRORDEF_( Too_Many_Extensions,                         0x31,
                  "too many extensions" )
- 
+
    /* memory errors */
- 
+
 -  FT_ERRORDEF_( Out_Of_Memory,                               0x40, \
 +  FT_ERRORDEF_( Out_Of_Memory,                               0x40,
                  "out of memory" )
 -  FT_ERRORDEF_( Unlisted_Object,                             0x41, \
 +  FT_ERRORDEF_( Unlisted_Object,                             0x41,
                  "unlisted object" )
- 
+
    /* stream errors */
- 
+
 -  FT_ERRORDEF_( Cannot_Open_Stream,                          0x51, \
 +  FT_ERRORDEF_( Cannot_Open_Stream,                          0x51,
                  "cannot open stream" )
@@ -1008,9 +1008,9 @@ index 76c7b9e..99b2fad 100644
 -  FT_ERRORDEF_( Invalid_Frame_Read,                          0x58, \
 +  FT_ERRORDEF_( Invalid_Frame_Read,                          0x58,
                  "invalid frame read" )
- 
+
    /* raster errors */
- 
+
 -  FT_ERRORDEF_( Raster_Uninitialized,                        0x60, \
 +  FT_ERRORDEF_( Raster_Uninitialized,                        0x60,
                  "raster uninitialized" )
@@ -1023,15 +1023,15 @@ index 76c7b9e..99b2fad 100644
 -  FT_ERRORDEF_( Raster_Negative_Height,                      0x63, \
 +  FT_ERRORDEF_( Raster_Negative_Height,                      0x63,
                  "negative height while rastering" )
- 
+
    /* cache errors */
- 
+
 -  FT_ERRORDEF_( Too_Many_Caches,                             0x70, \
 +  FT_ERRORDEF_( Too_Many_Caches,                             0x70,
                  "too many registered caches" )
- 
+
    /* TrueType and SFNT errors */
- 
+
 -  FT_ERRORDEF_( Invalid_Opcode,                              0x80, \
 +  FT_ERRORDEF_( Invalid_Opcode,                              0x80,
                  "invalid opcode" )
@@ -1116,9 +1116,9 @@ index 76c7b9e..99b2fad 100644
 -  FT_ERRORDEF_( Invalid_Post_Table,                          0x9B, \
 +  FT_ERRORDEF_( Invalid_Post_Table,                          0x9B,
                  "invalid PostScript (post) table" )
- 
+
    /* CFF, CID, and Type 1 errors */
- 
+
 -  FT_ERRORDEF_( Syntax_Error,                                0xA0, \
 +  FT_ERRORDEF_( Syntax_Error,                                0xA0,
                  "opcode syntax error" )
@@ -1134,9 +1134,9 @@ index 76c7b9e..99b2fad 100644
 -  FT_ERRORDEF_( Glyph_Too_Big,                               0xA4, \
 +  FT_ERRORDEF_( Glyph_Too_Big,                               0xA4,
                  "glyph to big for hinting" )
- 
+
    /* BDF errors */
- 
+
 -  FT_ERRORDEF_( Missing_Startfont_Field,                     0xB0, \
 +  FT_ERRORDEF_( Missing_Startfont_Field,                     0xB0,
                  "`STARTFONT' field missing" )
@@ -1170,8 +1170,8 @@ index 76c7b9e..99b2fad 100644
 -  FT_ERRORDEF_( Corrupted_Font_Glyphs,                       0xBA, \
 +  FT_ERRORDEF_( Corrupted_Font_Glyphs,                       0xBA,
                  "Font glyphs corrupted or missing fields" )
- 
- 
+
+
 diff --git a/src/autofit/afblue.c b/src/autofit/afblue.c
 index 6e214c8..f3526bf 100644
 --- a/src/autofit/afblue.c
@@ -1348,7 +1348,7 @@ index 6e214c8..f3526bf 100644
 -    { AF_BLUE_STRING_MAX,               0                            },
 +    { AF_BLUE_STRING_MAX,        0                            },
  #endif /* AF_CONFIG_OPTION_CJK                */
- 
+
    };
 diff --git a/src/autofit/afblue.dat b/src/autofit/afblue.dat
 index d488f3f..74a472d 100644
@@ -1382,12 +1382,12 @@ index d488f3f..74a472d 100644
  //   which can span multiple lines.  The opening brace of a block must be
 @@ -63,18 +63,32 @@
  // characters, not bytes.
- 
- 
+
+
 +// The blue zone string data, to be used in the blue stringsets below.
 +
  AF_BLUE_STRING_ENUM AF_BLUE_STRINGS_ARRAY AF_BLUE_STRING_MAX_LEN:
- 
+
 -  AF_BLUE_STRING_LATIN_CAPITAL_TOP
 -    "THEZOCQS"
 -  AF_BLUE_STRING_LATIN_CAPITAL_BOTTOM
@@ -1420,13 +1420,13 @@ index d488f3f..74a472d 100644
 +    "क म अ आ थ ध भ श"
 +  AF_BLUE_STRING_DEVANAGARI_BOTTOM
 +    "ु ृ"
- 
+
    AF_BLUE_STRING_GREEK_CAPITAL_TOP
      "ΓΒΕΖΘΟΩ"
 @@ -87,15 +101,6 @@ AF_BLUE_STRING_ENUM AF_BLUE_STRINGS_ARRAY AF_BLUE_STRING_MAX_LEN:
    AF_BLUE_STRING_GREEK_SMALL_DESCENDER
      "βγημρφχψ"
- 
+
 -  AF_BLUE_STRING_CYRILLIC_CAPITAL_TOP
 -    "БВЕПЗОСЭ"
 -  AF_BLUE_STRING_CYRILLIC_CAPITAL_BOTTOM
@@ -1442,7 +1442,7 @@ index d488f3f..74a472d 100644
 @@ -103,24 +108,33 @@ AF_BLUE_STRING_ENUM AF_BLUE_STRINGS_ARRAY AF_BLUE_STRING_MAX_LEN:
    AF_BLUE_STRING_HEBREW_DESCENDER
      "קךןףץ"
- 
+
 +  AF_BLUE_STRING_LATIN_CAPITAL_TOP
 +    "THEZOCQS"
 +  AF_BLUE_STRING_LATIN_CAPITAL_BOTTOM
@@ -1455,7 +1455,7 @@ index d488f3f..74a472d 100644
 +    "pqgjy"
 +
  #ifdef AF_CONFIG_OPTION_CJK
- 
+
 -  AF_BLUE_STRING_CJK_TOP_FILL
 +  AF_BLUE_STRING_CJK_TOP
      "他们你來們到和地"
@@ -1480,9 +1480,9 @@ index d488f3f..74a472d 100644
      "當看着置者自著裡"
      "过还进進過道還里"
 @@ -128,22 +142,20 @@ AF_BLUE_STRING_ENUM AF_BLUE_STRINGS_ARRAY AF_BLUE_STRING_MAX_LEN:
- 
+
  #ifdef AF_CONFIG_OPTION_CJK_BLUE_HANI_VERT
- 
+
 -  AF_BLUE_STRING_CJK_LEFT_FILL
 +  AF_BLUE_STRING_CJK_LEFT
      "些们你來們到和地"
@@ -1508,8 +1508,8 @@ index d488f3f..74a472d 100644
      "种調调費费那都間"
 @@ -154,17 +166,118 @@ AF_BLUE_STRING_ENUM AF_BLUE_STRINGS_ARRAY AF_BLUE_STRING_MAX_LEN:
  #endif /* AF_CONFIG_OPTION_CJK                */
- 
- 
+
+
 +// The blue zone stringsets, as used in the script styles, cf. `afstyles.h'.
 +//
 +// The AF_BLUE_PROPERTY_XXX flags are defined in `afblue.h'; here some
@@ -1603,7 +1603,7 @@ index d488f3f..74a472d 100644
 +
 +
  AF_BLUE_STRINGSET_ENUM AF_BLUE_STRINGSETS_ARRAY AF_BLUE_STRINGSET_MAX_LEN:
- 
+
 -  AF_BLUE_STRINGSET_LATN
 -    { AF_BLUE_STRING_LATIN_CAPITAL_TOP,     AF_BLUE_PROPERTY_LATIN_TOP        }
 -    { AF_BLUE_STRING_LATIN_CAPITAL_BOTTOM,  0                                 }
@@ -1631,13 +1631,13 @@ index d488f3f..74a472d 100644
 +    { AF_BLUE_STRING_DEVANAGARI_BASE,   0                                 }
 +    { AF_BLUE_STRING_DEVANAGARI_BOTTOM, 0                                 }
 +    { AF_BLUE_STRING_MAX,               0                                 }
- 
+
    AF_BLUE_STRINGSET_GREK
      { AF_BLUE_STRING_GREEK_CAPITAL_TOP,     AF_BLUE_PROPERTY_LATIN_TOP        }
 @@ -176,15 +289,6 @@ AF_BLUE_STRINGSET_ENUM AF_BLUE_STRINGSETS_ARRAY AF_BLUE_STRINGSET_MAX_LEN:
      { AF_BLUE_STRING_GREEK_SMALL_DESCENDER, 0                                 }
      { AF_BLUE_STRING_MAX,                   0                                 }
- 
+
 -  AF_BLUE_STRINGSET_CYRL
 -    { AF_BLUE_STRING_CYRILLIC_CAPITAL_TOP,     AF_BLUE_PROPERTY_LATIN_TOP        }
 -    { AF_BLUE_STRING_CYRILLIC_CAPITAL_BOTTOM,  0                                 }
@@ -1653,7 +1653,7 @@ index d488f3f..74a472d 100644
 @@ -192,25 +296,27 @@ AF_BLUE_STRINGSET_ENUM AF_BLUE_STRINGSETS_ARRAY AF_BLUE_STRINGSET_MAX_LEN:
      { AF_BLUE_STRING_HEBREW_DESCENDER, 0                             }
      { AF_BLUE_STRING_MAX,              0                             }
- 
+
 +  AF_BLUE_STRINGSET_LATN
 +    { AF_BLUE_STRING_LATIN_CAPITAL_TOP,     AF_BLUE_PROPERTY_LATIN_TOP        }
 +    { AF_BLUE_STRING_LATIN_CAPITAL_BOTTOM,  0                                 }
@@ -1665,7 +1665,7 @@ index d488f3f..74a472d 100644
 +    { AF_BLUE_STRING_MAX,                   0                                 }
 +
  #ifdef AF_CONFIG_OPTION_CJK
- 
+
    AF_BLUE_STRINGSET_HANI
 -    { AF_BLUE_STRING_CJK_TOP_FILL,      AF_BLUE_PROPERTY_CJK_TOP |
 -                                        AF_BLUE_PROPERTY_CJK_FILL    }
@@ -1689,9 +1689,9 @@ index d488f3f..74a472d 100644
  #endif /* AF_CONFIG_OPTION_CJK_BLUE_HANI_VERT */
 -    { AF_BLUE_STRING_MAX,               0                            }
 +    { AF_BLUE_STRING_MAX,        0                            }
- 
+
  #endif /* AF_CONFIG_OPTION_CJK                */
- 
+
 diff --git a/src/autofit/afblue.h b/src/autofit/afblue.h
 index 6f336ab..d239e8e 100644
 --- a/src/autofit/afblue.h
@@ -1707,14 +1707,14 @@ index 6f336ab..d239e8e 100644
  /*  This file is part of the FreeType project, and may only be used,       */
 @@ -67,42 +67,42 @@ FT_BEGIN_HEADER
    /* At the bottommost level, we define strings for finding blue zones. */
- 
- 
+
+
 -#define AF_BLUE_STRING_MAX_LEN  25
 +#define AF_BLUE_STRING_MAX_LEN  51
- 
+
    /* The AF_Blue_String enumeration values are offsets into the */
    /* `af_blue_strings' array.                                   */
- 
+
    typedef enum  AF_Blue_String_
    {
 -    AF_BLUE_STRING_LATIN_CAPITAL_TOP = 0,
@@ -1786,21 +1786,21 @@ index 6f336ab..d239e8e 100644
 +#define AF_BLUE_PROPERTY_LATIN_NEUTRAL   ( 1 << 1 )
 +#define AF_BLUE_PROPERTY_LATIN_X_HEIGHT  ( 1 << 2 )
 +#define AF_BLUE_PROPERTY_LATIN_LONG      ( 1 << 3 )
- 
+
 -#define AF_BLUE_PROPERTY_CJK_HORIZ  ( 1 << 0 )
 -#define AF_BLUE_PROPERTY_CJK_TOP    ( 1 << 1 )
 -#define AF_BLUE_PROPERTY_CJK_FILL   ( 1 << 2 )
 +#define AF_BLUE_PROPERTY_CJK_TOP    ( 1 << 0 )        /* must have value 1 */
 +#define AF_BLUE_PROPERTY_CJK_HORIZ  ( 1 << 1 )        /* must have value 2 */
  #define AF_BLUE_PROPERTY_CJK_RIGHT  AF_BLUE_PROPERTY_CJK_TOP
- 
- 
+
+
 -#define AF_BLUE_STRINGSET_MAX_LEN  9
 +#define AF_BLUE_STRINGSET_MAX_LEN  7
- 
+
    /* The AF_Blue_Stringset enumeration values are offsets into the */
    /* `af_blue_stringsets' array.                                   */
- 
+
    typedef enum  AF_Blue_Stringset_
    {
 -    AF_BLUE_STRINGSET_LATN = 0,
@@ -1848,15 +1848,15 @@ index 4fc9917..0b4b48d 100644
 +#define AF_BLUE_PROPERTY_LATIN_NEUTRAL   ( 1 << 1 )
 +#define AF_BLUE_PROPERTY_LATIN_X_HEIGHT  ( 1 << 2 )
 +#define AF_BLUE_PROPERTY_LATIN_LONG      ( 1 << 3 )
- 
+
 -#define AF_BLUE_PROPERTY_CJK_HORIZ  ( 1 << 0 )
 -#define AF_BLUE_PROPERTY_CJK_TOP    ( 1 << 1 )
 -#define AF_BLUE_PROPERTY_CJK_FILL   ( 1 << 2 )
 +#define AF_BLUE_PROPERTY_CJK_TOP    ( 1 << 0 )        /* must have value 1 */
 +#define AF_BLUE_PROPERTY_CJK_HORIZ  ( 1 << 1 )        /* must have value 2 */
  #define AF_BLUE_PROPERTY_CJK_RIGHT  AF_BLUE_PROPERTY_CJK_TOP
- 
- 
+
+
 diff --git a/src/autofit/afcjk.c b/src/autofit/afcjk.c
 index 3a65fc5..ca7acca 100644
 --- a/src/autofit/afcjk.c
@@ -1872,17 +1872,17 @@ index 3a65fc5..ca7acca 100644
  /*  This file is part of the FreeType project, and may only be used,       */
 @@ -178,6 +178,8 @@
            goto Exit;
- 
+
          af_latin_hints_link_segments( hints,
 +                                      0,
 +                                      NULL,
                                        (AF_Dimension)dim );
- 
+
          seg   = axhints->segments;
 @@ -261,6 +263,8 @@
      FT_Int      num_fills;
      FT_Int      num_flats;
- 
+
 +    FT_Bool     fill;
 +
      AF_CJKBlue  blue;
@@ -1891,7 +1891,7 @@ index 3a65fc5..ca7acca 100644
 @@ -271,22 +275,6 @@
      AF_Blue_Stringset         bss = sc->blue_stringset;
      const AF_Blue_StringRec*  bs  = &af_blue_stringsets[bss];
- 
+
 -#ifdef FT_DEBUG_LEVEL_TRACE
 -    FT_String*  cjk_blue_name[4] =
 -    {
@@ -1908,13 +1908,13 @@ index 3a65fc5..ca7acca 100644
 -    };
 -#endif
 -
- 
+
      /* we walk over the blue character strings as specified in the   */
      /* style's entry in the `af_blue_stringset' array, computing its */
 @@ -308,15 +296,29 @@
        else
          axis = &metrics->axis[AF_DIMENSION_VERT];
- 
+
 -      FT_TRACE5(( "blue zone %d:\n", axis->blue_count ));
 +#ifdef FT_DEBUG_LEVEL_TRACE
 +      {
@@ -1933,23 +1933,23 @@ index 3a65fc5..ca7acca 100644
 +                                  AF_CJK_IS_TOP_BLUE( bs )   ] ));
 +      }
 +#endif /* FT_DEBUG_LEVEL_TRACE */
- 
+
        num_fills = 0;
        num_flats = 0;
- 
+
 -      FT_TRACE5(( "  cjk blue %s/%s\n",
 -                  cjk_blue_name[AF_CJK_IS_HORIZ_BLUE( bs ) |
 -                                AF_CJK_IS_TOP_BLUE( bs )   ],
 -                  cjk_blue_type_name[!!AF_CJK_IS_FILLED_BLUE( bs )] ));
 +      fill = 1;  /* start with characters that define fill values */
 +      FT_TRACE5(( "  [overshoot values]\n" ));
- 
+
        while ( *p )
        {
 @@ -330,6 +332,14 @@
- 
+
          GET_UTF8_CHAR( ch, p );
- 
+
 +        /* switch to characters that define flat values */
 +        if ( ch == '|' )
 +        {
@@ -1964,7 +1964,7 @@ index 3a65fc5..ca7acca 100644
 @@ -417,7 +427,7 @@
            FT_TRACE5(( "  U+%04lX: best_pos = %5ld\n", ch, best_pos ));
          }
- 
+
 -        if ( AF_CJK_IS_FILLED_BLUE( bs ) )
 +        if ( fill )
            fills[num_fills++] = best_pos;
@@ -1978,7 +1978,7 @@ index 3a65fc5..ca7acca 100644
 +        FT_TRACE5(( "  empty\n" ));
          continue;
        }
- 
+
 -      /* we have computed the contents of the `fill' and `flats' tables, */
 -      /* now determine the reference position of the blue zone --        */
 -      /* we simply take the median value after a simple sort             */
@@ -1988,13 +1988,13 @@ index 3a65fc5..ca7acca 100644
 +      /* we simply take the median value after a simple sort               */
        af_sort_pos( num_fills, fills );
 +      af_sort_pos( num_flats, flats );
- 
+
        blue       = &axis->blues[axis->blue_count];
        blue_ref   = &blue->ref.org;
 @@ -476,7 +486,7 @@
            *blue_ref   =
            *blue_shoot = ( shoot + ref ) / 2;
- 
+
 -          FT_TRACE5(( "  [overshoot smaller than reference,"
 +          FT_TRACE5(( "  [reference smaller than overshoot,"
                        " taking mean value]\n" ));
@@ -2010,12 +2010,12 @@ index 3a65fc5..ca7acca 100644
 +          (FT_Byte)( ( blue->flags & AF_CJK_BLUE_TOP ) != 0 );
 +        is_major_dir =
 +          FT_BOOL( edge->dir == axis->major_dir );
- 
+
          /* if it is a top zone, the edge must be against the major    */
          /* direction; if it is a bottom zone, it must be in the major */
 @@ -1528,6 +1540,12 @@
- 
- 
+
+
      stem_edge->pos = base_edge->pos + fitted_width;
 +
 +    FT_TRACE5(( "  CJKLINK: edge %d @%d (opos=%.2f) linked to %.2f,"
@@ -2024,8 +2024,8 @@ index 3a65fc5..ca7acca 100644
 +                stem_edge->opos / 64.0, stem_edge->pos / 64.0,
 +                dist / 64.0, fitted_width / 64.0 ));
    }
- 
- 
+
+
 diff --git a/src/autofit/afcjk.h b/src/autofit/afcjk.h
 index a260b09..4dd4f39 100644
 --- a/src/autofit/afcjk.h
@@ -2046,7 +2046,7 @@ index a260b09..4dd4f39 100644
 -#define AF_CJK_IS_FILLED_BLUE( b ) \
 -          ( (b)->properties & AF_BLUE_PROPERTY_CJK_FILL )
  #define AF_CJK_IS_RIGHT_BLUE  AF_CJK_IS_TOP_BLUE
- 
+
  #define AF_CJK_MAX_WIDTHS  16
 diff --git a/src/autofit/afglobal.c b/src/autofit/afglobal.c
 index 7aa2e11..a54c20c 100644
@@ -2058,8 +2058,8 @@ index 7aa2e11..a54c20c 100644
      FT_UInt     i;
 -    FT_UInt     dflt        = -1;
 +    FT_UInt     dflt        = ~0U; /* a non-valid value */
- 
- 
+
+
      /* the value AF_STYLE_UNASSIGNED means `uncovered glyph' */
 @@ -176,7 +176,8 @@
         */
@@ -2069,7 +2069,7 @@ index 7aa2e11..a54c20c 100644
 +        if ( (FT_UInt)style_class->script ==
 +             globals->module->default_script )
            dflt = ss;
- 
+
          for ( range = script_class->script_uni_ranges;
 @@ -332,8 +333,8 @@
        af_face_globals_free( globals );
@@ -2079,7 +2079,7 @@ index 7aa2e11..a54c20c 100644
 -    globals->increase_x_height = AF_PROP_INCREASE_X_HEIGHT_MAX;
 +    else
 +      globals->increase_x_height = AF_PROP_INCREASE_X_HEIGHT_MAX;
- 
+
    Exit:
      *aglobals = globals;
 diff --git a/src/autofit/afglobal.h b/src/autofit/afglobal.h
@@ -2087,7 +2087,7 @@ index d2da40e..38d8d69 100644
 --- a/src/autofit/afglobal.h
 +++ b/src/autofit/afglobal.h
 @@ -66,16 +66,16 @@ FT_BEGIN_HEADER
- 
+
    /* index of fallback style in `af_style_classes' */
  #ifdef AF_CONFIG_OPTION_CJK
 -#define AF_STYLE_FALLBACK  AF_STYLE_HANI_DFLT
@@ -2104,7 +2104,7 @@ index d2da40e..38d8d69 100644
    /* if this flag is set, we have an ASCII digit     */
 -#define AF_DIGIT              0x80
 +#define AF_DIGIT             0x80
- 
+
    /* `increase-x-height' property */
  #define AF_PROP_INCREASE_X_HEIGHT_MIN  6
 diff --git a/src/autofit/afhints.c b/src/autofit/afhints.c
@@ -2112,7 +2112,7 @@ index 270a06b..88a97d4 100644
 --- a/src/autofit/afhints.c
 +++ b/src/autofit/afhints.c
 @@ -651,6 +651,9 @@
- 
+
          for ( point = points; point < point_limit; point++, vec++, tag++ )
          {
 +          point->in_dir  = (FT_Char)AF_DIR_NONE;
@@ -2124,7 +2124,7 @@ index 270a06b..88a97d4 100644
 @@ -698,91 +701,186 @@
          }
        }
- 
+
 -      /* compute directions of in & out vectors */
        {
 -        AF_Point      first  = points;
@@ -2151,10 +2151,10 @@ index 270a06b..88a97d4 100644
          FT_UInt  units_per_em = hints->metrics->scaler.face->units_per_EM;
          FT_Int   near_limit   = 20 * units_per_em / 2048;
 +        FT_Int   near_limit2  = 2 * near_limit - 1;
- 
+
 +        AF_Point*  contour;
 +        AF_Point*  contour_limit = hints->contours + hints->num_contours;
- 
+
 -        for ( point = points; point < point_limit; point++ )
 +
 +        for ( contour = hints->contours; contour < contour_limit; contour++ )
@@ -2165,9 +2165,9 @@ index 270a06b..88a97d4 100644
 +          AF_Point  next, prev, curr;
 +
 +          FT_Pos  out_x, out_y;
- 
+
 +          FT_Bool  is_first;
- 
+
 -          if ( point == first )
 +
 +          /* since the first point of a contour could be part of a */
@@ -2197,22 +2197,22 @@ index 270a06b..88a97d4 100644
 +            point = prev;
 +            prev  = prev->prev;
 +          }
- 
+
 -            in_x = first->fx - prev->fx;
 -            in_y = first->fy - prev->fy;
 +          /* adjust first point */
 +          first = point;
- 
+
 -            last_good_in_x = in_x;
 -            last_good_in_y = in_y;
 +          /* now loop over all points of the contour to get */
 +          /* `in' and `out' vector directions               */
- 
+
 -            if ( FT_ABS( in_x ) + FT_ABS( in_y ) < near_limit )
 -            {
 -              /* search first non-near point to get a good `in_dir' value */
 +          curr  = first;
- 
+
 -              AF_Point  point_ = prev;
 +          /*
 +           *  We abuse the `u' and `v' fields to store index deltas to the
@@ -2224,15 +2224,15 @@ index 270a06b..88a97d4 100644
 +           */
 +          curr->u  = (FT_Pos)( first - curr );
 +          first->v = -curr->u;
- 
+
 +          out_x = 0;
 +          out_y = 0;
- 
+
 -              while ( point_ != first )
 -              {
 -                AF_Point  prev_ = point_->prev;
 +          is_first = 1;
- 
+
 -                FT_Pos  in_x_ = point_->fx - prev_->fx;
 -                FT_Pos  in_y_ = point_->fy - prev_->fy;
 +          for ( point = first;
@@ -2240,18 +2240,18 @@ index 270a06b..88a97d4 100644
 +                point = point->next )
 +          {
 +            AF_Direction  out_dir;
- 
- 
+
+
 -                if ( FT_ABS( in_x_ ) + FT_ABS( in_y_ ) >= near_limit )
 -                {
 -                  last_good_in_x = in_x_;
 -                  last_good_in_y = in_y_;
 +            is_first = 0;
- 
+
 -                  break;
 -                }
 +            next = point->next;
- 
+
 -                point_ = prev_;
 -              }
 +            out_x += next->fx - point->fx;
@@ -2277,7 +2277,7 @@ index 270a06b..88a97d4 100644
 +              curr->out_dir = (FT_Char)out_dir;
              }
 +            next->in_dir = (FT_Char)out_dir;
- 
+
 -            in_dir = af_direction_compute( in_x, in_y );
 -            first  = prev + 1;
 +            curr->u  = (FT_Pos)( first - curr );
@@ -2287,7 +2287,7 @@ index 270a06b..88a97d4 100644
 +            out_y = 0;
            }
 +        }
- 
+
 -          point->in_dir = (FT_Char)in_dir;
 +        /*
 +         *  The next step is to `simplify' an outline's topology so that we
@@ -2297,7 +2297,7 @@ index 270a06b..88a97d4 100644
 +         *  topological point of the view, the intermediate points are of no
 +         *  interest and thus tagged as weak.
 +         */
- 
+
 -          /* check whether the current point is near to the previous one */
 -          /* (value 20 in `near_limit' is heuristic; we use Taxicab      */
 -          /* metrics for the test)                                       */
@@ -2305,7 +2305,7 @@ index 270a06b..88a97d4 100644
 +        {
 +          if ( point->flags & AF_FLAG_WEAK_INTERPOLATION )
 +            continue;
- 
+
 -          if ( FT_ABS( in_x ) + FT_ABS( in_y ) < near_limit )
 -            point->flags |= AF_FLAG_NEAR;
 -          else
@@ -2323,7 +2323,7 @@ index 270a06b..88a97d4 100644
 +            AF_Point  next_u = point + point->u;
 +            AF_Point  prev_v = point + point->v;
 +
- 
+
 -          next  = point->next;
 -          out_x = next->fx - point->fx;
 -          out_y = next->fy - point->fy;
@@ -2345,7 +2345,7 @@ index 270a06b..88a97d4 100644
 +            }
 +          }
 +        }
- 
+
 -          in_dir         = af_direction_compute( out_x, out_y );
 -          point->out_dir = (FT_Char)in_dir;
 +        /*
@@ -2353,20 +2353,20 @@ index 270a06b..88a97d4 100644
 +         *  collected in edges so far is then implicitly classified as strong
 +         *  points.
 +         */
- 
+
 -          /* Check for weak points.  The remaining points not collected */
 -          /* in edges are then implicitly classified as strong points.  */
 +        for ( point = points; point < point_limit; point++ )
 +        {
 +          if ( point->flags & AF_FLAG_WEAK_INTERPOLATION )
 +            continue;
- 
+
            if ( point->flags & AF_FLAG_CONTROL )
            {
 @@ -799,18 +897,25 @@
                goto Is_Weak_Point;
              }
- 
+
 -            /* test whether `in' and `out' direction is approximately */
 -            /* the same (and use the last good `in' vector in case    */
 -            /* the current point is near to the previous one)         */
@@ -2425,16 +2425,16 @@ index 5f1507f..c0ebd0d 100644
  /*  This file is part of the FreeType project, and may only be used,       */
 @@ -236,10 +236,7 @@ FT_BEGIN_HEADER
      AF_FLAG_WEAK_INTERPOLATION = 1 << 8,
- 
+
      /* all inflection points in the outline have this flag set */
 -    AF_FLAG_INFLECTION = 1 << 9,
 -
 -    /* the current point is very near to another one */
 -    AF_FLAG_NEAR = 1 << 10
 +    AF_FLAG_INFLECTION = 1 << 9
- 
+
    } AF_Flags;
- 
+
 @@ -247,10 +244,11 @@ FT_BEGIN_HEADER
    /* edge hint flags */
    typedef enum  AF_Edge_Flags_
@@ -2448,9 +2448,9 @@ index 5f1507f..c0ebd0d 100644
 +    AF_EDGE_SERIF   = 1 << 1,
 +    AF_EDGE_DONE    = 1 << 2,
 +    AF_EDGE_NEUTRAL = 1 << 3  /* set if edge aligns to a neutral blue zone */
- 
+
    } AF_Edge_Flags;
- 
+
 diff --git a/src/autofit/aflatin.c b/src/autofit/aflatin.c
 index e3a7742..a1f2b33 100644
 --- a/src/autofit/aflatin.c
@@ -2458,7 +2458,7 @@ index e3a7742..a1f2b33 100644
 @@ -171,7 +171,15 @@
          if ( error )
            goto Exit;
- 
+
 +        /*
 +         *  We assume that the glyphs selected for the stem width
 +         *  computation are `featureless' enough so that the linking
@@ -2469,12 +2469,12 @@ index e3a7742..a1f2b33 100644
 +                                      0,
 +                                      NULL,
                                        (AF_Dimension)dim );
- 
+
          seg   = axhints->segments;
 @@ -298,6 +306,14 @@
              have_flag = 1;
            }
- 
+
 +          if ( AF_LATIN_IS_NEUTRAL_BLUE( bs ) )
 +          {
 +            if ( have_flag )
@@ -2489,7 +2489,7 @@ index e3a7742..a1f2b33 100644
 @@ -520,6 +536,13 @@
                FT_Int   last;
                FT_Bool  hit;
- 
+
 +              /* we intentionally declare these two variables        */
 +              /* outside of the loop since various compilers emit    */
 +              /* incorrect warning messages otherwise, talking about */
@@ -2498,20 +2498,20 @@ index e3a7742..a1f2b33 100644
 +              FT_Int  p_last  = 0;
 +
                FT_Bool  left2right;
- 
- 
+
+
 @@ -552,7 +575,6 @@
                {
                  FT_Bool  l2r;
                  FT_Pos   d;
 -                FT_Int   p_first, p_last;
- 
- 
+
+
                  if ( !hit )
 @@ -688,6 +710,13 @@
                        FT_CURVE_TAG( outline.tags[best_segment_last]  ) !=
                          FT_CURVE_TAG_ON                                   );
- 
+
 +          if ( round && AF_LATIN_IS_NEUTRAL_BLUE( bs ) )
 +          {
 +            /* only use flat segments for a neutral blue zone */
@@ -2521,24 +2521,24 @@ index e3a7742..a1f2b33 100644
 +
            FT_TRACE5(( " (%s)\n", round ? "round" : "flat" ));
          }
- 
+
 @@ -758,6 +787,8 @@
        blue->flags = 0;
        if ( AF_LATIN_IS_TOP_BLUE( bs ) )
          blue->flags |= AF_LATIN_BLUE_TOP;
 +      if ( AF_LATIN_IS_NEUTRAL_BLUE( bs ) )
 +        blue->flags |= AF_LATIN_BLUE_NEUTRAL;
- 
+
        /*
         * The following flag is used later to adjust the y and x scales
 @@ -1337,25 +1368,40 @@
    }
- 
- 
+
+
 -  /* Link segments to form stems and serifs. */
 +  /* Link segments to form stems and serifs.  If `width_count' and      */
 +  /* `widths' are non-zero, use them to fine-tune the scoring function. */
- 
+
    FT_LOCAL_DEF( void )
    af_latin_hints_link_segments( AF_GlyphHints  hints,
 +                                FT_UInt        width_count,
@@ -2551,8 +2551,8 @@ index e3a7742..a1f2b33 100644
 -    FT_Pos        len_threshold, len_score;
 +    FT_Pos        len_threshold, len_score, dist_score, max_width;
      AF_Segment    seg1, seg2;
- 
- 
+
+
 +    if ( width_count )
 +      max_width = widths[width_count - 1].org;
 +    else
@@ -2562,10 +2562,10 @@ index e3a7742..a1f2b33 100644
      len_threshold = AF_LATIN_CONSTANT( hints->metrics, 8 );
      if ( len_threshold == 0 )
        len_threshold = 1;
- 
+
 +    /* a heuristic value to weight lengths */
      len_score = AF_LATIN_CONSTANT( hints->metrics, 6000 );
- 
+
 +    /* a heuristic value to weight distances (no call to    */
 +    /* AF_LATIN_CONSTANT needed, since we work on multiples */
 +    /* of the stem width)                                   */
@@ -2585,12 +2585,12 @@ index e3a7742..a1f2b33 100644
 +          FT_Pos  min = seg1->min_coord;
 +          FT_Pos  max = seg1->max_coord;
 +          FT_Pos  len;
- 
- 
+
+
            if ( min < seg2->min_coord )
 @@ -1388,15 +1433,49 @@
              max = seg2->max_coord;
- 
+
            /* compute maximum coordinate difference of the two segments */
 +          /* (this is, how much they overlap)                          */
            len = max - min;
@@ -2636,14 +2636,14 @@ index e3a7742..a1f2b33 100644
 +              dist_demerit = dist; /* default if no widths available */
 +
 +            score = dist_demerit + len_score / len;
- 
+
              /* and we search for the smallest score */
 -            /* of the sum of the two values         */
              if ( score < seg1->score )
              {
                seg1->score = score;
 @@ -1728,6 +1807,8 @@
- 
+
    FT_LOCAL_DEF( FT_Error )
    af_latin_hints_detect_features( AF_GlyphHints  hints,
 +                                  FT_UInt        width_count,
@@ -2657,7 +2657,7 @@ index e3a7742..a1f2b33 100644
      {
 -      af_latin_hints_link_segments( hints, dim );
 +      af_latin_hints_link_segments( hints, width_count, widths, dim );
- 
+
        error = af_latin_hints_compute_edges( hints, dim );
      }
 @@ -1765,8 +1846,9 @@
@@ -2669,8 +2669,8 @@ index e3a7742..a1f2b33 100644
 +      AF_Width  best_blue            = NULL;
 +      FT_Bool   best_blue_is_neutral = 0;
 +      FT_Pos    best_dist;                 /* initial threshold */
- 
- 
+
+
        /* compute the initial threshold as a fraction of the EM size */
 @@ -1780,24 +1862,26 @@
        for ( bb = 0; bb < latin->blue_count; bb++ )
@@ -2678,12 +2678,12 @@ index e3a7742..a1f2b33 100644
          AF_LatinBlue  blue = latin->blues + bb;
 -        FT_Bool       is_top_blue, is_major_dir;
 +        FT_Bool       is_top_blue, is_neutral_blue, is_major_dir;
- 
- 
+
+
          /* skip inactive blue zones (i.e., those that are too large) */
          if ( !( blue->flags & AF_LATIN_BLUE_ACTIVE ) )
            continue;
- 
+
 -        /* if it is a top zone, check for right edges -- if it is a bottom */
 -        /* zone, check for left edges                                      */
 -        /*                                                                 */
@@ -2710,7 +2710,7 @@ index e3a7742..a1f2b33 100644
 +        if ( is_top_blue ^ is_major_dir || is_neutral_blue )
          {
            FT_Pos  dist;
- 
+
 @@ -1810,15 +1894,19 @@
            dist = FT_MulFix( dist, scale );
            if ( dist < best_dist )
@@ -2721,7 +2721,7 @@ index e3a7742..a1f2b33 100644
 +            best_blue            = &blue->ref;
 +            best_blue_is_neutral = is_neutral_blue;
            }
- 
+
            /* now compare it to the overshoot position and check whether */
            /* the edge is rounded, and whether the edge is over the      */
            /* reference position of a top zone, or under the reference   */
@@ -2734,7 +2734,7 @@ index e3a7742..a1f2b33 100644
 +               !is_neutral_blue            )
            {
              FT_Bool  is_under_ref = FT_BOOL( edge->fpos < blue->ref.org );
- 
+
 @@ -1832,8 +1920,9 @@
                dist = FT_MulFix( dist, scale );
                if ( dist < best_dist )
@@ -2749,7 +2749,7 @@ index e3a7742..a1f2b33 100644
            }
 @@ -1841,7 +1930,11 @@
        }
- 
+
        if ( best_blue )
 +      {
          edge->blue_edge = best_blue;
@@ -2758,24 +2758,24 @@ index e3a7742..a1f2b33 100644
 +      }
      }
    }
- 
+
 @@ -2159,7 +2252,7 @@
- 
+
      FT_TRACE5(( "  LINK: edge %d (opos=%.2f) linked to %.2f,"
                  " dist was %.2f, now %.2f\n",
 -                stem_edge-hints->axis[dim].edges, stem_edge->opos / 64.0,
 +                stem_edge - hints->axis[dim].edges, stem_edge->opos / 64.0,
                  stem_edge->pos / 64.0, dist / 64.0, fitted_width / 64.0 ));
    }
- 
+
 @@ -2226,14 +2319,41 @@
          if ( edge->flags & AF_EDGE_DONE )
            continue;
- 
+
 -        blue  = edge->blue_edge;
          edge1 = NULL;
          edge2 = edge->link;
- 
+
 +        /*
 +         *  If a stem contains both a neutral and a non-neutral blue zone,
 +         *  skip the neutral one.  Otherwise, outlines with different
@@ -2806,7 +2806,7 @@ index e3a7742..a1f2b33 100644
 +        blue = edge->blue_edge;
          if ( blue )
            edge1 = edge;
- 
+
 -        /* flip edges if the other stem is aligned to a blue zone */
 +        /* flip edges if the other edge is aligned to a blue zone */
          else if ( edge2 && edge2->blue_edge )
@@ -2818,16 +2818,16 @@ index e3a7742..a1f2b33 100644
        {
 -        FT_TRACE5(( "  ASSERTION FAILED for edge %d\n", edge2-edges ));
 +        FT_TRACE5(( "  ASSERTION FAILED for edge %d\n", edge2 - edges ));
- 
+
          af_latin_align_linked_edge( hints, dim, edge2, edge );
          edge->flags |= AF_EDGE_DONE;
 @@ -2689,6 +2809,8 @@
      FT_Error  error;
      int       dim;
- 
+
 +    AF_LatinAxis  axis;
 +
- 
+
      error = af_glyph_hints_reload( hints, outline );
      if ( error )
 @@ -2702,14 +2824,22 @@
@@ -2843,7 +2843,7 @@ index e3a7742..a1f2b33 100644
        if ( error )
          goto Exit;
      }
- 
+
      if ( AF_HINTS_DO_VERTICAL( hints ) )
      {
 -      error = af_latin_hints_detect_features( hints, AF_DIMENSION_VERT );
@@ -2854,7 +2854,7 @@ index e3a7742..a1f2b33 100644
 +                                              AF_DIMENSION_VERT );
        if ( error )
          goto Exit;
- 
+
 diff --git a/src/autofit/aflatin.h b/src/autofit/aflatin.h
 index a958af3..2c0bfca 100644
 --- a/src/autofit/aflatin.h
@@ -2869,7 +2869,7 @@ index a958af3..2c0bfca 100644
  /*                                                                         */
  /*  This file is part of the FreeType project, and may only be used,       */
 @@ -53,6 +53,8 @@ FT_BEGIN_HEADER
- 
+
  #define AF_LATIN_IS_TOP_BLUE( b ) \
            ( (b)->properties & AF_BLUE_PROPERTY_LATIN_TOP )
 +#define AF_LATIN_IS_NEUTRAL_BLUE( b ) \
@@ -2878,7 +2878,7 @@ index a958af3..2c0bfca 100644
            ( (b)->properties & AF_BLUE_PROPERTY_LATIN_X_HEIGHT )
  #define AF_LATIN_IS_LONG_BLUE( b ) \
 @@ -63,10 +65,11 @@ FT_BEGIN_HEADER
- 
+
    enum
    {
 -    AF_LATIN_BLUE_ACTIVE     = 1 << 0,  /* set if zone height is <= 3/4px */
@@ -2892,24 +2892,24 @@ index a958af3..2c0bfca 100644
 +                                       /* optimization                     */
      AF_LATIN_BLUE_FLAG_MAX
    };
- 
+
 @@ -169,6 +172,8 @@ FT_BEGIN_HEADER
- 
+
    FT_LOCAL( void )
    af_latin_hints_link_segments( AF_GlyphHints  hints,
 +                                FT_UInt        width_count,
 +                                AF_WidthRec*   widths,
                                  AF_Dimension   dim );
- 
+
    FT_LOCAL( FT_Error )
 @@ -177,6 +182,8 @@ FT_BEGIN_HEADER
- 
+
    FT_LOCAL( FT_Error )
    af_latin_hints_detect_features( AF_GlyphHints  hints,
 +                                  FT_UInt        width_count,
 +                                  AF_WidthRec*   widths,
                                    AF_Dimension   dim );
- 
+
  /* */
 diff --git a/src/autofit/afmodule.c b/src/autofit/afmodule.c
 index 73bf832..181cf55 100644
@@ -2917,8 +2917,8 @@ index 73bf832..181cf55 100644
 +++ b/src/autofit/afmodule.c
 @@ -103,8 +103,8 @@
          AF_StyleClass  style_class = AF_STYLE_CLASSES_GET[ss];
- 
- 
+
+
 -        if ( style_class->script == *fallback_script      &&
 -             style_class->coverage == AF_COVERAGE_DEFAULT )
 +        if ( (FT_UInt)style_class->script == *fallback_script &&
@@ -2931,7 +2931,7 @@ index 3d919b5..139a4c1 100644
 --- a/src/autofit/afranges.c
 +++ b/src/autofit/afranges.c
 @@ -21,51 +21,59 @@
- 
+
    const AF_Script_UniRangeRec  af_cyrl_uniranges[] =
    {
 -    AF_UNIRANGE_REC(  0x0400UL,  0x04FFUL ),  /* Cyrillic */
@@ -2941,7 +2941,7 @@ index 3d919b5..139a4c1 100644
      AF_UNIRANGE_REC(  0xA640UL,  0xA69FUL ),  /* Cyrillic Extended-B */
      AF_UNIRANGE_REC(       0UL,       0UL )
    };
- 
+
 +  const AF_Script_UniRangeRec  af_deva_uniranges[] =
 +  {
 +    AF_UNIRANGE_REC(  0x0900UL,  0x097FUL ),  /* Devanagari       */
@@ -2956,7 +2956,7 @@ index 3d919b5..139a4c1 100644
 +    AF_UNIRANGE_REC(  0x1F00UL,  0x1FFFUL ),  /* Greek Extended   */
      AF_UNIRANGE_REC(       0UL,       0UL )
    };
- 
+
    const AF_Script_UniRangeRec  af_hebr_uniranges[] =
    {
 -    AF_UNIRANGE_REC(  0x0590UL,  0x05FFUL ),  /* Hebrew */
@@ -2964,7 +2964,7 @@ index 3d919b5..139a4c1 100644
      AF_UNIRANGE_REC(  0xFB1DUL,  0xFB4FUL ),  /* Alphab. Present. Forms (Hebrew) */
      AF_UNIRANGE_REC(       0UL,       0UL )
    };
- 
+
    const AF_Script_UniRangeRec  af_latn_uniranges[] =
    {
 -    AF_UNIRANGE_REC(  0x0020UL,  0x007FUL ),  /* Basic Latin (no control chars) */
@@ -3013,11 +3013,11 @@ index 3d919b5..139a4c1 100644
 +    AF_UNIRANGE_REC( 0x1F100UL, 0x1F1FFUL ),  /* Enclosed Alphanumeric Supplement       */
      AF_UNIRANGE_REC(       0UL,       0UL )
    };
- 
+
 @@ -82,12 +90,6 @@
      AF_UNIRANGE_REC(       0UL,       0UL )
    };
- 
+
 -  const AF_Script_UniRangeRec  af_deva_uniranges[] =
 -  {
 -    AF_UNIRANGE_REC(  0x0900UL,  0x097FUL ),  /* Devanagari */
@@ -3034,7 +3034,7 @@ index ae20932..a418b05 100644
 @@ -31,6 +31,11 @@
            HB_SCRIPT_CYRILLIC,
            0x43E, 0x41E, 0x0 ) /* оО */
- 
+
 +  SCRIPT( deva, DEVA,
 +          "Devanagari",
 +          HB_SCRIPT_DEVANAGARI,
@@ -3046,7 +3046,7 @@ index ae20932..a418b05 100644
 @@ -58,11 +63,6 @@
            HB_SCRIPT_BENGALI,
            'o', 0x0, 0x0 ) /* XXX */
- 
+
 -  SCRIPT( deva, DEVA,
 -          "Devanagari",
 -          HB_SCRIPT_DEVANAGARI,
@@ -3061,7 +3061,7 @@ index 429da76..27fdd2e 100644
 +++ b/src/autofit/afstyles.h
 @@ -81,7 +81,9 @@
                         DEFAULT )
- 
+
    META_STYLE_LATIN( cyrl, CYRL, "Cyrillic" )
 +
    META_STYLE_LATIN( grek, GREK, "Greek" )
@@ -3072,7 +3072,7 @@ index 429da76..27fdd2e 100644
 @@ -90,6 +92,13 @@
           AF_COVERAGE_DEFAULT )
    META_STYLE_LATIN( latn, LATN, "Latin" )
- 
+
 +  STYLE( deva_dflt, DEVA_DFLT,
 +         "Devanagari default style",
 +         AF_WRITING_SYSTEM_LATIN,
@@ -3085,7 +3085,7 @@ index 429da76..27fdd2e 100644
           "Latin 2 default style",
 @@ -119,7 +128,6 @@
                   AF_COVERAGE_DEFAULT )
- 
+
    STYLE_DEFAULT_INDIC( beng, BENG, "Bengali" )
 -  STYLE_DEFAULT_INDIC( deva, DEVA, "Devanagari" )
    STYLE_DEFAULT_INDIC( gujr, GUJR, "Gujarati" )
@@ -3107,7 +3107,7 @@ index 11fb743..cc04815 100644
       * out whether a glyph gets shifted vertically, but this is something I
       * would like to avoid if not really necessary.
       *
-+     * Note that we don't follow this logic for the default coverage. 
++     * Note that we don't follow this logic for the default coverage.
 +     * Complex scripts like Devanagari have mandatory GPOS features to
 +     * position many glyph elements, using mark-to-base or mark-to-ligature
 +     * tables; the number of glyphs missed due to condition (b) would be far
@@ -3117,13 +3117,13 @@ index 11fb743..cc04815 100644
 -    hb_set_subtract( gsub_glyphs, gpos_glyphs );
 +    if ( style_class->coverage != AF_COVERAGE_DEFAULT )
 +      hb_set_subtract( gsub_glyphs, gpos_glyphs );
- 
+
  #ifdef FT_DEBUG_LEVEL_TRACE
      FT_TRACE4(( "  glyphs without GPOS data (`*' means already assigned)" ));
 @@ -347,6 +355,12 @@
        count++;
  #endif
- 
+
 +      /* glyph indices returned by `hb_ot_layout_lookup_collect_glyphs' */
 +      /* can be arbitrary: some fonts use fake indices for processing   */
 +      /* internal to GSUB or GPOS, which is fully valid                 */
@@ -3139,7 +3139,7 @@ index 6e65583..2216880 100644
 +++ b/src/base/ftcalc.c
 @@ -358,20 +358,26 @@
    /* documentation is in freetype.h */
- 
+
    /* The FT_MulDiv function has been optimized thanks to ideas from      */
 -  /* Graham Asher.  The trick is to optimize computation when everything */
 -  /* fits within 32-bits (a rather common case).                         */
@@ -3170,25 +3170,25 @@ index 6e65583..2216880 100644
 +  /*                                                                     */
 +  /*  a + b <= 92681 - (c >> 16)                                         */
    /*                                                                     */
- 
+
    FT_EXPORT_DEF( FT_Long )
 @@ -390,7 +396,7 @@
      s ^= b; b = FT_ABS( b );
      s ^= c; c = FT_ABS( c );
- 
+
 -    if ( a <= 46340L && b <= 46340L && c <= 176095L && c > 0 )
 +    if ( (FT_ULong)a + (FT_ULong)b <= 92681UL - ( c >> 16 ) && c > 0 )
        a = ( a * b + ( c >> 1 ) ) / c;
- 
+
      else if ( (FT_Int32)c > 0 )
 @@ -427,7 +433,7 @@
      s ^= b; b = FT_ABS( b );
      s ^= c; c = FT_ABS( c );
- 
+
 -    if ( a <= 46340L && b <= 46340L && c > 0 )
 +    if ( (FT_ULong)a + (FT_ULong)b <= 92681UL && c > 0 )
        a = a * b / c;
- 
+
      else if ( (FT_Int32)c > 0 )
 diff --git a/src/base/ftlcdfil.c b/src/base/ftlcdfil.c
 index 852fb32..4aefb68 100644
@@ -3205,8 +3205,8 @@ index 852fb32..4aefb68 100644
  /*  This file is part of the FreeType project, and may only be used,       */
 @@ -46,9 +46,12 @@
        FT_Byte*  line = bitmap->buffer;
- 
- 
+
+
 +      /* `fir' and `pix' must be at least 32 bit wide, since the sum of */
 +      /* the values in `weights' can exceed 0xFF                        */
 +
@@ -3215,33 +3215,33 @@ index 852fb32..4aefb68 100644
 -        FT_UInt  fir[5];
 +        FT_UInt  fir[4];        /* below, `pix' is used as the 5th element */
          FT_UInt  val1, xx;
- 
- 
+
+
 @@ -57,7 +60,6 @@
          fir[1] = weights[3] * val1;
          fir[2] = weights[4] * val1;
          fir[3] = 0;
 -        fir[4] = 0;
- 
+
          val1    = line[1];
          fir[0] += weights[1] * val1;
 @@ -78,7 +80,7 @@
            fir[3] =          weights[4] * val;
- 
+
            pix        >>= 8;
 -          pix         |= -( pix >> 8 );
 +          pix         |= (FT_UInt)-(FT_Int)( pix >> 8 );
            line[xx - 2] = (FT_Byte)pix;
          }
- 
+
 @@ -87,11 +89,11 @@
- 
- 
+
+
            pix          = fir[0] >> 8;
 -          pix         |= -( pix >> 8 );
 +          pix         |= (FT_UInt)-(FT_Int)( pix >> 8 );
            line[xx - 2] = (FT_Byte)pix;
- 
+
            pix          = fir[1] >> 8;
 -          pix         |= -( pix >> 8 );
 +          pix         |= (FT_UInt)-(FT_Int)( pix >> 8 );
@@ -3255,19 +3255,19 @@ index 852fb32..4aefb68 100644
 -        FT_UInt   fir[5];
 +        FT_UInt   fir[4];       /* below, `pix' is used as the 5th element */
          FT_UInt   val1, yy;
- 
- 
+
+
 @@ -116,7 +118,6 @@
          fir[1] = weights[3] * val1;
          fir[2] = weights[4] * val1;
          fir[3] = 0;
 -        fir[4] = 0;
          col   += pitch;
- 
+
          val1    = col[0];
 @@ -139,7 +140,7 @@
            fir[3] =          weights[4] * val;
- 
+
            pix           >>= 8;
 -          pix            |= -( pix >> 8 );
 +          pix            |= (FT_UInt)-(FT_Int)( pix >> 8 );
@@ -3275,13 +3275,13 @@ index 852fb32..4aefb68 100644
            col            += pitch;
          }
 @@ -149,11 +150,11 @@
- 
- 
+
+
            pix             = fir[0] >> 8;
 -          pix            |= -( pix >> 8 );
 +          pix            |= (FT_UInt)-(FT_Int)( pix >> 8 );
            col[-2 * pitch] = (FT_Byte)pix;
- 
+
            pix         = fir[1] >> 8;
 -          pix        |= -( pix >> 8 );
 +          pix        |= (FT_UInt)-(FT_Int)( pix >> 8 );
@@ -3299,7 +3299,7 @@ index 6f32336..cc56105 100644
 +
 +      error = FT_Err_Ok;
      }
- 
+
      return error;
 diff --git a/src/bdf/bdfdrivr.c b/src/bdf/bdfdrivr.c
 index 5a1c296..d7649ab 100644
@@ -3307,8 +3307,8 @@ index 5a1c296..d7649ab 100644
 +++ b/src/bdf/bdfdrivr.c
 @@ -182,7 +182,7 @@ THE SOFTWARE.
    }
- 
- 
+
+
 -  FT_CALLBACK_TABLE_DEF
 +  static
    const FT_CMap_ClassRec  bdf_cmap_class =
@@ -3330,7 +3330,7 @@ index 84d336d..01be88c 100644
 @@ -229,7 +229,7 @@
    *
    */
- 
+
 -  FT_CALLBACK_TABLE_DEF
 +  static
    const FTC_IFamilyClassRec  ftc_basic_image_family_class =
@@ -3338,8 +3338,8 @@ index 84d336d..01be88c 100644
      {
 @@ -243,7 +243,7 @@
    };
- 
- 
+
+
 -  FT_CALLBACK_TABLE_DEF
 +  static
    const FTC_GCacheClassRec  ftc_basic_image_cache_class =
@@ -3348,7 +3348,7 @@ index 84d336d..01be88c 100644
 @@ -415,7 +415,7 @@
     *
     */
- 
+
 -  FT_CALLBACK_TABLE_DEF
 +  static
    const FTC_SFamilyClassRec  ftc_basic_sbit_family_class =
@@ -3356,8 +3356,8 @@ index 84d336d..01be88c 100644
      {
 @@ -430,7 +430,7 @@
    };
- 
- 
+
+
 -  FT_CALLBACK_TABLE_DEF
 +  static
    const FTC_GCacheClassRec  ftc_basic_sbit_cache_class =
@@ -3378,8 +3378,8 @@ index 848349b..b2e9609 100644
  /*  This file is part of the FreeType project, and may only be used,       */
 @@ -202,7 +202,7 @@
    /*************************************************************************/
- 
- 
+
+
 -  FT_CALLBACK_TABLE_DEF
 +  static
    const FTC_CacheClassRec  ftc_cmap_cache_class =
@@ -3400,8 +3400,8 @@ index 4eb2c5b..a65f94d 100644
  /*  This file is part of the FreeType project, and may only be used,       */
 @@ -151,7 +151,7 @@
    }
- 
- 
+
+
 -  FT_CALLBACK_TABLE_DEF
 +  static
    const FTC_MruListClassRec  ftc_size_list_class =
@@ -3409,8 +3409,8 @@ index 4eb2c5b..a65f94d 100644
      sizeof ( FTC_SizeNodeRec ),
 @@ -290,7 +290,7 @@
    }
- 
- 
+
+
 -  FT_CALLBACK_TABLE_DEF
 +  static
    const FTC_MruListClassRec  ftc_face_list_class =
@@ -3421,18 +3421,18 @@ index 748cbca..5183f6f 100644
 --- a/src/pcf/pcfdrivr.c
 +++ b/src/pcf/pcfdrivr.c
 @@ -2,7 +2,7 @@
- 
+
      FreeType font driver for pcf files
- 
+
 -    Copyright (C) 2000-2004, 2006-2011, 2013 by
 +    Copyright (C) 2000-2004, 2006-2011, 2013, 2014 by
      Francesco Zappa Nardelli
- 
+
  Permission is hereby granted, free of charge, to any person obtaining a copy
 @@ -189,7 +189,7 @@ THE SOFTWARE.
    }
- 
- 
+
+
 -  FT_CALLBACK_TABLE_DEF
 +  static
    const FT_CMap_ClassRec  pcf_cmap_class =
@@ -3453,8 +3453,8 @@ index 4c43947..188aa0d 100644
  /*  This file is part of the FreeType project, and may only be used,       */
 @@ -134,7 +134,7 @@
    }
- 
- 
+
+
 -  FT_CALLBACK_TABLE_DEF
 +  static
    const FT_Service_PfrMetricsRec  pfr_metrics_service_rec =
@@ -3467,16 +3467,16 @@ index ddecc80..abbecb7 100644
 @@ -2284,6 +2284,8 @@
      Long   e1, e2;
      Byte*  target;
- 
+
 +    Int  dropOutControl = left->flags & 7;
 +
      FT_UNUSED( y );
      FT_UNUSED( left );
      FT_UNUSED( right );
 @@ -2293,7 +2295,8 @@
- 
+
      e1 = TRUNC( CEILING( x1 ) );
- 
+
 -    if ( x2 - x1 - ras.precision <= ras.precision_jitter )
 +    if ( dropOutControl != 2                             &&
 +         x2 - x1 - ras.precision <= ras.precision_jitter )
@@ -3497,7 +3497,7 @@ index 878de1f..9afbe5a 100644
  /*                                                                         */
  /*  This file is part of the FreeType project, and may only be used,       */
 @@ -129,7 +129,7 @@
- 
+
      *error = FT_THROW( Out_Of_Memory );
  #ifdef PNG_SETJMP_SUPPORTED
 -    longjmp( png_jmpbuf( png ), 1 );
@@ -3520,8 +3520,8 @@ index a31c77c..44aa467 100644
  /*  This file is part of the FreeType project, and may only be used,       */
 @@ -348,29 +348,22 @@
    }
- 
- 
+
+
 -#define WRITE_BYTE( p, v )     \
 -          do                   \
 -          {                    \
@@ -3534,7 +3534,7 @@ index a31c77c..44aa467 100644
 +            *(p)++ = (FT_Byte)( (v) >> 0 ); \
 +                                            \
            } while ( 0 )
- 
+
 -#define WRITE_USHORT( p, v )   \
 -          do                   \
 -          {                    \
@@ -3560,8 +3560,8 @@ index a31c77c..44aa467 100644
 +            *(p)++ = (FT_Byte)( (v) >>  0 ); \
 +                                             \
            } while ( 0 )
- 
- 
+
+
 @@ -661,6 +654,8 @@
        }
        else
@@ -3570,7 +3570,7 @@ index a31c77c..44aa467 100644
 +
          /* Uncompress with zlib. */
          FT_ULong  output_len = table->OrigLength;
- 
+
 @@ -675,6 +670,13 @@
            error = FT_THROW( Invalid_Table );
            goto Exit;
@@ -3583,16 +3583,16 @@ index a31c77c..44aa467 100644
 +
 +#endif /* !FT_CONFIG_OPTION_USE_ZLIB */
        }
- 
+
        FT_FRAME_EXIT();
 @@ -717,7 +719,6 @@
    }
- 
- 
+
+
 -#undef WRITE_BYTE
  #undef WRITE_USHORT
  #undef WRITE_ULONG
- 
+
 diff --git a/src/sfnt/ttcmap.c b/src/sfnt/ttcmap.c
 index c717f5f..f9acf5d 100644
 --- a/src/sfnt/ttcmap.c
@@ -3608,7 +3608,7 @@ index c717f5f..f9acf5d 100644
 +                 TT_PEEK_USHORT( p - 2) ));
        return FT_THROW( Invalid_Table );
      }
- 
+
 diff --git a/src/sfnt/ttpost.c b/src/sfnt/ttpost.c
 index 47a85c0..99d8005 100644
 --- a/src/sfnt/ttpost.c
@@ -3623,12 +3623,12 @@ index 47a85c0..99d8005 100644
  /*                                                                         */
  /*  This file is part of the FreeType project, and may only be used,       */
 @@ -64,12 +64,12 @@
- 
+
  #define MAC_NAME( x )  ( (FT_String*)tt_post_default_names[x] )
- 
+
 -  /* the 258 default Mac PS glyph names */
 +  /* the 258 default Mac PS glyph names; see file `tools/glnames.py' */
- 
+
    static const FT_String* const  tt_post_default_names[258] =
    {
      /*   0 */
@@ -3655,8 +3655,8 @@ index 47a85c0..99d8005 100644
 +    "Idotaccent", "Scedilla", "scedilla", "Cacute", "cacute",
 +    "Ccaron", "ccaron", "dcroat",
    };
- 
- 
+
+
 diff --git a/src/sfnt/ttsbit.c b/src/sfnt/ttsbit.c
 index 8ff7b9d..180d559 100644
 --- a/src/sfnt/ttsbit.c
@@ -3670,11 +3670,11 @@ index 8ff7b9d..180d559 100644
 +        FT_UShort       ppem, resolution;
          TT_HoriHeader  *hori;
          FT_ULong        table_size;
- 
+
 @@ -800,12 +801,12 @@
      FT_Error  error = FT_Err_Ok;
      FT_UInt   num_components, nn;
- 
+
 -    FT_Char  horiBearingX = decoder->metrics->horiBearingX;
 -    FT_Char  horiBearingY = decoder->metrics->horiBearingY;
 -    FT_Byte  horiAdvance  = decoder->metrics->horiAdvance;
@@ -3687,13 +3687,13 @@ index 8ff7b9d..180d559 100644
 +    FT_Char  vertBearingX = (FT_Char)decoder->metrics->vertBearingX;
 +    FT_Char  vertBearingY = (FT_Char)decoder->metrics->vertBearingY;
 +    FT_Byte  vertAdvance  = (FT_Byte)decoder->metrics->vertAdvance;
- 
- 
+
+
      if ( p + 2 > limit )
 @@ -1352,10 +1353,11 @@
- 
+
        tt_face_get_metrics( face, FALSE, glyph_index, &abearing, &aadvance );
- 
+
 -      metrics->horiBearingX = originOffsetX;
 -      metrics->horiBearingY = -originOffsetY + metrics->height;
 -      metrics->horiAdvance  = aadvance * face->root.size->metrics.x_ppem /
@@ -3704,7 +3704,7 @@ index 8ff7b9d..180d559 100644
 +                                          face->root.size->metrics.x_ppem /
 +                                          face->header.Units_Per_EM );
      }
- 
+
      return error;
 diff --git a/src/smooth/ftgrays.c b/src/smooth/ftgrays.c
 index 425911a..27be966 100644
@@ -3713,11 +3713,11 @@ index 425911a..27be966 100644
 @@ -98,6 +98,9 @@
  #define FT_ERR_XCAT( x, y )  x ## y
  #define FT_ERR_CAT( x, y )   FT_ERR_XCAT( x, y )
- 
+
 +#define FT_BEGIN_STMNT  do {
 +#define FT_END_STMNT    } while ( 0 )
 +
- 
+
    /* define this to dump debugging information */
  /* #define FT_DEBUG_LEVEL_TRACE */
 diff --git a/src/tools/afblue.pl b/src/tools/afblue.pl
@@ -3727,18 +3727,18 @@ index 58aa2a0..60fe696 100644
 @@ -63,8 +63,8 @@ my $enum_element_re = qr/ ^ \s* ( [A-Za-z0-9_]+ ) \s* $ /x;
  # '#' <preprocessor directive> '\n'
  my $preprocessor_re = qr/ ^ \# /x;
- 
+
 -# '/' '/' <comment> '\n'
 -my $comment_re = qr| ^ // |x;
 +# [<ws>] '/' '/' <comment> '\n'
 +my $comment_re = qr| ^ \s* // |x;
- 
+
  # empty line
  my $whitespace_only_re = qr/ ^ \s* $ /x;
 @@ -159,6 +159,9 @@ sub convert_ascii_chars
    # A series of ASCII characters in the printable range.
    my $s = shift;
- 
+
 +  # We ignore spaces.
 +  $s =~ s/ //g;
 +
@@ -3759,21 +3759,21 @@ index 5f676a2..02298e3 100644
  /*                                                                         */
  /*  This file is part of the FreeType project, and may only be used,       */
 @@ -99,13 +99,13 @@
- 
+
      else if ( face->os2.version != 0xFFFFU )
      {
 -      *tsb = face->os2.sTypoAscender - yMax;
 +      *tsb = (FT_Short)( face->os2.sTypoAscender - yMax );
        *ah  = face->os2.sTypoAscender - face->os2.sTypoDescender;
      }
- 
+
      else
      {
 -      *tsb = face->horizontal.Ascender - yMax;
 +      *tsb = (FT_Short)( face->horizontal.Ascender - yMax );
        *ah  = face->horizontal.Ascender - face->horizontal.Descender;
      }
- 
+
 diff --git a/src/truetype/ttinterp.c b/src/truetype/ttinterp.c
 index 56e8fa7..f71d306 100644
 --- a/src/truetype/ttinterp.c
@@ -3787,7 +3787,7 @@ index 56e8fa7..f71d306 100644
                else
 -                B1 = CUR.zp0.cur[A].x;
 +                B1 = (FT_UShort)CUR.zp0.cur[A].x;
- 
+
  #if 0
                /* Standard Subpixel Hinting: Allow y move.       */
 @@ -7615,7 +7615,7 @@
@@ -3796,16 +3796,16 @@ index 56e8fa7..f71d306 100644
                  /* save the y value of the point now; compare after move */
 -                B1 = CUR.zp0.cur[A].y;
 +                B1 = (FT_UShort)CUR.zp0.cur[A].y;
- 
+
                  if ( CUR.sph_tweak_flags & SPH_TWEAK_ROUND_NONPIXEL_Y_MOVES )
                    B = FT_PIX_ROUND( B1 + B ) - B1;
 @@ -7627,7 +7627,7 @@
                    CUR_Func_move( &CUR.zp0, A, B );
                }
- 
+
 -              B2 = CUR.zp0.cur[A].y;
 +              B2 = (FT_UShort)CUR.zp0.cur[A].y;
- 
+
                /* Reverse this move if it results in a disallowed move */
                if ( CUR.GS.freeVector.y != 0                           &&
 diff --git a/src/type1/t1driver.c b/src/type1/t1driver.c
@@ -3829,5 +3829,5 @@ index 697288d..2602bdb 100644
 -    default:
 -      break;
      }
- 
+
      return retval;
