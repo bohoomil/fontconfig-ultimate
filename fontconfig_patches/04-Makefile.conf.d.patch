@@ -3,11 +3,11 @@
 @@ -21,26 +21,9 @@
  #  TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  #  PERFORMANCE OF THIS SOFTWARE.
- 
+
 -BUILT_SOURCES = README
 -DOC_SOURCES = README.in
  DOC_FILES = $(DOC_SOURCES:.in=)
- 
+
 -CONF_LINKS = \
 -	10-scale-bitmap-fonts.conf \
 -	20-unhint-small-vera.conf \
@@ -24,14 +24,14 @@
 -	69-unifont.conf \
 -	80-delicious.conf \
 -	90-synthetic.conf
-+CONF_LINKS = 
- 
++CONF_LINKS =
+
  EXTRA_DIST = $(template_DATA) $(DOC_SOURCES)
  CLEANFILES = $(DOC_FILES)
 @@ -80,24 +63,4 @@ template_DATA =				\
  	80-delicious.conf		\
  	90-synthetic.conf
- 
+
 -README: $(srcdir)/README.in
 -	sed "s|\@TEMPLATEDIR\@|$(templatedir)|" $< > $@
 -
@@ -96,8 +96,8 @@
 -	69-unifont.conf \
 -	80-delicious.conf \
 -	90-synthetic.conf
-+CONF_LINKS = 
- 
++CONF_LINKS =
+
  EXTRA_DIST = $(template_DATA) $(DOC_SOURCES)
  CLEANFILES = $(DOC_FILES)
 @@ -504,7 +487,7 @@ check: $(BUILT_SOURCES)
@@ -111,8 +111,8 @@
  install: $(BUILT_SOURCES)
 @@ -625,9 +608,6 @@ uninstall-am: uninstall-configDATA unins
  	uninstall-local uninstall-templateDATA
- 
- 
+
+
 -README: $(srcdir)/README.in
 -	sed "s|\@TEMPLATEDIR\@|$(templatedir)|" $< > $@
 -
