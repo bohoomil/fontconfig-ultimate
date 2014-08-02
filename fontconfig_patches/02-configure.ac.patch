@@ -1,7 +1,7 @@
 --- a/configure.ac	2014-03-24 07:03:12.000000000 +0100
 +++ b/configure.ac	2014-03-24 22:28:42.203617370 +0100
 @@ -545,9 +545,14 @@ AC_SUBST(FC_FONTDATE)
- 
+
  AC_ARG_WITH(templatedir,
  	[AC_HELP_STRING([--with-templatedir=DIR],
 -			[Use DIR to store the configuration template files [default=DATADIR/fontconfig/conf.avail]])],
@@ -32,7 +32,7 @@
  	baseconfigdir='${sysconfdir}'/fonts
 @@ -594,10 +606,12 @@ no|yes)
  esac
- 
+
  TEMPLATEDIR=${templatedir}
 +TEMPLATEINFDIR=${templateinfdir}
  BASECONFIGDIR=${baseconfigdir}

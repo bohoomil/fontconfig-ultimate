@@ -3,12 +3,12 @@
 @@ -21,7 +21,18 @@
  	Keith Packard
  -->
- 
+
 -<!-- Font directory list -->
 +  <!-- Set DPI. dpi should be set in ~/.Xresources to 96 -->
-+  <!-- Setting to 72 here makes the px to pt conversions work better 
++  <!-- Setting to 72 here makes the px to pt conversions work better
 +       (Chrome/Chromium). Some may need to set this to 96, though.
-+       Uncomment the rule below in case of Chrome/Chromium px to pt 
++       Uncomment the rule below in case of Chrome/Chromium px to pt
 +       conversion issues. -->
 +  <!--match target="pattern">
 +    <edit name="dpi" mode="assign">
@@ -17,6 +17,6 @@
 +  </match-->
 +
 + <!-- Font directory list -->
- 
+
  	<dir>@FC_DEFAULT_FONTS@</dir>
  	@FC_FONTPATH@
