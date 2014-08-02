@@ -18,7 +18,7 @@ source=(http://www.gust.org.pl/projects/e-foundry/tg-math/download/texgyrebonum-
 sha1sums=('84ea30638f23eb3b99cdffe58bb9fdb1e5e1520f'
           '3ec77fd9d1c687cad5f0274903c2b8148f370b32'
           '48cf34bf7e678d021226584eb76cff37620099d9'
-          '7e9b02d3f480aeeebe30e9a88a671beff2ffde7b')
+          '2d8edd88388d9a43eeb041bc9f788e0d863ce7be')
 
 package(){
   cd "${srcdir}"
