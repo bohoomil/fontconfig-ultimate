@@ -33,7 +33,7 @@ sha1sums=('4f6e337d5d3edd7ea79d1426f575331552b003ec'
           '95d873fda436a1cc29cda1310f155ef0e3258c05')
 
 prepare(){
-  cd "$srcdir/$_pkgbasename-$pkgver"
+  cd "${_pkgbasename}-${pkgver}"
 
   patch -Np1 -i $srcdir/cairo-1.12.16-lto-optional.patch
   patch -Np1 -i $srcdir/cairo-respect-fontconfig_pb.patch
@@ -60,7 +60,7 @@ prepare(){
 }
 
 build() {
-  cd "$srcdir/$_pkgbasename-$pkgver"
+  cd "${_pkgbasename}-${pkgver}"
 
   # config options
   # --enable-xlib-xcb \
@@ -81,11 +81,11 @@ build() {
 }
 
 #check() {
-  #cd "$srcdir/$_pkgbasename-$pkgver"
+  #cd "${_pkgbasename}-${pkgver}"
   #make -k test || /bin/true
 #}
 
 package() {
-  cd "$srcdir/$_pkgbasename-$pkgver"
+  cd "${_pkgbasename}-${pkgver}"
   make DESTDIR="$pkgdir" install
 }
