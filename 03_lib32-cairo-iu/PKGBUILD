@@ -31,7 +31,7 @@ sha1sums=('4f6e337d5d3edd7ea79d1426f575331552b003ec'
           '95d873fda436a1cc29cda1310f155ef0e3258c05')
 
 prepare() {
-  cd $srcdir/$_pkgbasename-$pkgver
+  cd "${_pkgbasename}-${pkgver}"
 
   #for _f in $(cat $srcdir/debian/patches/series) ; do
   #  patch -Np1 -i $srcdir/debian/patches/$_f
@@ -62,7 +62,7 @@ build() {
   export CXX="g++ -m32"
   export PKG_CONFIG_PATH="/usr/lib32/pkgconfig"
 
-  cd $srcdir/$_pkgbasename-$pkgver
+  cd "${_pkgbasename}-${pkgver}"
 
   # configure options
   # --enable-svg
@@ -84,7 +84,7 @@ build() {
 }
 
 package() {
-  cd $srcdir/cairo-$pkgver
+  cd "${_pkgbasename}-${pkgver}"
   make DESTDIR=$pkgdir install
   rm -rf ${pkgdir}/usr/{bin,include,share}
 }
