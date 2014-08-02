@@ -16,7 +16,7 @@ install=$pkgname.install
 source=("ftp://linux.thai.net/pub/thailinux/software/thai-ttf/${_src_pkg}-${pkgver}.tar.xz"
         'LICENSE')
 sha1sums=('0848d2c7fa18c1f01daa2aef9c964471952b159b'
-          '39a8c3eb83856f9dff63a3493f891a702d3fa802')
+          '174356eab02649dd2e76b1a9040e2c020d9647be')
 
 package() {
   cd "${srcdir}/${_src_pkg}-${pkgver}"
