@@ -18,9 +18,11 @@ conflicts=('lib32-fontconfig')
 install="lib32-fontconfig.install"
 source=(http://www.fontconfig.org/release/${_pkgbasename}-${pkgver}.tar.bz2
         'fc-cache.c.patch')
+md5sums=('824d000eb737af6e16c826dd3b2d6c90'
+         '51b760fb0658af0f9b85b819a3e94c9a')
 
 prepare() {
-  cd "${srcdir}/${_pkgbasename}-${pkgver}"
+  cd "${_pkgbasename}-${pkgver}"
 
   # fix for [bug 7752]
   # http://lists.freedesktop.org/archives/fontconfig-bugs/2014-April/000835.html
@@ -32,7 +34,7 @@ build() {
   export CXX="g++ -m32"
   export PKG_CONFIG_PATH="/usr/lib32/pkgconfig"
 
-  cd "${srcdir}/${_pkgbasename}-${pkgver}"
+  cd "${_pkgbasename}-${pkgver}"
 
   # make sure there's no rpath trouble and sane .so versioning - FC and Gentoo do this as well
   libtoolize -f
@@ -52,12 +54,12 @@ build() {
 }
 
 check() {
-  cd "$srcdir/$_pkgbasename-$pkgver"
+  cd "${_pkgbasename}-${pkgver}"
   make -k check
 }
 
 package() {
-  cd "${srcdir}/${_pkgbasename}-${pkgver}"
+  cd "${_pkgbasename}-${pkgver}"
 
   make DESTDIR="${pkgdir}" install
 
@@ -67,6 +69,3 @@ package() {
   mkdir -p "${pkgdir}/usr/share/licenses"
   ln -s ${_pkgbasename} "${pkgdir}/usr/share/licenses/${pkgname}"
 }
-
-md5sums=('824d000eb737af6e16c826dd3b2d6c90'
-         '51b760fb0658af0f9b85b819a3e94c9a')
