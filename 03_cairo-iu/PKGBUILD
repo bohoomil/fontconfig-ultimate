@@ -6,7 +6,7 @@
 pkgname=cairo-infinality-ultimate
 _pkgbasename=cairo
 pkgver=1.12.16
-pkgrel=6
+pkgrel=7
 groups=('infinality-bundle')
 pkgdesc="Cairo vector graphics library with respect-fontconfig and Ubuntu patches (infinality-bundle)"
 arch=('i686' 'x86_64')

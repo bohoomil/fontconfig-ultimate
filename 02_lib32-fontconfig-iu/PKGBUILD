@@ -4,7 +4,7 @@
 _pkgbasename=fontconfig
 pkgname=lib32-$_pkgbasename-infinality-ultimate
 pkgver=2.11.1
-pkgrel=3
+pkgrel=4
 pkgdesc="A library for configuring and customizing font access (32-bit, infinality-bundle)"
 arch=(x86_64)
 url="http://www.fontconfig.org/release/"

@@ -4,7 +4,7 @@
 
 pkgname=freetype2-infinality-ultimate
 pkgver=2.5.3
-pkgrel=9
+pkgrel=10
 _patchrel=2014.07.28
 pkgdesc="TrueType font rendering library with Infinality patches and custom settings by bohoomil (infinality-bundle)."
 arch=('i686' 'x86_64')
