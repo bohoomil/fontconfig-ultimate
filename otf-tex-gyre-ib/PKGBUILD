@@ -17,7 +17,7 @@ source=("http://www.gust.org.pl/projects/e-foundry/tex-gyre/whole/tg-${pkgver}ot
         45-tex-gyre.conf
         90-non-tt-tex-gyre.conf)
 sha1sums=('beba3be8c9ed56327dafd80455baaa51aa0b1406'
-          '7e9b02d3f480aeeebe30e9a88a671beff2ffde7b'
+          '2d8edd88388d9a43eeb041bc9f788e0d863ce7be'
           '9938b2724132a0c2c1255e2a759b7751f718e4ba'
           'f3836f50c845a86e31d140c095ccc39b74f979ee')
 
