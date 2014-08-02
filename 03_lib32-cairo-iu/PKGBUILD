@@ -26,12 +26,12 @@ source=(http://cairographics.org/releases/$_pkgbasename-$pkgver.tar.xz
         cairo-respect-fontconfig_pb.patch
         http://archive.ubuntu.com/ubuntu/pool/main/c/cairo/cairo_1.12.16-0ubuntu2.debian.tar.gz)
 sha1sums=('4f6e337d5d3edd7ea79d1426f575331552b003ec'
-          '80883e44a57942762995aea2f136701b1fa54568'
-          'db7bd3e7f3cbb30dafe4ed6604ade944163fbfbe'
+          'bbc22db3e7dde6522fbc916bf8503d3cafffb8b7'
+          'ea6e6216e9aeeef0e692be63385f8bbb8aee21ca'
           '95d873fda436a1cc29cda1310f155ef0e3258c05')
 
 prepare() {
-  cd $srcdir/$_pkgbasename-$pkgver
+  cd ${_pkgbasename}-${pkgver}
 
   #for _f in $(cat $srcdir/debian/patches/series) ; do
   #  patch -Np1 -i $srcdir/debian/patches/$_f
@@ -62,7 +62,7 @@ build() {
   export CXX="g++ -m32"
   export PKG_CONFIG_PATH="/usr/lib32/pkgconfig"
 
-  cd $srcdir/$_pkgbasename-$pkgver
+  cd ${_pkgbasename}-${pkgver}
 
   # configure options
   # --enable-svg
@@ -84,7 +84,7 @@ build() {
 }
 
 package() {
-  cd $srcdir/cairo-$pkgver
+  cd ${_pkgbasename}-${pkgver}
   make DESTDIR=$pkgdir install
   rm -rf ${pkgdir}/usr/{bin,include,share}
 }

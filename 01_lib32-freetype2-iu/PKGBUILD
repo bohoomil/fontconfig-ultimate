@@ -23,12 +23,12 @@ source=(http://download.savannah.gnu.org/releases/freetype/freetype-${pkgver}.ta
         "upstream-${_patchrel}.patch"
         "infinality-2.5.3-${_patchrel}.patch")
 sha1sums=('d3c26cc17ec7fe6c36f4efc02ef92ab6aa3f4b46'
-          'abf7a8f726ad6359533651a8942636880febf9f6'
-          'b0a3d73e1471dd505c30d03d077444169876a91e'
-          'a9c16046836b13a67a1158b87669f7f18ffe1665')
+          '926bab130ef0d56e05656048565a404e64bb46b1'
+          'e15fb8cb9314dfe9fb08838624532d0a76baef3c'
+          'cddc93f7d4c9e7b69263a30e451b99c68e134aa2')
 
 prepare() {
-  cd "${srcdir}/freetype-${pkgver}"
+  cd "freetype-${pkgver}"
 
   patches=(freetype-2.5.3-enable-valid.patch
            "upstream-${_patchrel}.patch"
@@ -45,7 +45,7 @@ build() {
   export CXX="g++ -m32"
   export PKG_CONFIG_PATH="/usr/lib32/pkgconfig"
 
-  cd "${srcdir}/freetype-${pkgver}"
+  cd "freetype-${pkgver}"
 
   ./configure \
     --prefix=/usr \
@@ -54,7 +54,7 @@ build() {
 }
 
 package() {
-  cd "${srcdir}/freetype-${pkgver}"
+  cd "freetype-${pkgver}"
   make DESTDIR="${pkgdir}" install
   rm -rf "${pkgdir}"/usr/{include,share,bin}
 }

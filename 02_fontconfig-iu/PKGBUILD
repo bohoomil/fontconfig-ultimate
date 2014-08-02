@@ -47,7 +47,7 @@ prepare() {
            05-Makefile.am.in.patch)
 
   # copy fontconfig-ib patches & stuff
-  cd "${srcdir}/${_gitname}"
+  cd "${_gitname}"
 
   cp -r conf.d.infinality "${srcdir}/${_basename}-${pkgver}"/conf.d.infinality
   cp -r fontconfig_patches/*.patch "${srcdir}/${_basename}-${pkgver}"
@@ -66,11 +66,11 @@ prepare() {
 
   aclocal
   libtoolize -f
-  automake --add-missing -fi
+  automake -afi
 }
 
 build() {
-  cd "${srcdir}/${_basename}-${pkgver}"
+  cd "${_basename}-${pkgver}"
 
   ./configure --prefix=/usr \
     --sysconfdir=/etc \
@@ -85,12 +85,12 @@ build() {
 }
 
 check() {
-  cd "${srcdir}/${_basename}-${pkgver}"
+  cd "${_basename}-${pkgver}"
   make -k check
 }
 
 package() {
-  cd "${srcdir}/${_basename}-${pkgver}"
+  cd "${_basename}-${pkgver}"
   make DESTDIR="${pkgdir}" install
 
   #Install license
