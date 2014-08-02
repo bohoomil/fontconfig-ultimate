@@ -4,7 +4,7 @@
 _pkgbasename=fontconfig
 pkgname=lib32-$_pkgbasename-infinality-ultimate
 pkgver=2.11.1
-pkgrel=3
+pkgrel=4
 pkgdesc="A library for configuring and customizing font access (32-bit, infinality-bundle)"
 arch=(x86_64)
 url="http://www.fontconfig.org/release/"
@@ -20,7 +20,7 @@ source=(http://www.fontconfig.org/release/${_pkgbasename}-${pkgver}.tar.bz2
         'fc-cache.c.patch')
 
 prepare() {
-  cd "${srcdir}/${_pkgbasename}-${pkgver}"
+  cd "${_pkgbasename}-${pkgver}"
 
   # fix for [bug 7752]
   # http://lists.freedesktop.org/archives/fontconfig-bugs/2014-April/000835.html
@@ -32,7 +32,7 @@ build() {
   export CXX="g++ -m32"
   export PKG_CONFIG_PATH="/usr/lib32/pkgconfig"
 
-  cd "${srcdir}/${_pkgbasename}-${pkgver}"
+  cd "${_pkgbasename}-${pkgver}"
 
   # make sure there's no rpath trouble and sane .so versioning - FC and Gentoo do this as well
   libtoolize -f
@@ -52,12 +52,12 @@ build() {
 }
 
 check() {
-  cd "$srcdir/$_pkgbasename-$pkgver"
+  cd "${_pkgbasename}-${pkgver}"
   make -k check
 }
 
 package() {
-  cd "${srcdir}/${_pkgbasename}-${pkgver}"
+  cd "${_pkgbasename}-${pkgver}"
 
   make DESTDIR="${pkgdir}" install
 

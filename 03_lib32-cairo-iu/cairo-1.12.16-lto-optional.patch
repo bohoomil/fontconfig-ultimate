@@ -3,9 +3,9 @@ index f984eb2..15b3da2 100644
 --- a/build/configure.ac.warnings
 +++ b/build/configure.ac.warnings
 @@ -38,13 +38,18 @@ dnl options.  Namely, the following:
- 
+
  dnl -flto working really needs a test link, not just a compile
- 
+
 -safe_MAYBE_WARN="$MAYBE_WARN"
 -MAYBE_WARN="$MAYBE_WARN -flto"
 -AC_TRY_LINK([],[
@@ -23,7 +23,7 @@ index f984eb2..15b3da2 100644
 -])
 +  ])
 +fi
- 
+
  MAYBE_WARN="$MAYBE_WARN -fno-strict-aliasing -fno-common"
- 
+
 
