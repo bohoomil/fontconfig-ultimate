@@ -1,0 +1,45 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=ttf-caviar-dreams-ibx
+pkgver=5.00
+pkgrel=1
+depends=('fontconfig')
+pkgdesc="Caviar Dreams is a geometric sans-serif family designed by Lauren Thompson."
+url="http://www.nymfont.com/"
+arch=('any')
+groups=('infinality-bundle-fonts-extra')
+license=('Custom')
+conflicts=('ttf-caviar_dreams')
+replaces=('ttf-caviar_dreams')
+install=$pkgname.install
+source=(http://img.dafont.com/dl/?f=caviar_dreams
+        Nymphont-License.txt
+        45-caviar-dreams.conf
+        90-tt-caviar-dreams.conf)
+
+sha1sums=('ad9311ec4590c225d83c35b79960bc5bc02d46f6'
+          'c40fce9cbde879ac851f28e890d22b96ba902d6a'
+          '299a4b295f817035919549f31826f643d3c52de0'
+          '05682d6a4c0ef620633c14f9f3c9ae8cbb569cbd')
+
+package(){
+  cd "${srcdir}"
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 "Nymphont-License.txt" \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"/"Nymphont-License.txt"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-caviar-dreams.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-caviar-dreams.conf
+  install -m644 90-tt-caviar-dreams.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-caviar-dreams.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-caviar-dreams.conf .
+  ln -s ../conf.avail/90-tt-caviar-dreams.conf .
+}
