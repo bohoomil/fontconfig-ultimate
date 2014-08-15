@@ -111,10 +111,94 @@ index a4e583d..df77d96 100644
  
  # Packaging
 diff --git a/ChangeLog b/ChangeLog
-index ea1eb4a..30626ce 100644
+index ea1eb4a..e89e459 100644
 --- a/ChangeLog
 +++ b/ChangeLog
-@@ -1,3 +1,425 @@
+@@ -1,3 +1,509 @@
++2014-08-08  Alexei Podtelezhnikov  <apodtele@gmail.com>
++
++	* src/base/ftbitmap.c (ft_gray_for_premultiplied_srgb_bgra): Refactor.
++
++2014-07-26  Werner Lemberg  <wl@gnu.org>
++
++	[cff] Fix typo.
++
++	* src/cff/cf2hints.c (cf2_glyphpath_computeOffset): Use correct
++	offsets in third quadrant.
++
++	Reported by maks <maksqwe1@ukr.net>.
++
++2014-07-17  Werner Lemberg  <wl@gnu.org>
++
++	Fix Savannah bug #42788.
++
++	* src/pfr/pfrobjs.c: Include `ftcalc.h'.
++
++2014-07-16  Alexei Podtelezhnikov  <apodtele@gmail.com>
++
++	Replace `ft_highpow2' function.
++
++	* src/pfr/pfrobjs.c (pfr_face_get_kerning): Use `FT_MSB' instead of
++	`ft_highpow2'.
++
++	* src/base/ftutil.c, include/internal/ftobjs.h (ft_highpow2): Remove
++	it.
++
++2014-07-15  Alexei Podtelezhnikov  <apodtele@gmail.com>
++
++	* src/base/ftcalc.c (FT_MSB): Utilize gcc builtins.
++
++2014-07-15  Alexei Podtelezhnikov  <apodtele@gmail.com>
++
++	[base] Move assembler code back in the source file.
++
++	FT_MulFix assembler used to reside in ftcalc.c before f47d263f1b.
++
++	* include/config/ftconfig.h, builds/unix/ftconfig.in,
++	builds/vms/ftconfig.h [FT_MULFIX_ASSEMBLER]: Move code from here...
++
++	* src/base/ftcalc.c [FT_MULFIX_ASSEMBLER]: ... to here.
++
++2014-07-14  Alexei Podtelezhnikov  <apodtele@gmail.com>
++
++	[base] Further clean up color bitmap conversion.
++
++	* src/base/ftbitmap.c (ft_gray_for_premultiplied_srgb_bgra): Stop
++	using FT_MulFix and FT_DivFix since all calculations fit into 32 bits.
++
++2014-07-13  Werner Lemberg  <wl@gnu.org>
++
++	[truetype] Improve handling of buggy `prep' tables.
++
++	In case of an error in the `prep' table, no longer try to execute it
++	again and again.  This makes FreeType handle endless loops in buggy
++	fonts much faster.
++
++	* src/truetype/ttobjs.h (TT_SizeRec): The fields `bytecode_ready'
++	and `cvt_ready' are now negative if not initialized yet, otherwise
++	they indicate the error code of the last run.
++
++	* src/truetype/ttobjs.c (tt_size_run_fpgm, tt_size_run_prep,
++	tt_size_done_bytecode, tt_size_init_bytecode,
++	tt_size_ready_bytecode, tt_size_init, tt_size_done, tt_size_reset):
++	Updated.
++
++	* src/truetype/ttgload.c (tt_loader_init): Updated.
++	* src/truetype/ttinterp.c (TT_RunIns): Force reexecution of `fpgm'
++	and `prep' only if we are in the `glyf' table.
++
++2014-07-12  Werner Lemberg  <wl@gnu.org>
++
++	* builds/vms/ftconfig.h: Synchronize.
++	Problem reported by Alexei.
++
++2014-07-11  Alexei Podtelezhnikov  <apodtele@gmail.com>
++
++	[base] Clean up bitmap conversion.
++
++	* src/base/ftbitmap.c (ft_gray_for_premultiplied_srgb_bgra): Use
++	appropriate FT_DivFix and remove superfluous upscaling.
++
 +2014-07-04  Alexei Podtelezhnikov  <apodtele@gmail.com>
 +
 +	[base] Small optimization of the ancient code.
@@ -163,7 +247,7 @@ index ea1eb4a..30626ce 100644
 +	Reported by Wojciech Mamrak <wmamrak@gmail.com>.
 +
 +	* src/autofit/afglobal.c (af_face_globals_compute_style_coverage),
-+	src/autofit/afmodule.c (af_property_set): Fix `signed' vs. 
++	src/autofit/afmodule.c (af_property_set): Fix `signed' vs.
 +	`unsigned' issues.
 +
 +	* src/autofit/aflatin.c (af_latin_metrics_init_blues): Make compiler
@@ -712,6 +796,230 @@ index 3d0ecb3..3a806d9 100644
     fi
  
     min_ft_version=m4_if([$1], [], [7.0.1], [$1])
+diff --git a/builds/unix/ftconfig.in b/builds/unix/ftconfig.in
+index 2cf6708..5bc6a3a 100644
+--- a/builds/unix/ftconfig.in
++++ b/builds/unix/ftconfig.in
+@@ -366,219 +366,6 @@ FT_BEGIN_HEADER
+ #define FT_DUMMY_STMNT  FT_BEGIN_STMNT FT_END_STMNT
+ 
+ 
+-#ifndef  FT_CONFIG_OPTION_NO_ASSEMBLER
+-  /* Provide assembler fragments for performance-critical functions. */
+-  /* These must be defined `static __inline__' with GCC.             */
+-
+-#if defined( __CC_ARM ) || defined( __ARMCC__ )  /* RVCT */
+-
+-#define FT_MULFIX_ASSEMBLER  FT_MulFix_arm
+-
+-  /* documentation is in freetype.h */
+-
+-  static __inline FT_Int32
+-  FT_MulFix_arm( FT_Int32  a,
+-                 FT_Int32  b )
+-  {
+-    register FT_Int32  t, t2;
+-
+-
+-    __asm
+-    {
+-      smull t2, t,  b,  a           /* (lo=t2,hi=t) = a*b */
+-      mov   a,  t,  asr #31         /* a   = (hi >> 31) */
+-      add   a,  a,  #0x8000         /* a  += 0x8000 */
+-      adds  t2, t2, a               /* t2 += a */
+-      adc   t,  t,  #0              /* t  += carry */
+-      mov   a,  t2, lsr #16         /* a   = t2 >> 16 */
+-      orr   a,  a,  t,  lsl #16     /* a  |= t << 16 */
+-    }
+-    return a;
+-  }
+-
+-#endif /* __CC_ARM || __ARMCC__ */
+-
+-
+-#ifdef __GNUC__
+-
+-#if defined( __arm__ )                                 && \
+-    ( !defined( __thumb__ ) || defined( __thumb2__ ) ) && \
+-    !( defined( __CC_ARM ) || defined( __ARMCC__ ) )
+-
+-#define FT_MULFIX_ASSEMBLER  FT_MulFix_arm
+-
+-  /* documentation is in freetype.h */
+-
+-  static __inline__ FT_Int32
+-  FT_MulFix_arm( FT_Int32  a,
+-                 FT_Int32  b )
+-  {
+-    register FT_Int32  t, t2;
+-
+-
+-    __asm__ __volatile__ (
+-      "smull  %1, %2, %4, %3\n\t"       /* (lo=%1,hi=%2) = a*b */
+-      "mov    %0, %2, asr #31\n\t"      /* %0  = (hi >> 31) */
+-#if defined( __clang__ ) && defined( __thumb2__ )
+-      "add.w  %0, %0, #0x8000\n\t"      /* %0 += 0x8000 */
+-#else
+-      "add    %0, %0, #0x8000\n\t"      /* %0 += 0x8000 */
+-#endif
+-      "adds   %1, %1, %0\n\t"           /* %1 += %0 */
+-      "adc    %2, %2, #0\n\t"           /* %2 += carry */
+-      "mov    %0, %1, lsr #16\n\t"      /* %0  = %1 >> 16 */
+-      "orr    %0, %0, %2, lsl #16\n\t"  /* %0 |= %2 << 16 */
+-      : "=r"(a), "=&r"(t2), "=&r"(t)
+-      : "r"(a), "r"(b)
+-      : "cc" );
+-    return a;
+-  }
+-
+-#endif /* __arm__                      && */
+-       /* ( __thumb2__ || !__thumb__ ) && */
+-       /* !( __CC_ARM || __ARMCC__ )      */
+-
+-
+-#if defined( __i386__ )
+-
+-#define FT_MULFIX_ASSEMBLER  FT_MulFix_i386
+-
+-  /* documentation is in freetype.h */
+-
+-  static __inline__ FT_Int32
+-  FT_MulFix_i386( FT_Int32  a,
+-                  FT_Int32  b )
+-  {
+-    register FT_Int32  result;
+-
+-
+-    __asm__ __volatile__ (
+-      "imul  %%edx\n"
+-      "movl  %%edx, %%ecx\n"
+-      "sarl  $31, %%ecx\n"
+-      "addl  $0x8000, %%ecx\n"
+-      "addl  %%ecx, %%eax\n"
+-      "adcl  $0, %%edx\n"
+-      "shrl  $16, %%eax\n"
+-      "shll  $16, %%edx\n"
+-      "addl  %%edx, %%eax\n"
+-      : "=a"(result), "=d"(b)
+-      : "a"(a), "d"(b)
+-      : "%ecx", "cc" );
+-    return result;
+-  }
+-
+-#endif /* i386 */
+-
+-#endif /* __GNUC__ */
+-
+-
+-#ifdef _MSC_VER /* Visual C++ */
+-
+-#ifdef _M_IX86
+-
+-#define FT_MULFIX_ASSEMBLER  FT_MulFix_i386
+-
+-  /* documentation is in freetype.h */
+-
+-  static __inline FT_Int32
+-  FT_MulFix_i386( FT_Int32  a,
+-                  FT_Int32  b )
+-  {
+-    register FT_Int32  result;
+-
+-    __asm
+-    {
+-      mov eax, a
+-      mov edx, b
+-      imul edx
+-      mov ecx, edx
+-      sar ecx, 31
+-      add ecx, 8000h
+-      add eax, ecx
+-      adc edx, 0
+-      shr eax, 16
+-      shl edx, 16
+-      add eax, edx
+-      mov result, eax
+-    }
+-    return result;
+-  }
+-
+-#endif /* _M_IX86 */
+-
+-#endif /* _MSC_VER */
+-
+-
+-#if defined( __GNUC__ ) && defined( __x86_64__ )
+-
+-#define FT_MULFIX_ASSEMBLER  FT_MulFix_x86_64
+-
+-  static __inline__ FT_Int32
+-  FT_MulFix_x86_64( FT_Int32  a,
+-                    FT_Int32  b )
+-  {
+-    /* Temporarily disable the warning that C90 doesn't support */
+-    /* `long long'.                                             */
+-#if ( __GNUC__ > 4 ) || ( ( __GNUC__ == 4 ) && ( __GNUC_MINOR__ >= 6 ) )
+-#pragma GCC diagnostic push
+-#pragma GCC diagnostic ignored "-Wlong-long"
+-#endif
+-
+-#if 1
+-    /* Technically not an assembly fragment, but GCC does a really good */
+-    /* job at inlining it and generating good machine code for it.      */
+-    long long  ret, tmp;
+-
+-
+-    ret  = (long long)a * b;
+-    tmp  = ret >> 63;
+-    ret += 0x8000 + tmp;
+-
+-    return (FT_Int32)( ret >> 16 );
+-#else
+-
+-    /* For some reason, GCC 4.6 on Ubuntu 12.04 generates invalid machine  */
+-    /* code from the lines below.  The main issue is that `wide_a' is not  */
+-    /* properly initialized by sign-extending `a'.  Instead, the generated */
+-    /* machine code assumes that the register that contains `a' on input   */
+-    /* can be used directly as a 64-bit value, which is wrong most of the  */
+-    /* time.                                                               */
+-    long long  wide_a = (long long)a;
+-    long long  wide_b = (long long)b;
+-    long long  result;
+-
+-
+-    __asm__ __volatile__ (
+-      "imul %2, %1\n"
+-      "mov %1, %0\n"
+-      "sar $63, %0\n"
+-      "lea 0x8000(%1, %0), %0\n"
+-      "sar $16, %0\n"
+-      : "=&r"(result), "=&r"(wide_a)
+-      : "r"(wide_b)
+-      : "cc" );
+-
+-    return (FT_Int32)result;
+-#endif
+-
+-#if ( __GNUC__ > 4 ) || ( ( __GNUC__ == 4 ) && ( __GNUC_MINOR__ >= 6 ) )
+-#pragma GCC diagnostic pop
+-#endif
+-  }
+-
+-#endif /* __GNUC__ && __x86_64__ */
+-
+-#endif /* !FT_CONFIG_OPTION_NO_ASSEMBLER */
+-
+-
+-#ifdef FT_CONFIG_OPTION_INLINE_MULFIX
+-#ifdef FT_MULFIX_ASSEMBLER
+-#define FT_MULFIX_INLINED  FT_MULFIX_ASSEMBLER
+-#endif
+-#endif
+-
+-
+ #ifdef FT_MAKE_OPTION_SINGLE_OBJECT
+ 
+ #define FT_LOCAL( x )      static  x
 diff --git a/builds/unix/unix-def.in b/builds/unix/unix-def.in
 index 35ea9c8..4c06a05 100644
 --- a/builds/unix/unix-def.in
@@ -768,6 +1076,235 @@ index 35ea9c8..4c06a05 100644
  	    $<                                                 \
  	    > $@.tmp
  	chmod a-w $@.tmp
+diff --git a/builds/vms/ftconfig.h b/builds/vms/ftconfig.h
+index 3fb8f84..52b0f65 100644
+--- a/builds/vms/ftconfig.h
++++ b/builds/vms/ftconfig.h
+@@ -4,7 +4,7 @@
+ /*                                                                         */
+ /*    VMS-specific configuration file (specification only).                */
+ /*                                                                         */
+-/*  Copyright 1996-2004, 2006-2008, 2011, 2013 by                          */
++/*  Copyright 1996-2004, 2006-2008, 2011, 2013, 2014 by                    */
+ /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+ /*                                                                         */
+ /*  This file is part of the FreeType project, and may only be used,       */
+@@ -306,215 +306,6 @@ FT_BEGIN_HEADER
+ #define FT_DUMMY_STMNT  FT_BEGIN_STMNT FT_END_STMNT
+ 
+ 
+-#ifndef  FT_CONFIG_OPTION_NO_ASSEMBLER
+-  /* Provide assembler fragments for performance-critical functions. */
+-  /* These must be defined `static __inline__' with GCC.             */
+-
+-#if defined( __CC_ARM ) || defined( __ARMCC__ )  /* RVCT */
+-
+-#define FT_MULFIX_ASSEMBLER  FT_MulFix_arm
+-
+-  /* documentation is in freetype.h */
+-
+-  static __inline FT_Int32
+-  FT_MulFix_arm( FT_Int32  a,
+-                 FT_Int32  b )
+-  {
+-    register FT_Int32  t, t2;
+-
+-
+-    __asm
+-    {
+-      smull t2, t,  b,  a           /* (lo=t2,hi=t) = a*b */
+-      mov   a,  t,  asr #31         /* a   = (hi >> 31) */
+-      add   a,  a,  #0x8000         /* a  += 0x8000 */
+-      adds  t2, t2, a               /* t2 += a */
+-      adc   t,  t,  #0              /* t  += carry */
+-      mov   a,  t2, lsr #16         /* a   = t2 >> 16 */
+-      orr   a,  a,  t,  lsl #16     /* a  |= t << 16 */
+-    }
+-    return a;
+-  }
+-
+-#endif /* __CC_ARM || __ARMCC__ */
+-
+-
+-#ifdef __GNUC__
+-
+-#if defined( __arm__ )                                 && \
+-    ( !defined( __thumb__ ) || defined( __thumb2__ ) ) && \
+-    !( defined( __CC_ARM ) || defined( __ARMCC__ ) )
+-
+-#define FT_MULFIX_ASSEMBLER  FT_MulFix_arm
+-
+-  /* documentation is in freetype.h */
+-
+-  static __inline__ FT_Int32
+-  FT_MulFix_arm( FT_Int32  a,
+-                 FT_Int32  b )
+-  {
+-    register FT_Int32  t, t2;
+-
+-
+-    __asm__ __volatile__ (
+-      "smull  %1, %2, %4, %3\n\t"       /* (lo=%1,hi=%2) = a*b */
+-      "mov    %0, %2, asr #31\n\t"      /* %0  = (hi >> 31) */
+-      "add    %0, %0, #0x8000\n\t"      /* %0 += 0x8000 */
+-      "adds   %1, %1, %0\n\t"           /* %1 += %0 */
+-      "adc    %2, %2, #0\n\t"           /* %2 += carry */
+-      "mov    %0, %1, lsr #16\n\t"      /* %0  = %1 >> 16 */
+-      "orr    %0, %0, %2, lsl #16\n\t"  /* %0 |= %2 << 16 */
+-      : "=r"(a), "=&r"(t2), "=&r"(t)
+-      : "r"(a), "r"(b)
+-      : "cc" );
+-    return a;
+-  }
+-
+-#endif /* __arm__                      && */
+-       /* ( __thumb2__ || !__thumb__ ) && */
+-       /* !( __CC_ARM || __ARMCC__ )      */
+-
+-
+-#if defined( __i386__ )
+-
+-#define FT_MULFIX_ASSEMBLER  FT_MulFix_i386
+-
+-  /* documentation is in freetype.h */
+-
+-  static __inline__ FT_Int32
+-  FT_MulFix_i386( FT_Int32  a,
+-                  FT_Int32  b )
+-  {
+-    register FT_Int32  result;
+-
+-
+-    __asm__ __volatile__ (
+-      "imul  %%edx\n"
+-      "movl  %%edx, %%ecx\n"
+-      "sarl  $31, %%ecx\n"
+-      "addl  $0x8000, %%ecx\n"
+-      "addl  %%ecx, %%eax\n"
+-      "adcl  $0, %%edx\n"
+-      "shrl  $16, %%eax\n"
+-      "shll  $16, %%edx\n"
+-      "addl  %%edx, %%eax\n"
+-      : "=a"(result), "=d"(b)
+-      : "a"(a), "d"(b)
+-      : "%ecx", "cc" );
+-    return result;
+-  }
+-
+-#endif /* i386 */
+-
+-#endif /* __GNUC__ */
+-
+-
+-#ifdef _MSC_VER /* Visual C++ */
+-
+-#ifdef _M_IX86
+-
+-#define FT_MULFIX_ASSEMBLER  FT_MulFix_i386
+-
+-  /* documentation is in freetype.h */
+-
+-  static __inline FT_Int32
+-  FT_MulFix_i386( FT_Int32  a,
+-                  FT_Int32  b )
+-  {
+-    register FT_Int32  result;
+-
+-    __asm
+-    {
+-      mov eax, a
+-      mov edx, b
+-      imul edx
+-      mov ecx, edx
+-      sar ecx, 31
+-      add ecx, 8000h
+-      add eax, ecx
+-      adc edx, 0
+-      shr eax, 16
+-      shl edx, 16
+-      add eax, edx
+-      mov result, eax
+-    }
+-    return result;
+-  }
+-
+-#endif /* _M_IX86 */
+-
+-#endif /* _MSC_VER */
+-
+-
+-#if defined( __GNUC__ ) && defined( __x86_64__ )
+-
+-#define FT_MULFIX_ASSEMBLER  FT_MulFix_x86_64
+-
+-  static __inline__ FT_Int32
+-  FT_MulFix_x86_64( FT_Int32  a,
+-                    FT_Int32  b )
+-  {
+-    /* Temporarily disable the warning that C90 doesn't support */
+-    /* `long long'.                                             */
+-#if ( __GNUC__ > 4 ) || ( ( __GNUC__ == 4 ) && ( __GNUC_MINOR__ >= 6 ) )
+-#pragma GCC diagnostic push
+-#pragma GCC diagnostic ignored "-Wlong-long"
+-#endif
+-
+-#if 1
+-    /* Technically not an assembly fragment, but GCC does a really good */
+-    /* job at inlining it and generating good machine code for it.      */
+-    long long  ret, tmp;
+-
+-
+-    ret  = (long long)a * b;
+-    tmp  = ret >> 63;
+-    ret += 0x8000 + tmp;
+-
+-    return (FT_Int32)( ret >> 16 );
+-#else
+-
+-    /* For some reason, GCC 4.6 on Ubuntu 12.04 generates invalid machine  */
+-    /* code from the lines below.  The main issue is that `wide_a' is not  */
+-    /* properly initialized by sign-extending `a'.  Instead, the generated */
+-    /* machine code assumes that the register that contains `a' on input   */
+-    /* can be used directly as a 64-bit value, which is wrong most of the  */
+-    /* time.                                                               */
+-    long long  wide_a = (long long)a;
+-    long long  wide_b = (long long)b;
+-    long long  result;
+-
+-
+-    __asm__ __volatile__ (
+-      "imul %2, %1\n"
+-      "mov %1, %0\n"
+-      "sar $63, %0\n"
+-      "lea 0x8000(%1, %0), %0\n"
+-      "sar $16, %0\n"
+-      : "=&r"(result), "=&r"(wide_a)
+-      : "r"(wide_b)
+-      : "cc" );
+-
+-    return (FT_Int32)result;
+-#endif
+-
+-#if ( __GNUC__ > 4 ) || ( ( __GNUC__ == 4 ) && ( __GNUC_MINOR__ >= 6 ) )
+-#pragma GCC diagnostic pop
+-#endif
+-  }
+-
+-#endif /* __GNUC__ && __x86_64__ */
+-
+-#endif /* !FT_CONFIG_OPTION_NO_ASSEMBLER */
+-
+-
+-#ifdef FT_CONFIG_OPTION_INLINE_MULFIX
+-#ifdef FT_MULFIX_ASSEMBLER
+-#define FT_MULFIX_INLINED  FT_MULFIX_ASSEMBLER
+-#endif
+-#endif
+-
+-
+ #ifdef FT_MAKE_OPTION_SINGLE_OBJECT
+ 
+ #define FT_LOCAL( x )      static  x
 diff --git a/docs/CHANGES b/docs/CHANGES
 index 803f02d..51b829c 100644
 --- a/docs/CHANGES
@@ -826,8 +1363,232 @@ index 803f02d..51b829c 100644
      - Another round of TrueType subpixel hinting fixes.
  
      - The `apinames' tool can now create an import file for NetWare.
+diff --git a/include/config/ftconfig.h b/include/config/ftconfig.h
+index d98a311..89a0f8f 100644
+--- a/include/config/ftconfig.h
++++ b/include/config/ftconfig.h
+@@ -333,219 +333,6 @@ FT_BEGIN_HEADER
+ #define FT_DUMMY_STMNT  FT_BEGIN_STMNT FT_END_STMNT
+ 
+ 
+-#ifndef  FT_CONFIG_OPTION_NO_ASSEMBLER
+-  /* Provide assembler fragments for performance-critical functions. */
+-  /* These must be defined `static __inline__' with GCC.             */
+-
+-#if defined( __CC_ARM ) || defined( __ARMCC__ )  /* RVCT */
+-
+-#define FT_MULFIX_ASSEMBLER  FT_MulFix_arm
+-
+-  /* documentation is in freetype.h */
+-
+-  static __inline FT_Int32
+-  FT_MulFix_arm( FT_Int32  a,
+-                 FT_Int32  b )
+-  {
+-    register FT_Int32  t, t2;
+-
+-
+-    __asm
+-    {
+-      smull t2, t,  b,  a           /* (lo=t2,hi=t) = a*b */
+-      mov   a,  t,  asr #31         /* a   = (hi >> 31) */
+-      add   a,  a,  #0x8000         /* a  += 0x8000 */
+-      adds  t2, t2, a               /* t2 += a */
+-      adc   t,  t,  #0              /* t  += carry */
+-      mov   a,  t2, lsr #16         /* a   = t2 >> 16 */
+-      orr   a,  a,  t,  lsl #16     /* a  |= t << 16 */
+-    }
+-    return a;
+-  }
+-
+-#endif /* __CC_ARM || __ARMCC__ */
+-
+-
+-#ifdef __GNUC__
+-
+-#if defined( __arm__ )                                 && \
+-    ( !defined( __thumb__ ) || defined( __thumb2__ ) ) && \
+-    !( defined( __CC_ARM ) || defined( __ARMCC__ ) )
+-
+-#define FT_MULFIX_ASSEMBLER  FT_MulFix_arm
+-
+-  /* documentation is in freetype.h */
+-
+-  static __inline__ FT_Int32
+-  FT_MulFix_arm( FT_Int32  a,
+-                 FT_Int32  b )
+-  {
+-    register FT_Int32  t, t2;
+-
+-
+-    __asm__ __volatile__ (
+-      "smull  %1, %2, %4, %3\n\t"       /* (lo=%1,hi=%2) = a*b */
+-      "mov    %0, %2, asr #31\n\t"      /* %0  = (hi >> 31) */
+-#if defined( __clang__ ) && defined( __thumb2__ )
+-      "add.w  %0, %0, #0x8000\n\t"      /* %0 += 0x8000 */
+-#else
+-      "add    %0, %0, #0x8000\n\t"      /* %0 += 0x8000 */
+-#endif
+-      "adds   %1, %1, %0\n\t"           /* %1 += %0 */
+-      "adc    %2, %2, #0\n\t"           /* %2 += carry */
+-      "mov    %0, %1, lsr #16\n\t"      /* %0  = %1 >> 16 */
+-      "orr    %0, %0, %2, lsl #16\n\t"  /* %0 |= %2 << 16 */
+-      : "=r"(a), "=&r"(t2), "=&r"(t)
+-      : "r"(a), "r"(b)
+-      : "cc" );
+-    return a;
+-  }
+-
+-#endif /* __arm__                      && */
+-       /* ( __thumb2__ || !__thumb__ ) && */
+-       /* !( __CC_ARM || __ARMCC__ )      */
+-
+-
+-#if defined( __i386__ )
+-
+-#define FT_MULFIX_ASSEMBLER  FT_MulFix_i386
+-
+-  /* documentation is in freetype.h */
+-
+-  static __inline__ FT_Int32
+-  FT_MulFix_i386( FT_Int32  a,
+-                  FT_Int32  b )
+-  {
+-    register FT_Int32  result;
+-
+-
+-    __asm__ __volatile__ (
+-      "imul  %%edx\n"
+-      "movl  %%edx, %%ecx\n"
+-      "sarl  $31, %%ecx\n"
+-      "addl  $0x8000, %%ecx\n"
+-      "addl  %%ecx, %%eax\n"
+-      "adcl  $0, %%edx\n"
+-      "shrl  $16, %%eax\n"
+-      "shll  $16, %%edx\n"
+-      "addl  %%edx, %%eax\n"
+-      : "=a"(result), "=d"(b)
+-      : "a"(a), "d"(b)
+-      : "%ecx", "cc" );
+-    return result;
+-  }
+-
+-#endif /* i386 */
+-
+-#endif /* __GNUC__ */
+-
+-
+-#ifdef _MSC_VER /* Visual C++ */
+-
+-#ifdef _M_IX86
+-
+-#define FT_MULFIX_ASSEMBLER  FT_MulFix_i386
+-
+-  /* documentation is in freetype.h */
+-
+-  static __inline FT_Int32
+-  FT_MulFix_i386( FT_Int32  a,
+-                  FT_Int32  b )
+-  {
+-    register FT_Int32  result;
+-
+-    __asm
+-    {
+-      mov eax, a
+-      mov edx, b
+-      imul edx
+-      mov ecx, edx
+-      sar ecx, 31
+-      add ecx, 8000h
+-      add eax, ecx
+-      adc edx, 0
+-      shr eax, 16
+-      shl edx, 16
+-      add eax, edx
+-      mov result, eax
+-    }
+-    return result;
+-  }
+-
+-#endif /* _M_IX86 */
+-
+-#endif /* _MSC_VER */
+-
+-
+-#if defined( __GNUC__ ) && defined( __x86_64__ )
+-
+-#define FT_MULFIX_ASSEMBLER  FT_MulFix_x86_64
+-
+-  static __inline__ FT_Int32
+-  FT_MulFix_x86_64( FT_Int32  a,
+-                    FT_Int32  b )
+-  {
+-    /* Temporarily disable the warning that C90 doesn't support */
+-    /* `long long'.                                             */
+-#if ( __GNUC__ > 4 ) || ( ( __GNUC__ == 4 ) && ( __GNUC_MINOR__ >= 6 ) )
+-#pragma GCC diagnostic push
+-#pragma GCC diagnostic ignored "-Wlong-long"
+-#endif
+-
+-#if 1
+-    /* Technically not an assembly fragment, but GCC does a really good */
+-    /* job at inlining it and generating good machine code for it.      */
+-    long long  ret, tmp;
+-
+-
+-    ret  = (long long)a * b;
+-    tmp  = ret >> 63;
+-    ret += 0x8000 + tmp;
+-
+-    return (FT_Int32)( ret >> 16 );
+-#else
+-
+-    /* For some reason, GCC 4.6 on Ubuntu 12.04 generates invalid machine  */
+-    /* code from the lines below.  The main issue is that `wide_a' is not  */
+-    /* properly initialized by sign-extending `a'.  Instead, the generated */
+-    /* machine code assumes that the register that contains `a' on input   */
+-    /* can be used directly as a 64-bit value, which is wrong most of the  */
+-    /* time.                                                               */
+-    long long  wide_a = (long long)a;
+-    long long  wide_b = (long long)b;
+-    long long  result;
+-
+-
+-    __asm__ __volatile__ (
+-      "imul %2, %1\n"
+-      "mov %1, %0\n"
+-      "sar $63, %0\n"
+-      "lea 0x8000(%1, %0), %0\n"
+-      "sar $16, %0\n"
+-      : "=&r"(result), "=&r"(wide_a)
+-      : "r"(wide_b)
+-      : "cc" );
+-
+-    return (FT_Int32)result;
+-#endif
+-
+-#if ( __GNUC__ > 4 ) || ( ( __GNUC__ == 4 ) && ( __GNUC_MINOR__ >= 6 ) )
+-#pragma GCC diagnostic pop
+-#endif
+-  }
+-
+-#endif /* __GNUC__ && __x86_64__ */
+-
+-#endif /* !FT_CONFIG_OPTION_NO_ASSEMBLER */
+-
+-
+-#ifdef FT_CONFIG_OPTION_INLINE_MULFIX
+-#ifdef FT_MULFIX_ASSEMBLER
+-#define FT_MULFIX_INLINED  FT_MULFIX_ASSEMBLER
+-#endif
+-#endif
+-
+-
+ #ifdef FT_MAKE_OPTION_SINGLE_OBJECT
+ 
+ #define FT_LOCAL( x )      static  x
 diff --git a/include/freetype.h b/include/freetype.h
-index fb62b62..9ab843c 100644
+index fb62b62..d6217e9 100644
 --- a/include/freetype.h
 +++ b/include/freetype.h
 @@ -1592,7 +1592,6 @@ FT_BEGIN_HEADER
@@ -858,6 +1619,18 @@ index fb62b62..9ab843c 100644
     *
     *     This flag implies @FT_LOAD_NO_SCALE and @FT_LOAD_IGNORE_TRANSFORM.
     *
+@@ -3065,9 +3061,8 @@ FT_BEGIN_HEADER
+   /*    glyph index~0 always corresponds to the `missing glyph' (called    */
+   /*    `.notdef').                                                        */
+   /*                                                                       */
+-  /*    This function is not compiled within the library if the config     */
+-  /*    macro `FT_CONFIG_OPTION_NO_GLYPH_NAMES' is defined in              */
+-  /*    `ftoptions.h'.                                                     */
++  /*    This function always returns an error if the config macro          */
++  /*    `FT_CONFIG_OPTION_NO_GLYPH_NAMES' is not defined in `ftoptions.h'. */
+   /*                                                                       */
+   FT_EXPORT( FT_Error )
+   FT_Get_Glyph_Name( FT_Face     face,
 diff --git a/include/fterrdef.h b/include/fterrdef.h
 index 76c7b9e..99b2fad 100644
 --- a/include/fterrdef.h
@@ -1172,6 +1945,25 @@ index 76c7b9e..99b2fad 100644
                  "Font glyphs corrupted or missing fields" )
  
  
+diff --git a/include/internal/ftobjs.h b/include/internal/ftobjs.h
+index 701c850..faa37f8 100644
+--- a/include/internal/ftobjs.h
++++ b/include/internal/ftobjs.h
+@@ -83,14 +83,6 @@ FT_BEGIN_HEADER
+ 
+ 
+   /*
+-   *  Return the highest power of 2 that is <= value; this correspond to
+-   *  the highest bit in a given 32-bit value.
+-   */
+-  FT_BASE( FT_UInt32 )
+-  ft_highpow2( FT_UInt32  value );
+-
+-
+-  /*
+    *  character classification functions -- since these are used to parse
+    *  font files, we must not use those in <ctypes.h> which are
+    *  locale-dependent
 diff --git a/src/autofit/afblue.c b/src/autofit/afblue.c
 index 6e214c8..f3526bf 100644
 --- a/src/autofit/afblue.c
@@ -3133,11 +3925,339 @@ index 11fb743..cc04815 100644
        if ( gstyles[idx] == AF_STYLE_UNASSIGNED )
          gstyles[idx] = (FT_Byte)style_class->style;
  #ifdef FT_DEBUG_LEVEL_TRACE
+diff --git a/src/base/ftbitmap.c b/src/base/ftbitmap.c
+index 5606745..158a428 100644
+--- a/src/base/ftbitmap.c
++++ b/src/base/ftbitmap.c
+@@ -378,11 +378,8 @@
+   static FT_Byte
+   ft_gray_for_premultiplied_srgb_bgra( const FT_Byte*  bgra )
+   {
+-    FT_Long  a = bgra[3];
+-    FT_Long  b = bgra[0];
+-    FT_Long  g = bgra[1];
+-    FT_Long  r = bgra[2];
+-    FT_Long  l;
++    FT_UInt  a = bgra[3];
++    FT_UInt  l;
+ 
+ 
+     /* Short-circuit transparent color to avoid div-by-zero. */
+@@ -397,38 +394,30 @@
+      *
+      * http://accessibility.kde.org/hsl-adjusted.php
+      *
+-     * We do the computation with integers only.
++     * We do the computation with integers only, applying a gamma of 2.0.
++     * We guarantee 32-bit arithmetic to avoid overflow but the resulting
++     * luminosity fits into 16 bits. 
++     *
+      */
+ 
+-    /* Undo premultification, get the number in a 16.16 form. */
+-    b = FT_MulDiv( b, 65536, a );
+-    g = FT_MulDiv( g, 65536, a );
+-    r = FT_MulDiv( r, 65536, a );
+-    a = a * 256;
+-
+-    /* Apply gamma of 2.0 instead of 2.2. */
+-    b = FT_MulFix( b, b );
+-    g = FT_MulFix( g, g );
+-    r = FT_MulFix( r, r );
+-
+-    /* Apply coefficients. */
+-    b = FT_MulFix( b,  4731 /* 0.0722 * 65536 */ );
+-    g = FT_MulFix( g, 46871 /* 0.7152 * 65536 */ );
+-    r = FT_MulFix( r, 13933 /* 0.2126 * 65536 */ );
+-
+-    l = r + g + b;
++    l = (  4732UL /* 0.0722 * 65536 */ * bgra[0] * bgra[0] +
++          46871UL /* 0.7152 * 65536 */ * bgra[1] * bgra[1] +
++          13933UL /* 0.2126 * 65536 */ * bgra[2] * bgra[2] ) >> 16;
+ 
+     /*
+-     * Final transparency can be determined this way:
++     * Final transparency can be determined as follows.
+      *
+      * - If alpha is zero, we want 0.
+      * - If alpha is zero and luminosity is zero, we want 255.
+      * - If alpha is zero and luminosity is one, we want 0.
+      *
+-     * So the formula is a * (1 - l).
++     * So the formula is a * (1 - l) = a - l * a.
++     *
++     * We still need to undo premultiplication by dividing l by a*a.
++     *
+      */
+ 
+-    return (FT_Byte)( FT_MulFix( 65535 - l, a ) >> 8 );
++    return (FT_Byte)( a - l / a );
+   }
+ 
+ 
 diff --git a/src/base/ftcalc.c b/src/base/ftcalc.c
-index 6e65583..2216880 100644
+index 6e65583..4db43e0 100644
 --- a/src/base/ftcalc.c
 +++ b/src/base/ftcalc.c
-@@ -358,20 +358,26 @@
+@@ -39,6 +39,235 @@
+ #include FT_INTERNAL_DEBUG_H
+ #include FT_INTERNAL_OBJECTS_H
+ 
++
++#ifndef  FT_CONFIG_OPTION_NO_ASSEMBLER
++  /* Provide assembler fragments for performance-critical functions. */
++  /* These must be defined `static __inline__' with GCC.             */
++
++#if defined( __CC_ARM ) || defined( __ARMCC__ )  /* RVCT */
++
++#define FT_MULFIX_ASSEMBLER  FT_MulFix_arm
++
++  /* documentation is in freetype.h */
++
++  static __inline FT_Int32
++  FT_MulFix_arm( FT_Int32  a,
++                 FT_Int32  b )
++  {
++    register FT_Int32  t, t2;
++
++
++    __asm
++    {
++      smull t2, t,  b,  a           /* (lo=t2,hi=t) = a*b */
++      mov   a,  t,  asr #31         /* a   = (hi >> 31) */
++      add   a,  a,  #0x8000         /* a  += 0x8000 */
++      adds  t2, t2, a               /* t2 += a */
++      adc   t,  t,  #0              /* t  += carry */
++      mov   a,  t2, lsr #16         /* a   = t2 >> 16 */
++      orr   a,  a,  t,  lsl #16     /* a  |= t << 16 */
++    }
++    return a;
++  }
++
++#endif /* __CC_ARM || __ARMCC__ */
++
++
++#ifdef __GNUC__
++
++#if defined( __arm__ )                                 && \
++    ( !defined( __thumb__ ) || defined( __thumb2__ ) ) && \
++    !( defined( __CC_ARM ) || defined( __ARMCC__ ) )
++
++#define FT_MULFIX_ASSEMBLER  FT_MulFix_arm
++
++  /* documentation is in freetype.h */
++
++  static __inline__ FT_Int32
++  FT_MulFix_arm( FT_Int32  a,
++                 FT_Int32  b )
++  {
++    register FT_Int32  t, t2;
++
++
++    __asm__ __volatile__ (
++      "smull  %1, %2, %4, %3\n\t"       /* (lo=%1,hi=%2) = a*b */
++      "mov    %0, %2, asr #31\n\t"      /* %0  = (hi >> 31) */
++#if defined( __clang__ ) && defined( __thumb2__ )
++      "add.w  %0, %0, #0x8000\n\t"      /* %0 += 0x8000 */
++#else
++      "add    %0, %0, #0x8000\n\t"      /* %0 += 0x8000 */
++#endif
++      "adds   %1, %1, %0\n\t"           /* %1 += %0 */
++      "adc    %2, %2, #0\n\t"           /* %2 += carry */
++      "mov    %0, %1, lsr #16\n\t"      /* %0  = %1 >> 16 */
++      "orr    %0, %0, %2, lsl #16\n\t"  /* %0 |= %2 << 16 */
++      : "=r"(a), "=&r"(t2), "=&r"(t)
++      : "r"(a), "r"(b)
++      : "cc" );
++    return a;
++  }
++
++#endif /* __arm__                      && */
++       /* ( __thumb2__ || !__thumb__ ) && */
++       /* !( __CC_ARM || __ARMCC__ )      */
++
++
++#if defined( __i386__ )
++
++#define FT_MULFIX_ASSEMBLER  FT_MulFix_i386
++
++  /* documentation is in freetype.h */
++
++  static __inline__ FT_Int32
++  FT_MulFix_i386( FT_Int32  a,
++                  FT_Int32  b )
++  {
++    register FT_Int32  result;
++
++
++    __asm__ __volatile__ (
++      "imul  %%edx\n"
++      "movl  %%edx, %%ecx\n"
++      "sarl  $31, %%ecx\n"
++      "addl  $0x8000, %%ecx\n"
++      "addl  %%ecx, %%eax\n"
++      "adcl  $0, %%edx\n"
++      "shrl  $16, %%eax\n"
++      "shll  $16, %%edx\n"
++      "addl  %%edx, %%eax\n"
++      : "=a"(result), "=d"(b)
++      : "a"(a), "d"(b)
++      : "%ecx", "cc" );
++    return result;
++  }
++
++#endif /* i386 */
++
++#endif /* __GNUC__ */
++
++
++#ifdef _MSC_VER /* Visual C++ */
++
++#ifdef _M_IX86
++
++#define FT_MULFIX_ASSEMBLER  FT_MulFix_i386
++
++  /* documentation is in freetype.h */
++
++  static __inline FT_Int32
++  FT_MulFix_i386( FT_Int32  a,
++                  FT_Int32  b )
++  {
++    register FT_Int32  result;
++
++    __asm
++    {
++      mov eax, a
++      mov edx, b
++      imul edx
++      mov ecx, edx
++      sar ecx, 31
++      add ecx, 8000h
++      add eax, ecx
++      adc edx, 0
++      shr eax, 16
++      shl edx, 16
++      add eax, edx
++      mov result, eax
++    }
++    return result;
++  }
++
++#endif /* _M_IX86 */
++
++#endif /* _MSC_VER */
++
++
++#if defined( __GNUC__ ) && defined( __x86_64__ )
++
++#define FT_MULFIX_ASSEMBLER  FT_MulFix_x86_64
++
++  static __inline__ FT_Int32
++  FT_MulFix_x86_64( FT_Int32  a,
++                    FT_Int32  b )
++  {
++    /* Temporarily disable the warning that C90 doesn't support */
++    /* `long long'.                                             */
++#if ( __GNUC__ > 4 ) || ( ( __GNUC__ == 4 ) && ( __GNUC_MINOR__ >= 6 ) )
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wlong-long"
++#endif
++
++#if 1
++    /* Technically not an assembly fragment, but GCC does a really good */
++    /* job at inlining it and generating good machine code for it.      */
++    long long  ret, tmp;
++
++
++    ret  = (long long)a * b;
++    tmp  = ret >> 63;
++    ret += 0x8000 + tmp;
++
++    return (FT_Int32)( ret >> 16 );
++#else
++
++    /* For some reason, GCC 4.6 on Ubuntu 12.04 generates invalid machine  */
++    /* code from the lines below.  The main issue is that `wide_a' is not  */
++    /* properly initialized by sign-extending `a'.  Instead, the generated */
++    /* machine code assumes that the register that contains `a' on input   */
++    /* can be used directly as a 64-bit value, which is wrong most of the  */
++    /* time.                                                               */
++    long long  wide_a = (long long)a;
++    long long  wide_b = (long long)b;
++    long long  result;
++
++
++    __asm__ __volatile__ (
++      "imul %2, %1\n"
++      "mov %1, %0\n"
++      "sar $63, %0\n"
++      "lea 0x8000(%1, %0), %0\n"
++      "sar $16, %0\n"
++      : "=&r"(result), "=&r"(wide_a)
++      : "r"(wide_b)
++      : "cc" );
++
++    return (FT_Int32)result;
++#endif
++
++#if ( __GNUC__ > 4 ) || ( ( __GNUC__ == 4 ) && ( __GNUC_MINOR__ >= 6 ) )
++#pragma GCC diagnostic pop
++#endif
++  }
++
++#endif /* __GNUC__ && __x86_64__ */
++
++#if defined( __GNUC__ )
++#if ( __GNUC__ > 3 ) || ( ( __GNUC__ == 3 ) && ( __GNUC_MINOR__ >= 4 ) )
++
++#if FT_SIZEOF_INT == 4
++
++#define FT_MSB_BUILTIN( x )  ( 31 - __builtin_clz( x ) )
++
++#elif FT_SIZEOF_LONG == 4
++
++#define FT_MSB_BUILTIN( x )  ( 31 - __builtin_clzl( x ) )
++
++#endif
++
++#endif
++#endif /* __GNUC__ */
++
++#endif /* !FT_CONFIG_OPTION_NO_ASSEMBLER */
++
++
++#ifdef FT_CONFIG_OPTION_INLINE_MULFIX
++#ifdef FT_MULFIX_ASSEMBLER
++#define FT_MULFIX_INLINED  FT_MULFIX_ASSEMBLER
++#endif
++#endif
++
+ #ifdef FT_MULFIX_INLINED
+ #undef FT_MulFix
+ #endif
+@@ -103,6 +332,12 @@
+   FT_BASE_DEF ( FT_Int )
+   FT_MSB( FT_UInt32 z )
+   {
++#ifdef FT_MSB_BUILTIN
++
++    return FT_MSB_BUILTIN( z );
++
++#else
++
+     FT_Int shift = 0;
+ 
+     /* determine msb bit index in `shift' */
+@@ -133,6 +368,8 @@
+     }
+ 
+     return shift;
++
++#endif /* FT_MSB_BUILTIN */
+   }
+ 
+ 
+@@ -358,20 +595,26 @@
    /* documentation is in freetype.h */
  
    /* The FT_MulDiv function has been optimized thanks to ideas from      */
@@ -3145,34 +4265,34 @@ index 6e65583..2216880 100644
 -  /* fits within 32-bits (a rather common case).                         */
 +  /* Graham Asher and Alexei Podtelezhnikov.  The trick is to optimize   */
 +  /* a rather common case when everything fits within 32-bits.           */
-   /*                                                                     */
--  /*  we compute 'a*b+c/2', then divide it by 'c'. (positive values)     */
++  /*                                                                     */
 +  /*  We compute 'a*b+c/2', then divide it by 'c'. (positive values)     */
    /*                                                                     */
--  /*  46340 is FLOOR(SQRT(2^31-1)).                                      */
+-  /*  we compute 'a*b+c/2', then divide it by 'c'. (positive values)     */
 +  /*  The product of two positive numbers never exceeds the square of    */
 +  /*  their mean.  Therefore, we always avoid the overflow by imposing   */
    /*                                                                     */
--  /*  if ( a <= 46340 && b <= 46340 ) then ( a*b <= 0x7FFEA810 )         */
+-  /*  46340 is FLOOR(SQRT(2^31-1)).                                      */
 +  /*  ( a + b ) / 2 <= sqrt( X - c/2 )                                   */
    /*                                                                     */
--  /*  0x7FFFFFFF - 0x7FFEA810 = 0x157F0                                  */
+-  /*  if ( a <= 46340 && b <= 46340 ) then ( a*b <= 0x7FFEA810 )         */
 +  /*  where X = 2^31 - 1.  Now we replace sqrt with a linear function    */
 +  /*  that is smaller or equal in the entire range of c from 0 to X;     */
 +  /*  it should be equal to sqrt(X) and sqrt(X/2) at the range termini.  */
 +  /*  Substituting the linear solution and explicit numbers we get       */
    /*                                                                     */
--  /*  if ( c < 0x157F0*2 ) then ( a*b+c/2 <= 0x7FFFFFFF )                */
+-  /*  0x7FFFFFFF - 0x7FFEA810 = 0x157F0                                  */
 +  /*  a + b <= 92681.9 - c / 79108.95                                    */
    /*                                                                     */
--  /*  and 2*0x157F0 = 176096                                             */
+-  /*  if ( c < 0x157F0*2 ) then ( a*b+c/2 <= 0x7FFFFFFF )                */
 +  /*  In practice we use a faster and even stronger inequality           */
-+  /*                                                                     */
+   /*                                                                     */
+-  /*  and 2*0x157F0 = 176096                                             */
 +  /*  a + b <= 92681 - (c >> 16)                                         */
    /*                                                                     */
  
    FT_EXPORT_DEF( FT_Long )
-@@ -390,7 +396,7 @@
+@@ -390,7 +633,7 @@
      s ^= b; b = FT_ABS( b );
      s ^= c; c = FT_ABS( c );
  
@@ -3181,7 +4301,7 @@ index 6e65583..2216880 100644
        a = ( a * b + ( c >> 1 ) ) / c;
  
      else if ( (FT_Int32)c > 0 )
-@@ -427,7 +433,7 @@
+@@ -427,7 +670,7 @@
      s ^= b; b = FT_ABS( b );
      s ^= c; c = FT_ABS( c );
  
@@ -3301,6 +4421,37 @@ index 6f32336..cc56105 100644
      }
  
      return error;
+diff --git a/src/base/ftutil.c b/src/base/ftutil.c
+index 879d027..9f37189 100644
+--- a/src/base/ftutil.c
++++ b/src/base/ftutil.c
+@@ -411,26 +411,4 @@
+   }
+ 
+ 
+-  FT_BASE_DEF( FT_UInt32 )
+-  ft_highpow2( FT_UInt32  value )
+-  {
+-    FT_UInt32  value2;
+-
+-
+-    /*
+-     *  We simply clear the lowest bit in each iteration.  When
+-     *  we reach 0, we know that the previous value was our result.
+-     */
+-    for ( ;; )
+-    {
+-      value2 = value & (value - 1);  /* clear lowest bit */
+-      if ( value2 == 0 )
+-        break;
+-
+-      value = value2;
+-    }
+-    return value;
+-  }
+-
+-
+ /* END */
 diff --git a/src/bdf/bdfdrivr.c b/src/bdf/bdfdrivr.c
 index 5a1c296..d7649ab 100644
 --- a/src/bdf/bdfdrivr.c
@@ -3416,6 +4567,19 @@ index 4eb2c5b..a65f94d 100644
    const FTC_MruListClassRec  ftc_face_list_class =
    {
      sizeof ( FTC_FaceNodeRec),
+diff --git a/src/cff/cf2hints.c b/src/cff/cf2hints.c
+index 5853d77..81049f4 100644
+--- a/src/cff/cf2hints.c
++++ b/src/cff/cf2hints.c
+@@ -1560,7 +1560,7 @@
+         {
+           /* -y */
+           *x = -glyphpath->xOffset;
+-          *y = glyphpath->xOffset;
++          *y = glyphpath->yOffset;
+         }
+         else
+         {
 diff --git a/src/pcf/pcfdrivr.c b/src/pcf/pcfdrivr.c
 index 748cbca..5183f6f 100644
 --- a/src/pcf/pcfdrivr.c
@@ -3460,6 +4624,36 @@ index 4c43947..188aa0d 100644
    const FT_Service_PfrMetricsRec  pfr_metrics_service_rec =
    {
      pfr_get_metrics,
+diff --git a/src/pfr/pfrobjs.c b/src/pfr/pfrobjs.c
+index 194d2df..0c89242 100644
+--- a/src/pfr/pfrobjs.c
++++ b/src/pfr/pfrobjs.c
+@@ -4,7 +4,7 @@
+ /*                                                                         */
+ /*    FreeType PFR object methods (body).                                  */
+ /*                                                                         */
+-/*  Copyright 2002-2008, 2010-2011, 2013 by                                */
++/*  Copyright 2002-2008, 2010-2011, 2013, 2014 by                          */
+ /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+ /*                                                                         */
+ /*  This file is part of the FreeType project, and may only be used,       */
+@@ -23,6 +23,7 @@
+ #include "pfrsbit.h"
+ #include FT_OUTLINE_H
+ #include FT_INTERNAL_DEBUG_H
++#include FT_INTERNAL_CALC_H
+ #include FT_TRUETYPE_IDS_H
+ 
+ #include "pfrerror.h"
+@@ -515,7 +516,7 @@
+       {
+         FT_UInt    count       = item->pair_count;
+         FT_UInt    size        = item->pair_size;
+-        FT_UInt    power       = (FT_UInt)ft_highpow2( (FT_UInt32)count );
++        FT_UInt    power       = 1 << FT_MSB( count );
+         FT_UInt    probe       = power * size;
+         FT_UInt    extra       = count - power;
+         FT_Byte*   base        = stream->cursor;
 diff --git a/src/raster/ftraster.c b/src/raster/ftraster.c
 index ddecc80..abbecb7 100644
 --- a/src/raster/ftraster.c
@@ -3746,7 +4940,7 @@ index 58aa2a0..60fe696 100644
    $curr_offset += $count;
    $curr_elem_size += $count;
 diff --git a/src/truetype/ttgload.c b/src/truetype/ttgload.c
-index 5f676a2..02298e3 100644
+index 5f676a2..ff2b339 100644
 --- a/src/truetype/ttgload.c
 +++ b/src/truetype/ttgload.c
 @@ -4,7 +4,7 @@
@@ -3774,8 +4968,46 @@ index 5f676a2..02298e3 100644
        *ah  = face->horizontal.Ascender - face->horizontal.Descender;
      }
  
+@@ -2120,7 +2120,7 @@
+       FT_Bool  reexecute = FALSE;
+ 
+ 
+-      if ( !size->cvt_ready )
++      if ( size->bytecode_ready < 0 || size->cvt_ready < 0 )
+       {
+         FT_Error  error = tt_size_ready_bytecode( size, pedantic );
+ 
+@@ -2128,6 +2128,10 @@
+         if ( error )
+           return error;
+       }
++      else if ( size->bytecode_ready )
++        return size->bytecode_ready;
++      else if ( size->cvt_ready )
++        return size->cvt_ready;
+ 
+       /* query new execution context */
+       exec = size->debug ? size->context
+@@ -2238,12 +2242,15 @@
+ 
+       if ( reexecute )
+       {
+-        FT_UInt  i;
++        FT_UInt   i;
++        FT_Error  error;
+ 
+ 
+         for ( i = 0; i < size->cvt_size; i++ )
+           size->cvt[i] = FT_MulFix( face->cvt[i], size->ttmetrics.scale );
+-        tt_size_run_prep( size, pedantic );
++        error = tt_size_run_prep( size, pedantic );
++        if ( error )
++          return error;
+       }
+ 
+       /* see whether the cvt program has disabled hinting */
 diff --git a/src/truetype/ttinterp.c b/src/truetype/ttinterp.c
-index 56e8fa7..f71d306 100644
+index 56e8fa7..9491533 100644
 --- a/src/truetype/ttinterp.c
 +++ b/src/truetype/ttinterp.c
 @@ -7596,9 +7596,9 @@
@@ -3808,6 +5040,184 @@ index 56e8fa7..f71d306 100644
  
                /* Reverse this move if it results in a disallowed move */
                if ( CUR.GS.freeVector.y != 0                           &&
+@@ -9035,10 +9035,13 @@
+     /* If any errors have occurred, function tables may be broken. */
+     /* Force a re-execution of `prep' and `fpgm' tables if no      */
+     /* bytecode debugger is run.                                   */
+-    if ( CUR.error && !CUR.instruction_trap )
++    if ( CUR.error
++         && !CUR.instruction_trap
++         && CUR.curRange == tt_coderange_glyph )
+     {
+       FT_TRACE1(( "  The interpreter returned error 0x%x\n", CUR.error ));
+-      exc->size->cvt_ready      = FALSE;
++      exc->size->bytecode_ready = -1;
++      exc->size->cvt_ready      = -1;
+     }
+ 
+     return CUR.error;
+diff --git a/src/truetype/ttobjs.c b/src/truetype/ttobjs.c
+index 4adba58..05a121c 100644
+--- a/src/truetype/ttobjs.c
++++ b/src/truetype/ttobjs.c
+@@ -813,6 +813,8 @@
+     else
+       error = FT_Err_Ok;
+ 
++    size->bytecode_ready = error;
++
+     if ( !error )
+       TT_Save_Context( exec, size );
+ 
+@@ -884,6 +886,8 @@
+     else
+       error = FT_Err_Ok;
+ 
++    size->cvt_ready = error;
++
+     /* UNDOCUMENTED!  The MS rasterizer doesn't allow the following */
+     /* graphics state variables to be modified by the CVT program.  */
+ 
+@@ -912,10 +916,6 @@
+     return error;
+   }
+ 
+-#endif /* TT_USE_BYTECODE_INTERPRETER */
+-
+-
+-#ifdef TT_USE_BYTECODE_INTERPRETER
+ 
+   static void
+   tt_size_done_bytecode( FT_Size  ftsize )
+@@ -953,8 +953,8 @@
+     size->max_func = 0;
+     size->max_ins  = 0;
+ 
+-    size->bytecode_ready = 0;
+-    size->cvt_ready      = 0;
++    size->bytecode_ready = -1;
++    size->cvt_ready      = -1;
+   }
+ 
+ 
+@@ -974,8 +974,8 @@
+     TT_MaxProfile*  maxp = &face->max_profile;
+ 
+ 
+-    size->bytecode_ready = 1;
+-    size->cvt_ready      = 0;
++    size->bytecode_ready = -1;
++    size->cvt_ready      = -1;
+ 
+     size->max_function_defs    = maxp->maxFunctionDefs;
+     size->max_instruction_defs = maxp->maxInstructionDefs;
+@@ -1052,15 +1052,14 @@
+     FT_Error  error = FT_Err_Ok;
+ 
+ 
+-    if ( !size->bytecode_ready )
+-    {
++    if ( size->bytecode_ready < 0 )
+       error = tt_size_init_bytecode( (FT_Size)size, pedantic );
+-      if ( error )
+-        goto Exit;
+-    }
++
++    if ( error || size->bytecode_ready )
++      goto Exit;
+ 
+     /* rescale CVT when needed */
+-    if ( !size->cvt_ready )
++    if ( size->cvt_ready < 0 )
+     {
+       FT_UInt  i;
+       TT_Face  face = (TT_Face)size->root.face;
+@@ -1087,8 +1086,6 @@
+       size->GS = tt_default_graphics_state;
+ 
+       error = tt_size_run_prep( size, pedantic );
+-      if ( !error )
+-        size->cvt_ready = 1;
+     }
+ 
+   Exit:
+@@ -1119,8 +1116,8 @@
+     FT_Error  error = FT_Err_Ok;
+ 
+ #ifdef TT_USE_BYTECODE_INTERPRETER
+-    size->bytecode_ready = 0;
+-    size->cvt_ready      = 0;
++    size->bytecode_ready = -1;
++    size->cvt_ready      = -1;
+ #endif
+ 
+     size->ttmetrics.valid = FALSE;
+@@ -1148,7 +1145,7 @@
+ 
+ 
+ #ifdef TT_USE_BYTECODE_INTERPRETER
+-    if ( size->bytecode_ready )
++    if ( size->bytecode_ready >= 0 )
+       tt_size_done_bytecode( ttsize );
+ #endif
+ 
+@@ -1229,7 +1226,7 @@
+     }
+ 
+ #ifdef TT_USE_BYTECODE_INTERPRETER
+-    size->cvt_ready = 0;
++    size->cvt_ready = -1;
+ #endif /* TT_USE_BYTECODE_INTERPRETER */
+ 
+     if ( !error )
+diff --git a/src/truetype/ttobjs.h b/src/truetype/ttobjs.h
+index a11dd37..47d50d9 100644
+--- a/src/truetype/ttobjs.h
++++ b/src/truetype/ttobjs.h
+@@ -4,7 +4,7 @@
+ /*                                                                         */
+ /*    Objects manager (specification).                                     */
+ /*                                                                         */
+-/*  Copyright 1996-2009, 2011-2013 by                                      */
++/*  Copyright 1996-2009, 2011-2014 by                                      */
+ /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+ /*                                                                         */
+ /*  This file is part of the FreeType project, and may only be used,       */
+@@ -333,8 +333,10 @@ FT_BEGIN_HEADER
+     FT_Bool            debug;
+     TT_ExecContext     context;
+ 
+-    FT_Bool            bytecode_ready;
+-    FT_Bool            cvt_ready;
++    /* if negative, `fpgm' (resp. `prep'), wasn't executed yet; */
++    /* otherwise it is the returned error code                  */
++    FT_Error           bytecode_ready;
++    FT_Error           cvt_ready;
+ 
+ #endif /* TT_USE_BYTECODE_INTERPRETER */
+ 
+diff --git a/src/truetype/ttsubpix.c b/src/truetype/ttsubpix.c
+index 28470ad..9871994 100644
+--- a/src/truetype/ttsubpix.c
++++ b/src/truetype/ttsubpix.c
+@@ -956,7 +956,7 @@
+       if ( loader->exec->rasterizer_version != TT_INTERPRETER_VERSION_35 )
+       {
+         loader->exec->rasterizer_version = TT_INTERPRETER_VERSION_35;
+-        loader->exec->size->cvt_ready    = FALSE;
++        loader->exec->size->cvt_ready    = -1;
+ 
+         tt_size_ready_bytecode(
+           loader->exec->size,
+@@ -971,7 +971,7 @@
+            SPH_OPTION_SET_RASTERIZER_VERSION )
+       {
+         loader->exec->rasterizer_version = SPH_OPTION_SET_RASTERIZER_VERSION;
+-        loader->exec->size->cvt_ready    = FALSE;
++        loader->exec->size->cvt_ready    = -1;
+ 
+         tt_size_ready_bytecode(
+           loader->exec->size,
 diff --git a/src/type1/t1driver.c b/src/type1/t1driver.c
 index 697288d..2602bdb 100644
 --- a/src/type1/t1driver.c
