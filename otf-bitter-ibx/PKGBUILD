@@ -1,0 +1,41 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=otf-bitter-ibx
+pkgver=1.3
+pkgrel=1
+depends=('fontconfig')
+pkgdesc="Bitter is a contemporary slab serif family intended for screen."
+url="http://www.huertatipografica.com/"
+arch=('any')
+groups=('infinality-bundle-fonts-extra')
+conflicts=('otf-bitter')
+replaces=('otf-bitter')
+license=('MIT')
+install=$pkgname.install
+source=(http://www.huertatipografica.com/free_download/36
+        45-bitter.conf
+        90-non-tt-bitter.conf)
+sha1sums=('aaa55b0de89b258c770aaa0b4aefd978a1dd01fe'
+          'f91291a6571d02008bcf1312b9799b6cd6cceed0'
+          '8f0a3b4f688096ad852a651192f8469ca17ce25a')
+
+package(){
+  cd "${srcdir}"/
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 "OFL.txt" "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-bitter.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-bitter.conf
+  install -m644 90-non-tt-bitter.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-bitter.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-bitter.conf .
+  ln -s ../conf.avail/90-non-tt-bitter.conf .
+}
