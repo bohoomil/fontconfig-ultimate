@@ -11,18 +11,17 @@ Project's website: [bohoomil.com](http://bohoomil.com "bohoomil.com")
 
 #### Quick installation instructions
 
-**I. If you are an Arch Linux user, or if you are using one of the Arch Linux derivatives,** you may want to use pre-compiled packages from the `[infinality-bundle]` repository I maintain. This is a recommended approach in a majority of cases as it gives access to the entire functionality offered by Infinality patches and the ultimate configuration without a typical post installation routine. 
+**I. If you are an Arch Linux user, or if you are using one of the Arch Linux derivatives,** you may want to use pre-compiled packages from the `[infinality-bundle]` repository I maintain. This is a recommended approach in a majority of cases as it gives access to the entire functionality offered by Infinality patches and the ultimate configuration without a typical post installation routine.
 
 
 > **NOTE**
-> Make sure your distribution has been fully updated and is using the most recent libraries 
-> as present in the official Arch Linux repositories. Using outdated system components with 
+> Make sure your distribution has been fully updated and is using the most recent libraries
+> as present in the official Arch Linux repositories. Using outdated system components with
 > the bundle is not recommended as it may severely break your system.
 
 
 For more information, see:
 
-* [infinality-bundle user notes](http://bohoomil.cu.cc/) (general information about infinality-bundle, needs update),
 * [Infinality-bundle+fonts](https://wiki.archlinux.org/index.php/Infinality-bundle+fonts) (install notes, troubleshooting)
 * [infinality-bundle: good looking fonts made (even) easier](https://bbs.archlinux.org/viewtopic.php?id=162098) (official infinality-bundle support thread for Arch Linux users)
 * [infinality-bundle-fonts: a free multilingual font collection for Arch](https://bbs.archlinux.org/viewtopic.php?id=170976) (official infinality-bundle-fonts support thread)
@@ -40,7 +39,7 @@ For more information, see:
 
 
 > **NOTE**
-> Start troubleshooting by temporarily disabling your local `fontconfig` configuration. It may be 
+> Start troubleshooting by temporarily disabling your local `fontconfig` configuration. It may be
 > possible that your personal configuration overrides and interferes with global `fontconfig` settings.
 
 
