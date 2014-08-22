@@ -1,5 +1,5 @@
 ###          freetype2-infinality-ultimate settings          ###
-###           rev. 0.4.7.4, for freetype2 v.2.5.x            ###
+###           rev. 0.4.7.5, for freetype2 v.2.5.x            ###
 ###                                                          ###
 ###                Copyright (c) 2014 bohoomil               ###
 ### The MIT License (MIT) http://opensource.org/licenses/MIT ###
@@ -14,7 +14,7 @@ Xft.hinting:    1
 Xft.hintstyle:  hintfull
 Xft.lcdfilter:  lcddefault
 Xft.rgba:       rgb
-" 
+"
 
 echo "$XFT_SETTINGS" | xrdb -merge > /dev/null 2>&1
 
@@ -27,7 +27,7 @@ echo "$XFT_SETTINGS" | xrdb -merge > /dev/null 2>&1
 USE_STYLE="1"
 
 if [ "$USE_STYLE" = "1" ]; then
-  export INFINALITY_FT_FILTER_PARAMS="07 24 35 24 07"
+  export INFINALITY_FT_FILTER_PARAMS="07 26 34 26 07"
 elif [ "$USE_STYLE" = "2" ]; then
   export INFINALITY_FT_FILTER_PARAMS="11 26 33 26 11"
 elif [ "$USE_STYLE" = "3" ]; then

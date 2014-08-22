@@ -2,68 +2,64 @@
 # Maintainer: JIN Xiao-Yong <jinxiaoyong@gmail.com>
 # Maintainer: bohoomil <@zoho.com>
 
-# Installation order: freetype2-iu, fontconfig-iu, cairo-iu
-pkgname=freetype2-infinality-ultimate-git
-pkgver=1
-pkgrel=1
+pkgname=freetype2-infinality-ultimate
+pkgver=2.5.3
+pkgrel=10
+_patchrel=2014.08.08
 pkgdesc="TrueType font rendering library with Infinality patches and custom settings by bohoomil (infinality-bundle)."
-arch=(i686 x86_64)
+arch=('i686' 'x86_64')
 license=('GPL' 'MIT')
 groups=('infinality-bundle')
 url="http://freetype.sourceforge.net"
 depends=('zlib' 'bzip2' 'sh' 'xorg-xrdb' 'libpng' 'harfbuzz')
-conflicts=('freetype2' 'freetype2-infinality' 'freetype2-iinfinality-ultimate')
+conflicts=('freetype2' 'freetype2-infinality')
 provides=("freetype2=$pkgver" 'freetype2-infinality' 'freetype2-infinality-ultimate')
 install='infinality.install'
 backup=('etc/profile.d/infinality-settings.sh')
-source=(git://git.sv.gnu.org/freetype/freetype2.git
+source=(http://downloads.sourceforge.net/sourceforge/freetype/freetype-${pkgver}.tar.bz2
+        infinality-settings.sh
         freetype-2.5.3-enable-valid.patch
-        infinality-2.5.3-git.patch
-        infinality-settings.sh)
-
-pkgver() {
-  local _tag _count
-
-  cd "${srcdir}/freetype2"
-  _tag=$(git describe --abbrev=0 )
-  _count=$(git rev-list --count ${_tag}..HEAD)
-  _tag=${_tag#VER-}
-  echo ${_tag//-/.}+$_count+g$(git rev-parse --short HEAD)
-}
+        "upstream-${_patchrel}.patch"
+        "infinality-2.5.3-${_patchrel}.patch")
+sha1sums=('d3c26cc17ec7fe6c36f4efc02ef92ab6aa3f4b46'
+          '2bceadc3283de4dbedcf18a95ef4e75d4212cc35'
+          'abf7a8f726ad6359533651a8942636880febf9f6'
+          '6cf9c5ef2ade7f2460d19d12b072a73b48958ac9'
+          'a9c16046836b13a67a1158b87669f7f18ffe1665')
 
 prepare() {
-  cd "${srcdir}"/freetype2
+  cd "freetype-${pkgver}"
 
   patches=(freetype-2.5.3-enable-valid.patch
-           infinality-2.5.3-git.patch)
+           "upstream-${_patchrel}.patch"
+           "infinality-2.5.3-${_patchrel}.patch")
 
   # infinality & post release fixes
   for patch in "${patches[@]}"; do
-    patch -Np1 -i ${srcdir}/${patch}
+    patch -Np1 -i ${srcdir}/"${patch}"
   done
 }
 
 build() {
-  cd "${srcdir}"/freetype2
+  cd "freetype-${pkgver}"
 
-  ./autogen.sh
-  ./configure --prefix=/usr --disable-static
+  ./configure \
+    --prefix=/usr \
+    --disable-static \
+    --with-harfbuzz \
+    --with-png
+
   make
 }
 
 check() {
-  cd "${srcdir}"/freetype2
+  cd "freetype-${pkgver}"
   make -k check
 }
 
 package() {
-  cd "${srcdir}"/freetype2
+  cd "freetype-${pkgver}"
 
   make DESTDIR="${pkgdir}" install
   install -D -T "${srcdir}/infinality-settings.sh" "${pkgdir}/etc/profile.d/infinality-settings.sh"
 }
-
-sha1sums=('SKIP'
-          'abf7a8f726ad6359533651a8942636880febf9f6'
-          'cff259cd69dba17e4b284619cf8f0adccd6af0ed'
-          '8c15e24f37a3c0f74e5f901190247dc566cac79b')
