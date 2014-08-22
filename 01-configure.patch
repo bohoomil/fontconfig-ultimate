@@ -1,0 +1,32 @@
+--- a/configure	2013-05-28 23:00:03.000000000 +0200
++++ b/configure	2014-03-07 19:21:57.063320787 +0100
+@@ -13,6 +13,8 @@
+ # Call the `configure' script located in `builds/unix'.
+ #
+ 
++export LDFLAGS="$LDFLAGS -lm"
++
+ rm -f config.mk builds/unix/unix-def.mk builds/unix/unix-cc.mk
+ 
+ # respect GNUMAKE environment variable for backwards compatibility
+--- a/devel/ftoption.h	2013-12-21 21:39:04.000000000 +0100
++++ b/devel/ftoption.h	2014-03-07 19:21:57.066654119 +0100
+@@ -609,6 +609,17 @@ FT_BEGIN_HEADER
+ 
+   /*************************************************************************/
+   /*                                                                       */
++  /* Define FT_CONFIG_OPTION_INFINALITY_PATCHSET if you want to enable     */
++  /* all additional infinality patches, which are configured via env       */
++  /* variables.                                                            */
++  /*                                                                       */
++  /*   This option requires TT_CONFIG_OPTION_SUBPIXEL_HINTING to           */
++  /*   defined.                                                            */
++  /*                                                                       */
++#define FT_CONFIG_OPTION_INFINALITY_PATCHSET
++
++  /*************************************************************************/
++  /*                                                                       */
+   /* If you define TT_CONFIG_OPTION_UNPATENTED_HINTING, a special version  */
+   /* of the TrueType bytecode interpreter is used that doesn't implement   */
+   /* any of the patented opcodes and algorithms.  The patents related to   */
+
