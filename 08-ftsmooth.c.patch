@@ -18,7 +18,7 @@
  
    /* initialize renderer -- init its raster */
    static FT_Error
-@@ -93,6 +104,2996 @@
+@@ -93,6 +104,2997 @@
        FT_Outline_Get_CBox( &slot->outline, cbox );
    }
  
@@ -1772,6 +1772,7 @@
 +         known_stem_values->stem_translating_only > -1024 )
 +    {
 +      *translate_value = known_stem_values->stem_translating_only;
++      free ( known_stem_values );
 +      return;
 +    }
 +
@@ -3015,7 +3016,7 @@
  
    /* convert a slot's glyph image into a bitmap */
    static FT_Error
-@@ -104,8 +3105,9 @@
+@@ -104,8 +3106,9 @@
    {
      FT_Error     error;
      FT_Outline*  outline = NULL;
@@ -3026,7 +3027,7 @@
  #ifndef FT_CONFIG_OPTION_SUBPIXEL_RENDERING
      FT_Pos       height_org, width_org;
  #endif
-@@ -123,6 +3125,483 @@
+@@ -123,6 +3126,483 @@
      FT_Bool  have_outline_shifted   = FALSE;
      FT_Bool  have_buffer            = FALSE;
  
@@ -3510,7 +3511,7 @@
  
      /* check glyph image format */
      if ( slot->format != render->glyph_format )
-@@ -138,9 +3617,105 @@
+@@ -138,9 +3618,105 @@
        goto Exit;
      }
  
@@ -3616,7 +3617,7 @@
      if ( origin )
      {
        FT_Outline_Translate( outline, origin->x, origin->y );
-@@ -154,6 +3729,7 @@
+@@ -154,6 +3730,7 @@
      cbox.yMin = FT_PIX_FLOOR( cbox.yMin );
      cbox.xMax = FT_PIX_CEIL( cbox.xMax );
      cbox.yMax = FT_PIX_CEIL( cbox.yMax );
@@ -3624,7 +3625,7 @@
  
      if ( cbox.xMin < 0 && cbox.xMax > FT_INT_MAX + cbox.xMin )
      {
-@@ -227,6 +3803,9 @@
+@@ -227,6 +3804,9 @@
          y_top   += extra >> 1;
        }
      }
@@ -3634,7 +3635,7 @@
  
  #endif
  
-@@ -251,6 +3830,9 @@
+@@ -251,6 +3831,9 @@
      bitmap->pitch      = pitch;
  
      /* translate outline to render it into the bitmap */
@@ -3644,7 +3645,7 @@
      FT_Outline_Translate( outline, -x_shift, -y_shift );
      have_outline_shifted = TRUE;
  
-@@ -306,9 +3888,153 @@
+@@ -306,9 +3889,153 @@
      if ( error )
        goto Exit;
  
@@ -3798,4 +3799,3 @@
  #else /* !FT_CONFIG_OPTION_SUBPIXEL_RENDERING */
  
      /* render outline into bitmap */
-
