@@ -3635,17 +3635,23 @@
  
  #endif
  
-@@ -251,6 +3831,9 @@
+@@ -251,8 +3831,15 @@
      bitmap->pitch      = pitch;
  
      /* translate outline to render it into the bitmap */
 +#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
 +    if ( align_called == 0 )
++    {
 +#endif
      FT_Outline_Translate( outline, -x_shift, -y_shift );
      have_outline_shifted = TRUE;
++#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
++    }
++#endif
  
-@@ -306,9 +3889,153 @@
+     if ( FT_ALLOC( bitmap->buffer, (FT_ULong)pitch * height ) )
+       goto Exit;
+@@ -306,9 +3893,153 @@
      if ( error )
        goto Exit;
  
