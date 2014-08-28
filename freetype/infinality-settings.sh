@@ -27,7 +27,7 @@ echo "$XFT_SETTINGS" | xrdb -merge > /dev/null 2>&1
 USE_STYLE="1"
 
 if [ "$USE_STYLE" = "1" ]; then
-  export INFINALITY_FT_FILTER_PARAMS="06 27 34 27 06"
+  export INFINALITY_FT_FILTER_PARAMS="05 27 36 27 05"
 elif [ "$USE_STYLE" = "2" ]; then
   export INFINALITY_FT_FILTER_PARAMS="11 26 33 26 11"
 elif [ "$USE_STYLE" = "3" ]; then
