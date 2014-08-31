@@ -4,10 +4,11 @@
 
 pkgname=freetype2-infinality-ultimate
 pkgver=2.5.3
-pkgrel=10
-_patchrel=2014.08.08
+pkgrel=11
+_patchrel=2014.08.25
 pkgdesc="TrueType font rendering library with Infinality patches and custom settings by bohoomil (infinality-bundle)."
 arch=('i686' 'x86_64')
+changelog=CHANGELOG
 license=('GPL' 'MIT')
 groups=('infinality-bundle')
 url="http://freetype.sourceforge.net"
@@ -22,10 +23,10 @@ source=(http://downloads.sourceforge.net/sourceforge/freetype/freetype-${pkgver}
         "upstream-${_patchrel}.patch"
         "infinality-2.5.3-${_patchrel}.patch")
 sha1sums=('d3c26cc17ec7fe6c36f4efc02ef92ab6aa3f4b46'
-          '2bceadc3283de4dbedcf18a95ef4e75d4212cc35'
+          '85fe927cc376999a72e449709b30d17cafdc7fec'
           'abf7a8f726ad6359533651a8942636880febf9f6'
-          '6cf9c5ef2ade7f2460d19d12b072a73b48958ac9'
-          'a9c16046836b13a67a1158b87669f7f18ffe1665')
+          'd3d04a9e263e1868ac74c634ccd14c027c846b2a'
+          '7df648c3188cad78dfafe90ee4687b31c256d1c1')
 
 prepare() {
   cd "freetype-${pkgver}"
@@ -61,5 +62,6 @@ package() {
   cd "freetype-${pkgver}"
 
   make DESTDIR="${pkgdir}" install
-  install -D -T "${srcdir}/infinality-settings.sh" "${pkgdir}/etc/profile.d/infinality-settings.sh"
+  install -D -T "${srcdir}/infinality-settings.sh" \
+    "${pkgdir}/etc/profile.d/infinality-settings.sh"
 }

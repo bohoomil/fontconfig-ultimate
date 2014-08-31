@@ -710,7 +710,7 @@
  
    /* initialize renderer -- init its raster */
    static FT_Error
-@@ -93,6 +104,2994 @@
+@@ -93,6 +104,2997 @@
        FT_Outline_Get_CBox( &slot->outline, cbox );
    }
  
@@ -2464,6 +2464,7 @@
 +         known_stem_values->stem_translating_only > -1024 )
 +    {
 +      *translate_value = known_stem_values->stem_translating_only;
++      free ( known_stem_values );
 +      return;
 +    }
 +
@@ -3644,7 +3645,9 @@
 +
 +    free ( segments );
 +    free ( leftmost_segment );
++    free ( leftmost_segment_not_extrema );
 +    free ( rightmost_segment );
++    free ( rightmost_segment_not_extrema );
 +    free ( known_stem_values );
 +    free ( stems );
 +    free ( possible_stems );
@@ -3705,7 +3708,7 @@
  
    /* convert a slot's glyph image into a bitmap */
    static FT_Error
-@@ -104,8 +3103,9 @@
+@@ -104,8 +3106,9 @@
    {
      FT_Error     error;
      FT_Outline*  outline = NULL;
@@ -3716,7 +3719,7 @@
  #ifndef FT_CONFIG_OPTION_SUBPIXEL_RENDERING
      FT_Pos       height_org, width_org;
  #endif
-@@ -123,6 +3123,483 @@
+@@ -123,6 +3126,483 @@
      FT_Bool  have_outline_shifted   = FALSE;
      FT_Bool  have_buffer            = FALSE;
  
@@ -4200,7 +4203,7 @@
  
      /* check glyph image format */
      if ( slot->format != render->glyph_format )
-@@ -138,9 +3615,105 @@
+@@ -138,9 +3618,105 @@
        goto Exit;
      }
  
@@ -4306,7 +4309,7 @@
      if ( origin )
      {
        FT_Outline_Translate( outline, origin->x, origin->y );
-@@ -154,6 +3727,7 @@
+@@ -154,6 +3730,7 @@
      cbox.yMin = FT_PIX_FLOOR( cbox.yMin );
      cbox.xMax = FT_PIX_CEIL( cbox.xMax );
      cbox.yMax = FT_PIX_CEIL( cbox.yMax );
@@ -4314,7 +4317,7 @@
  
      if ( cbox.xMin < 0 && cbox.xMax > FT_INT_MAX + cbox.xMin )
      {
-@@ -227,6 +3801,9 @@
+@@ -227,6 +3804,9 @@
          y_top   += extra >> 1;
        }
      }
@@ -4324,17 +4327,23 @@
  
  #endif
  
-@@ -251,6 +3828,9 @@
+@@ -251,8 +3831,15 @@
      bitmap->pitch      = pitch;
  
      /* translate outline to render it into the bitmap */
 +#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
 +    if ( align_called == 0 )
++    {
 +#endif
      FT_Outline_Translate( outline, -x_shift, -y_shift );
      have_outline_shifted = TRUE;
++#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
++    }
++#endif
  
-@@ -306,9 +3886,153 @@
+     if ( FT_ALLOC( bitmap->buffer, (FT_ULong)pitch * height ) )
+       goto Exit;
+@@ -306,9 +3893,153 @@
      if ( error )
        goto Exit;
  
@@ -4488,9 +4497,8 @@
  #else /* !FT_CONFIG_OPTION_SUBPIXEL_RENDERING */
  
      /* render outline into bitmap */
-
---- a/src/truetype/ttinterp.c	2014-02-08 13:48:27.000000000 +0100
-+++ b/src/truetype/ttinterp.c	2014-03-07 19:21:57.083320788 +0100
+--- a/src/truetype/ttinterp.c	2014-08-31 05:16:34.545521438 +0200
++++ b/src/truetype/ttinterp.c	2014-08-31 05:16:44.845521525 +0200
 @@ -4882,6 +4882,10 @@
      CUR.sph_in_func_flags = 0x0000;
  #endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
@@ -4523,7 +4531,7 @@
           !( CUR.sph_tweak_flags & SPH_TWEAK_NORMAL_ROUND ) )
        minimum_distance = 0;
  #endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
-@@ -8374,6 +8385,34 @@
+@@ -8376,6 +8387,34 @@
  
  #endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
  

@@ -1,5 +1,5 @@
 ###          freetype2-infinality-ultimate settings          ###
-###           rev. 0.4.7.5, for freetype2 v.2.5.x            ###
+###           rev. 0.4.8.0, for freetype2 v.2.5.x            ###
 ###                                                          ###
 ###                Copyright (c) 2014 bohoomil               ###
 ### The MIT License (MIT) http://opensource.org/licenses/MIT ###
@@ -20,27 +20,30 @@ echo "$XFT_SETTINGS" | xrdb -merge > /dev/null 2>&1
 
 ### Available styles:
 ### 1 <> ultimate (default)
-### 2 <> well balanced
-### 3 <> darker & smoother #1 (OS X-like)
-### 4 <> darker & smoother #2
+### 2 <> sharpest
+### 3 <> well balanced
+### 4 <> darker & smoother
+### 5 <> darkest
 
 USE_STYLE="1"
 
 if [ "$USE_STYLE" = "1" ]; then
-  export INFINALITY_FT_FILTER_PARAMS="07 26 34 26 07"
+  export INFINALITY_FT_FILTER_PARAMS="05 27 36 27 05"
 elif [ "$USE_STYLE" = "2" ]; then
-  export INFINALITY_FT_FILTER_PARAMS="11 26 33 26 11"
+  export INFINALITY_FT_FILTER_PARAMS="05 25 40 25 05"
 elif [ "$USE_STYLE" = "3" ]; then
-  export INFINALITY_FT_FILTER_PARAMS="13 26 39 26 13"
+  export INFINALITY_FT_FILTER_PARAMS="08 26 32 26 08"
 elif [ "$USE_STYLE" = "4" ]; then
-  export INFINALITY_FT_FILTER_PARAMS="14 28 42 28 14"
+  export INFINALITY_FT_FILTER_PARAMS="10 25 30 25 10"
+elif [ "$USE_STYLE" = "5" ]; then
+  export INFINALITY_FT_FILTER_PARAMS="12 24 28 24 24"
 fi
 
 export INFINALITY_FT_GRAYSCALE_FILTER_STRENGTH="0"
-export INFINALITY_FT_FRINGE_FILTER_STRENGTH="0"
+export INFINALITY_FT_FRINGE_FILTER_STRENGTH="100"
 export INFINALITY_FT_AUTOHINT_HORIZONTAL_STEM_DARKEN_STRENGTH="0"
 export INFINALITY_FT_AUTOHINT_VERTICAL_STEM_DARKEN_STRENGTH="0"
-export INFINALITY_FT_CHROMEOS_STYLE_SHARPENING_STRENGTH="30"
+export INFINALITY_FT_CHROMEOS_STYLE_SHARPENING_STRENGTH="20"
 export INFINALITY_FT_WINDOWS_STYLE_SHARPENING_STRENGTH="0"
 export INFINALITY_FT_STEM_ALIGNMENT_STRENGTH="0"
 export INFINALITY_FT_STEM_FITTING_STRENGTH="0"
