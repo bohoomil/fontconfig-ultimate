@@ -1,5 +1,5 @@
---- a/src/truetype/ttinterp.c	2014-02-08 13:48:27.000000000 +0100
-+++ b/src/truetype/ttinterp.c	2014-03-07 19:21:57.083320788 +0100
+--- a/src/truetype/ttinterp.c	2014-08-31 05:16:34.545521438 +0200
++++ b/src/truetype/ttinterp.c	2014-08-31 05:16:44.845521525 +0200
 @@ -4882,6 +4882,10 @@
      CUR.sph_in_func_flags = 0x0000;
  #endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
@@ -32,7 +32,7 @@
           !( CUR.sph_tweak_flags & SPH_TWEAK_NORMAL_ROUND ) )
        minimum_distance = 0;
  #endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
-@@ -8374,6 +8385,34 @@
+@@ -8376,6 +8387,34 @@
  
  #endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
  
