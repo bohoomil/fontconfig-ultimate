@@ -3,7 +3,7 @@
 pkgname=ttf-alegreya-fonts-ibx
 pkgname=('ttf-alegreya-ibx' 'ttf-alegreya-sans-ibx')
 pkgver=1.003
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Alegreya and Alegreya Sans are modern font families designed by Juan Pablo del Peral."
 url="http://www.huertatipografica.com/"
@@ -25,8 +25,8 @@ sha1sums=('240ebab403fcde2abb1a25ef763f135f2d7f69e4'
           'a92f0667f5a1e486127bc3457ed9e3af935816c8'
           'db08107ef08332b400ba3fcc5eb78fe0cd8ebebe'
           '8454c43dce5f6df1ed2bc7fa8c1a1aa8223766a5'
-          'b027557c2eacf0deff2b1172fd59c037f2c54b10'
-          '8d0676703aac2d4acbeea34bc6dd1f65d16dccb9')
+          '8a05d01a843d176f7bb04398f5c2809093274198'
+          'd96a2eb942bfa8444dcace7fbc6ff6726ae42275')
 
 package_ttf-alegreya-ibx(){
   pkgdesc="Alegreya is a serif typeface originally intended for literature. TrueType version."
