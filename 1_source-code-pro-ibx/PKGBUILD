@@ -3,7 +3,7 @@
 pkgname=source-code-pro-ibx
 pkgname=('otf-source-code-pro-ibx' 'ttf-source-code-pro-ibx')
 pkgver=1.017
-pkgrel=4
+pkgrel=5
 depends=('fontconfig')
 pkgdesc="A set of OpenType fonts designed for user interfaces. TrueType version."
 url="http://www.adobe.com/"
@@ -17,7 +17,7 @@ source=("http://downloads.sourceforge.net/project/sourcecodepro.adobe/SourceCode
 sha1sums=('c0e3f6f8e25b434c0e28a817539632f8a5ecb9e5'
           'd20feb494116f95e4a35ad40f625a94f9a3bbcb2'
           '287ef2255289182912eb2daa16810bd87d7100b1'
-          '823777372374eff5c5619bd5e99af94570b3a1f0')
+          'ae4fa14a8aa927e325a8bfd7c0f8db29eefb00ab')
 
 package_otf-source-code-pro-ibx(){
   pkgdesc="A set of OpenType fonts designed for user interfaces. OpenType version."
