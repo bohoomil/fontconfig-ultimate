@@ -2,7 +2,7 @@
 
 pkgname=ttf-lato-ibx
 pkgver=2.007
-pkgrel=4
+pkgrel=5
 depends=('fontconfig')
 pkgdesc="Lato is a sanserif type­face family designed in the Summer 2010 by Warsaw-based designer Łukasz Dziedzic."
 url="http://www.latofonts.com/"
@@ -17,7 +17,7 @@ source=("http://www.latofonts.com/download/Lato2OFL.zip"
         90-tt-lato.conf)
 sha1sums=('a66cda6cef79d80a9266eefb65d0da88eaa8c09c'
           '86f9ff2da81ba10f64e6747fdd8d27231da28d2b'
-          'daf4ea3ee6bc55a6fa13b77eba8013af1f260a93')
+          'a84058cb3051d858221a7a0eefeea18db24306c5')
 
 package(){
   cd "${srcdir}"/Lato2OFL
@@ -28,7 +28,7 @@ package(){
   install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
-  install -m644 Lato-{Black,Bold,Heavy,Light,Semibold}*.ttf \
+  install -m644 Lato-{Black,Bold,Heavy,Light,Medium,Semibold,Thin}*.ttf \
     "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 Lato-{Regular,Italic}.ttf \
     "${pkgdir}"/usr/share/fonts/"${pkgname}"
