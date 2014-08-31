@@ -5,7 +5,7 @@
 pkgname=dejavu-ib
 pkgname=('t1-dejavu-ib' 'ttf-dejavu-ib')
 pkgver=2.34
-pkgrel=9
+pkgrel=10
 pkgdesc="Font family based on the Bitstream Vera Fonts with a wider range of characters. Re-packed for infinality-bundle-fonts."
 arch=('any')
 url="http://dejavu-fonts.org/wiki/Main_Page"
@@ -20,7 +20,7 @@ sha1sums=('f77232e447079a269dae426ea00460849a68634e'
           '33fa825aa1dd44ce23a11af92b3078e978ff513d'
           '4072385eb6d18754f932bda5634da259ab875a1b'
           'b8fafbd2622046a312d1dffc32f7e017aeb24fae'
-          'c6ff96b61d8905a471a108302731edc4352622ce')
+          '5daeb5fa5d00d2304fe8c30ba8b08ec43fde6881')
 
 package_t1-dejavu-ib() {
   pkgdesc="Font family based on the Bitstream Vera Fonts with a wider range of characters. Re-packed for infinality-bundle-fonts. Type 1 version."
@@ -63,7 +63,8 @@ package_ttf-dejavu-ib() {
   install -dm755 "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 ttf/*.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -Dm644 LICENSE "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -Dm644 LICENSE \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
 
   install -dm755 "${pkgdir}"/etc/fonts/conf.avail
   install -dm755 "${pkgdir}"/etc/fonts/conf.d
