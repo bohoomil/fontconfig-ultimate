@@ -5,7 +5,7 @@
 pkgname=ttf-droid-family
 pkgname=('ttf-droid-ib' 'ttf-droid-nonlatin-ib')
 pkgver=20121017
-pkgrel=9
+pkgrel=10
 pkgdesc="General-purpose fonts released by Google as part of Android. Includes additional monospaced variants with dotted and slashed zeros."
 arch=('any')
 license=('apache')
@@ -76,5 +76,5 @@ sha1sums=('4190b9c3a75766df2e4a8a1a38c4c1722c63e41b'
           '7aa504d19793ac0feda1882d1504fe0cd5cf7654'
           'a6d3cc79db9e3cc01aedf599691314499edae02d'
           '1d540e1d02740a3e2cfe56c6197dad8d317193ef'
-          '0df50bcd2d132503c1489a385338b3dfeedaa3fd')
+          '79f8568f08597e78d7320092677928461ed1f047')
 
