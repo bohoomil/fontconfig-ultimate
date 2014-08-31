@@ -3,10 +3,10 @@
 pkgname=raleway-ibx
 pkgname=('otf-raleway-ibx' 'ttf-raleway-ibx')
 pkgver=3.0
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Raleway is an elegant sans-serif typeface family, initially designed by Matt McInerney, later expanded by Pablo Impallari and Rodrigo Fuenzalida."
-url="http://openfontlibrary.org/"
+url="http://www.impallari.com/"
 arch=('any')
 license=('OFL-1.1')
 groups=('infinality-bundle-fonts-extra')
