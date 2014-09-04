@@ -30,8 +30,10 @@ CONF_LINKS = \
 	28-user.conf		\
 	29-local.conf		\
 	35-repl-custom.conf		\
-	40-non-latin.conf    \
-	45-latin.conf   \
+	40-non-latin-microsoft.conf    \
+	40-non-latin-misc.conf    \
+	45-latin-microsoft.conf   \
+	45-latin-misc.conf   \
 	49-sansserif.conf   \
 	68-override.conf    \
 	67-override-aliases.conf		\
@@ -42,8 +44,10 @@ CONF_LINKS = \
 	83-yes-postscript.conf    \
 	88-forced-synthetic.conf    \
 	90-non-tt-fonts.conf    \
-	90-tt-fonts.conf    \
-	92-selective-rendering.conf   \
+	90-tt-fonts-microsoft.conf    \
+	90-tt-fonts-misc.conf    \
+	92-selective-rendering-microsoft.conf   \
+	92-selective-rendering-misc.conf   \
 	93-final-rendering.conf   \
 	94-no-synthetic.conf    \
 	95-reject.conf
@@ -64,8 +68,10 @@ templateinf_DATA =				\
 	36-repl-missing-glyphs.conf  \
 	38-repl-proggy-bitmap.conf   \
 	38-repl-terminus-bitmap.conf   \
-	40-non-latin.conf    \
-	45-latin.conf   \
+	40-non-latin-microsoft.conf    \
+	40-non-latin-misc.conf    \
+	45-latin-microsoft.conf   \
+	45-latin-misc.conf   \
 	49-sansserif.conf   \
 	67-override-aliases.conf		\
 	68-override.conf    \
@@ -81,8 +87,10 @@ templateinf_DATA =				\
 	83-yes-ttf-as-bitmap.conf   \
 	88-forced-synthetic.conf    \
 	90-non-tt-fonts.conf    \
-	90-tt-fonts.conf    \
-	92-selective-rendering.conf   \
+	90-tt-fonts-microsoft.conf    \
+	90-tt-fonts-misc.conf    \
+	92-selective-rendering-microsoft.conf   \
+	92-selective-rendering-misc.conf   \
 	93-final-rendering.conf   \
 	94-no-synthetic.conf    \
 	95-reject.conf
