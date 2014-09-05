@@ -36,7 +36,7 @@ elif [ "$USE_STYLE" = "3" ]; then
 elif [ "$USE_STYLE" = "4" ]; then
   export INFINALITY_FT_FILTER_PARAMS="10 25 30 25 10"
 elif [ "$USE_STYLE" = "5" ]; then
-  export INFINALITY_FT_FILTER_PARAMS="12 24 28 24 24"
+  export INFINALITY_FT_FILTER_PARAMS="12 24 28 24 12"
 fi
 
 export INFINALITY_FT_GRAYSCALE_FILTER_STRENGTH="0"
