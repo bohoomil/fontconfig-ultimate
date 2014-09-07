@@ -19,26 +19,31 @@ Xft.rgba:       rgb
 echo "$XFT_SETTINGS" | xrdb -merge > /dev/null 2>&1
 
 ### Available styles:
-### 1 <> ultimate (default)
-### 2 <> sharpest
-### 3 <> well balanced
-### 4 <> darker & smoother
-### 5 <> darkest
+### 1 <> bright & light
+### 2 <> sharp & smooth #1
+### 3 <> sharp & smooth #2
+### 4 <> ultimate: well balanced (default)
+### 5 <> darker & smoother
+### 6 <> darkest & heaviest ("MacIsh")
 
-USE_STYLE="1"
+USE_STYLE="4"
 
 if [ "$USE_STYLE" = "1" ]; then
-  export INFINALITY_FT_FILTER_PARAMS="06 22 38 22 06"
+  export INFINALITY_FT_FILTER_PARAMS="05 22 34 22 05"
 elif [ "$USE_STYLE" = "2" ]; then
   export INFINALITY_FT_FILTER_PARAMS="05 25 40 25 05"
 elif [ "$USE_STYLE" = "3" ]; then
-  export INFINALITY_FT_FILTER_PARAMS="08 26 32 26 08"
+  export INFINALITY_FT_FILTER_PARAMS="06 24 38 24 06"
 elif [ "$USE_STYLE" = "4" ]; then
-  export INFINALITY_FT_FILTER_PARAMS="10 25 30 25 10"
+  export INFINALITY_FT_FILTER_PARAMS="08 26 32 26 08"
 elif [ "$USE_STYLE" = "5" ]; then
-  export INFINALITY_FT_FILTER_PARAMS="12 24 28 24 12"
+  export INFINALITY_FT_FILTER_PARAMS="10 25 35 25 10"
+elif [ "$USE_STYLE" = "6" ]; then
+  export INFINALITY_FT_FILTER_PARAMS="12 28 42 28 12"
 fi
 
 export INFINALITY_FT_FRINGE_FILTER_STRENGTH="50"
 export INFINALITY_FT_USE_VARIOUS_TWEAKS="true"
 export INFINALITY_FT_USE_KNOWN_SETTINGS_ON_SELECTED_FONTS="true"
+
+# vim:ft=sh:
