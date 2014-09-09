@@ -5,18 +5,19 @@ freetype2-infinality-ultimate
 CHANGELOG
 ---------
 
-2014-09-01
+2014-09-09
 ~~~~~~~~~~
 
 ### freetype2-infinality-ultimate, rev. 2.5.3-11
 
-* Bug #36: Fix small memory in _lcd_stem_align (by goddesse).
-* Bug #38: Fix another small memory leak (by goddesse).
-* Bug #39: Set have_outline_shifted properly in ftsmooth.c (by goddesse).
+* Changes to Infinality patchset:
+  * Bug #36: Fix small memory in _lcd_stem_align (by goddesse).
+  * Bug #38: Fix another small memory leak (by goddesse).
+  * Bug #39: Set have_outline_shifted properly in ftsmooth.c (by goddesse).
 * `infinality-settings.sh` was updated to v.0.4.8.0.
-  * A new, sharp variant was added.
-  * All styles were revised and updated, providing a smoother and more distinctive transition between visual variants.
-* New upstream patch, updated Infinality patchset.
+  * All styles were revised and updated, providing a smoother and more distinctive transition between visual variants, from sharp and light to dark and bold.
+  * Core rendering settings were simplified and remain stable for all styles.
+* New upstream changes were merged with freetype2 code base.
 
 2014-08-15
 ~~~~~~~~~~
