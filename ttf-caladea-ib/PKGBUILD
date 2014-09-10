@@ -2,7 +2,7 @@
 
 pkgname=ttf-caladea-ib
 pkgver=20130214
-pkgrel=4
+pkgrel=5
 _tarname=crosextrafonts
 depends=('fontconfig')
 pkgdesc="Caladeo is a serif font metrically compatible with Cambria."
@@ -16,7 +16,7 @@ source=(http://commondatastorage.googleapis.com/chromeos-localmirror/distfiles/$
         90-tt-caladea.conf)
 sha1sums=('6f8f87cd21c4cd7e72031852eb90453dba3e2473'
           '90d29666e807c1f7456f4ffa86f4b6ed5b92639b'
-          '93e666b0909bfe4cb078d53cd900d76eb4e5bc99')
+          'd4747515ff61405209314f9d909975eec01f56bf')
 
 package(){
   cd "${srcdir}"/"${_tarname}"-"${pkgver}"
