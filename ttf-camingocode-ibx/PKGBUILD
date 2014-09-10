@@ -2,7 +2,7 @@
 
 pkgname=ttf-camingocode-ibx
 pkgver=1.0
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="CamingoCode by Jan Fromm is designed for source-code editors."
 url="http://www.janfromm.de"
@@ -15,7 +15,7 @@ source=(http://www.janfromm.de/_data/downloads/get-camingocode.php
         90-tt-camingocode.conf)
 sha1sums=('1809ebc624e2cfdc1f7109e9c13413b335770494'
           '2ead06d5a13f79becdb7313c5513208bef580d73'
-          'ac826174234395a85436d67e468be01f64a2cc88')
+          'b58ad5ce0adfc03ae86fbd0026d180dda453f6af')
 
 package(){
   cd "${srcdir}"
