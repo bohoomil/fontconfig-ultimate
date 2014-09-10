@@ -1,0 +1,41 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=ttf-libre-baskerville-ibx
+pkgver=1.0
+pkgrel=6
+pkgdesc="Libre Baskerville font designed by Pablo Impallari. TrueType version."
+url="http://www.impallari.com/"
+depends=('fontconfig')
+arch=('any')
+conflicts=('ttf-impallari-libre-baskerville' 'ttf-librebaskerville' 't1-libre-baskerville-ibx' 'otf-libre-baskerville-ibx')
+groups=('infinality-bundle-fonts-extra')
+license=('OFL-1.1')
+install=${pkgname}.install
+source=("http://www.impallari.com/media/uploads/prosources/update-86-source.zip"
+        45-libre-baskerville.conf
+        90-tt-libre-baskerville.conf)
+sha1sums=('e866f713cf022769eaa13287f7a088a8bb873110'
+          '502d5f64b28f00d48a76646f846a77f76a86930a'
+          'e87f321cafc25b21549ed8df07c90c357f1d3bda')
+
+package(){
+
+  cd "${srcdir}"/"Libre Baskerville v1.0"
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 ../45-libre-baskerville.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-libre-baskerville.conf
+  install -m644 ../90-tt-libre-baskerville.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-libre-baskerville.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-libre-baskerville.conf .
+  ln -s ../conf.avail/90-tt-libre-baskerville.conf .
+}
