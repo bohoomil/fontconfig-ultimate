@@ -2,7 +2,7 @@
 
 pkgname=ibfonts-meta-extended-lt
 pkgver=1
-pkgrel=14
+pkgrel=17
 arch=('any')
 url="https://github.com/bohoomil/fontconfig-ultimate"
 license=('GPL')
@@ -10,24 +10,21 @@ pkgdesc="infinality-bundle-fonts extended collection meta package (lite version)
 conflicts=('xorg-fonts-type1' 't1-xorg-fonts-meta-ib')
 replaces=('xorg-fonts-type1')
 provides=('xorg-fonts-type1')
+install=metaextlt.install
 depends=('ibfonts-meta-base'
          'otf-cantarell-ib'
-         'otf-cantoraone-ib'
          'otf-oswald-ib'
          'otf-quintessential-ib'
-         'otf-signika-family-ib'
          'otf-tex-gyre-ib'
          't1-cursor-ib'
          't1-urw-fonts-ib'
          'ttf-caladea-ib'
+         'ttf-cantoraone-ib'
          'ttf-carlito-ib'
-         'ttf-courier-prime-ib'
          'ttf-droid-ib'
          'ttf-gelasio-ib'
-         'ttf-liberastika-ib'
          'ttf-merriweather-ib'
          'ttf-merriweather-sans-ib'
-         'ttf-noto-sans-multilang-ib'
-         'ttf-noto-serif-multilang-ib'
          'ttf-opensans-ib'
+         'ttf-signika-family-ib'
          'ttf-ubuntu-font-family-ib')
