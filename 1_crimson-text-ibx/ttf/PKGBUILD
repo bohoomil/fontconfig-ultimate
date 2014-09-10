@@ -1,0 +1,38 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=ttf-crimson-text-ibx
+_gitname=Crimson
+pkgver=0.8
+pkgrel=6
+depends=('fontconfig')
+pkgdesc="Crimson Text is an open source serif font family in the tradition of beautiful oldstyle typefaces. TrueType version."
+url="http://aldusleaf.org/"
+arch=('any')
+conflicts=('otf-crimson-text' 'otf-crimson-text-ibx')
+groups=('infinality-bundle-fonts-extra')
+license=('Custom')
+install=$pkgname.install
+source=(git+https://github.com/skosch/Crimson.git
+        45-crimson-text.conf
+        90-tt-crimson-text.conf)
+md5sums=('SKIP'
+         '5e549238466293c0800ac4fbf8a2d4d7'
+         'f60b63dbb9bd23cc6f6c3f43562bd4cd')
+
+package(){
+  cd "${srcdir}"/"Crimson/Desktop Fonts"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -Dm644 TTF/*.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 ../../45-crimson-text.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-crimson-text.conf
+  install -m644 ../../90-tt-crimson-text.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-crimson-text.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-crimson-text.conf .
+  ln -s ../conf.avail/90-tt-crimson-text.conf .
+}
