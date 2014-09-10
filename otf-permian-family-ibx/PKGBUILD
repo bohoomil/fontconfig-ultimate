@@ -1,0 +1,42 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=otf-permian-family-ibx
+pkgver=1.0
+pkgrel=1
+depends=('fontconfig')
+pkgdesc="Developed for the city of Perm, Permian family provides extensive number of Latin and Cyrillic glyphs, icons and small caps."
+url="http://pcrd.ru/"
+arch=('any')
+license=('Custom')
+groups=('infinality-bundle-fonts-extra')
+source=("http://pcrd.ru/files/permian.zip"
+        "http://pcrd.ru/files/Permian_Free_Font_License_eng.txt"
+        45-permian.conf
+        90-non-tt-permian.conf)
+install=${pkgname}.install
+sha1sums=('51bd88bc588b754c2354ae294c901ddca13f6358'
+          'd246e709ed7166b55497381fbbd9121aa901fc04'
+          '44411053046e1c2c784f3b1339f3d894bc8eb1de'
+          '4ff6ff33df5758270447f29b36d026e19db622c1')
+
+package() {
+  cd "${srcdir}"
+
+  install -d -m755 "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 "Permian_Free_Font_License_eng.txt" \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
+
+  install -d -m755 "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-permian.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-permian.conf
+  install -m644 90-non-tt-permian.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-permian.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-permian.conf .
+  ln -s ../conf.avail/90-non-tt-permian.conf .
+}
