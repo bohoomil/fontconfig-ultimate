@@ -17,7 +17,7 @@ source=(http://sortsmill.googlecode.com/files/fanwood-1.1.zip
         90-non-tt-fanwood.conf)
 sha1sums=('f79b817d438ec1fe898c254b5dbf773d6717dc9e'
           '099a03aaf4393bd3606081838bb8466d27920207'
-          '10062b7432caa3074fd3e5cdb3d7ff4e0b194c62')
+          'e993607d59dfa222ff7dd3d7138da7137459245c')
 
 package(){
   cd "${srcdir}"/
