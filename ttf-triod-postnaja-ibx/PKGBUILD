@@ -2,7 +2,7 @@
 
 pkgname=ttf-triod-postnaja-ibx
 pkgver=20110805
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="Triod Postnaja attempts to mimic the typefaces used to publish Old Church Slavonic service books."
 url="http://openfontlibrary.org/en/font/triod-postnaja"
@@ -16,7 +16,7 @@ source=(http://openfontlibrary.org/assets/downloads/triod-postnaja/bb24f868ae4d9
         90-tt-triod-postnaja.conf)
 sha1sums=('cb085b03f590a4f0c0562732e1010dfc66e5397e'
           '08ad084d79d51f91a6d647045b1ce933a458520e'
-          '2081938d521a1750b225613b251aca7b912017f1')
+          'b984296121412779bf6766247c969eae70310a7b')
 
 package(){
   cd "${srcdir}"
