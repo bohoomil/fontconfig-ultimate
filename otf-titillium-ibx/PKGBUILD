@@ -2,7 +2,7 @@
 
 pkgname=otf-titillium-ibx
 pkgver=2.0
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Titillium is an elegant sans-serif typeface created at Accademia di Belle Arti di Urbino."
 url="http://www.campivisivi.net/titillium/"
@@ -31,16 +31,16 @@ package() {
     "${pkgdir}"/usr/share/licenses/"${pkgname}"/OFL-FAQ
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
-  install -m644 Titillium-Black.otf \
-    "${pkgdir}"/usr/share/fonts/"${pkgname}"
-  install -m644 Titillium-Bold{,Italic}.otf \
-    "${pkgdir}"/usr/share/fonts/"${pkgname}"
-  install -m644 Titillium-Light{,Italic}.otf \
-    "${pkgdir}"/usr/share/fonts/"${pkgname}"
-  install -m644 Titillium-Regular{,Italic}.otf \
-    "${pkgdir}"/usr/share/fonts/"${pkgname}"
-  install -m644 Titillium-Semibold{,Italic}.otf \
-    "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  family=(Titillium-Black.otf Titillium-{Bold,BoldItalic}.otf
+          Titillium-{Light,LightItalic}.otf
+          Titillium-{Regular,RegularItalic}.otf
+          Titillium-{Semibold,SemiboldItalic}.otf
+          Titillium-{Thin,ThinItalic}.otf)
+
+  for font in "${family[@]}"; do
+    install -m644 "$font" "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  done
 
   install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
   install -m755 -d "${pkgdir}"/etc/fonts/conf.d
