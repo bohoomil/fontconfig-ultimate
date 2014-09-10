@@ -2,13 +2,14 @@
 
 pkgname=ibfonts-meta-base
 pkgver=1
-pkgrel=4
+pkgrel=6
 arch=('any')
 url="https://github.com/bohoomil/fontconfig-ultimate"
 license=('GPL')
 pkgdesc="infinality-bundle-fonts base collection meta package"
-depends=('otf-heuristica-ib'
-         'ttf-dejavu-ib'
+depends=('ttf-dejavu-ib'
+         'ttf-courier-prime-ib'
+         'ttf-heuristica-ib'
          'ttf-liberation-ib'
          'ttf-noto-sans-ib'
          'ttf-noto-serif-ib'
