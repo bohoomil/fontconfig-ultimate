@@ -2,7 +2,7 @@
 
 pkgname=otf-exo2-ibx
 pkgver=2.0
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Exo is a geometric sans serif font with a technological feel."
 url="http://ndiscovered.com"
@@ -23,8 +23,7 @@ package(){
   cd "${srcdir}"/
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
-  install -m644 Exo2-{Black,BlackItalic,Bold,BoldItalic,ExtraBold,ExtraBoldItalic,ExtraLight,ExtraLightItalic,Italic,Light,LightItalic,Medium,MediumItalic,Regular,SemiBold,SemiBoldItalic}.otf \
-  "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
   install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
   install -m755 -d "${pkgdir}"/etc/fonts/conf.d
