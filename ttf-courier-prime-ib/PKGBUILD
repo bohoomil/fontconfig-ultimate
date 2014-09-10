@@ -2,7 +2,7 @@
 
 pkgname=ttf-courier-prime-ib
 pkgver=1.203
-pkgrel=4
+pkgrel=5
 depends=('fontconfig')
 pkgdesc="A free, improved, classical monospaced typeface."
 url="http://quoteunquoteapps.com/courierprime/"
@@ -18,7 +18,7 @@ source=(http://quoteunquoteapps.com/downloads/courier-prime.zip
         90-tt-courier-prime.conf)
 sha1sums=('05e3c5fb937d44f8b2dd9b5705df98812ed73711'
           '718837e1ac40010d446d9c4e8817d221abc3041e'
-          'f45d3d1361aef976511dbcdf2a09389ee3d6eea5')
+          '5b774e915c204364eb9d1bf580264de991c084a4')
 
 package(){
   cd "${srcdir}/Courier Prime"
