@@ -2,15 +2,18 @@
 # Contributor: Brice Carpentier <brice@daknet.org>
 # Maintainer: bohoomil <@zoho.com>
 
-# Installation order: freetype2-infinality-ultimate fontconfig-infinality-ultimate cairo-infinality-ultimate
 pkgname=cairo-infinality-ultimate
-_pkgbasename=cairo
-pkgver=1.12.16
-pkgrel=6
+_name=cairo
+_rev=1.13.0~20140204
+_url=launchpad.net/ubuntu/utopic/+source
+pkgver=1.13.1
+_upver=1.12.6
+pkgrel=1
 groups=('infinality-bundle')
-pkgdesc="Cairo vector graphics library with respect-fontconfig and Ubuntu patches (infinality-bundle)"
+pkgdesc="Cairo vector graphics library with respect-fontconfig and Ubuntu patches (infinality-bundle, Ubuntu src)"
 arch=('i686' 'x86_64')
 license=('LGPL' 'MPL')
+changelog=CHANGELOG
 url="http://cairographics.org/"
 depends=('libpng' 'libxrender' 'libxext' 'fontconfig' 'pixman>=0.28.0'
          'glib2' 'mesa' 'libgl' 'sh' 'lzo2')
@@ -18,49 +21,37 @@ makedepends=('mesa-libgl' 'librsvg' 'gtk2' 'poppler-glib' 'libspectre'
              'gtk-doc' 'valgrind'
              # for the test suite:
              'ttf-dejavu' 'gsfonts' 'xorg-server-xvfb' ) # 'libdrm')
-provides=("cairo=$pkgver" 'cairo-xcb' 'cairo-ubuntu')
+provides=("cairo=$_upver" 'cairo-xcb' 'cairo-ubuntu')
 replaces=('cairo-xcb')
 conflicts=('cairo' 'cairo-cleartype' 'cairo-git' 'cairo-gl-git' 'cairo-glitz'
            'cairo-ocaml-git' 'cairo-small' 'cairo-ubuntu')
 options=('!libtool')
-source=(http://cairographics.org/releases/$_pkgbasename-$pkgver.tar.xz
-        cairo-1.12.16-lto-optional.patch
-        cairo-respect-fontconfig_pb.patch
-        http://archive.ubuntu.com/ubuntu/pool/main/c/cairo/cairo_1.12.16-0ubuntu2.debian.tar.gz)
-sha1sums=('4f6e337d5d3edd7ea79d1426f575331552b003ec'
-          '80883e44a57942762995aea2f136701b1fa54568'
-          'db7bd3e7f3cbb30dafe4ed6604ade944163fbfbe'
-          '95d873fda436a1cc29cda1310f155ef0e3258c05')
+source=("https://${_url}/${_name}/${_rev}-0ubuntu1/+files/${_name}_${_rev}.orig.tar.xz"
+        "https://${_url}/${_name}/${_rev}-0ubuntu1/+files/${_name}_${_rev}-0ubuntu1.debian.tar.gz"
+        cairo-webkit-html5-fix.patch
+        cairo-respect-fontconfig_pb.patch)
+sha1sums=('0c88360abce7d6f302086360da77612fe3b11eaa'
+          '5b616586068a6ff5ef2f3e2f6cd8495e2eda66b2'
+          '5bff494f52a16114f4cf6d04bfb0b9d7c4e9da23'
+          'db7bd3e7f3cbb30dafe4ed6604ade944163fbfbe')
 
 prepare(){
-  cd "${_pkgbasename}-${pkgver}"
+  cd "$srcdir/$_name-$pkgver"
 
-  patch -Np1 -i $srcdir/cairo-1.12.16-lto-optional.patch
   patch -Np1 -i $srcdir/cairo-respect-fontconfig_pb.patch
+  patch -Np1 -i $srcdir/cairo-webkit-html5-fix.patch
 
-  #for _f in $(cat $srcdir/debian/patches/series) ; do
-  #  patch -Np1 -i $srcdir/debian/patches/$_f
-  #done
-
-  patches=(01_build_perf_utils.patch
-           02_am-maintainer-mode.patch
-           03_export-symbols.patch
-           06_hurd-map-noreserve.patch
-           pdf-output-avoid-transparency.patch
-           pdf-output-mime-data-embedding.patch
-           server_side_gradients.patch)
-
-  for patch in "${patches[@]}"; do
-    patch -Np1 -i "${srcdir}"/debian/patches/"${patch}"
+  for _f in $(cat $srcdir/debian/patches/series) ; do
+    patch -Np1 -i $srcdir/debian/patches/$_f
   done
 
-  sed '20 aAM_PROG_AR' -i $srcdir/$_pkgbasename-$pkgver/configure.ac
+  sed '20 aAM_PROG_AR' -i $srcdir/$_name-$pkgver/configure.ac
 
   autoreconf -vif
 }
 
 build() {
-  cd "${_pkgbasename}-${pkgver}"
+  cd "$srcdir/$_name-$pkgver"
 
   # config options
   # --enable-xlib-xcb \
@@ -81,11 +72,11 @@ build() {
 }
 
 #check() {
-  #cd "${_pkgbasename}-${pkgver}"
+  #cd "$srcdir/$_name-$pkgver"
   #make -k test || /bin/true
 #}
 
 package() {
-  cd "${_pkgbasename}-${pkgver}"
+  cd "$srcdir/$_name-$pkgver"
   make DESTDIR="$pkgdir" install
 }
