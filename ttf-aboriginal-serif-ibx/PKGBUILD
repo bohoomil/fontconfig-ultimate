@@ -17,7 +17,7 @@ source=(http://www.languagegeek.com/font/AboriginalSerif.zip
         90-tt-aboriginal-serif.conf)
 sha1sums=('dc1f9ab1b897d65c5f84228adcf38e03b07fafbf'
           '2a1874a60e1245be153991c33d5052fe68f9bc1e'
-          'f8246ce822987a51fc366e73c8c5443f61a8a715')
+          'e954b2ea8d41befed2baf9cc22c170a3ff36faca')
 
 package(){
   cd "${srcdir}"
