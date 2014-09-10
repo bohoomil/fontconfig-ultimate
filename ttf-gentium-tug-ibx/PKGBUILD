@@ -2,7 +2,7 @@
 
 pkgname=ttf-gentium-tug-ibx
 pkgver=1.0
-pkgrel=4
+pkgrel=5
 depends=('fontconfig')
 pkgdesc="Gentium is a serif typeface family designed by Victor Gaultney."
 url="http://www.ctan.org/tex-archive/fonts/gentium-tug"
@@ -17,9 +17,9 @@ source=(http://mirrors.ctan.org/fonts/gentium-tug.zip
         90-tt-gentium.conf)
 sha1sums=('66b6a3d4c03d9ac7057d4121b62c0fa678a734a4'
           '7df6e3c69c5edd63a2a6c380cdf053139dbd8884'
-          '3364a5dd3e8148a531b1a9e9a16c6cb919c33d50')
+          'c5403887e6fe19137cb509c64e4c745a3fc3181c')
 
-package_ttf-gentium-tug-ibx(){
+package(){
   cd "${srcdir}"/gentium-tug
 
   install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
