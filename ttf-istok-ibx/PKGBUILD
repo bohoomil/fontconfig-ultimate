@@ -2,7 +2,7 @@
 
 pkgname=ttf-istok-ibx
 pkgver=1.0.1
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Istok is a sans-serif typeface designed by Andrey Panov."
 url="https://code.google.com/p/istok/"
@@ -15,7 +15,7 @@ source=(https://istok.googlecode.com/files/istok-ttf-${pkgver}.tar.xz
         90-tt-istok.conf)
 sha1sums=('1100899ff2963b9391f2797fce4df1055760e91f'
           'bcb3fa1467a220414a8c4b4cb84857c32353bad6'
-          'b05069565e1a6b85d5ce0456c3968905683c8761')
+          'f5683a0af831832aab06031bd2cb6179232bbadf')
 
 package() {
   cd "${srcdir}"
