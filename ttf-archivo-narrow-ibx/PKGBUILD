@@ -2,7 +2,7 @@
 
 pkgname=ttf-archivo-narrow-ibx
 pkgver=1.002
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Archivo from Omnibus-Type is a grotesque sans-serif typeface family derived from Chivo. Narrow style."
 url="http://omnibus-type.com/"
@@ -15,7 +15,7 @@ source=(Archivo_Narrow.zip
         90-tt-archivo-narrow.conf)
 sha1sums=('8fb3677004c317e0e4e15a3c05cf7713dcfef9c3'
           'a8d7d1cfccf71bf2b13e9c01e1b5c43376353997'
-          '3839493b357ff2b158ef2b035472cae7c7542f80')
+          '8bc1809e19b7c80a77aa5c9009d266a203c20255')
 
 package(){
   cd "${srcdir}"/
