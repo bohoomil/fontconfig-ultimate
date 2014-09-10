@@ -13,13 +13,11 @@ arch=('any')
 license=('OFL-1.1')
 #http://www.google.com/fonts
 source=(Signika.zip
-        Signika_Negative.zip
         45-signika.conf
         90-tt-signika.conf)
 sha1sums=('0769c357ae884d47efd40f9fc9631de582f1ae76'
-          'bb191e73dad084a1e7909bbc2f6be8b3c71d8099'
           '9cb4a27053a347bd10e117874ca126e4901e469e'
-          'dbadcc376d512cced75adfaad952c2b0c2a30e0b')
+          '107bcfd30759580b9dd213c329dc735f26f87fc3')
 
 package(){
   cd "${srcdir}"
