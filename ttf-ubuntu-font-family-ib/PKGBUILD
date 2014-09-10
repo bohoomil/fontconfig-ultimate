@@ -4,7 +4,7 @@
 
 pkgname=ttf-ubuntu-font-family-ib
 pkgver=0.80
-pkgrel=9
+pkgrel=10
 pkgdesc="Ubuntu font family. Part of infinality-bundle-fonts."
 arch=('any')
 url="http://font.ubuntu.com/"
@@ -20,7 +20,7 @@ source=(http://font.ubuntu.com/download/ubuntu-font-family-$pkgver.zip
         90-tt-ubuntu.conf)
 sha1sums=('88276ba9d38d75b33a9640efa15cd80979cb21e2'
           '5089359e856cb621d24746f79f64e85e53ce35c8'
-          '84621f30da3c9dbdcdf11a6bbf947188eb703e04')
+          '00de40a3bdfc1d6fefa40e5acf00f54c1dbce7cf')
 
 package() {
   cd "${srcdir}"/ubuntu-font-family-"${pkgver}"
