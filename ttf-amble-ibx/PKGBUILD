@@ -2,7 +2,7 @@
 
 pkgname=ttf-amble-ibx
 pkgver=1.0
-pkgrel=4
+pkgrel=5
 depends=('fontconfig')
 pkgdesc="A free, screen-optimized sans-serif font from Punchcut."
 url="http://punchcut.com/"
@@ -13,9 +13,9 @@ install=$pkgname.install
 source=(http://www.fontsquirrel.com/fonts/download/amble
         45-amble.conf
         90-tt-amble.conf)
-sha1sums=('dd1bf16454fe81aa6e9ae05ea7d051ef553e7d24'
+sha1sums=('1da9f35f514b2400034c260d34ea03a4510c0af0'
           '3dd5fcbbaee2bcfe18d6f7a4a035e4b7898a3ea9'
-          'b67daac566134738e9600f549f0b23fa0f78f219')
+          'ce9f3695e3bc7c5143377d59d7aa0ecbd2a24e76')
 
 package(){
   cd "${srcdir}"
