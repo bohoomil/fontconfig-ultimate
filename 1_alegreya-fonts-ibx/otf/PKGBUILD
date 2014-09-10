@@ -3,7 +3,7 @@
 pkgname=otf-alegreya-fonts-ibx
 pkgname=('otf-alegreya-ibx' 'otf-alegreya-sans-ibx')
 pkgver=1.003
-pkgrel=6
+pkgrel=7
 depends=('fontconfig')
 pkgdesc="Alegreya and Alegreya Sans are modern font families designed by Juan Pablo del Peral."
 url="http://www.huertatipografica.com/"
@@ -37,11 +37,9 @@ package_otf-alegreya-ibx(){
   install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
-  install -Dm644 Alegreya-{Black,BlackItalic,Bold,BoldItalic,Italic,Regular}.otf \
-    "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -Dm644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -Dm644 AlegreyaSC-{Black,BlackItalic,Bold,BoldItalic,Italic,Regular}.otf \
-    "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -Dm644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
   install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
   install -m755 -d "${pkgdir}"/etc/fonts/conf.d
@@ -66,12 +64,9 @@ package_otf-alegreya-sans-ibx(){
   install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
-  install -Dm644 AlegreyaSans-{Black,BlackItalic,Bold,BoldItalic,ExtraBold,ExtraBoldItalic,Italic,Light,LightItalic,Medium,MediumItalic,Regular,Thin,ThinItalic}.otf \
-    "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -Dm644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -Dm644 AlegreyaSansSC-{Black,BlackItalic,Bold,BoldItalic,ExtraBold,ExtraBoldItalic,Italic,Light,LightItalic,Medium,MediumItalic,Regular,Thin,ThinItalic}.otf \
-    "${pkgdir}"/usr/share/fonts/"${pkgname}"
-
+  install -Dm644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
   install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
   install -m755 -d "${pkgdir}"/etc/fonts/conf.d
