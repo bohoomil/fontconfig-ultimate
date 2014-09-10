@@ -15,7 +15,7 @@ install=$pkgname.install
 source=("http://www.latofonts.com/download/Lato2OFL.zip"
         45-lato.conf
         90-tt-lato.conf)
-sha1sums=('a66cda6cef79d80a9266eefb65d0da88eaa8c09c'
+sha1sums=('875d4afb6f0f5748a5b82d6e74c3e8306e552609'
           '86f9ff2da81ba10f64e6747fdd8d27231da28d2b'
           'a84058cb3051d858221a7a0eefeea18db24306c5')
 
@@ -28,10 +28,7 @@ package(){
   install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
-  install -m644 Lato-{Black,Bold,Heavy,Light,Medium,Semibold,Thin}*.ttf \
-    "${pkgdir}"/usr/share/fonts/"${pkgname}"
-  install -m644 Lato-{Regular,Italic}.ttf \
-    "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
   install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
   install -m755 -d "${pkgdir}"/etc/fonts/conf.d
