@@ -1,0 +1,41 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=otf-ebgaramond-ibx
+pkgver=0.16
+pkgrel=1
+depends=('fontconfig')
+pkgdesc="EB Garamond is a revival by Georg Duffner of the 16th century fonts designed by Claude Garamond. OpenType version."
+url="http://www.georgduffner.at/ebgaramond/"
+arch=('any')
+conflicts=('ttf-ebgaramond' 'otf-ebgaramond' 'otf-eb-garamond' 't1-ebgaramond-ibx' 'ttf-ebgaramond-ibx')
+groups=('infinality-bundle-fonts-extra')
+license=('OFL-1.1')
+install=$pkgname.install
+#"https://bitbucket.org/georgd/eb-garamond/downloads/EBGaramond-0.016.zip"
+source=("http://mirrors.ctan.org/fonts/ebgaramond.zip"
+        '45-ebgaramond.conf'
+        '90-non-tt-ebgaramond.conf')
+sha1sums=('fbf811e461e445aeee50f1dfcbb5554f5bff4c6c'
+          'ba581cc9f03cb3a60030b25e26e2578af5f7e7b7'
+          '7a8d6b16f14ff260f27517490bbc05bf9bbab0bb')
+
+package(){
+  cd "${srcdir}"/ebgaramond
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 doc/COPYING "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 opentype/*.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 ../../45-ebgaramond.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-ebgaramond.conf
+  install -m644 ../../90-non-tt-ebgaramond.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-ebgaramond.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-ebgaramond.conf .
+  ln -s ../conf.avail/90-non-tt-ebgaramond.conf .
+}
