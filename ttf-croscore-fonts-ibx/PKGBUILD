@@ -2,7 +2,7 @@
 
 pkgname=ttf-croscore-fonts-ibx
 pkgver=1.23
-pkgrel=7
+pkgrel=8
 depends=('fontconfig')
 pkgdesc="Google Chrome OS core fonts."
 url="http://code.google.com/p/chromium-os/issues/detail?id=5287"
@@ -32,7 +32,7 @@ sha1sums=('301e3a72da338e2e90515ca17fba21dacb6dc9a6'
           '9cb8c892e66a52d0950265296f7e468da4f65414'
           '2b8b815229aa8a61e483fb4ba0588b8b6c491890'
           '23410520226bc33f24a7b0ce315fd3f42aa13bee'
-          'be36dc3573b0e2de5a3e451c2e32eedca876b67a')
+          '6baec77ed28c068996566f0287652ca165c703ee')
 
 package(){
   cd "${srcdir}"
