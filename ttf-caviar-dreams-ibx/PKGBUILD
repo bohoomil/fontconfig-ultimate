@@ -2,7 +2,7 @@
 
 pkgname=ttf-caviar-dreams-ibx
 pkgver=5.00
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="Caviar Dreams is a geometric sans-serif family designed by Lauren Thompson."
 url="http://www.nymfont.com/"
@@ -20,7 +20,7 @@ source=(http://img.dafont.com/dl/?f=caviar_dreams
 sha1sums=('ad9311ec4590c225d83c35b79960bc5bc02d46f6'
           'c40fce9cbde879ac851f28e890d22b96ba902d6a'
           '299a4b295f817035919549f31826f643d3c52de0'
-          '05682d6a4c0ef620633c14f9f3c9ae8cbb569cbd')
+          'ac6685ba2e84833def852c7b160df178b6064d6f')
 
 package(){
   cd "${srcdir}"
