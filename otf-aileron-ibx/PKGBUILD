@@ -2,7 +2,7 @@
 
 pkgname=otf-aileron-ibx
 pkgver=0.101
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Aileron is a high quality sans serif font designed by Sora Sagano."
 url="http://dotcolon.net/"
@@ -14,10 +14,10 @@ source=("http://dotcolon.net/DL/font/aileron.zip"
         45-aileron.conf
         90-non-tt-aileron.conf)
 install=${pkgname}.install
-sha1sums=('ffd6dcff4d5f476837e5aed77bee8c5045e5da45'
+sha1sums=('df0ac550e211f615827bf4ee1ddd5f83a8494a42'
           '07fde791308bad26de4578a05716e7a5fde3d8af'
           '0b66d2ae456c6eaa6be5ee55168fc78c8bf8931c'
-          '20c538bf3b0e7ad125cf668e7dfb523c05213bf5')
+          '3af82b9cb475c67c3a73c78230c67fd6686cf438')
 
 package() {
   cd "${srcdir}"
