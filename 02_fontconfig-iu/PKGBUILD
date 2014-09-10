@@ -8,7 +8,7 @@ pkgdesc="A library for configuring and customizing font access (includes generic
 url=('http://www.fontconfig.org/release/')
 license=('custom' 'MIT')
 pkgver=2.11.1
-pkgrel=17
+pkgrel=18
 arch=('i686' 'x86_64')
 changelog=CHANGELOG
 groups=('infinality-bundle')
@@ -101,16 +101,16 @@ package() {
   cd "${srcdir}/${_gitname}"
 
   # copy presets
-  cp -r fontconfig_patches/{combi,free,ms,ftypes} \
+  cp -r fontconfig_patches/{combi,free,ms} \
     "${pkgdir}"/etc/fonts/conf.avail.infinality
 
   # install fc-presets
   install -m755 fontconfig_patches/"fc-presets" "${pkgdir}"/usr/bin/"fc-presets"
 
   # copy font settings
-  install -m755 -d "${pkgdir}"/usr/share/doc/"${pkgname}"/font-settings
-  cp fontconfig_patches/font-settings/*.conf  \
-    "${pkgdir}"/usr/share/doc/"${pkgname}"/font-settings
+  install -m755 -d "${pkgdir}"/usr/share/doc/"${pkgname}"/fonts-settings
+  cp fontconfig_patches/fonts-settings/*.conf  \
+    "${pkgdir}"/usr/share/doc/"${pkgname}"/fonts-settings
 
   # copy documentation
   install -m755 -d "${pkgdir}"/usr/share/doc/"${pkgname}"

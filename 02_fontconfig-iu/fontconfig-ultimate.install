@@ -45,16 +45,6 @@ _EOF
 }
 
 post_upgrade() {
-  #pushd etc/fonts/conf.d > /dev/null
-  #echo -e "Removing redundant symlinks ..."
-  #for bit in "${redundant[@]}"; do
-    #if [ -f ${bit} ]; then
-      #rm -f ${bit}
-    #fi
-  #done
-  #popd > /dev/null
-  #echo -e "Done."
-
   echo -e "Updating font cache... "
   /usr/bin/fc-cache -f
   echo "Done."

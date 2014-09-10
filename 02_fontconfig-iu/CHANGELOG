@@ -1,9 +1,64 @@
 
-infinality-bundle+fonts
-=======================
+fontconfig-infinality-ultimate & fonts
+======================================
 
 CHANGELOG
 ---------
+
+
+2014-09-01
+~~~~~~~~~~
+
+### fontconfig-infinality-ultimate, rev. 2.11.1-18
+
+* Fixed #40: `ms` preset: remove redundant Nirmala UI entries from 60-non-latin-ms.conf.
+* `ftypes` and `fonts-settings` directories were merged, and all Helvetica configuration files where updated.
+* `40-non-latin.conf`, `45-latin.conf`, `90-tt-fonts.conf` and `92-selective-rendering.conf` were split into `-microsoft` and `-misc` groups for easier maintenance.
+* Rendering instruction for all supported free and proprietary font families were revised, updated and fixed where necessary.
+* Added support for missing font families.
+* Additional, optional font replacements (`free` preset):
+  * Arial Black => Archivo Black
+  * Baskerville Old Face => Libre Baskerville
+  * Segoe UI => WeblySleek UI
+
+### infinality-bundle-fonts
+
+Most font packages was updated to reflect changes introduced to rendering scheme. Besides, the following packages were fixed:
+
+* `otf-inconsolatazi4-ibx`: fixed `conflicts` array (#31).
+* `otf-raleway-ibx` & `ttf-raleway-ibx`: fixed upstream URL.
+Missing weights (< Light) were added to the packages:
+* `ttf-clear-sans-ibx`
+* `otf-exo2-ibx`
+* `{otf|ttf}-alegreya-ibx` and `{otf|ttf}-alegreya-sans ibx`
+* `ttf-lato-ibx`
+* `otf-oswald-ib`
+* `ttf-roboto-ibx`
+* `otf-titillium-ibx`
+* `{otf|ttf}-source-code-pro-ibx` and `{otf|ttf}-source-sans-pro-ibx`
+
+Upgraded and newly added font packages:
+* `otf-ebgaramond-ibx`, v.0.16-1
+* `{otf|ttf}-fira-mono-ibx` and `{otf|ttf}-fira-sans-ibx`, v.3.111-1 (TrueType version was added to the repository)
+* `ttf-symbola-ib`, v.7.17-1
+
+Changes to `ibfonts` meta packages:
+* `ibfonts-meta-base`:
+  * Heuristica OpenType was replaced by TrueType version.
+* `ibfonts-meta-extended` and `ibfonts-meta-extended-lt`:
+  * CantoraOne OpenType was replaced by TrueType version.
+  * `ttf-liberastika-ib` was removed (it can be installed on demand, if necessary).
+  * `ttf-noto-sans-multilang-ib` and `ttf-noto-serif-multilang-ib` were moved to `ibfonts-meta-extended`.
+
+2014/08/15
+~~~~~~~~~~
+
+### infinality-bundle-fonts
+
+New fonts in the repository:
+
+* Bitter family (`otf-bitter-ibx`).
+* Caviar Dreams family (`ttf-caviar-dreams-ibx`).
 
 2014-07-20
 ~~~~~~~~~~
@@ -57,14 +112,6 @@ The packages can be installed either individually, or all in one shot using `sou
 * Roboto family (`ttf-roboto-ibx`) was upgraded to version 2.0 (a.k.a 2014).
 
 Both font sets come with fixed weight metrics.
-
-2014-07-08
-~~~~~~~~~~
-
-### freetype2-infinality-ultimate, rev. 2.5.3-8 (incl. multilib)
-
-* Merging with most recent upstream commits.
-* Updating Infinality patchset accordingly.
 
 2014-07-01
 ~~~~~~~~~~
@@ -247,10 +294,6 @@ Updated font packages:
 * Support for new fonts was added.
 * Font information and rendering settings for families from `infinality-bundle-fonts-extra` group was split from global configuration files and added to font packages.
 
-### cairo-infinality-ultimate, rev. 1.12.16-6 (incl. multilib)
-
-* Package update.
-
 2014-05-24
 ~~~~~~~~~~
 
@@ -281,10 +324,6 @@ The following font packages have been updated:
 2014-05-15
 ~~~~~~~~~~
 
-### freetype2-infinality-ultimate, rev. 2.5.3-5 (incl. multilib)
-
-* Semi-major upgrade, introducing most changes and fixes present in the development branch of the upstream `freetype2`.
-
 ### fontconfig-infinality-ultimate, rev. 2.11.1-10
 
 * Multiple minor bugs have been fixed.
@@ -312,10 +351,6 @@ New fonts in the repository:
 
 2014-05-03
 ~~~~~~~~~~
-
-### cairo-infinality-ultimate, rev. 1.12.16-5
-
-* Package update.
 
 ### fontconfig-infinality-ultimate, rev. 2.11.1-8
 
@@ -451,10 +486,6 @@ Miscellaneous changes:
 ** modified naming convention for `ftypes` config files
 ** added support for new font families
 
-* freetype2-infinality-ultimate
-** `infinality-settings.sh`: revised and updated rendering styles
-** updated dependencies
-
 2014-03-11
 ~~~~~~~~~~
 
@@ -506,9 +537,6 @@ Miscellaneous changes:
 2013-12-09
 ~~~~~~~~~~
 
-* freetype2-infinality-ultimate
-** upstream update to 2.5.2
-
 * fontconfig-infinality-ultimate
 ** added support for new fonts:
    - Amble (TTF)
@@ -547,10 +575,6 @@ Miscellaneous changes:
 * fixed bitmap to outline replacement rules and split `38-repl-tt-traced-bitmap.conf` (issue #8)
 * fixed Liberation Sans Bold & Regular < 13px
 * swapping Heuristica T1 for OTF (bug in T1 Unicode encoding)
-
-### freetype2-infinality-ultimate, rev. 2.5.1-2
-* upstream version upgrade to 2.5.1
-* revised and regenerated Infinality patchset
 
 2013-11-09
 ~~~~~~~~~~
@@ -643,12 +667,6 @@ Miscellaneous changes:
    `ms` (Microsoft font families) and `custom`
 ** `fc-presets` rev. 0.2 included
 
-* freetype2-infinality-ultimate: revision update to 2.5.0.1-7
-** added libpng dependency
-
-* cairo-infinality-ultimate: revision update to 1.12.16-3
-** recompiled with updated Ubuntu patch set
-
 2013-10-07
 ~~~~~~~~~~
 
@@ -718,20 +736,13 @@ Miscellaneous changes:
 2013-06-21
 ~~~~~~~~~~
 
-* upstream versions upgrade: fontconfig 2.10.93, freetype2 2.5.0.1.
+### fontconfig-infinality-ultimate, rev. 2.10.93-3
 
-* freetype2-infinality-ultimate 2.5.0.1-2:
-** moving to Adobe CFF as the default renderer
-** improved and simplified infinality setttings: most minor rendering
-   issues was reolved
-** added new style, Classical
-
-* fontconfig-infinality-ultimate 2.10.93-3:
-** code cleanup and revision results in more consistent rules
-** simpler yes (`83-yes-foo.conf`) / no (`82-no-foo.conf`) switches for
-   more intuitive access to global features
-** added support for several new font families
-** new per-user config templates
+* Code cleanup and revision providing more consistent rules.
+* Simpler yes (`83-yes-foo.conf`) / no (`82-no-foo.conf`) switches for
+  more intuitive access to global features.
+* Added support for several new font families/
+* New per-user config templates.
 
 
 2013-05-11
