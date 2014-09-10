@@ -2,7 +2,7 @@
 
 pkgname=ttf-opensans-ib
 pkgver=1.2
-pkgrel=11
+pkgrel=12
 depends=('fontconfig')
 pkgdesc="Open Sans is a humanist sans serif typeface designed by Steve Matteson, Type Director of Ascender Corp."
 url="http://opensans.com/"
@@ -19,7 +19,7 @@ source=(open-sans.zip
 sha1sums=('b708b3e056d5d612c47c2d163aa274cd2fd23c33'
           '281be1d16cbf8890079c5cee3a1ac6e5046dae79'
           'e2cccbc4c5d9552430fe158351de374e2aa3b889'
-          '49da585a56fec80fa7a1b38edbb2a4d90a01c7cc')
+          'b088e98fa41719aec5ab66958360beda77601c6f')
 
 package(){
   cd "${srcdir}"
