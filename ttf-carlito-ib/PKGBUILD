@@ -2,7 +2,7 @@
 
 pkgname=ttf-carlito-ib
 pkgver=20130920
-pkgrel=5
+pkgrel=6
 _tarname=crosextrafonts-carlito
 depends=('fontconfig')
 pkgdesc="Carlito is a sans-serif font metrically compatible with Calibri."
@@ -16,7 +16,7 @@ source=(http://commondatastorage.googleapis.com/chromeos-localmirror/distfiles/$
         90-tt-carlito.conf)
 sha1sums=('65ceb1377897a4d5a404134423728592aea6eb13'
           'ba31fb428eba83034a4d6edd31cb227d3045f2b5'
-          '328a8e43f52a9977929adc619819a313741f6a78')
+          '2ee9bcd6c28d0928d657d21c3a9ece5fb133c9c3')
 
 package(){
   cd "${srcdir}"/"${_tarname}"-"${pkgver}"
