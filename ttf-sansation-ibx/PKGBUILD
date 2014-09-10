@@ -2,7 +2,7 @@
 
 pkgname=ttf-sansation-ibx
 pkgver=1.31
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Sansation is a sans-serif typeface by Bernd Montag, perfect both for headings and paragraphs."
 url="http://www.dafont.com/"
@@ -17,7 +17,7 @@ source=(sansation.zip
         90-tt-sansation.conf)
 sha1sums=('3bfebc294ec791c0d3921f1ef17bab9c4898a17c'
           'e52310d7df0dae357a308ccce6c8e382f58a1f31'
-          'f35b50eda951272a7ee03b3a5ebca84f06598729')
+          'b894e27f2f0cffda063a13e893b820738a946cce')
 
 package(){
   cd "${srcdir}"/
