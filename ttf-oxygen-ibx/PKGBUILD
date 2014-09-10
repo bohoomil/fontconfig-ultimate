@@ -1,0 +1,47 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=ttf-oxygen-ibx
+pkgver=0.4.0
+_plasmaver=5.0.0
+pkgrel=1
+depends=('fontconfig')
+pkgdesc="The Oxygen typeface family is created as part of the KDE Project."
+url="http://kde.org/"
+arch=('any')
+groups=('infinality-bundle-fonts-extra')
+conflicts=('ttf-oxygen' 'ttf-oxygen-git')
+provides=('ttf-oxygen')
+license=('custom:OFL' 'custom:GPL+FE' 'GPL')
+install=$pkgname.install
+source=(http://download.kde.org/stable/plasma/${_plasmaver}/oxygen-fonts-${pkgver}.tar.xz
+        45-oxygen.conf
+        90-tt-oxygen.conf)
+sha1sums=('c4bd89151876484e06ef6c49543b5bb746a0a659'
+          'cc78ee55ef16f085e7d73dd8eb9df191793791c1'
+          '0e884da0573482a1c9ce7b20d43a28231d9689c3')
+
+package(){
+  cd "${srcdir}"/oxygen-fonts-"${pkgver}"
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 "COPYING-OFL" \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"/"COPYING-OFL"
+  install -m644 "COPYING-GPL+FE.txt" \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"/"COPYING-GPL+FE.txt"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 oxygen-fonts/Bold-700/*.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 oxygen-fonts/Regular-400/*.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 oxygen-fonts/mono-400/*.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 ../45-oxygen.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-oxygen.conf
+  install -m644 ../90-tt-oxygen.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-oxygen.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-oxygen.conf .
+  ln -s ../conf.avail/90-tt-oxygen.conf .
+}
