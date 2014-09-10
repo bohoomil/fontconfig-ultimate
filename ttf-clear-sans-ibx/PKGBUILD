@@ -3,7 +3,7 @@
 pkgname=ttf-clear-sans-ibx
 _archname=clearsans
 pkgver=1.00
-pkgrel=5
+pkgrel=6
 depends=('fontconfig')
 pkgdesc="Clear Sans is a versatile OpenType font for screen, print, and Web."
 url="https://01.org/clear-sans"
@@ -24,8 +24,7 @@ package(){
   cd "${srcdir}"/TTF
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
-  install -m644 ClearSans-{Bold,BoldItalic,Italic,Light,Medium,MediumItalic,Regular}.ttf \
-    "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
   install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
   install -m755 -d "${pkgdir}"/etc/fonts/conf.d
