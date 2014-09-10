@@ -1,9 +1,9 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=ttf-noto-family-ib
-pkgname=('ttf-noto-sans-ib' 'ttf-noto-sans-multilang-ib' 'ttf-noto-serif-ib' 'ttf-noto-serif-multilang-ib')
+pkgname=('ttf-noto-sans-multilang-ib' 'ttf-noto-serif-multilang-ib')
 pkgver=2014.07
-pkgrel=2
+pkgrel=3
 pkgdesc="Noto Sans family."
 url="http://www.google.com/get/noto/"
 arch=('any')
@@ -13,55 +13,12 @@ source=(http://www.google.com/get/noto/pkgs/Noto-hinted.zip
         NotoSansKhmer-Bold_fixed.ttf
         NotoSansKhmer-Regular_fixed.ttf
         NotoSansCham-Bold_fixed.ttf
-        NotoSansCham-Regular_fixed.ttf
-        40-noto-arabic.conf
-        45-noto-sans.conf
-        45-noto-serif.conf
-        90-non-tt-noto-sans-cjk.conf
-        90-tt-noto-sans.conf
-        90-tt-noto-serif.conf)
+        NotoSansCham-Regular_fixed.ttf)
 sha1sums=('07a296d0ebb3358dbb8f053f30bd9350ce942eda'
           '00546fa8ef612640b4722f66e61570362c83f1e3'
           '5a9fbe054b1021b1a3d4747ab2fd94c4f1aa7430'
           'ad20f6e5660381b9885fa71b0d97a20ac1edf7ab'
-          '605e53252681cce2e3c35587909a05ab885d75c3'
-          '926c11b9f0b3b6271079aedcacfeae9900a933f6'
-          '4abf4162d461ae9f14970fd9480ef6edcae5a4bc'
-          'e20c836813721d8bf53e07f6fced4a4639a3c238'
-          'c168452c543abc496bb0a53833fc8019c7f09d22'
-          '97b73fc0ea295ad04b89f2e97b475d4284a8d480'
-          'd73acfd5daf4514232f6f05274476ba0b366d74d')
-
-package_ttf-noto-sans-ib() {
-  pkgdesc="Noto Sans family: Latin and basic non-Latin set."
-  depends=('fontconfig')
-  conflicts=('ttf-noto' 'ttf-noto-svn' 'ttf-google-webfonts-git')
-  install=$pkgname.install
-
-  cd "${srcdir}"
-
-  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 LICENSE "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
-
-  _sans=(NotoSans-Bold.ttf NotoSans-BoldItalic.ttf NotoSans-Italic.ttf NotoSans-Regular.ttf)
-
-  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
-
-  for fnt in "${_sans[@]}"; do
-    install -m644 "$fnt" "${pkgdir}"/usr/share/fonts/"${pkgname}"
-  done
-
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m644 45-noto-sans.conf \
-    "${pkgdir}"/etc/fonts/conf.avail/45-noto-sans.conf
-  install -m644 90-tt-noto-sans.conf \
-    "${pkgdir}"/etc/fonts/conf.avail/90-tt-noto-sans.conf
-
-  cd "${pkgdir}"/etc/fonts/conf.d
-  ln -s ../conf.avail/45-noto-sans.conf .
-  ln -s ../conf.avail/90-tt-noto-sans.conf .
-}
+          '605e53252681cce2e3c35587909a05ab885d75c3')
 
 package_ttf-noto-sans-multilang-ib() {
   pkgdesc="Noto Sans family: non-Latin extension."
@@ -81,47 +38,6 @@ package_ttf-noto-sans-multilang-ib() {
   for fnt in "${_sans_multi[@]}"; do
     install -m644 "$fnt" "${pkgdir}"/usr/share/fonts/"${pkgname}"
   done
-
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m644 40-noto-arabic.conf \
-    "${pkgdir}"/etc/fonts/conf.avail/40-noto-arabic.conf
-  install -m644 90-non-tt-noto-sans-cjk.conf \
-    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-noto-sans-cjk.conf
-
-  cd "${pkgdir}"/etc/fonts/conf.d
-  ln -s ../conf.avail/40-noto-arabic.conf .
-  ln -s ../conf.avail/90-non-tt-noto-sans-cjk.conf .
-}
-
-package_ttf-noto-serif-ib() {
-  pkgdesc="Noto Serif family: Latin and basic non-Latin set."
-  depends=('fontconfig')
-  install=$pkgname.install
-
-  cd "${srcdir}"
-
-  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 LICENSE "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
-
-  _serif=(NotoSerif-Bold.ttf NotoSerif-BoldItalic.ttf NotoSerif-Italic.ttf NotoSerif-Regular.ttf)
-
-  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
-
-  for fnt in "${_serif[@]}"; do
-    install -m644 "$fnt" "${pkgdir}"/usr/share/fonts/"${pkgname}"
-  done
-
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m644 45-noto-serif.conf \
-    "${pkgdir}"/etc/fonts/conf.avail/45-noto-serif.conf
-  install -m644 90-tt-noto-serif.conf \
-    "${pkgdir}"/etc/fonts/conf.avail/90-tt-noto-serif.conf
-
-  cd "${pkgdir}"/etc/fonts/conf.d
-  ln -s ../conf.avail/45-noto-serif.conf .
-  ln -s ../conf.avail/90-tt-noto-serif.conf .
 }
 
 package_ttf-noto-serif-multilang-ib() {
