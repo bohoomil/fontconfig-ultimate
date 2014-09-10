@@ -2,7 +2,7 @@
 
 pkgname=ttf-merriweather-sans-ib
 pkgver=1.003
-pkgrel=6
+pkgrel=7
 depends=('fontconfig')
 pkgdesc="Merriweather Sans-Serif font family by Eben Sorkin."
 url="http://sorkintype.com"
@@ -18,7 +18,7 @@ source=(Merriweather_Sans.zip
         90-tt-merriweather-sans.conf)
 sha1sums=('3bd344160ceb5cace6f2e9941e0a9b6f984cf2b1'
           'cf1094eea5008854b8368a39fb5545f218498ced'
-          '08f7befaeb43458a4f8024f0a216de44e99841ce')
+          '27b49bd914983321ab5bc4a807d4ec189de2643d')
 
 package(){
   cd "${srcdir}"
