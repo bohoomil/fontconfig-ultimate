@@ -2,7 +2,7 @@
 
 pkgname=ttf-aboriginal-sans-ibx
 pkgver=9.602
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Aboriginal Sans typeface by Christopher Harvey for Syllabics, Cherokee, and Latin script."
 url="http://www.languagegeek.com/"
@@ -17,7 +17,7 @@ source=(http://www.languagegeek.com/font/AboriginalSans.zip
         90-tt-aboriginal-sans.conf)
 sha1sums=('690c6cc3026cb80b07c09b7d47b7c4f1dbbc50ec'
           'e0b93ccdb1d441ba6f5b557f31014976db1cab06'
-          'd7a67328d03f8647c44626d696ba6ea5f00ea906')
+          '07c9d2f596accc72bd1b30de013d1318428a9a96')
 
 package(){
   cd "${srcdir}"
