@@ -2,7 +2,7 @@
 
 pkgname=ttf-junicode-ibx
 pkgver=0.7.8
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="Junicode is a serif typeface for medievalists with many OpenType features."
 url="http://junicode.sourceforge.net/"
@@ -16,7 +16,7 @@ source=(http://downloads.sourceforge.net/project/junicode/junicode/junicode-0-7-
         90-tt-junicode.conf)
 sha1sums=('492946ca18c3e23febd7c77221ff438ad85d2147'
           'cd7a76487c981d4131b2b881073955ffc94f74c5'
-          '683f7bcf6649e84bfcb7bcf6d3e3da5a733a7f58')
+          '86317ae1b421b14ca1ac9f7df7d0dd33a93d2ebd')
 
 package(){
   cd "${srcdir}"/junicode/fonts
