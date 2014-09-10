@@ -1,24 +1,25 @@
 # Maintainer: bohoomil <@zoho.com>
 
-pkgname=otf-cantoraone-ib
+pkgname=ttf-cantoraone-ib
 pkgver=1.001
-pkgrel=4
+pkgrel=5
 depends=('fontconfig')
 pkgdesc="Cantora is a friendly semi formal, semi condensed, semi sans serif. It has reminiscences of hand lettering, mixing straight and bowed stems, and natural curves."
 url="http://www.impallari.com"
 arch=('any')
 groups=('infinality-bundle-fonts')
-conflicts=('ttf-impallari-cantora')
+conflicts=('ttf-impallari-cantora' 'otf-cantoraone-ib')
+replaces=('otf-cantoraone-ib')
 license=('OFL-1.1')
 install=$pkgname.install
-source=(http://googlefontdirectory.googlecode.com/hg/ofl/cantoraone/src/CantoraOne-Regular.otf
+source=(http://googlefontdirectory.googlecode.com/hg/ofl/cantoraone/CantoraOne-Regular.ttf
         http://googlefontdirectory.googlecode.com/hg/ofl/cantoraone/OFL.txt
         45-cantoraone.conf
-        90-non-tt-cantoraone.conf)
-sha1sums=('e7a89648b05efe08e5306706e34ce701810a9db2'
+        90-tt-cantoraone.conf)
+sha1sums=('dd63013885a41ded4ee0890a45a7fbfed0d44f76'
           '62f9cce0b7e68a956086a037278e93acaf84c703'
           '9dcc8a013dacb9ec5978c33ac8d1210f69f272fc'
-          '124298b0212f00bb71bcea0db8a8dd48ea642d76')
+          'd973ee87f5953f051e01a70dded1f6632915fbf3')
 
 package(){
   cd "${srcdir}"
@@ -27,16 +28,16 @@ package(){
   install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
-  install -Dm644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -Dm644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
   install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
   install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   install -m644 45-cantoraone.conf \
     "${pkgdir}"/etc/fonts/conf.avail/45-cantoraone.conf
-  install -m644 90-non-tt-cantoraone.conf \
-    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-cantoraone.conf
+  install -m644 90-tt-cantoraone.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-cantoraone.conf
 
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/45-cantoraone.conf .
-  ln -s ../conf.avail/90-non-tt-cantoraone.conf .
+  ln -s ../conf.avail/90-tt-cantoraone.conf .
 }
