@@ -8,7 +8,7 @@
 
 pkgname=ttf-liberation-ib
 pkgver=2.00.1
-pkgrel=6
+pkgrel=7
 pkgdesc='Red Hats Liberation fonts for infinality-bundle-fonts (inc. Liberation Sans Narrow).'
 arch=('any')
 license=('custom:OFL')
@@ -34,7 +34,7 @@ sha1sums=('84b40d7f8bb0cd085dd70b3abed197133d761557'
           '6a4c8a790024acb920ca70748f6654db29f1ff07'
           '8a53a47004b2b441a1fc80f1d8b583fcdc2a06ff'
           'a2dc2b031a82c6c9be2d3f6b6dbf2c5eabc5e7d2'
-          '8ae30d6b29390500a4070f34e2fa451a0b96b8fc')
+          '3d80282f390bdef28585313a01c742a55a6de6c4')
 package() {
   cd "${srcdir}"/liberation-fonts-ttf-"${pkgver}"
 
