@@ -1,5 +1,5 @@
---- a/src/smooth/ftsmooth.c	2013-06-05 12:12:47.000000000 +0200
-+++ b/src/smooth/ftsmooth.c	2014-03-07 19:21:57.079987455 +0100
+--- a/src/smooth/ftsmooth.c	2013-06-05 05:12:47.000000000 -0500
++++ b/src/smooth/ftsmooth.c	2014-09-14 11:55:39.848343363 -0500
 @@ -26,6 +26,17 @@
  
  #include "ftsmerrs.h"
@@ -18,7 +18,7 @@
  
    /* initialize renderer -- init its raster */
    static FT_Error
-@@ -93,6 +104,2997 @@
+@@ -93,6 +104,2993 @@
        FT_Outline_Get_CBox( &slot->outline, cbox );
    }
  
@@ -1603,15 +1603,11 @@
 +    FT_Bool         checked_use_known_settings_on_selected_fonts_env = FALSE;
 +    FT_Bool         use_known_settings_on_selected_fonts = FALSE;
 +
-+    int cur_width;
-+    char *cur_width_env = getenv( "CUR_WIDTH" );
++    FT_Pos          cur_width = infinality_cur_width;
 +
 +
-+
-+    if ( cur_width_env != NULL )
++    if ( cur_width )
 +    {
-+      sscanf ( cur_width_env, "%d", &cur_width );
-+      if ( cur_width != 0 )
 +        autohinted = TRUE;
 +    }
 +
@@ -3016,7 +3012,7 @@
  
    /* convert a slot's glyph image into a bitmap */
    static FT_Error
-@@ -104,8 +3106,9 @@
+@@ -104,8 +3102,9 @@
    {
      FT_Error     error;
      FT_Outline*  outline = NULL;
@@ -3027,7 +3023,7 @@
  #ifndef FT_CONFIG_OPTION_SUBPIXEL_RENDERING
      FT_Pos       height_org, width_org;
  #endif
-@@ -123,6 +3126,483 @@
+@@ -123,6 +3122,479 @@
      FT_Bool  have_outline_shifted   = FALSE;
      FT_Bool  have_buffer            = FALSE;
  
@@ -3094,8 +3090,7 @@
 +    int          checked_use_various_tweaks_env = 0;
 +    FT_Bool      use_various_tweaks = FALSE;
 +
-+    int          cur_width;
-+    char         *cur_width_env = getenv( "CUR_WIDTH" );
++    FT_Pos        cur_width = infinality_cur_width;
 +
 +    const FT_Int MIN_PPEM = 1;
 +    /*const FT_Int    MAX_PPEM = 100;    */
@@ -3110,11 +3105,8 @@
 +    else
 +      ppem = 0;
 +
-+    if ( cur_width_env != NULL )
++    if ( cur_width )
 +    {
-+      sscanf ( cur_width_env, "%d", &cur_width );
-+
-+      if ( cur_width != 0 )
 +        autohinted = TRUE;
 +    }
 +
@@ -3511,7 +3503,7 @@
  
      /* check glyph image format */
      if ( slot->format != render->glyph_format )
-@@ -138,9 +3618,105 @@
+@@ -138,9 +3610,105 @@
        goto Exit;
      }
  
@@ -3617,7 +3609,7 @@
      if ( origin )
      {
        FT_Outline_Translate( outline, origin->x, origin->y );
-@@ -154,6 +3730,7 @@
+@@ -154,6 +3722,7 @@
      cbox.yMin = FT_PIX_FLOOR( cbox.yMin );
      cbox.xMax = FT_PIX_CEIL( cbox.xMax );
      cbox.yMax = FT_PIX_CEIL( cbox.yMax );
@@ -3625,7 +3617,7 @@
  
      if ( cbox.xMin < 0 && cbox.xMax > FT_INT_MAX + cbox.xMin )
      {
-@@ -227,6 +3804,9 @@
+@@ -227,6 +3796,9 @@
          y_top   += extra >> 1;
        }
      }
@@ -3635,7 +3627,7 @@
  
  #endif
  
-@@ -251,8 +3831,15 @@
+@@ -251,8 +3823,15 @@
      bitmap->pitch      = pitch;
  
      /* translate outline to render it into the bitmap */
@@ -3651,7 +3643,7 @@
  
      if ( FT_ALLOC( bitmap->buffer, (FT_ULong)pitch * height ) )
        goto Exit;
-@@ -306,9 +3893,153 @@
+@@ -306,9 +3885,153 @@
      if ( error )
        goto Exit;
  

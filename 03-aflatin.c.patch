@@ -1,5 +1,5 @@
---- a/src/autofit/aflatin.c	2014-07-07 23:10:20.716743596 +0200
-+++ b/src/autofit/aflatin.c	2014-07-07 23:32:36.263462412 +0200
+--- a/src/autofit/aflatin.c	2014-09-14 11:35:20.946193837 -0500
++++ b/src/autofit/aflatin.c	2014-09-14 11:58:37.726708173 -0500
 @@ -24,6 +24,7 @@
  #include "afpic.h"
  #include "aflatin.h"
@@ -8,7 +8,18 @@
  
  
  #ifdef AF_CONFIG_OPTION_USE_WARPER
-@@ -892,8 +893,33 @@
+@@ -40,6 +41,10 @@
+ #undef  FT_COMPONENT
+ #define FT_COMPONENT  trace_aflatin
+ 
++#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
++FT_Pos infinality_cur_width = 0;
++#endif
++
+ 
+   /*************************************************************************/
+   /*************************************************************************/
+@@ -892,8 +897,33 @@
      FT_Pos        delta;
      AF_LatinAxis  axis;
      FT_UInt       nn;
@@ -42,7 +53,7 @@
      if ( dim == AF_DIMENSION_HORZ )
      {
        scale = scaler->x_scale;
-@@ -920,7 +946,7 @@
+@@ -920,7 +950,7 @@
      {
        AF_LatinAxis  Axis = &metrics->axis[AF_DIMENSION_VERT];
        AF_LatinBlue  blue = NULL;
@@ -51,7 +62,7 @@
  
        for ( nn = 0; nn < Axis->blue_count; nn++ )
        {
-@@ -930,7 +956,12 @@
+@@ -930,7 +960,12 @@
            break;
          }
        }
@@ -65,7 +76,7 @@
        if ( blue )
        {
          FT_Pos   scaled;
-@@ -1049,7 +1080,13 @@
+@@ -1049,7 +1084,13 @@
  
          /* a blue zone is only active if it is less than 3/4 pixels tall */
          dist = FT_MulFix( blue->ref.org - blue->shoot.org, scale );
@@ -79,7 +90,7 @@
          {
  #if 0
            FT_Pos  delta1;
-@@ -1100,7 +1137,12 @@
+@@ -1100,7 +1141,12 @@
              delta2 = -delta2;
  
            blue->ref.fit   = FT_PIX_ROUND( blue->ref.cur );
@@ -92,7 +103,7 @@
  
  #endif
  
-@@ -1916,7 +1958,10 @@
+@@ -1916,7 +1962,10 @@
                dist = edge->fpos - blue->shoot.org;
                if ( dist < 0 )
                  dist = -dist;
@@ -104,7 +115,7 @@
                dist = FT_MulFix( dist, scale );
                if ( dist < best_dist )
                {
-@@ -2082,8 +2127,31 @@
+@@ -2082,8 +2131,31 @@
      FT_Pos           dist     = width;
      FT_Int           sign     = 0;
      FT_Int           vertical = ( dim == AF_DIMENSION_VERT );
@@ -136,7 +147,7 @@
      if ( !AF_LATIN_HINTS_DO_STEM_ADJUST( hints ) ||
           axis->extra_light                       )
        return width;
-@@ -2093,9 +2161,73 @@
+@@ -2093,9 +2165,73 @@
        dist = -width;
        sign = 1;
      }
@@ -186,8 +197,7 @@
 +            infinality_dist = 254;
 +          else infinality_dist = ( infinality_dist + 16 ) & ~63;
 +        }
- 
--    if ( (  vertical && !AF_LATIN_HINTS_DO_VERT_SNAP( hints ) ) ||
++
 +      }
 +      if ( infinality_dist < 52 )
 +      {
@@ -204,14 +214,15 @@
 +              ( ( vertical && !AF_LATIN_HINTS_DO_VERT_SNAP( hints ) )  ||
 +                ( !vertical && !AF_LATIN_HINTS_DO_HORZ_SNAP( hints ) ) ) )
 +#else
-+
+ 
+-    if ( (  vertical && !AF_LATIN_HINTS_DO_VERT_SNAP( hints ) ) ||
 +    if ( ( vertical && !AF_LATIN_HINTS_DO_VERT_SNAP( hints ) ) ||
           ( !vertical && !AF_LATIN_HINTS_DO_HORZ_SNAP( hints ) ) )
 +#endif /* FT_CONFIG_OPTION_INFINALITY_PATCHSET */
      {
        /* smooth hinting process: very lightly quantize the stem width */
  
-@@ -2155,6 +2287,9 @@
+@@ -2155,6 +2291,9 @@
        }
      }
      else
@@ -221,7 +232,7 @@
      {
        /* strong hinting process: snap the stem width to integer pixels */
  
-@@ -2162,7 +2297,10 @@
+@@ -2162,7 +2301,10 @@
  
  
        dist = af_latin_snap_width( axis->widths, axis->width_count, dist );
@@ -233,7 +244,7 @@
        if ( vertical )
        {
          /* in the case of vertical hinting, always round */
-@@ -2225,6 +2363,32 @@
+@@ -2225,6 +2367,32 @@
      }
  
    Done_Width:
@@ -266,7 +277,7 @@
      if ( sign )
        dist = -dist;
  
-@@ -2247,6 +2411,8 @@
+@@ -2247,6 +2415,8 @@
                               (AF_Edge_Flags)base_edge->flags,
                               (AF_Edge_Flags)stem_edge->flags );
  
@@ -275,7 +286,7 @@
  
      stem_edge->pos = base_edge->pos + fitted_width;
  
-@@ -2810,8 +2976,32 @@
+@@ -2810,8 +2980,32 @@
      int       dim;
  
      AF_LatinAxis  axis;
@@ -309,19 +320,14 @@
      error = af_glyph_hints_reload( hints, outline );
      if ( error )
        goto Exit;
-@@ -2877,7 +3067,17 @@
+@@ -2877,7 +3071,11 @@
      }
  
      af_glyph_hints_save( hints, outline );
+-
 +#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
 +    {
-+      /* Save this width for use in ftsmooth.c.  This is a shameful hack */
-+      const char* c1 = "CUR_WIDTH";
-+      char        c2[8];
- 
-+
-+      snprintf( c2, 8, "%ld", metrics->axis->widths[0].cur );
-+      setenv( c1, c2, 1 );
++      infinality_cur_width = metrics->axis->widths[0].cur;
 +    }
 +#endif /* FT_CONFIG_OPTION_INFINALITY_PATCHSET */
    Exit:
