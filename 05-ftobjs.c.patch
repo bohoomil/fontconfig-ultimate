@@ -1,17 +1,18 @@
---- a/src/base/ftobjs.c	2014-09-14 11:35:20.947193822 -0500
-+++ b/src/base/ftobjs.c	2014-09-14 11:59:30.672221004 -0500
-@@ -67,6 +67,10 @@
+--- a/src/base/ftobjs.c	2014-09-14 12:35:03.207593493 -0500
++++ b/src/base/ftobjs.c	2014-09-14 15:15:51.604552925 -0500
+@@ -67,6 +67,11 @@
  
  #define GRID_FIT_METRICS
  
 +#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
 +#include <strings.h>
 +#include <stdlib.h>
++#include "../autofit/aflatin.h"
 +#endif
  
    FT_BASE_DEF( FT_Pointer )
    ft_service_list_lookup( FT_ServiceDesc  service_descriptors,
-@@ -538,6 +542,25 @@
+@@ -538,6 +543,25 @@
    ft_lookup_glyph_renderer( FT_GlyphSlot  slot );
  
  
@@ -37,7 +38,7 @@
  #ifdef GRID_FIT_METRICS
    static void
    ft_glyphslot_grid_fit_metrics( FT_GlyphSlot  slot,
-@@ -596,8 +619,40 @@
+@@ -596,8 +620,40 @@
      FT_Bool       autohint = FALSE;
      FT_Module     hinter;
      TT_Face       ttface = (TT_Face)face;
@@ -78,7 +79,7 @@
      if ( !face || !face->size || !face->glyph )
        return FT_THROW( Invalid_Face_Handle );
  
-@@ -685,6 +740,18 @@
+@@ -685,6 +741,18 @@
      {
        FT_AutoHinter_Interface  hinting;
  
@@ -97,11 +98,12 @@
  
        /* try to load embedded bitmaps first if available            */
        /*                                                            */
-@@ -730,6 +797,17 @@
+@@ -730,6 +798,18 @@
        if ( error )
          goto Exit;
  
 +#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
++      infinality_cur_width = 0;
 +
 +      {
 +        /* fix for sdl_ttf */
