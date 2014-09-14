@@ -25,7 +25,7 @@ echo "$XFT_SETTINGS" | xrdb -merge > /dev/null 2>&1
 ### 4 <> darker & smoother
 ### 5 <> darkest & heaviest ("MacIsh")
 
-USE_STYLE="3"
+USE_STYLE="2"
 
 if [ "$USE_STYLE" = "1" ]; then
   export INFINALITY_FT_FILTER_PARAMS="04 22 38 22 04"
