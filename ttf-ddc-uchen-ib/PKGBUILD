@@ -2,7 +2,7 @@
 
 pkgname=ttf-ddc-uchen-ib
 pkgver=1.000
-pkgrel=4
+pkgrel=5
 depends=('fontconfig')
 pkgdesc="DDC Uchen is a font designed by Chris Fynn for the Dzongkha Development Commission."
 url="https://sites.google.com/site/chrisfynn2/home/fonts/ddc-uchen"
@@ -15,7 +15,7 @@ source=(http://www.dzongkha.gov.bt/IT/download/fonts/DDC_Uchen.ttf
         90-tt-ddc-uchen.conf)
 sha1sums=('82b6129f846419503a69e969fbd442949fa949ba'
           '59c74030a9a20bd5964fd814d0d7784a92dc2a86'
-          'ec546c38aa1fb52a02f66b4497f278a85ade8aac')
+          '7071e8731d2d85ae18e159b450e1bb393c2babc7')
 
 package(){
   cd "${srcdir}"
