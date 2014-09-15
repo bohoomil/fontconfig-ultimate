@@ -2,7 +2,7 @@
 
 pkgname=ttf-himalaya-fonts-ibx
 pkgver=1.0
-pkgrel=6
+pkgrel=7
 depends=('fontconfig')
 makedepends=('unrar')
 pkgdesc="Himalaya fonts."
@@ -18,7 +18,7 @@ source=(HimalayaFonts.rar
         90-tt-himalaya-fonts.conf)
 sha1sums=('74f5fa41df50340cd43d73ea92916b7fab5a284d'
           '2e5aaffdea626bcfc1086034f3da9d4d8a4ab7fd'
-          '17c30ee191d5e3dd481ee0559060cdcc1c7b23d3')
+          '51a5942be1bb2d01a93ab432bd6af0d0d0ef12d1')
 
 prepare(){
   cd ${srcdir}
