@@ -4,7 +4,7 @@
 
 pkgname=ttf-nanumgothic-coding-ibx
 pkgver=2.0
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="The monospaced version of NanumGothic."
 url="http://hangeul.naver.com/"
@@ -19,7 +19,7 @@ source=('http://dev.naver.com/frs/download.php/441/NanumGothicCoding-2.0.zip'
         90-tt-nanumgothic-coding.conf)
 sha1sums=('051e7658cbd74befbd9c9bda9814cc3ede437080'
           '3ea2c3cfb6ec1db65531e162015b5e140f0a9935'
-          '00cd90a43c6425a4c4c2c3b42b1e3e1e8dd8a309')
+          'ac50c135c8ba61d0addb525a2fc37b615a14925b')
 
 package(){
   cd "${srcdir}"
