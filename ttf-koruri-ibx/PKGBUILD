@@ -2,8 +2,8 @@
 # Contributor: bohoomil <@zoho.com>
 
 pkgname=ttf-koruri-ibx
-pkgver=20140524
-pkgrel=2
+pkgver=20140904
+pkgrel=1
 pkgdesc="Japanese TrueType font obtained by mixing M+ and Open Sans (fixed base family name)."
 arch=('any')
 url="http://sourceforge.jp/projects/koruri"
@@ -14,12 +14,12 @@ conflicts=('ttf-koruri')
 replaces=('ttf-koruri')
 _mirror="jaist"
 install=${pkgname}.install
-source=(http://${_mirror}.dl.sourceforge.jp/koruri/61231/Koruri-${pkgver}.tar.xz
+source=(http://${_mirror}.dl.sourceforge.jp/koruri/61919/Koruri-${pkgver}.tar.xz
         40-koruri.conf
         90-tt-koruri.conf)
-sha1sums=('3ba04ef04d25ed2a75dd3e34de2554d55618bc5b'
+sha1sums=('0abe8b438b8d23183a235bada1ce4dffab2cfe55'
           '9fdc5ef0e988112ce19cc2b20b1bbc22ca13c901'
-          '77b2c5db3a06982e192c0a41354da4dcf3fdd65d')
+          'be5278f69144dd42a749249e6ab7ed4e0dffb48b')
 
 package() {
   cd "${srcdir}/Koruri-${pkgver}"
