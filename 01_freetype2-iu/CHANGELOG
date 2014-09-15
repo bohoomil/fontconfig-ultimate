@@ -5,6 +5,14 @@ freetype2-infinality-ultimate
 CHANGELOG
 ---------
 
+2014-09-14
+~~~~~~~~~~
+
+### freetype2-infinality-ultimate, rev. 2.5.3-12 (inc. multilib)
+
+* Bug #40 (affecting Urxvt): do not track cur_width through setenv (by goddesse, contributed by estar).
+* Merged with the recent upstream code base.
+
 2014-09-09
 ~~~~~~~~~~
 

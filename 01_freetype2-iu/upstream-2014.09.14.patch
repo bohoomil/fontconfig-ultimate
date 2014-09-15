@@ -111,13 +111,57 @@ index a4e583d..df77d96 100644
  
  # Packaging
 diff --git a/ChangeLog b/ChangeLog
-index ea1eb4a..16dbaaf 100644
+index ea1eb4a..2dc6f6e 100644
 --- a/ChangeLog
 +++ b/ChangeLog
-@@ -1,3 +1,581 @@
+@@ -1,3 +1,625 @@
++2014-09-08  Alexei Podtelezhnikov  <apodtele@gmail.com>
++
++	Fix Savannah bug #43153.
++
++	* src/psaux/psconv.c (PS_Conv_ToFixed): Add protection against
++	overflow in `divider'. 
++
++2014-09-03  Alexei Podtelezhnikov  <apodtele@gmail.com>
++
++	[base] Tighten the overflow check in `FT_DivFix'.
++
++	This fixes a 13-year old bug. The original overflow check should have
++	been updated when rounding was introduced into this function
++	(c2cd00443b).
++
++	* src/base/ftcalc.c (FT_DivFix) [!FT_LONG64]: Updated.
++	* include/freetype.h (FT_DivFix): Updated documentation.
++
++2014-09-03  Alexei Podtelezhnikov  <apodtele@gmail.com>
++
++	[base] Tighten the overflow check in `FT_MulFix'.
++
++	* src/base/ftcalc.c (FT_MulFix) [!FT_LONG64]: Updated.
++
++2014-09-02  Alexei Podtelezhnikov  <apodtele@gmail.com>
++
++	[truetype] Shortcut ppem calculations for square pixels.
++
++	* src/truetype/ttinterp.h (TT_ExecContextRec): New field
++	`cur_ppem_func' with a function pointer.
++	* src/truetype/ttinterp.c (TT_RunIns): Initialize `cur_ppem_func'
++	depending on the pixel geometry to either...
++	(Current_Ppem_Stretched): ... this for stretched pixels.
++	(Current_Ppem): ... or this for square pixels.
++	(DO_MPPEM, DO_MPS, Ins_DELTAP, Ins_DELTAC): Use `cur_ppem_func'.
++
++2014-08-31  Behdad Esfahbod  <behdad@behdad.org>
++
++	Don't use `register' keyword.  Fixes compiler warnings.
++
++	* src/base/ftcalc.c (FT_Add64) [!FT_LONG64]: Do it.
++	* src/gzip/inftrees.c (huft_build): Ditto.
++	* src/truetype/ttinterp.c (TT_MulFix14_arm): Ditto.
++
 +2014-08-24  Alexei Podtelezhnikov  <apodtele@gmail.com>
 +
-+	[truetype] Optimize DELTAP and DELTAC. 
++	[truetype] Optimize DELTAP and DELTAC.
 +
 +	* src/truetype/ttinterp.c (Ins_DELTAP, Ins_DELTAC): Move ppem
 +	calculations outside of the loop.
@@ -1807,7 +1851,7 @@ index d98a311..22d70fd 100644
  
  #define FT_LOCAL( x )      static  x
 diff --git a/include/freetype.h b/include/freetype.h
-index fb62b62..1ce138c 100644
+index fb62b62..6a31502 100644
 --- a/include/freetype.h
 +++ b/include/freetype.h
 @@ -1592,7 +1592,6 @@ FT_BEGIN_HEADER
@@ -1881,6 +1925,27 @@ index fb62b62..1ce138c 100644
  
    /*************************************************************************/
    /*                                                                       */
+@@ -3829,18 +3807,12 @@ FT_BEGIN_HEADER
+   /*    used to divide a given value by a 16.16 fixed-point factor.        */
+   /*                                                                       */
+   /* <Input>                                                               */
+-  /*    a :: The first multiplier.                                         */
+-  /*    b :: The second multiplier.  Use a 16.16 factor here whenever      */
+-  /*         possible (see note below).                                    */
++  /*    a :: The numerator.                                                */
++  /*    b :: The denominator.  Use a 16.16 factor here.                    */
+   /*                                                                       */
+   /* <Return>                                                              */
+   /*    The result of `(a*0x10000)/b'.                                     */
+   /*                                                                       */
+-  /* <Note>                                                                */
+-  /*    The optimization for FT_DivFix() is simple: If (a~<<~16) fits in   */
+-  /*    32~bits, then the division is computed directly.  Otherwise, we    */
+-  /*    use a specialized version of @FT_MulDiv.                           */
+-  /*                                                                       */
+   FT_EXPORT( FT_Long )
+   FT_DivFix( FT_Long  a,
+              FT_Long  b );
 diff --git a/include/fterrdef.h b/include/fterrdef.h
 index 76c7b9e..99b2fad 100644
 --- a/include/fterrdef.h
@@ -4732,7 +4797,7 @@ index 5606745..158a428 100644
  
  
 diff --git a/src/base/ftcalc.c b/src/base/ftcalc.c
-index 6e65583..8eed4ce 100644
+index 6e65583..723712e 100644
 --- a/src/base/ftcalc.c
 +++ b/src/base/ftcalc.c
 @@ -39,7 +39,8 @@
@@ -4788,7 +4853,16 @@ index 6e65583..8eed4ce 100644
    }
  
  
-@@ -355,24 +358,46 @@
+@@ -344,7 +347,7 @@
+             FT_Int64*  y,
+             FT_Int64  *z )
+   {
+-    register FT_UInt32  lo, hi;
++    FT_UInt32  lo, hi;
+ 
+ 
+     lo = x->lo + y->lo;
+@@ -355,24 +358,54 @@
    }
  
  
@@ -4800,19 +4874,18 @@ index 6e65583..8eed4ce 100644
 +  /*  The FT_MulDiv function has been optimized thanks to ideas from     */
 +  /*  Graham Asher and Alexei Podtelezhnikov.  The trick is to optimize  */
 +  /*  a rather common case when everything fits within 32-bits.          */
-   /*                                                                     */
--  /*  we compute 'a*b+c/2', then divide it by 'c'. (positive values)     */
++  /*                                                                     */
 +  /*  We compute 'a*b+c/2', then divide it by 'c' (all positive values). */
    /*                                                                     */
--  /*  46340 is FLOOR(SQRT(2^31-1)).                                      */
+-  /*  we compute 'a*b+c/2', then divide it by 'c'. (positive values)     */
 +  /*  The product of two positive numbers never exceeds the square of    */
 +  /*  its mean values.  Therefore, we always avoid the overflow by       */
 +  /*  imposing                                                           */
    /*                                                                     */
--  /*  if ( a <= 46340 && b <= 46340 ) then ( a*b <= 0x7FFEA810 )         */
+-  /*  46340 is FLOOR(SQRT(2^31-1)).                                      */
 +  /*    (a + b) / 2 <= sqrt(X - c/2)    ,                                */
    /*                                                                     */
--  /*  0x7FFFFFFF - 0x7FFEA810 = 0x157F0                                  */
+-  /*  if ( a <= 46340 && b <= 46340 ) then ( a*b <= 0x7FFEA810 )         */
 +  /*  where X = 2^32 - 1, the maximum unsigned 32-bit value, and using   */
 +  /*  unsigned arithmetic.  Now we replace `sqrt' with a linear function */
 +  /*  that is smaller or equal for all values of c in the interval       */
@@ -4820,14 +4893,15 @@ index 6e65583..8eed4ce 100644
 +  /*  endpoints.  Substituting the linear solution and explicit numbers  */
 +  /*  we get                                                             */
    /*                                                                     */
--  /*  if ( c < 0x157F0*2 ) then ( a*b+c/2 <= 0x7FFFFFFF )                */
+-  /*  0x7FFFFFFF - 0x7FFEA810 = 0x157F0                                  */
 +  /*    a + b <= 131071.99 - c / 122291.84    .                          */
    /*                                                                     */
--  /*  and 2*0x157F0 = 176096                                             */
+-  /*  if ( c < 0x157F0*2 ) then ( a*b+c/2 <= 0x7FFFFFFF )                */
 +  /*  In practice, we should use a faster and even stronger inequality   */
    /*                                                                     */
+-  /*  and 2*0x157F0 = 176096                                             */
 +  /*    a + b <= 131071 - (c >> 16)                                      */
-+  /*                                                                     */
+   /*                                                                     */
 +  /*  or, alternatively,                                                 */
 +  /*                                                                     */
 +  /*    a + b <= 129895 - (c >> 17)    .                                 */
@@ -4839,14 +4913,22 @@ index 6e65583..8eed4ce 100644
 +  /*                                                                     */
 +  /*    a + (b >> 8) <= (131071 >> 4)                                    */
 +  /*                                                                     */
-+  /*  should work well to avoid the overflow.                            */
++  /*  covers the practical range of use. The actual test below is a bit  */
++  /*  tighter to avoid the border case overflows.                        */
 +  /*                                                                     */
++  /*  In the case of FT_DivFix, the direct overflow check                */
++  /*                                                                     */
++  /*    a << 16 <= X - c/2                                               */
++  /*                                                                     */
++  /*  is scaled down by 2^16 and we use                                  */
++  /*                                                                     */
++  /*    a <= 65535 - (c >> 17)    .                                      */
 +
 +  /* documentation is in freetype.h */
  
    FT_EXPORT_DEF( FT_Long )
    FT_MulDiv( FT_Long  a,
-@@ -390,10 +415,13 @@
+@@ -390,10 +423,13 @@
      s ^= b; b = FT_ABS( b );
      s ^= c; c = FT_ABS( c );
  
@@ -4863,7 +4945,7 @@ index 6e65583..8eed4ce 100644
      {
        FT_Int64  temp, temp2;
  
-@@ -405,8 +433,6 @@
+@@ -405,8 +441,6 @@
        FT_Add64( &temp, &temp2, &temp );
        a = ft_div64by32( temp.hi, temp.lo, (FT_Int32)c );
      }
@@ -4872,7 +4954,7 @@ index 6e65583..8eed4ce 100644
  
      return ( s < 0 ? -a : a );
    }
-@@ -427,10 +453,13 @@
+@@ -427,10 +461,13 @@
      s ^= b; b = FT_ABS( b );
      s ^= c; c = FT_ABS( c );
  
@@ -4889,7 +4971,7 @@ index 6e65583..8eed4ce 100644
      {
        FT_Int64  temp;
  
-@@ -438,8 +467,6 @@
+@@ -438,8 +475,6 @@
        ft_multo64( (FT_Int32)a, (FT_Int32)b, &temp );
        a = ft_div64by32( temp.hi, temp.lo, (FT_Int32)c );
      }
@@ -4898,25 +4980,25 @@ index 6e65583..8eed4ce 100644
  
      return ( s < 0 ? -a : a );
    }
-@@ -497,7 +524,7 @@
+@@ -497,7 +532,7 @@
      ua = (FT_ULong)a;
      ub = (FT_ULong)b;
  
 -    if ( ua <= 2048 && ub <= 1048576L )
-+    if ( ua + ( ub >> 8 ) <= 8191UL )
++    if ( ua + ( ub >> 8 ) <= 8190UL )
        ua = ( ua * ub + 0x8000U ) >> 16;
      else
      {
-@@ -528,7 +555,7 @@
+@@ -528,7 +563,7 @@
      ua = (FT_ULong)a;
      ub = (FT_ULong)b;
  
 -    if ( ua <= 2048 && ub <= 1048576L )
-+    if ( ua + ( ub >> 8 ) <= 8191UL )
++    if ( ua + ( ub >> 8 ) <= 8190UL )
        ua = ( ua * ub + 0x8000UL ) >> 16;
      else
      {
-@@ -552,23 +579,23 @@
+@@ -552,23 +587,23 @@
    FT_DivFix( FT_Long  a,
               FT_Long  b )
    {
@@ -4939,7 +5021,8 @@ index 6e65583..8eed4ce 100644
 -      q = (FT_UInt32)0x7FFFFFFFL;
 +      q = 0x7FFFFFFFL;
      }
-     else if ( ( a >> 16 ) == 0 )
+-    else if ( ( a >> 16 ) == 0 )
++    else if ( a <= 65535L - ( b >> 17 ) )
      {
        /* compute result directly */
 -      q = (FT_UInt32)( ( (FT_ULong)a << 16 ) + ( b >> 1 ) ) / (FT_UInt32)b;
@@ -4947,7 +5030,7 @@ index 6e65583..8eed4ce 100644
      }
      else
      {
-@@ -581,10 +608,10 @@
+@@ -581,10 +616,10 @@
        temp2.hi = 0;
        temp2.lo = (FT_UInt32)( b >> 1 );
        FT_Add64( &temp, &temp2, &temp );
@@ -5257,6 +5340,32 @@ index 5853d77..81049f4 100644
          }
          else
          {
+diff --git a/src/gzip/inftrees.c b/src/gzip/inftrees.c
+index ef53652..56f52b1 100644
+--- a/src/gzip/inftrees.c
++++ b/src/gzip/inftrees.c
+@@ -115,16 +115,16 @@ uIntf *v                /* working area: values in order of bit length */
+   uInt f;                       /* i repeats in table every f entries */
+   int g;                        /* maximum code length */
+   int h;                        /* table level */
+-  register uInt i;              /* counter, current code */
+-  register uInt j;              /* counter */
+-  register int k;               /* number of bits in current code */
++  uInt i;                       /* counter, current code */
++  uInt j;                       /* counter */
++  int k;                        /* number of bits in current code */
+   int l;                        /* bits per table (returned in m) */
+   uInt mask;                    /* (1 << w) - 1, to avoid cc -O bug on HP */
+-  register uIntf *p;            /* pointer into c[], b[], or v[] */
++  uIntf *p;                     /* pointer into c[], b[], or v[] */
+   inflate_huft *q;              /* points to current table */
+   struct inflate_huft_s r;      /* table entry for structure assignment */
+   inflate_huft *u[BMAX];        /* table stack */
+-  register int w;               /* bits before this table == (l * h) */
++  int w;                        /* bits before this table == (l * h) */
+   uInt x[BMAX+1];               /* bit offsets, then code stack */
+   uIntf *xp;                    /* pointer into x */
+   int y;                        /* number of dummy codes added */
 diff --git a/src/pcf/pcfdrivr.c b/src/pcf/pcfdrivr.c
 index 748cbca..5183f6f 100644
 --- a/src/pcf/pcfdrivr.c
@@ -5331,6 +5440,20 @@ index 194d2df..0c89242 100644
          FT_UInt    probe       = power * size;
          FT_UInt    extra       = count - power;
          FT_Byte*   base        = stream->cursor;
+diff --git a/src/psaux/psconv.c b/src/psaux/psconv.c
+index d0d8861..7792a62 100644
+--- a/src/psaux/psconv.c
++++ b/src/psaux/psconv.c
+@@ -250,7 +250,8 @@
+         if ( c < 0 || c >= 10 )
+           break;
+ 
+-        if ( decimal < 0xCCCCCCCL )
++        /* only add digit if we don't overflow */
++        if ( divider < 0xCCCCCCCL && decimal < 0xCCCCCCCL )
+         {
+           decimal = decimal * 10 + c;
+ 
 diff --git a/src/raster/ftraster.c b/src/raster/ftraster.c
 index ddecc80..abbecb7 100644
 --- a/src/raster/ftraster.c
@@ -5684,10 +5807,78 @@ index 5f676a2..ff2b339 100644
  
        /* see whether the cvt program has disabled hinting */
 diff --git a/src/truetype/ttinterp.c b/src/truetype/ttinterp.c
-index 56e8fa7..dd75cce 100644
+index 56e8fa7..7d0248b 100644
 --- a/src/truetype/ttinterp.c
 +++ b/src/truetype/ttinterp.c
-@@ -7487,9 +7487,9 @@
+@@ -172,6 +172,9 @@
+ #define CUR_Func_round( d, c ) \
+           CUR.func_round( EXEC_ARG_ d, c )
+ 
++#define CUR_Func_cur_ppem() \
++          CUR.func_cur_ppem( EXEC_ARG )
++
+ #define CUR_Func_read_cvt( index ) \
+           CUR.func_read_cvt( EXEC_ARG_ index )
+ 
+@@ -184,12 +187,6 @@
+ #define CURRENT_Ratio() \
+           Current_Ratio( EXEC_ARG )
+ 
+-#define CURRENT_Ppem() \
+-          Current_Ppem( EXEC_ARG )
+-
+-#define CUR_Ppem() \
+-          Cur_PPEM( EXEC_ARG )
+-
+ #define INS_SxVTL( a, b, c, d ) \
+           Ins_SxVTL( EXEC_ARG_ a, b, c, d )
+ 
+@@ -1446,7 +1443,7 @@
+   TT_MulFix14_arm( FT_Int32  a,
+                    FT_Int    b )
+   {
+-    register FT_Int32  t, t2;
++    FT_Int32  t, t2;
+ 
+ 
+ #if defined( __CC_ARM ) || defined( __ARMCC__ )
+@@ -1706,9 +1703,16 @@
+   }
+ 
+ 
+-  static FT_Long
++  FT_CALLBACK_DEF( FT_Long )
+   Current_Ppem( EXEC_OP )
+   {
++    return CUR.tt_metrics.ppem;
++  }
++
++
++  FT_CALLBACK_DEF( FT_Long )
++  Current_Ppem_Stretched( EXEC_OP )
++  {
+     return FT_MulFix( CUR.tt_metrics.ppem, CURRENT_Ratio() );
+   }
+ 
+@@ -3089,7 +3093,7 @@
+ 
+ 
+ #define DO_MPPEM              \
+-    args[0] = CURRENT_Ppem();
++    args[0] = CUR_Func_cur_ppem();
+ 
+ 
+   /* Note: The pointSize should be irrelevant in a given font program; */
+@@ -3102,7 +3106,7 @@
+ #else
+ 
+ #define DO_MPS                \
+-    args[0] = CURRENT_Ppem();
++    args[0] = CUR_Func_cur_ppem();
+ 
+ #endif /* 0 */
+ 
+@@ -7487,9 +7491,9 @@
    static void
    Ins_DELTAP( INS_ARG )
    {
@@ -5699,15 +5890,15 @@ index 56e8fa7..dd75cce 100644
      FT_Long    B;
  #ifdef TT_CONFIG_OPTION_SUBPIXEL_HINTING
      FT_UShort  B1, B2;
-@@ -7523,6 +7523,7 @@
+@@ -7523,6 +7527,7 @@
      }
  #endif
  
-+    P = (FT_ULong)CURRENT_Ppem();
++    P = (FT_ULong)CUR_Func_cur_ppem();
      nump = (FT_ULong)args[0];   /* some points theoretically may occur more
                                     than once, thus UShort isn't enough */
  
-@@ -7567,7 +7568,7 @@
+@@ -7567,7 +7572,7 @@
  
          C += CUR.GS.delta_base;
  
@@ -5716,7 +5907,7 @@ index 56e8fa7..dd75cce 100644
          {
            B = ( (FT_ULong)B & 0xF ) - 8;
            if ( B >= 0 )
-@@ -7596,9 +7597,9 @@
+@@ -7596,9 +7601,9 @@
              else if ( CUR.ignore_x_mode )
              {
                if ( CUR.GS.freeVector.y != 0 )
@@ -5728,7 +5919,7 @@ index 56e8fa7..dd75cce 100644
  
  #if 0
                /* Standard Subpixel Hinting: Allow y move.       */
-@@ -7615,7 +7616,7 @@
+@@ -7615,7 +7620,7 @@
                     !( CUR.sph_tweak_flags & SPH_TWEAK_ALWAYS_SKIP_DELTAP ) )
                {
                  /* save the y value of the point now; compare after move */
@@ -5737,7 +5928,7 @@ index 56e8fa7..dd75cce 100644
  
                  if ( CUR.sph_tweak_flags & SPH_TWEAK_ROUND_NONPIXEL_Y_MOVES )
                    B = FT_PIX_ROUND( B1 + B ) - B1;
-@@ -7627,7 +7628,7 @@
+@@ -7627,7 +7632,7 @@
                    CUR_Func_move( &CUR.zp0, A, B );
                }
  
@@ -5746,7 +5937,7 @@ index 56e8fa7..dd75cce 100644
  
                /* Reverse this move if it results in a disallowed move */
                if ( CUR.GS.freeVector.y != 0                           &&
-@@ -7667,7 +7668,7 @@
+@@ -7667,7 +7672,7 @@
    Ins_DELTAC( INS_ARG )
    {
      FT_ULong  nump, k;
@@ -5755,15 +5946,15 @@ index 56e8fa7..dd75cce 100644
      FT_Long   B;
  
  
-@@ -7691,6 +7692,7 @@
+@@ -7691,6 +7696,7 @@
      }
  #endif
  
-+    P = (FT_ULong)CURRENT_Ppem();
++    P = (FT_ULong)CUR_Func_cur_ppem();
      nump = (FT_ULong)args[0];
  
      for ( k = 1; k <= nump; k++ )
-@@ -7736,7 +7738,7 @@
+@@ -7736,7 +7742,7 @@
  
          C += CUR.GS.delta_base;
  
@@ -5772,7 +5963,29 @@ index 56e8fa7..dd75cce 100644
          {
            B = ( (FT_ULong)B & 0xF ) - 8;
            if ( B >= 0 )
-@@ -9035,10 +9037,13 @@
+@@ -8269,11 +8275,12 @@
+     CUR.iup_called = FALSE;
+ #endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
+ 
+-    /* set CVT functions */
++    /* set PPEM and CVT functions */
+     CUR.tt_metrics.ratio = 0;
+     if ( CUR.metrics.x_ppem != CUR.metrics.y_ppem )
+     {
+       /* non-square pixels, use the stretched routines */
++      CUR.func_cur_ppem  = Current_Ppem_Stretched;
+       CUR.func_read_cvt  = Read_CVT_Stretched;
+       CUR.func_write_cvt = Write_CVT_Stretched;
+       CUR.func_move_cvt  = Move_CVT_Stretched;
+@@ -8281,6 +8288,7 @@
+     else
+     {
+       /* square pixels, use normal routines */
++      CUR.func_cur_ppem  = Current_Ppem;
+       CUR.func_read_cvt  = Read_CVT;
+       CUR.func_write_cvt = Write_CVT;
+       CUR.func_move_cvt  = Move_CVT;
+@@ -9035,10 +9043,13 @@
      /* If any errors have occurred, function tables may be broken. */
      /* Force a re-execution of `prep' and `fpgm' tables if no      */
      /* bytecode debugger is run.                                   */
@@ -5788,6 +6001,51 @@ index 56e8fa7..dd75cce 100644
      }
  
      return CUR.error;
+diff --git a/src/truetype/ttinterp.h b/src/truetype/ttinterp.h
+index 1d8825d..3cfc859 100644
+--- a/src/truetype/ttinterp.h
++++ b/src/truetype/ttinterp.h
+@@ -4,7 +4,7 @@
+ /*                                                                         */
+ /*    TrueType bytecode interpreter (specification).                       */
+ /*                                                                         */
+-/*  Copyright 1996-2007, 2010, 2012-2013 by                                */
++/*  Copyright 1996-2007, 2010, 2012-2014 by                                */
+ /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+ /*                                                                         */
+ /*  This file is part of the FreeType project, and may only be used,       */
+@@ -81,6 +81,10 @@ FT_BEGIN_HEADER
+   (*TT_Project_Func)( EXEC_OP_ FT_Pos   dx,
+                                FT_Pos   dy );
+ 
++  /* getting current ppem.  Take care of non-square pixels if necessary */
++  typedef FT_Long
++  (*TT_Cur_Ppem_Func)( EXEC_OP );
++
+   /* reading a cvt value.  Take care of non-square pixels if necessary */
+   typedef FT_F26Dot6
+   (*TT_Get_CVT_Func)( EXEC_OP_ FT_ULong  idx );
+@@ -228,11 +232,6 @@ FT_BEGIN_HEADER
+     FT_F26Dot6         phase;      /* `SuperRounding'     */
+     FT_F26Dot6         threshold;
+ 
+-#if 0
+-    /* this seems to be unused */
+-    FT_Int             cur_ppem;   /* ppem along the current proj vector */
+-#endif
+-
+     FT_Bool            instruction_trap; /* If `True', the interpreter will */
+                                          /* exit after each instruction     */
+ 
+@@ -254,6 +253,8 @@ FT_BEGIN_HEADER
+     TT_Move_Func       func_move;      /* current point move function */
+     TT_Move_Func       func_move_orig; /* move original position function */
+ 
++    TT_Cur_Ppem_Func   func_cur_ppem;  /* get current proj. ppem value  */
++
+     TT_Get_CVT_Func    func_read_cvt;  /* read a cvt entry              */
+     TT_Set_CVT_Func    func_write_cvt; /* write a cvt entry (in pixels) */
+     TT_Set_CVT_Func    func_move_cvt;  /* incr a cvt entry (in pixels)  */
 diff --git a/src/truetype/ttobjs.c b/src/truetype/ttobjs.c
 index 4adba58..05a121c 100644
 --- a/src/truetype/ttobjs.c
