@@ -2,7 +2,7 @@
 
 pkgname=ttf-myanmar3-ibx
 pkgver=1.358
-pkgrel=5
+pkgrel=6
 depends=('fontconfig')
 pkgdesc="Font for Myanmar/Burmese script."
 url="http://myanmar3source.googlecode.com/"
@@ -16,7 +16,7 @@ source=("http://myanmar3source.googlecode.com/files/mm3-multi-os%2816-08-2011%29
         90-tt-myanmar3.conf)
 sha1sums=('fa3faaef571b36731c68f955fb159d42ee3c7f55'
           '6308415aa55d1dec515374cf44af1aef2e397b61'
-          '9308c7fe71b2e467c87caeb0110a448434a95fce')
+          '53a4f9544546bbd12a9c9c072986e5136163ad15')
 
 package() {
   cd "${srcdir}"
