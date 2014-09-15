@@ -2,7 +2,7 @@
 
 pkgname=ttf-lklug-ibx
 pkgver=0.6
-pkgrel=6
+pkgrel=7
 depends=('fontconfig')
 pkgdesc="Font for Sinhala script."
 url="http://sinhala.sourceforge"
@@ -16,7 +16,7 @@ source=(http://sinhala.sourceforge.net/files/lklug.ttf
         90-tt-lklug.conf)
 sha1sums=('209f5a91c85efba898347fdaa032549d889e7722'
           'b7ba8a6ef5c4f2b4efae971fc94edccb5470e8eb'
-          'f392cc78fb7f40fbabedae4be09b5ef986081453')
+          '65e73bdfaeaf2ebfea8a2757820e87ca9217df90')
 
 package(){
   cd "${srcdir}"
