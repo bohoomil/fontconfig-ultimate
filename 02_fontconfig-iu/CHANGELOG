@@ -6,6 +6,40 @@ CHANGELOG
 ---------
 
 
+2014-09-15
+~~~~~~~~~~
+
+### fontconfig-infinality-ultimate, rev. 2.11.1-20
+
+* Updated rendering instructions for several non-Latin families.
+
+### infinality-bundle-fonts
+
+The following packages were updated:
+
+* `ttf-alef-ibx`
+* `ttf-amiri-ibx`
+* `ttf-ddc-uchen-ib`
+* `ttf-himalaya-fonts-ibx`
+* `ttf-koruri-ibx` (ugrade to v.20140904)
+* `ttf-lklug-ibx`
+* `ttf-myanmar3-ibx`
+* `ttf-nanum-fonts-ibx`
+* `ttf-nanumgothic-coding-ibx`
+* `ttf-saweri-ibx`
+
+2014-09-13
+~~~~~~~~~~
+
+### fontconfig-infinality-ultimate, rev. 2.11.1-19
+
+* Fixed Noto Sans Bold rendering in Webkit2 based Web browsers.
+* Improved Arial rendering (15.5px-17.5px, 19.5px-21.5px).
+
+### infinality-bundle-fonts
+
+* Improved Liberation Mono rendering (10.5px-13.5px, 15.5px-17.5px, 19.5px-22.5px).
+
 2014-09-01
 ~~~~~~~~~~
 
