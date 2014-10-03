@@ -1,5 +1,5 @@
 ###          freetype2-infinality-ultimate settings          ###
-###           rev. 0.4.8.0, for freetype2 v.2.5.x            ###
+###           rev. 0.4.8.1, for freetype2 v.2.5.x            ###
 ###                                                          ###
 ###                Copyright (c) 2014 bohoomil               ###
 ### The MIT License (MIT) http://opensource.org/licenses/MIT ###
@@ -41,6 +41,6 @@ fi
 
 export INFINALITY_FT_FRINGE_FILTER_STRENGTH="50"
 export INFINALITY_FT_USE_VARIOUS_TWEAKS="true"
-export INFINALITY_FT_CHROMEOS_STYLE_SHARPENING_STRENGTH="25"
+export INFINALITY_FT_CHROMEOS_STYLE_SHARPENING_STRENGTH="20"
 
 # vim:ft=sh:
