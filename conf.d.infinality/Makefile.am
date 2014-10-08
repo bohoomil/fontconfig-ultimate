@@ -30,6 +30,7 @@ CONF_LINKS = \
 	28-user.conf		\
 	29-local.conf		\
 	35-repl-custom.conf		\
+	37-repl-webfonts.conf		\
 	40-non-latin-microsoft.conf    \
 	40-non-latin-misc.conf    \
 	45-latin-microsoft.conf   \
@@ -66,6 +67,7 @@ templateinf_DATA =				\
 	29-local.conf		\
 	35-repl-custom.conf		\
 	36-repl-missing-glyphs.conf  \
+	37-repl-webfonts.conf		\
 	38-repl-proggy-bitmap.conf   \
 	38-repl-terminus-bitmap.conf   \
 	40-non-latin-microsoft.conf    \
