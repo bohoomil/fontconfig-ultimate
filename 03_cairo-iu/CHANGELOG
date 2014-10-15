@@ -5,6 +5,21 @@ cairo-infinality-ultimate
 CHANGELOG
 ---------
 
+2014-10-15
+~~~~~~~~~~
+
+### cairo-infinality-ultimate, rev. 1.14.0-1 (incl. multilib)
+
+* New upstream release.
+
+2014-09-26
+~~~~~~~~~~
+
+### cairo-infinality-ultimate, rev. 1.13.1-2 (incl. multilib)
+
+* Merging latest upstream commits as used in the stock Arch Linux cairo 1.13.1.
+* Removing obsolete Ubuntu patches.
+
 2014-09-09
 ~~~~~~~~~~
 
