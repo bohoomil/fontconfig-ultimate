@@ -1,0 +1,14 @@
+A minimal `custom` preset.
+
+Features:
+
+* every font family, free or proprietary, is used "as is"
+* only corrective replacements are used where neccesary
+* default aliases:
+  * primary: MS families
+  * fallback: free families
+
+To activate the preset, copy all files to
+
+  /etc/fonts/conf.avail.infinality/combi
+
