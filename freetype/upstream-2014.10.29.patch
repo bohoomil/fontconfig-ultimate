@@ -1,8 +1,8 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index a4e583d..df77d96 100644
+index a4e583d..17a8820 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -16,11 +16,16 @@
+@@ -16,13 +16,28 @@
  #
  #   cmake CMakeLists.txt
  #
@@ -14,20 +14,71 @@ index a4e583d..df77d96 100644
  #
  #   cmake CMakeLists.txt -DBUILD_SHARED_LIBS:BOOL=true
  #
+-# instead.  Please refer to the cmake manual for further options, in
+-# particular, how to modify compilation and linking parameters.
 +# For a framework on OS X, use
 +#
 +#   cmake CMakeLists.txt -DBUILD_FRAMEWORK:BOOL=true -G Xcode
 +#
- # instead.  Please refer to the cmake manual for further options, in
- # particular, how to modify compilation and linking parameters.
++# instead.
++#
++# For an iOS static library, use
++#
++#   cmake CMakeLists.txt -DIOS_PLATFORM=OS -G Xcode
++#
++# or
++#
++#   cmake CMakeLists.txt -DIOS_PLATFORM=SIMULATOR -G Xcode
++#
++# Please refer to the cmake manual for further options, in particular, how
++# to modify compilation and linking parameters.
  #
-@@ -39,6 +44,14 @@ cmake_minimum_required(VERSION 2.6)
+ # Some notes.
+ #
+@@ -37,8 +52,51 @@
  
+ cmake_minimum_required(VERSION 2.6)
+ 
++# CMAKE_TOOLCHAIN_FILE must be set before `project' is called, which
++# configures the base build environment and references the toolchain file
++if (APPLE)
++  if (DEFINED IOS_PLATFORM)
++    if (NOT "${IOS_PLATFORM}" STREQUAL "OS"
++        AND NOT "${IOS_PLATFORM}" STREQUAL "SIMULATOR")
++      message(FATAL_ERROR
++        "IOS_PLATFORM must be set to either OS or SIMULATOR")
++    endif ()
++    if (NOT "${CMAKE_GENERATOR}" STREQUAL "Xcode")
++      message(AUTHOR_WARNING
++        "You should use Xcode generator with IOS_PLATFORM enabled to get Universal builds.")
++    endif ()
++    if (BUILD_SHARED_LIBS)
++      message(FATAL_ERROR
++        "BUILD_SHARED_LIBS can not be on with IOS_PLATFORM enabled")
++    endif ()
++    if (BUILD_FRAMEWORK)
++      message(FATAL_ERROR
++        "BUILD_FRAMEWORK can not be on with IOS_PLATFORM enabled")
++    endif ()
++
++    # iOS only uses static libraries
++    set(BUILD_SHARED_LIBS OFF)
++
++    set(CMAKE_TOOLCHAIN_FILE
++      ${PROJECT_SOURCE_DIR}/builds/cmake/iOS.cmake)
++  endif ()
++else ()
++  if (DEFINED IOS_PLATFORM)
++    message(FATAL_ERROR "IOS_PLATFORM is not supported on this platform")
++  endif ()
++endif ()
++
  project(freetype)
  
 +if (BUILD_FRAMEWORK)
 +  if (NOT "${CMAKE_GENERATOR}" STREQUAL "Xcode")
-+    message(FATAL_ERROR "You should use Xcode generator with BUILD_FRAMEWORK enabled")
++    message(FATAL_ERROR
++      "You should use Xcode generator with BUILD_FRAMEWORK enabled")
 +  endif ()
 +  set(CMAKE_OSX_ARCHITECTURES "$(ARCHS_STANDARD_32_64_BIT)")
 +  set(BUILD_SHARED_LIBS ON)
@@ -36,7 +87,7 @@ index a4e583d..df77d96 100644
  set(VERSION_MAJOR "2")
  set(VERSION_MINOR "5")
  set(VERSION_PATCH "3")
-@@ -51,22 +64,27 @@ add_definitions(-DFT2_BUILD_LIBRARY)
+@@ -51,22 +109,27 @@ add_definitions(-DFT2_BUILD_LIBRARY)
  include_directories("${PROJECT_SOURCE_DIR}/include")
  
  # Create the configuration file
@@ -69,7 +120,7 @@ index a4e583d..df77d96 100644
    src/base/ftbitmap.c
    src/base/ftcalc.c
    src/base/ftcid.c
-@@ -125,7 +143,31 @@ include_directories("src/raster")
+@@ -125,7 +188,31 @@ include_directories("src/raster")
  include_directories("src/psaux")
  include_directories("src/psnames")
  
@@ -102,7 +153,7 @@ index a4e583d..df77d96 100644
  
  # Installations
  # Note the trailing slash in the argument to the `DIRECTORY' directive
-@@ -137,6 +179,7 @@ install(TARGETS freetype
+@@ -137,6 +224,7 @@ install(TARGETS freetype
    RUNTIME DESTINATION bin
    LIBRARY DESTINATION lib
    ARCHIVE DESTINATION lib
@@ -111,10 +162,226 @@ index a4e583d..df77d96 100644
  
  # Packaging
 diff --git a/ChangeLog b/ChangeLog
-index ea1eb4a..4e17454 100644
+index ea1eb4a..069fe4f 100644
 --- a/ChangeLog
 +++ b/ChangeLog
-@@ -1,3 +1,703 @@
+@@ -1,3 +1,919 @@
++2014-10-25  Werner Lemberg  <wl@gnu.org>
++
++	[cff] Test valid darkening parameter macros in `ftoption.h'.
++
++	We no longer need an otherwise unused typedef that can cause a gcc
++	warning.
++	Problem reported by Alexei.
++
++	* src/cff/cffobjs.c (cff_driver_init): Use
++	`CFF_CONFIG_OPTION_DARKENING_PARAMETER_XXX' macros directly.
++	(SET_DARKENING_PARAMETERS): Removed.
++	Compile time tests are now ...
++
++	* devel/ftoption.h, include/config/ftoption.h: ... here.
++
++2014-10-25  Alexei Podtelezhnikov  <apodtele@gmail.com>
++
++	Improve flat corner definition.
++
++	* include/internal/ftcalc.h (FT_HYPOT): Macro to approximate Euclidean
++	distance with the alpha max plus beta min algorithm.
++	* src/base/ftcalc.c (ft_corner_is_flat): Use it instead of Taxicab
++	metric.
++
++2014-10-23  David Weiß  <David.Weiss@ptvgroup.com>
++
++	[build] Improve property file for vc2010.
++
++	User-defined properties should be empty by default to prevent linker
++	failures.
++
++	* builds/windows/vc2010/freetype.user.props,
++	builds/windows/vc2010/freetype.vcxproj:
++	s/OptionsDirectory/UserOptionDirectory/.
++	Comment out all user options.
++
++2014-10-23  Werner Lemberg  <wl@gnu.org>
++
++	[cff] Work around bug in preprocessor of MSVC 2010.
++
++	We have been hit by
++
++	  https://connect.microsoft.com/VisualStudio/feedback/details/718976/msvc-pr
++
++	* devel/ftoption.h, include/config/ftoption.h: Replace
++	`CFF_CONFIG_OPTION_DARKENING_PARAMETERS' with eight macros
++	`CFF_CONFIG_OPTION_DARKENING_PARAMETER_{X,Y}{1,2,3,4}'.
++
++	* src/cff/cffobjs.c (SET_DARKENING_PARAMETERS): Removed.  We no
++	longer need double expansion.
++	(SET_DARKENING_PARAMETERS_0): Renamed to ...
++	(SET_DARKENING_PARAMETERS): ... this.
++	Update call.
++
++2014-10-20  Werner Lemberg  <wl@gnu.org>
++
++	[sbit] Minor fixes.
++
++	* src/sfnt/ttsbit.c (tt_face_load_sbit) [TT_SBIT_TABLE_TYPE_SBIX]:
++	Accept overlay format also, but emit warning message in that case.
++	(tt_sbit_decoder_load_metrics): Add missing newline to error
++	message.
++	(tt_sbit_load_sbix_image): Add `rgbl' graphic type (as used on iOS
++	7.1) to the list of unsupported formats.
++
++2014-10-19  Alexei Podtelezhnikov  <apodtele@gmail.com>
++
++	[truetype] Clean up bytecode rounding.
++
++	Zero distance does not have to be treated specially if you follow
++	specifications and check the sign as the very last step of rounding.
++
++	* src/truetype/ttinterp.c (Round_None, Round_To_Grid,
++	Round_Down_To_Grid, Round_Up_To_Grid, Round_To_Double_Grid): Use
++	macros when available, do not check for non-zero distance.
++	(Round_To_Half_Grid, Round_Super, Round_Super_45): Ditto, return phase
++	if sign changed.
++
++2014-10-18  Alexei Podtelezhnikov  <apodtele@gmail.com>
++
++	[truetype] Unwrap engine compensation settings.
++
++	* src/truetype/ttobjs.c (tt_size_init_bytecode): Updated.
++
++2014-10-18  David Weiß  <David.Weiss@ptvgroup.com>
++
++	[build] Add property file to vc2010 project.
++
++	This simplifies custom build configurations, especially for
++	automated build environments.
++
++	* builds/windows/vc2010/freetype.user.props: New configuration file.
++
++	* builds/windows/vc2010/freetype.vcxproj: Include
++	`freetype.user.props' and use its data fields.
++
++	* builds/windows/vc2010/index.html: Updated.
++
++2014-10-18  Werner Lemberg  <wl@gnu.org>
++
++	[autofit] Add blue-zone support for Telugu.
++
++	This essentially moves the Telugu script from the `Indic' hinter to
++	the `Latin' hinter.
++
++	Note that this is a first shot and quite certainly needs
++	refinements.
++
++	* src/autofit/afblue.dat: Add blue zone data for Telugu.
++
++	* src/autofit/afblue.c, src/autofit/afblue.h: Regenerated.
++
++	* src/autofit/afscript.h: Add Telugu standard characters and move
++	data out of AF_CONFIG_OPTION_INDIC block.
++
++	* src/autofit/afranges.c: Move Telugu data out of
++	AF_CONFIG_OPTION_INDIC block.
++
++	* src/autofit/afstyles.h: Update Telugu data; in particular, use
++	AF_WRITING_SYSTEM_LATIN.
++
++2014-10-18  David Wimsey  <david@wimsey.us>
++
++	[cmake] Add iOS build support.
++	From Savannah patch #8497.
++
++	* builds/cmake/iOS.cmake: New file.  Universal binaries are built
++	with both 32 and 64 bit arm architectures.
++
++	* CMakeLists.txt (IOS_PLATFORM): New variable for running the iOS
++	toolchain.  Possible values are `OS' to build on iOS, or
++	`SIMULATOR' to build on APPLE.
++
++2014-10-16  Behdad Esfahbod  <behdad@behdad.org>
++	    Werner Lemberg  <wl@gnu.org>
++
++	[cff] Add `CFF_CONFIG_OPTION_DARKENING_PARAMETERS' config macro.
++
++	* devel/ftoption.h, include/config/ftoption.h
++	(CFF_CONFIG_OPTION_DARKENING_PARAMETERS): New macro.
++
++	* src/cff/cffobjs.c (SET_DARKENING_PARAMETERS,
++	SET_DARKENING_PARAMETERS_0): New macros.
++	(cff_driver_init): Use new macros.
++
++2014-10-14  Alexei Podtelezhnikov  <apodtele@gmail.com>
++
++	[truetype] Limit delta shift range.
++
++	The valid range for delta shift is zero through six.  Negative values
++	are invalid according to
++
++	  https://developer.apple.com/fonts/TrueType-Reference-Manual/RM04/Chap4.html#delta%20shift
++
++	* src/truetype/ttobjs.h (delta_shift, delta_base): Make unsigned.
++	* src/truetype/ttinterp.h (DO_SDS): Throw an error if `delta_shift'
++	is out of range.
++	(Ins_DELTAP, Ins_DELTAC): Optimize for valid `delta_shift'.
++
++2014-10-16  Werner Lemberg  <wl@gnu.org>
++
++	A better fix for Savannah bug #43392.
++	Suggested by Doug Felt <dougfelt@gmail.com>.
++
++	* src/sfnt/ttsbit.c (tt_sbit_decoder_load_metrics): Set
++	`vertAdvance' to zero...
++
++	* src/truetype/ttgload.c (TT_Load_Glyph): ... and set here a default
++	value for `vertAdvance' based on `linearVertAdvance' in case
++	`vertAdvance' is zero.  Note that the previous computed ad-hoc value
++	for `linearVertAdvance' was apparently not tested in a real-life
++	situation.
++
++2014-10-14  David Weiß  <David.Weiss@ptvgroup.com>
++
++	[build] Better optimization settings for vc2010 solution file.
++
++	* builds/windows/vc2010/freetype.sln,
++	builds/windows/vc2010/freetype.vcxproj: Updated.
++
++2014-10-14  Werner Lemberg  <wl@gnu.org>
++
++	[autofit] Adjust Devenagari character range.
++
++	* src/autofit/afranges.c (af_deva_uniranges): Omit characters that
++	are common to all other Indic scripts.
++
++2014-10-12  Werner Lemberg  <wl@gnu.org>
++
++	[sfnt] Fix Savannah bug #43392.
++
++	* src/sfnt/ttsbit.c (tt_sbit_decoder_load_metrics): Don't let
++	vertical metrics uninitialized.
++
++2014-10-11  Alexei Podtelezhnikov  <apodtele@gmail.com>
++
++	[base] Small bbox correction.
++
++	* src/base/ftbbox.c (FT_Outline_Get_BBox): Start from nonsense bbox
++	instead of initial point that could be `off' in conic outlines.
++
++2014-10-08  Alexei Podtelezhnikov  <apodtele@gmail.com>
++
++	[base] Fix Savannah bug #43356.
++
++	* src/base/ftbbox.c (BBox_Move_To, BBox_Conic_To): Update bbox in case
++	of implicit `to'.
++	(BBox_Line_To): New emitter that does not update bbox.
++
++2014-10-08  Alexei Podtelezhnikov  <apodtele@gmail.com>
++
++	[base] Introduce and use new macro `FT_UPDATE_BBOX'
++
++	* src/base/ftbbox.c (FT_UPDATE_BBOX): New macro.
++	(FT_Outline_Get_BBox): Use it here.
++
 +2014-10-02  Alexei Podtelezhnikov  <apodtele@gmail.com>
 +
 +	[base] Significant optimization of `ft_div64by32'
@@ -818,6 +1085,287 @@ index ea1eb4a..4e17454 100644
  2014-03-06  Werner Lemberg  <wl@gnu.org>
  
  	* Version 2.5.3 released.
+diff --git a/builds/cmake/iOS.cmake b/builds/cmake/iOS.cmake
+new file mode 100644
+index 0000000..a41a7ac
+--- /dev/null
++++ b/builds/cmake/iOS.cmake
+@@ -0,0 +1,275 @@
++# iOS.cmake
++#
++# Copyright 2014 by
++# David Turner, Robert Wilhelm, and Werner Lemberg.
++#
++# Written by David Wimsey <david@wimsey.us>
++#
++# This file is part of the FreeType project, and may only be used, modified,
++# and distributed under the terms of the FreeType project license,
++# LICENSE.TXT.  By continuing to use, modify, or distribute this file you
++# indicate that you have read the license and understand and accept it
++# fully.
++#
++#
++# This file is derived from the files `Platform/Darwin.cmake' and
++# `Platform/UnixPaths.cmake', which are part of CMake 2.8.4.  It has been
++# altered for iOS development.
++
++
++# Options
++# -------
++#
++#   IOS_PLATFORM = OS | SIMULATOR
++#
++#     This decides whether SDKS are selected from the `iPhoneOS.platform' or
++#     `iPhoneSimulator.platform' folders.
++#
++#     OS - the default, used to build for iPhone and iPad physical devices,
++#       which have an ARM architecture.
++#     SIMULATOR - used to build for the Simulator platforms, which have an
++#       x86 architecture.
++#
++#   CMAKE_IOS_DEVELOPER_ROOT = /path/to/platform/Developer folder
++#
++#     By default, this location is automatically chosen based on the
++#     IOS_PLATFORM value above.  If you manually set this variable, it
++#     overrides the default location and forces the use of a particular
++#     Developer Platform.
++#
++#   CMAKE_IOS_SDK_ROOT = /path/to/platform/Developer/SDKs/SDK folder
++#
++#     By default, this location is automatically chosen based on the
++#     CMAKE_IOS_DEVELOPER_ROOT value.  In this case it is always the most
++#     up-to-date SDK found in the CMAKE_IOS_DEVELOPER_ROOT path.  If you
++#     manually set this variable, it forces the use of a specific SDK
++#     version.
++#
++#
++# Macros
++# ------
++#
++#   set_xcode_property (TARGET XCODE_PROPERTY XCODE_VALUE)
++#
++#     A convenience macro for setting Xcode specific properties on targets.
++#
++#     Example:
++#
++#       set_xcode_property(myioslib IPHONEOS_DEPLOYMENT_TARGET "3.1")
++#
++#   find_host_package (PROGRAM ARGS)
++#
++#     A macro to find executable programs on the host system, not within the
++#     iOS environment.  Thanks to the `android-cmake' project for providing
++#     the command.
++
++
++# standard settings
++set(CMAKE_SYSTEM_NAME Darwin)
++set(CMAKE_SYSTEM_VERSION 1)
++set(UNIX True)
++set(APPLE True)
++set(IOS True)
++
++# required as of cmake 2.8.10
++set(CMAKE_OSX_DEPLOYMENT_TARGET ""
++  CACHE STRING "Force unset of the deployment target for iOS" FORCE
++)
++
++# determine the cmake host system version so we know where to find the iOS
++# SDKs
++find_program(CMAKE_UNAME uname /bin /usr/bin /usr/local/bin)
++if (CMAKE_UNAME)
++  exec_program(uname ARGS -r OUTPUT_VARIABLE CMAKE_HOST_SYSTEM_VERSION)
++  string(REGEX REPLACE "^([0-9]+)\\.([0-9]+).*$" "\\1"
++    DARWIN_MAJOR_VERSION "${CMAKE_HOST_SYSTEM_VERSION}")
++endif (CMAKE_UNAME)
++
++# force the compilers to gcc for iOS
++include(CMakeForceCompiler)
++CMAKE_FORCE_C_COMPILER(gcc gcc)
++CMAKE_FORCE_CXX_COMPILER(g++ g++)
++
++# skip the platform compiler checks for cross compiling
++set(CMAKE_CXX_COMPILER_WORKS TRUE)
++set(CMAKE_C_COMPILER_WORKS TRUE)
++
++# all iOS/Darwin specific settings - some may be redundant
++set(CMAKE_SHARED_LIBRARY_PREFIX "lib")
++set(CMAKE_SHARED_LIBRARY_SUFFIX ".dylib")
++set(CMAKE_SHARED_MODULE_PREFIX "lib")
++set(CMAKE_SHARED_MODULE_SUFFIX ".so")
++set(CMAKE_MODULE_EXISTS 1)
++set(CMAKE_DL_LIBS "")
++
++set(CMAKE_C_OSX_COMPATIBILITY_VERSION_FLAG
++  "-compatibility_version ")
++set(CMAKE_C_OSX_CURRENT_VERSION_FLAG
++  "-current_version ")
++set(CMAKE_CXX_OSX_COMPATIBILITY_VERSION_FLAG
++  "${CMAKE_C_OSX_COMPATIBILITY_VERSION_FLAG}")
++set(CMAKE_CXX_OSX_CURRENT_VERSION_FLAG
++  "${CMAKE_C_OSX_CURRENT_VERSION_FLAG}")
++
++# hidden visibility is required for cxx on iOS
++set(CMAKE_C_FLAGS_INIT "")
++set(CMAKE_CXX_FLAGS_INIT
++  "-headerpad_max_install_names -fvisibility=hidden -fvisibility-inlines-hidden")
++
++set(CMAKE_C_LINK_FLAGS
++  "-Wl,-search_paths_first ${CMAKE_C_LINK_FLAGS}")
++set(CMAKE_CXX_LINK_FLAGS
++  "-Wl,-search_paths_first ${CMAKE_CXX_LINK_FLAGS}")
++
++set(CMAKE_PLATFORM_HAS_INSTALLNAME 1)
++set(CMAKE_SHARED_LIBRARY_CREATE_C_FLAGS
++  "-dynamiclib -headerpad_max_install_names")
++set(CMAKE_SHARED_MODULE_CREATE_C_FLAGS
++  "-bundle -headerpad_max_install_names")
++set(CMAKE_SHARED_MODULE_LOADER_C_FLAG
++  "-Wl,-bundle_loader,")
++set(CMAKE_SHARED_MODULE_LOADER_CXX_FLAG
++  "-Wl,-bundle_loader,")
++set(CMAKE_FIND_LIBRARY_SUFFIXES
++  ".dylib" ".so" ".a")
++
++# hack: If a new cmake (which uses CMAKE_INSTALL_NAME_TOOL) runs on an old
++#       build tree (where `install_name_tool' was hardcoded), and where
++#       CMAKE_INSTALL_NAME_TOOL isn't in the cache and still cmake didn't
++#       fail in `CMakeFindBinUtils.cmake' (because it isn't rerun), hardcode
++#       CMAKE_INSTALL_NAME_TOOL here to `install_name_tool' so it behaves as
++#       it did before.
++if (NOT DEFINED CMAKE_INSTALL_NAME_TOOL)
++  find_program(CMAKE_INSTALL_NAME_TOOL install_name_tool)
++endif (NOT DEFINED CMAKE_INSTALL_NAME_TOOL)
++
++# set up iOS platform unless specified manually with IOS_PLATFORM
++if (NOT DEFINED IOS_PLATFORM)
++  set(IOS_PLATFORM "OS")
++endif (NOT DEFINED IOS_PLATFORM)
++
++set(IOS_PLATFORM ${IOS_PLATFORM} CACHE STRING "Type of iOS Platform")
++
++# check the platform selection and setup for developer root
++if (${IOS_PLATFORM} STREQUAL "OS")
++  set(IOS_PLATFORM_LOCATION "iPhoneOS.platform")
++
++  # this causes the installers to properly locate the output libraries
++  set(CMAKE_XCODE_EFFECTIVE_PLATFORMS "-iphoneos")
++
++elseif (${IOS_PLATFORM} STREQUAL "SIMULATOR")
++  set(IOS_PLATFORM_LOCATION "iPhoneSimulator.platform")
++
++  # this causes the installers to properly locate the output libraries
++  set(CMAKE_XCODE_EFFECTIVE_PLATFORMS "-iphonesimulator")
++
++else (${IOS_PLATFORM} STREQUAL "OS")
++  message(FATAL_ERROR
++    "Unsupported IOS_PLATFORM value selected.  Please choose OS or SIMULATOR.")
++
++endif (${IOS_PLATFORM} STREQUAL "OS")
++
++# set up iOS developer location unless specified manually with
++# CMAKE_IOS_DEVELOPER_ROOT --
++# note that Xcode 4.3 changed the installation location; choose the most
++# recent one available
++set(XCODE_POST_43_ROOT
++  "/Applications/Xcode.app/Contents/Developer/Platforms/${IOS_PLATFORM_LOCATION}/Developer")
++set(XCODE_PRE_43_ROOT
++  "/Developer/Platforms/${IOS_PLATFORM_LOCATION}/Developer")
++
++if (NOT DEFINED CMAKE_IOS_DEVELOPER_ROOT)
++  if (EXISTS ${XCODE_POST_43_ROOT})
++    set(CMAKE_IOS_DEVELOPER_ROOT ${XCODE_POST_43_ROOT})
++  elseif (EXISTS ${XCODE_PRE_43_ROOT})
++    set(CMAKE_IOS_DEVELOPER_ROOT ${XCODE_PRE_43_ROOT})
++  endif (EXISTS ${XCODE_POST_43_ROOT})
++endif (NOT DEFINED CMAKE_IOS_DEVELOPER_ROOT)
++
++set(CMAKE_IOS_DEVELOPER_ROOT ${CMAKE_IOS_DEVELOPER_ROOT}
++  CACHE PATH "Location of iOS Platform"
++)
++
++# find and use the most recent iOS SDK unless specified manually with
++# CMAKE_IOS_SDK_ROOT
++if (NOT DEFINED CMAKE_IOS_SDK_ROOT)
++  file(GLOB _CMAKE_IOS_SDKS "${CMAKE_IOS_DEVELOPER_ROOT}/SDKs/*")
++  if (_CMAKE_IOS_SDKS)
++    list(SORT _CMAKE_IOS_SDKS)
++    list(REVERSE _CMAKE_IOS_SDKS)
++    list(GET _CMAKE_IOS_SDKS 0 CMAKE_IOS_SDK_ROOT)
++  else (_CMAKE_IOS_SDKS)
++    message(FATAL_ERROR
++      "No iOS SDK's found in default search path ${CMAKE_IOS_DEVELOPER_ROOT}.  Manually set CMAKE_IOS_SDK_ROOT or install the iOS SDK.")
++  endif (_CMAKE_IOS_SDKS)
++
++  message(STATUS "Toolchain using default iOS SDK: ${CMAKE_IOS_SDK_ROOT}")
++endif (NOT DEFINED CMAKE_IOS_SDK_ROOT)
++
++set(CMAKE_IOS_SDK_ROOT ${CMAKE_IOS_SDK_ROOT}
++  CACHE PATH "Location of the selected iOS SDK"
++)
++
++# set the sysroot default to the most recent SDK
++set(CMAKE_OSX_SYSROOT ${CMAKE_IOS_SDK_ROOT}
++  CACHE PATH "Sysroot used for iOS support"
++)
++
++# set the architecture for iOS --
++# note that currently both ARCHS_STANDARD_32_BIT and
++# ARCHS_UNIVERSAL_IPHONE_OS set armv7 only, so set both manually
++if (${IOS_PLATFORM} STREQUAL "OS")
++  set(IOS_ARCH $(ARCHS_STANDARD_32_64_BIT))
++else (${IOS_PLATFORM} STREQUAL "OS")
++  set(IOS_ARCH i386)
++endif (${IOS_PLATFORM} STREQUAL "OS")
++
++set(CMAKE_OSX_ARCHITECTURES ${IOS_ARCH}
++  CACHE string "Build architecture for iOS"
++)
++
++# set the find root to the iOS developer roots and to user defined paths
++set(CMAKE_FIND_ROOT_PATH
++  ${CMAKE_IOS_DEVELOPER_ROOT}
++  ${CMAKE_IOS_SDK_ROOT}
++  ${CMAKE_PREFIX_PATH}
++  CACHE string  "iOS find search path root"
++)
++
++# default to searching for frameworks first
++set(CMAKE_FIND_FRAMEWORK FIRST)
++
++# set up the default search directories for frameworks
++set(CMAKE_SYSTEM_FRAMEWORK_PATH
++  ${CMAKE_IOS_SDK_ROOT}/System/Library/Frameworks
++  ${CMAKE_IOS_SDK_ROOT}/System/Library/PrivateFrameworks
++  ${CMAKE_IOS_SDK_ROOT}/Developer/Library/Frameworks
++)
++
++# only search the iOS SDKs, not the remainder of the host filesystem
++set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM ONLY)
++set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
++set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
++
++# this little macro lets you set any Xcode specific property
++macro(set_xcode_property TARGET XCODE_PROPERTY XCODE_VALUE)
++  set_property(TARGET ${TARGET}
++    PROPERTY XCODE_ATTRIBUTE_${XCODE_PROPERTY} ${XCODE_VALUE})
++endmacro(set_xcode_property)
++
++# this macro lets you find executable programs on the host system
++macro(find_host_package)
++  set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
++  set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY NEVER)
++  set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE NEVER)
++  set(IOS FALSE)
++
++  find_package(${ARGN})
++
++  set(IOS TRUE)
++  set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM ONLY)
++  set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
++  set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
++endmacro(find_host_package)
++
++# eof
 diff --git a/builds/mac/freetype-Info.plist b/builds/mac/freetype-Info.plist
 new file mode 100644
 index 0000000..b3d114d
@@ -1598,6 +2146,1072 @@ index 3fb8f84..b309651 100644
  #ifdef FT_MAKE_OPTION_SINGLE_OBJECT
  
  #define FT_LOCAL( x )      static  x
+diff --git a/builds/windows/vc2010/freetype.sln b/builds/windows/vc2010/freetype.sln
+index e0f13a2..3bd176a 100644
+--- a/builds/windows/vc2010/freetype.sln
++++ b/builds/windows/vc2010/freetype.sln
+@@ -5,20 +5,24 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "freetype", "freetype.vcxpro
+ EndProject
+ Global
+ 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
++		Debug|Win32 = Debug|Win32
++		Debug|x64 = Debug|x64
+ 		Debug Multithreaded|Win32 = Debug Multithreaded|Win32
+ 		Debug Multithreaded|x64 = Debug Multithreaded|x64
+ 		Debug Singlethreaded|Win32 = Debug Singlethreaded|Win32
+ 		Debug Singlethreaded|x64 = Debug Singlethreaded|x64
+-		Debug|Win32 = Debug|Win32
+-		Debug|x64 = Debug|x64
++		Release|Win32 = Release|Win32
++		Release|x64 = Release|x64
+ 		Release Multithreaded|Win32 = Release Multithreaded|Win32
+ 		Release Multithreaded|x64 = Release Multithreaded|x64
+ 		Release Singlethreaded|Win32 = Release Singlethreaded|Win32
+ 		Release Singlethreaded|x64 = Release Singlethreaded|x64
+-		Release|Win32 = Release|Win32
+-		Release|x64 = Release|x64
+ 	EndGlobalSection
+ 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
++		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Debug|Win32.ActiveCfg = Debug|Win32
++		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Debug|Win32.Build.0 = Debug|Win32
++		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Debug|x64.ActiveCfg = Debug|x64
++		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Debug|x64.Build.0 = Debug|x64
+ 		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Debug Multithreaded|Win32.ActiveCfg = Debug Multithreaded|Win32
+ 		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Debug Multithreaded|Win32.Build.0 = Debug Multithreaded|Win32
+ 		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Debug Multithreaded|x64.ActiveCfg = Debug Multithreaded|x64
+@@ -27,10 +31,10 @@ Global
+ 		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Debug Singlethreaded|Win32.Build.0 = Debug Singlethreaded|Win32
+ 		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Debug Singlethreaded|x64.ActiveCfg = Debug Singlethreaded|x64
+ 		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Debug Singlethreaded|x64.Build.0 = Debug Singlethreaded|x64
+-		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Debug|Win32.ActiveCfg = Debug|Win32
+-		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Debug|Win32.Build.0 = Debug|Win32
+-		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Debug|x64.ActiveCfg = Debug|x64
+-		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Debug|x64.Build.0 = Debug|x64
++		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Release|Win32.ActiveCfg = Release|Win32
++		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Release|Win32.Build.0 = Release|Win32
++		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Release|x64.ActiveCfg = Release|x64
++		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Release|x64.Build.0 = Release|x64
+ 		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Release Multithreaded|Win32.ActiveCfg = Release Multithreaded|Win32
+ 		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Release Multithreaded|Win32.Build.0 = Release Multithreaded|Win32
+ 		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Release Multithreaded|x64.ActiveCfg = Release Multithreaded|x64
+@@ -39,10 +43,6 @@ Global
+ 		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Release Singlethreaded|Win32.Build.0 = Release Singlethreaded|Win32
+ 		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Release Singlethreaded|x64.ActiveCfg = Release Singlethreaded|x64
+ 		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Release Singlethreaded|x64.Build.0 = Release Singlethreaded|x64
+-		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Release|Win32.ActiveCfg = Release|Win32
+-		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Release|Win32.Build.0 = Release|Win32
+-		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Release|x64.ActiveCfg = Release|x64
+-		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}.Release|x64.Build.0 = Release|x64
+ 	EndGlobalSection
+ 	GlobalSection(SolutionProperties) = preSolution
+ 		HideSolutionNode = FALSE
+diff --git a/builds/windows/vc2010/freetype.user.props b/builds/windows/vc2010/freetype.user.props
+new file mode 100644
+index 0000000..0087650
+--- /dev/null
++++ b/builds/windows/vc2010/freetype.user.props
+@@ -0,0 +1,68 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!--
++ * freetype.user.props
++ *
++ * 
++ * You can specify custom options here without altering the project file.
++ *
++ * Multiple entries within each property are separated by semicolons (;).
++ *
++ * NOTE: If you want to link against zlib, libpng, bzip2 or harfbuzz, you
++ *       should alter these values appropriately.
++ -->
++
++<Project ToolsVersion="4.0"
++         xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
++  <PropertyGroup Label="Globals">
++  
++    <!--
++     * `;'-separated list of symbols to #define
++     -->
++    <UserDefines></UserDefines>
++    
++    <!--
++     * path where your custom `ftoption.h' lives;
++     * this is searched BEFORE any other path
++     -->
++    <!-- <UserOptionDirectory>..\..\..\devel</UserOptionDirectory> -->
++    <UserOptionDirectory></UserOptionDirectory>
++    
++    <!--
++     * `;'-separated list of paths to additional include directories,
++     * e.g., where to find zlib.h, png.h, etc.;
++     * this is searched AFTER any other path
++     -->
++    <!-- <UserIncludeDirectories>..\..\..\..\zlib-1.2.8;..\..\..\..\libpng-1.6.12</UserIncludeDirectories> -->
++    <UserIncludeDirectories></UserIncludeDirectories>
++    
++    <!--
++     * `;'-separated list of paths to additional library directories,
++     * e.g., where to find zlib.lib, libpng.lib, etc.
++     -->
++    <!-- <UserLibraryDirectories>..\..\..\..\zlib-1.2.8;..\..\..\..\libpng-1.6.12</UserLibraryDirectories> -->
++    <UserLibraryDirectories></UserLibraryDirectories>
++    
++    <!--
++     * `;'-separated list of additional linker dependencies,
++     * e.g., zlib.lib, libpng.lib, etc.
++     -->
++    <!-- <UserDependencies>zlib.lib;libpng16.lib</UserDependencies> -->
++    <UserDependencies></UserDependencies>
++    
++  </PropertyGroup>
++  
++  <!--
++   * Example configuration for x64 debug build only
++   -->
++
++  <!--
++    <PropertyGroup Label="DebugProperties"
++                   Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
++      <UserDefines>ENABLE_DEBUG_HELPER;ENABLE_DEBUG_LOGGING</UserDefines>
++      <UserOptionDirectory>config\debug</UserOptionDirectory>
++      <UserIncludeDirectories>C:\mydebughelp\include</UserIncludeDirectories>
++      <UserLibraryDirectories>C:\mydebughelp\lib</UserLibraryDirectories>
++      <UserDependencies>dhelper64.lib</UserDependencies>
++    </PropertyGroup>
++   -->
++</Project>
+diff --git a/builds/windows/vc2010/freetype.vcxproj b/builds/windows/vc2010/freetype.vcxproj
+index 1b94217..cf12ded 100644
+--- a/builds/windows/vc2010/freetype.vcxproj
++++ b/builds/windows/vc2010/freetype.vcxproj
+@@ -1,6 +1,14 @@
+ ﻿<?xml version="1.0" encoding="utf-8"?>
+ <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+   <ItemGroup Label="ProjectConfigurations">
++    <ProjectConfiguration Include="Debug|Win32">
++      <Configuration>Debug</Configuration>
++      <Platform>Win32</Platform>
++    </ProjectConfiguration>
++    <ProjectConfiguration Include="Debug|x64">
++      <Configuration>Debug</Configuration>
++      <Platform>x64</Platform>
++    </ProjectConfiguration>
+     <ProjectConfiguration Include="Debug Multithreaded|Win32">
+       <Configuration>Debug Multithreaded</Configuration>
+       <Platform>Win32</Platform>
+@@ -17,12 +25,12 @@
+       <Configuration>Debug Singlethreaded</Configuration>
+       <Platform>x64</Platform>
+     </ProjectConfiguration>
+-    <ProjectConfiguration Include="Debug|Win32">
+-      <Configuration>Debug</Configuration>
++    <ProjectConfiguration Include="Release|Win32">
++      <Configuration>Release</Configuration>
+       <Platform>Win32</Platform>
+     </ProjectConfiguration>
+-    <ProjectConfiguration Include="Debug|x64">
+-      <Configuration>Debug</Configuration>
++    <ProjectConfiguration Include="Release|x64">
++      <Configuration>Release</Configuration>
+       <Platform>x64</Platform>
+     </ProjectConfiguration>
+     <ProjectConfiguration Include="Release Multithreaded|Win32">
+@@ -41,62 +49,54 @@
+       <Configuration>Release Singlethreaded</Configuration>
+       <Platform>x64</Platform>
+     </ProjectConfiguration>
+-    <ProjectConfiguration Include="Release|Win32">
+-      <Configuration>Release</Configuration>
+-      <Platform>Win32</Platform>
+-    </ProjectConfiguration>
+-    <ProjectConfiguration Include="Release|x64">
+-      <Configuration>Release</Configuration>
+-      <Platform>x64</Platform>
+-    </ProjectConfiguration>
+   </ItemGroup>
+   <PropertyGroup Label="Globals">
+     <ProjectGuid>{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}</ProjectGuid>
+   </PropertyGroup>
+   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Multithreaded|Win32'" Label="Configuration">
++  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+     <ConfigurationType>StaticLibrary</ConfigurationType>
+     <UseOfMfc>false</UseOfMfc>
+     <CharacterSet>MultiByte</CharacterSet>
+     <PlatformToolset>v100</PlatformToolset>
+   </PropertyGroup>
+-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Multithreaded|x64'" Label="Configuration">
++  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+     <ConfigurationType>StaticLibrary</ConfigurationType>
+     <UseOfMfc>false</UseOfMfc>
+     <CharacterSet>MultiByte</CharacterSet>
+     <PlatformToolset>v100</PlatformToolset>
+   </PropertyGroup>
+-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Singlethreaded|Win32'" Label="Configuration">
++  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Multithreaded|Win32'" Label="Configuration">
+     <ConfigurationType>StaticLibrary</ConfigurationType>
+     <UseOfMfc>false</UseOfMfc>
+     <CharacterSet>MultiByte</CharacterSet>
+     <PlatformToolset>v100</PlatformToolset>
+   </PropertyGroup>
+-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Singlethreaded|x64'" Label="Configuration">
++  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Multithreaded|x64'" Label="Configuration">
+     <ConfigurationType>StaticLibrary</ConfigurationType>
+     <UseOfMfc>false</UseOfMfc>
+     <CharacterSet>MultiByte</CharacterSet>
+     <PlatformToolset>v100</PlatformToolset>
+   </PropertyGroup>
+-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
++  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Singlethreaded|Win32'" Label="Configuration">
+     <ConfigurationType>StaticLibrary</ConfigurationType>
+     <UseOfMfc>false</UseOfMfc>
+     <CharacterSet>MultiByte</CharacterSet>
+     <PlatformToolset>v100</PlatformToolset>
+   </PropertyGroup>
+-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
++  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Singlethreaded|x64'" Label="Configuration">
+     <ConfigurationType>StaticLibrary</ConfigurationType>
+     <UseOfMfc>false</UseOfMfc>
+     <CharacterSet>MultiByte</CharacterSet>
+     <PlatformToolset>v100</PlatformToolset>
+   </PropertyGroup>
+-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Singlethreaded|Win32'" Label="Configuration">
++  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+     <ConfigurationType>StaticLibrary</ConfigurationType>
+     <UseOfMfc>false</UseOfMfc>
+     <CharacterSet>MultiByte</CharacterSet>
+     <PlatformToolset>v100</PlatformToolset>
+   </PropertyGroup>
+-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Singlethreaded|x64'" Label="Configuration">
++  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+     <ConfigurationType>StaticLibrary</ConfigurationType>
+     <UseOfMfc>false</UseOfMfc>
+     <CharacterSet>MultiByte</CharacterSet>
+@@ -114,13 +114,13 @@
+     <CharacterSet>MultiByte</CharacterSet>
+     <PlatformToolset>v100</PlatformToolset>
+   </PropertyGroup>
+-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
++  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Singlethreaded|Win32'" Label="Configuration">
+     <ConfigurationType>StaticLibrary</ConfigurationType>
+     <UseOfMfc>false</UseOfMfc>
+     <CharacterSet>MultiByte</CharacterSet>
+     <PlatformToolset>v100</PlatformToolset>
+   </PropertyGroup>
+-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
++  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Singlethreaded|x64'" Label="Configuration">
+     <ConfigurationType>StaticLibrary</ConfigurationType>
+     <UseOfMfc>false</UseOfMfc>
+     <CharacterSet>MultiByte</CharacterSet>
+@@ -131,18 +131,36 @@
+   </ImportGroup>
+   <PropertyGroup>
+     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\..\..\..\objs\win32\vc2010\</OutDir>
+-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\..\..\..\objs\release\</IntDir>
+-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release Multithreaded|Win32'">.\..\..\..\objs\win32\vc2010\</OutDir>
+-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release Multithreaded|Win32'">.\..\..\..\objs\release_mt\</IntDir>
+-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release Singlethreaded|Win32'">.\..\..\..\objs\win32\vc2010\</OutDir>
+-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release Singlethreaded|Win32'">.\..\..\..\objs\release_st\</IntDir>
+-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\..\..\..\objs\win32\vc2010\</OutDir>
+-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\..\..\..\objs\debug\</IntDir>
+-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug Singlethreaded|Win32'">.\..\..\..\objs\win32\vc2010\</OutDir>
+-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug Singlethreaded|Win32'">.\..\..\..\objs\debug_st\</IntDir>
+-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug Multithreaded|Win32'">.\..\..\..\objs\win32\vc2010\</OutDir>
+-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug Multithreaded|Win32'">.\..\..\..\objs\debug_mt\</IntDir>
++    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\..\..\..\objs\vc2010\$(Platform)\</OutDir>
++    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\..\..\..\objs\vc2010\$(Platform)\$(Configuration)\</IntDir>
++    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\..\..\..\objs\vc2010\$(Platform)\</OutDir>
++    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\..\..\..\objs\vc2010\$(Platform)\$(Configuration)\</IntDir>
++    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug Multithreaded|Win32'">.\..\..\..\objs\vc2010\$(Platform)\</OutDir>
++    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug Multithreaded|Win32'">.\..\..\..\objs\vc2010\$(Platform)\$(Configuration)\</IntDir>
++    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug Multithreaded|x64'">.\..\..\..\objs\vc2010\$(Platform)\</OutDir>
++    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug Multithreaded|x64'">.\..\..\..\objs\vc2010\$(Platform)\$(Configuration)\</IntDir>
++    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug Singlethreaded|Win32'">.\..\..\..\objs\vc2010\$(Platform)\</OutDir>
++    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug Singlethreaded|Win32'">.\..\..\..\objs\vc2010\$(Platform)\$(Configuration)\</IntDir>
++    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug Singlethreaded|x64'">.\..\..\..\objs\vc2010\$(Platform)\</OutDir>
++    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug Singlethreaded|x64'">.\..\..\..\objs\vc2010\$(Platform)\$(Configuration)\</IntDir>
++    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\..\..\..\objs\vc2010\$(Platform)\</OutDir>
++    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\..\..\..\objs\vc2010\$(Platform)\$(Configuration)\</IntDir>
++    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\..\..\..\objs\vc2010\$(Platform)\</OutDir>
++    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\..\..\..\objs\vc2010\$(Platform)\$(Configuration)\</IntDir>
++    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release Multithreaded|Win32'">.\..\..\..\objs\vc2010\$(Platform)\</OutDir>
++    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release Multithreaded|Win32'">.\..\..\..\objs\vc2010\$(Platform)\$(Configuration)\</IntDir>
++    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release Multithreaded|x64'">.\..\..\..\objs\vc2010\$(Platform)\</OutDir>
++    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release Multithreaded|x64'">.\..\..\..\objs\vc2010\$(Platform)\$(Configuration)\</IntDir>
++    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release Singlethreaded|Win32'">.\..\..\..\objs\vc2010\$(Platform)\</OutDir>
++    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release Singlethreaded|Win32'">.\..\..\..\objs\vc2010\$(Platform)\$(Configuration)\</IntDir>
++    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release Singlethreaded|x64'">.\..\..\..\objs\vc2010\$(Platform)\</OutDir>
++    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release Singlethreaded|x64'">.\..\..\..\objs\vc2010\$(Platform)\$(Configuration)\</IntDir>
++    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
++    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
++    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
++    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
++    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
++    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
+     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug Multithreaded|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug Multithreaded|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
+     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug Multithreaded|Win32'" />
+@@ -155,12 +173,12 @@
+     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug Singlethreaded|x64'" />
+     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug Singlethreaded|Win32'" />
+     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug Singlethreaded|x64'" />
+-    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+-    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
+-    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+-    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
+-    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+-    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
++    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
++    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
++    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
++    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
++    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
++    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
+     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release Multithreaded|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release Multithreaded|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
+     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release Multithreaded|Win32'" />
+@@ -173,18 +191,12 @@
+     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release Singlethreaded|x64'" />
+     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release Singlethreaded|Win32'" />
+     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release Singlethreaded|x64'" />
+-    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+-    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
+-    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+-    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
+-    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+-    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
+-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">freetype253_D</TargetName>
+-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">freetype253_D</TargetName>
+-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug Multithreaded|Win32'">freetype253MT_D</TargetName>
+-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug Multithreaded|x64'">freetype253MT_D</TargetName>
+-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug Singlethreaded|Win32'">freetype253ST_D</TargetName>
+-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug Singlethreaded|x64'">freetype253ST_D</TargetName>
++    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">freetype253d</TargetName>
++    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">freetype253d</TargetName>
++    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug Multithreaded|Win32'">freetype253MTd</TargetName>
++    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug Multithreaded|x64'">freetype253MTd</TargetName>
++    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug Singlethreaded|Win32'">freetype253STd</TargetName>
++    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug Singlethreaded|x64'">freetype253STd</TargetName>
+     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">freetype253</TargetName>
+     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">freetype253</TargetName>
+     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release Multithreaded|Win32'">freetype253MT</TargetName>
+@@ -192,290 +204,419 @@
+     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release Singlethreaded|Win32'">freetype253ST</TargetName>
+     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release Singlethreaded|x64'">freetype253ST</TargetName>
+   </PropertyGroup>
+-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+-    <OutDir>.\..\..\..\objs\win64\vc2010\</OutDir>
+-    <IntDir>.\..\..\..\objs\debug\</IntDir>
+-  </PropertyGroup>
+-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
++  <Import Project="$(SolutionDir)\freetype.user.props" Condition="exists('$(SolutionDir)\freetype.user.props')" Label="UserProperties" />
++  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+     <ClCompile>
+-      <Optimization>MaxSpeed</Optimization>
+-      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+-      <AdditionalIncludeDirectories>..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+-      <PreprocessorDefinitions>NDEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+-      <StringPooling>true</StringPooling>
+-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+-      <FunctionLevelLinking>true</FunctionLevelLinking>
++      <Optimization>Disabled</Optimization>
++      <AdditionalIncludeDirectories>$(UserOptionDirectory);..\..\..\include;$(UserIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
++      <PreprocessorDefinitions>_DEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;FT_DEBUG_LEVEL_ERROR;FT_DEBUG_LEVEL_TRACE;FT2_BUILD_LIBRARY;$(UserDefines);%(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
++      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+       <DisableLanguageExtensions>true</DisableLanguageExtensions>
+       <WarningLevel>Level4</WarningLevel>
+-      <DebugInformationFormat>
+-      </DebugInformationFormat>
++      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+       <CompileAs>Default</CompileAs>
+       <DisableSpecificWarnings>4001</DisableSpecificWarnings>
+       <MultiProcessorCompilation>true</MultiProcessorCompilation>
++      <CompileAsManaged>false</CompileAsManaged>
++      <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
++      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+     </ClCompile>
+     <ResourceCompile>
+-      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <PreprocessorDefinitions>_DEBUG;$(UserDefines);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+       <Culture>0x0409</Culture>
+     </ResourceCompile>
+     <Lib>
+       <SuppressStartupBanner>true</SuppressStartupBanner>
++      <TargetMachine>MachineX86</TargetMachine>
++      <AdditionalLibraryDirectories>$(UserLibraryDirectories);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
++      <AdditionalDependencies>$(UserDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+     </Lib>
+   </ItemDefinitionGroup>
+-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
++  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+     <ClCompile>
+-      <Optimization>MaxSpeed</Optimization>
+-      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+-      <AdditionalIncludeDirectories>..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+-      <PreprocessorDefinitions>NDEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+-      <StringPooling>true</StringPooling>
+-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+-      <FunctionLevelLinking>true</FunctionLevelLinking>
++      <Optimization>Disabled</Optimization>
++      <AdditionalIncludeDirectories>$(UserOptionDirectory);..\..\..\include;$(UserIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
++      <PreprocessorDefinitions>_DEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;FT_DEBUG_LEVEL_ERROR;FT_DEBUG_LEVEL_TRACE;FT2_BUILD_LIBRARY;$(UserDefines);%(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
++      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+       <DisableLanguageExtensions>true</DisableLanguageExtensions>
+       <WarningLevel>Level4</WarningLevel>
+-      <DebugInformationFormat>
+-      </DebugInformationFormat>
++      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+       <CompileAs>Default</CompileAs>
+       <DisableSpecificWarnings>4001</DisableSpecificWarnings>
+       <MultiProcessorCompilation>true</MultiProcessorCompilation>
++      <CompileAsManaged>false</CompileAsManaged>
++      <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
++      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+     </ClCompile>
+     <ResourceCompile>
+-      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <PreprocessorDefinitions>_DEBUG;$(UserDefines);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+       <Culture>0x0409</Culture>
+     </ResourceCompile>
+     <Lib>
+       <SuppressStartupBanner>true</SuppressStartupBanner>
++      <TargetMachine>MachineX64</TargetMachine>
++      <AdditionalLibraryDirectories>$(UserLibraryDirectories);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
++      <AdditionalDependencies>$(UserDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+     </Lib>
+   </ItemDefinitionGroup>
+-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Multithreaded|Win32'">
++  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Multithreaded|Win32'">
+     <ClCompile>
+-      <Optimization>MaxSpeed</Optimization>
+-      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+-      <AdditionalIncludeDirectories>..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+-      <PreprocessorDefinitions>NDEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+-      <StringPooling>true</StringPooling>
+-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+-      <FunctionLevelLinking>true</FunctionLevelLinking>
++      <Optimization>Disabled</Optimization>
++      <AdditionalIncludeDirectories>$(UserOptionDirectory);..\..\..\include;$(UserIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
++      <PreprocessorDefinitions>_DEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;FT_DEBUG_LEVEL_ERROR;FT_DEBUG_LEVEL_TRACE;FT2_BUILD_LIBRARY;_CRT_SECURE_NO_DEPRECATE;$(UserDefines);%(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <PreprocessToFile>false</PreprocessToFile>
++      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
++      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
++      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+       <DisableLanguageExtensions>true</DisableLanguageExtensions>
+       <WarningLevel>Level4</WarningLevel>
+-      <DebugInformationFormat>
+-      </DebugInformationFormat>
++      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+       <CompileAs>Default</CompileAs>
+       <DisableSpecificWarnings>4001</DisableSpecificWarnings>
+       <MultiProcessorCompilation>true</MultiProcessorCompilation>
++      <CompileAsManaged>false</CompileAsManaged>
++      <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
++      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+     </ClCompile>
+     <ResourceCompile>
+-      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <PreprocessorDefinitions>_DEBUG;$(UserDefines);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+       <Culture>0x0409</Culture>
+     </ResourceCompile>
+     <Lib>
+       <SuppressStartupBanner>true</SuppressStartupBanner>
++      <TargetMachine>MachineX86</TargetMachine>
++      <AdditionalLibraryDirectories>$(UserLibraryDirectories);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
++      <AdditionalDependencies>$(UserDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+     </Lib>
+   </ItemDefinitionGroup>
+-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Multithreaded|x64'">
++  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Multithreaded|x64'">
+     <ClCompile>
+-      <Optimization>MaxSpeed</Optimization>
+-      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+-      <AdditionalIncludeDirectories>..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+-      <PreprocessorDefinitions>NDEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+-      <StringPooling>true</StringPooling>
+-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+-      <FunctionLevelLinking>true</FunctionLevelLinking>
++      <Optimization>Disabled</Optimization>
++      <AdditionalIncludeDirectories>$(UserOptionDirectory);..\..\..\include;$(UserIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
++      <PreprocessorDefinitions>_DEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;FT_DEBUG_LEVEL_ERROR;FT_DEBUG_LEVEL_TRACE;FT2_BUILD_LIBRARY;_CRT_SECURE_NO_DEPRECATE;$(UserDefines);%(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <PreprocessToFile>false</PreprocessToFile>
++      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
++      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
++      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+       <DisableLanguageExtensions>true</DisableLanguageExtensions>
+       <WarningLevel>Level4</WarningLevel>
+-      <DebugInformationFormat>
+-      </DebugInformationFormat>
++      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+       <CompileAs>Default</CompileAs>
+       <DisableSpecificWarnings>4001</DisableSpecificWarnings>
+       <MultiProcessorCompilation>true</MultiProcessorCompilation>
++      <CompileAsManaged>false</CompileAsManaged>
++      <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
++      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+     </ClCompile>
+     <ResourceCompile>
+-      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <PreprocessorDefinitions>_DEBUG;$(UserDefines);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+       <Culture>0x0409</Culture>
+     </ResourceCompile>
+     <Lib>
+       <SuppressStartupBanner>true</SuppressStartupBanner>
++      <TargetMachine>MachineX64</TargetMachine>
++      <AdditionalLibraryDirectories>$(UserLibraryDirectories);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
++      <AdditionalDependencies>$(UserDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+     </Lib>
+   </ItemDefinitionGroup>
+-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Singlethreaded|Win32'">
++  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Singlethreaded|Win32'">
+     <ClCompile>
+-      <Optimization>MaxSpeed</Optimization>
+-      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+-      <AdditionalIncludeDirectories>..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+-      <PreprocessorDefinitions>NDEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+-      <StringPooling>true</StringPooling>
+-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+-      <FunctionLevelLinking>true</FunctionLevelLinking>
++      <Optimization>Disabled</Optimization>
++      <AdditionalIncludeDirectories>$(UserOptionDirectory);..\..\..\include;$(UserIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
++      <PreprocessorDefinitions>_DEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;FT_DEBUG_LEVEL_ERROR;FT_DEBUG_LEVEL_TRACE;FT2_BUILD_LIBRARY;$(UserDefines);%(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
++      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+       <DisableLanguageExtensions>true</DisableLanguageExtensions>
+       <WarningLevel>Level4</WarningLevel>
+-      <DebugInformationFormat>
+-      </DebugInformationFormat>
++      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+       <CompileAs>Default</CompileAs>
+       <DisableSpecificWarnings>4001</DisableSpecificWarnings>
+       <MultiProcessorCompilation>true</MultiProcessorCompilation>
++      <CompileAsManaged>false</CompileAsManaged>
++      <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
++      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+     </ClCompile>
+     <ResourceCompile>
+-      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <PreprocessorDefinitions>_DEBUG;$(UserDefines);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+       <Culture>0x0409</Culture>
+     </ResourceCompile>
+-    <Lib />
++    <Lib>
++      <SuppressStartupBanner>true</SuppressStartupBanner>
++      <TargetMachine>MachineX86</TargetMachine>
++      <AdditionalLibraryDirectories>$(UserLibraryDirectories);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
++      <AdditionalDependencies>$(UserDependencies);%(AdditionalDependencies)</AdditionalDependencies>
++    </Lib>
+   </ItemDefinitionGroup>
+-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Singlethreaded|x64'">
++  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Singlethreaded|x64'">
+     <ClCompile>
+-      <Optimization>MaxSpeed</Optimization>
+-      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+-      <AdditionalIncludeDirectories>..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+-      <PreprocessorDefinitions>NDEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+-      <StringPooling>true</StringPooling>
+-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+-      <FunctionLevelLinking>true</FunctionLevelLinking>
++      <Optimization>Disabled</Optimization>
++      <AdditionalIncludeDirectories>$(UserOptionDirectory);..\..\..\include;$(UserIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
++      <PreprocessorDefinitions>_DEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;FT_DEBUG_LEVEL_ERROR;FT_DEBUG_LEVEL_TRACE;FT2_BUILD_LIBRARY;$(UserDefines);%(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
++      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+       <DisableLanguageExtensions>true</DisableLanguageExtensions>
+       <WarningLevel>Level4</WarningLevel>
+-      <DebugInformationFormat>
+-      </DebugInformationFormat>
++      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+       <CompileAs>Default</CompileAs>
+       <DisableSpecificWarnings>4001</DisableSpecificWarnings>
+       <MultiProcessorCompilation>true</MultiProcessorCompilation>
++      <CompileAsManaged>false</CompileAsManaged>
++      <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
++      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+     </ClCompile>
+     <ResourceCompile>
+-      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <PreprocessorDefinitions>_DEBUG;$(UserDefines);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+       <Culture>0x0409</Culture>
+     </ResourceCompile>
+-    <Lib />
++    <Lib>
++      <SuppressStartupBanner>true</SuppressStartupBanner>
++      <TargetMachine>MachineX64</TargetMachine>
++      <AdditionalLibraryDirectories>$(UserLibraryDirectories);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
++      <AdditionalDependencies>$(UserDependencies);%(AdditionalDependencies)</AdditionalDependencies>
++    </Lib>
+   </ItemDefinitionGroup>
+-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
++  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+     <ClCompile>
+-      <Optimization>Disabled</Optimization>
+-      <AdditionalIncludeDirectories>..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+-      <PreprocessorDefinitions>_DEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;FT_DEBUG_LEVEL_ERROR;FT_DEBUG_LEVEL_TRACE;FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
++      <Optimization>Full</Optimization>
++      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
++      <AdditionalIncludeDirectories>$(UserOptionDirectory);..\..\..\include;$(UserIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
++      <PreprocessorDefinitions>NDEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;FT2_BUILD_LIBRARY;$(UserDefines);%(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <StringPooling>true</StringPooling>
++      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
++      <FunctionLevelLinking>true</FunctionLevelLinking>
+       <DisableLanguageExtensions>true</DisableLanguageExtensions>
+       <WarningLevel>Level4</WarningLevel>
+-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+       <CompileAs>Default</CompileAs>
+       <DisableSpecificWarnings>4001</DisableSpecificWarnings>
+       <MultiProcessorCompilation>true</MultiProcessorCompilation>
++      <WholeProgramOptimization>false</WholeProgramOptimization>
++      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
++      <FloatingPointExceptions>false</FloatingPointExceptions>
++      <CreateHotpatchableImage>false</CreateHotpatchableImage>
++      <CompileAsManaged>false</CompileAsManaged>
++      <ProgramDataBaseFileName>
++      </ProgramDataBaseFileName>
++      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
++      <DebugInformationFormat>
++      </DebugInformationFormat>
++      <IntrinsicFunctions>true</IntrinsicFunctions>
++      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
++      <OmitFramePointers>true</OmitFramePointers>
+     </ClCompile>
+     <ResourceCompile>
+-      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <PreprocessorDefinitions>NDEBUG;$(UserDefines);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+       <Culture>0x0409</Culture>
+     </ResourceCompile>
+     <Lib>
+       <SuppressStartupBanner>true</SuppressStartupBanner>
++      <LinkTimeCodeGeneration>true</LinkTimeCodeGeneration>
++      <TargetMachine>MachineX86</TargetMachine>
++      <AdditionalLibraryDirectories>$(UserLibraryDirectories);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
++      <AdditionalDependencies>$(UserDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+     </Lib>
+   </ItemDefinitionGroup>
+-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
++  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+     <ClCompile>
+-      <Optimization>Disabled</Optimization>
+-      <AdditionalIncludeDirectories>..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+-      <PreprocessorDefinitions>_DEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;FT_DEBUG_LEVEL_ERROR;FT_DEBUG_LEVEL_TRACE;FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
++      <Optimization>Full</Optimization>
++      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
++      <AdditionalIncludeDirectories>$(UserOptionDirectory);..\..\..\include;$(UserIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
++      <PreprocessorDefinitions>NDEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;FT2_BUILD_LIBRARY;$(UserDefines);%(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <StringPooling>true</StringPooling>
++      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
++      <FunctionLevelLinking>true</FunctionLevelLinking>
+       <DisableLanguageExtensions>true</DisableLanguageExtensions>
+       <WarningLevel>Level4</WarningLevel>
+-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+       <CompileAs>Default</CompileAs>
+       <DisableSpecificWarnings>4001</DisableSpecificWarnings>
+       <MultiProcessorCompilation>true</MultiProcessorCompilation>
++      <WholeProgramOptimization>false</WholeProgramOptimization>
++      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
++      <FloatingPointExceptions>false</FloatingPointExceptions>
++      <CreateHotpatchableImage>false</CreateHotpatchableImage>
++      <CompileAsManaged>false</CompileAsManaged>
++      <ProgramDataBaseFileName>
++      </ProgramDataBaseFileName>
++      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
++      <DebugInformationFormat>
++      </DebugInformationFormat>
++      <IntrinsicFunctions>true</IntrinsicFunctions>
++      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
++      <OmitFramePointers>true</OmitFramePointers>
+     </ClCompile>
+     <ResourceCompile>
+-      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <PreprocessorDefinitions>NDEBUG;$(UserDefines);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+       <Culture>0x0409</Culture>
+     </ResourceCompile>
+     <Lib>
+       <SuppressStartupBanner>true</SuppressStartupBanner>
++      <LinkTimeCodeGeneration>true</LinkTimeCodeGeneration>
++      <TargetMachine>MachineX64</TargetMachine>
++      <AdditionalLibraryDirectories>$(UserLibraryDirectories);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
++      <AdditionalDependencies>$(UserDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+     </Lib>
+   </ItemDefinitionGroup>
+-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Singlethreaded|Win32'">
++  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Multithreaded|Win32'">
+     <ClCompile>
+-      <Optimization>Disabled</Optimization>
+-      <AdditionalIncludeDirectories>..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+-      <PreprocessorDefinitions>_DEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;FT_DEBUG_LEVEL_ERROR;FT_DEBUG_LEVEL_TRACE;FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
++      <Optimization>Full</Optimization>
++      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
++      <AdditionalIncludeDirectories>$(UserOptionDirectory);..\..\..\include;$(UserIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
++      <PreprocessorDefinitions>NDEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;FT2_BUILD_LIBRARY;$(UserDefines);%(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <StringPooling>true</StringPooling>
++      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
++      <FunctionLevelLinking>true</FunctionLevelLinking>
+       <DisableLanguageExtensions>true</DisableLanguageExtensions>
+       <WarningLevel>Level4</WarningLevel>
+-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+       <CompileAs>Default</CompileAs>
+       <DisableSpecificWarnings>4001</DisableSpecificWarnings>
+       <MultiProcessorCompilation>true</MultiProcessorCompilation>
++      <WholeProgramOptimization>false</WholeProgramOptimization>
++      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
++      <FloatingPointExceptions>false</FloatingPointExceptions>
++      <CreateHotpatchableImage>false</CreateHotpatchableImage>
++      <RuntimeTypeInfo>false</RuntimeTypeInfo>
++      <CompileAsManaged>false</CompileAsManaged>
++      <ProgramDataBaseFileName>
++      </ProgramDataBaseFileName>
++      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
++      <DebugInformationFormat>
++      </DebugInformationFormat>
++      <IntrinsicFunctions>true</IntrinsicFunctions>
++      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
++      <OmitFramePointers>true</OmitFramePointers>
+     </ClCompile>
+     <ResourceCompile>
+-      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <PreprocessorDefinitions>NDEBUG;$(UserDefines);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+       <Culture>0x0409</Culture>
+     </ResourceCompile>
+     <Lib>
+       <SuppressStartupBanner>true</SuppressStartupBanner>
++      <LinkTimeCodeGeneration>true</LinkTimeCodeGeneration>
++      <TargetMachine>MachineX86</TargetMachine>
++      <AdditionalLibraryDirectories>$(UserLibraryDirectories);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
++      <AdditionalDependencies>$(UserDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+     </Lib>
+   </ItemDefinitionGroup>
+-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Singlethreaded|x64'">
++  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Multithreaded|x64'">
+     <ClCompile>
+-      <Optimization>Disabled</Optimization>
+-      <AdditionalIncludeDirectories>..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+-      <PreprocessorDefinitions>_DEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;FT_DEBUG_LEVEL_ERROR;FT_DEBUG_LEVEL_TRACE;FT2_BUILD_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
++      <Optimization>Full</Optimization>
++      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
++      <AdditionalIncludeDirectories>$(UserOptionDirectory);..\..\..\include;$(UserIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
++      <PreprocessorDefinitions>NDEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;FT2_BUILD_LIBRARY;$(UserDefines);%(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <StringPooling>true</StringPooling>
++      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
++      <FunctionLevelLinking>true</FunctionLevelLinking>
+       <DisableLanguageExtensions>true</DisableLanguageExtensions>
+       <WarningLevel>Level4</WarningLevel>
+-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+       <CompileAs>Default</CompileAs>
+       <DisableSpecificWarnings>4001</DisableSpecificWarnings>
+       <MultiProcessorCompilation>true</MultiProcessorCompilation>
++      <WholeProgramOptimization>false</WholeProgramOptimization>
++      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
++      <FloatingPointExceptions>false</FloatingPointExceptions>
++      <CreateHotpatchableImage>false</CreateHotpatchableImage>
++      <RuntimeTypeInfo>false</RuntimeTypeInfo>
++      <CompileAsManaged>false</CompileAsManaged>
++      <ProgramDataBaseFileName>
++      </ProgramDataBaseFileName>
++      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
++      <DebugInformationFormat>
++      </DebugInformationFormat>
++      <IntrinsicFunctions>true</IntrinsicFunctions>
++      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
++      <OmitFramePointers>true</OmitFramePointers>
+     </ClCompile>
+     <ResourceCompile>
+-      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <PreprocessorDefinitions>NDEBUG;$(UserDefines);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+       <Culture>0x0409</Culture>
+     </ResourceCompile>
+     <Lib>
+       <SuppressStartupBanner>true</SuppressStartupBanner>
++      <LinkTimeCodeGeneration>true</LinkTimeCodeGeneration>
++      <TargetMachine>MachineX64</TargetMachine>
++      <AdditionalLibraryDirectories>$(UserLibraryDirectories);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
++      <AdditionalDependencies>$(UserDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+     </Lib>
+   </ItemDefinitionGroup>
+-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Multithreaded|Win32'">
++  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Singlethreaded|Win32'">
+     <ClCompile>
+-      <Optimization>Disabled</Optimization>
+-      <AdditionalIncludeDirectories>..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+-      <PreprocessorDefinitions>_DEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;FT_DEBUG_LEVEL_ERROR;FT_DEBUG_LEVEL_TRACE;FT2_BUILD_LIBRARY;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+-      <PreprocessToFile>false</PreprocessToFile>
+-      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
+-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
++      <Optimization>Full</Optimization>
++      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
++      <AdditionalIncludeDirectories>$(UserOptionDirectory);..\..\..\include;$(UserIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
++      <PreprocessorDefinitions>NDEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;FT2_BUILD_LIBRARY;$(UserDefines);%(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <StringPooling>true</StringPooling>
++      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
++      <FunctionLevelLinking>true</FunctionLevelLinking>
+       <DisableLanguageExtensions>true</DisableLanguageExtensions>
+       <WarningLevel>Level4</WarningLevel>
+-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+       <CompileAs>Default</CompileAs>
+       <DisableSpecificWarnings>4001</DisableSpecificWarnings>
+       <MultiProcessorCompilation>true</MultiProcessorCompilation>
++      <WholeProgramOptimization>false</WholeProgramOptimization>
++      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
++      <FloatingPointExceptions>false</FloatingPointExceptions>
++      <CreateHotpatchableImage>false</CreateHotpatchableImage>
++      <CompileAsManaged>false</CompileAsManaged>
++      <ProgramDataBaseFileName>
++      </ProgramDataBaseFileName>
++      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
++      <DebugInformationFormat>
++      </DebugInformationFormat>
++      <IntrinsicFunctions>true</IntrinsicFunctions>
++      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
++      <OmitFramePointers>true</OmitFramePointers>
+     </ClCompile>
+     <ResourceCompile>
+-      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <PreprocessorDefinitions>NDEBUG;$(UserDefines);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+       <Culture>0x0409</Culture>
+     </ResourceCompile>
++    <Lib />
+     <Lib>
+-      <SuppressStartupBanner>true</SuppressStartupBanner>
++      <LinkTimeCodeGeneration>true</LinkTimeCodeGeneration>
++      <TargetMachine>MachineX86</TargetMachine>
++      <AdditionalLibraryDirectories>$(UserLibraryDirectories);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
++      <AdditionalDependencies>$(UserDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+     </Lib>
+   </ItemDefinitionGroup>
+-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Multithreaded|x64'">
++  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Singlethreaded|x64'">
+     <ClCompile>
+-      <Optimization>Disabled</Optimization>
+-      <AdditionalIncludeDirectories>..\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+-      <PreprocessorDefinitions>_DEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;FT_DEBUG_LEVEL_ERROR;FT_DEBUG_LEVEL_TRACE;FT2_BUILD_LIBRARY;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+-      <PreprocessToFile>false</PreprocessToFile>
+-      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
+-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
++      <Optimization>Full</Optimization>
++      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
++      <AdditionalIncludeDirectories>$(UserOptionDirectory);..\..\..\include;$(UserIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
++      <PreprocessorDefinitions>NDEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;FT2_BUILD_LIBRARY;$(UserDefines);%(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <StringPooling>true</StringPooling>
++      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
++      <FunctionLevelLinking>true</FunctionLevelLinking>
+       <DisableLanguageExtensions>true</DisableLanguageExtensions>
+       <WarningLevel>Level4</WarningLevel>
+-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+       <CompileAs>Default</CompileAs>
+       <DisableSpecificWarnings>4001</DisableSpecificWarnings>
+       <MultiProcessorCompilation>true</MultiProcessorCompilation>
++      <WholeProgramOptimization>false</WholeProgramOptimization>
++      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
++      <FloatingPointExceptions>false</FloatingPointExceptions>
++      <CreateHotpatchableImage>false</CreateHotpatchableImage>
++      <CompileAsManaged>false</CompileAsManaged>
++      <ProgramDataBaseFileName>
++      </ProgramDataBaseFileName>
++      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
++      <DebugInformationFormat>
++      </DebugInformationFormat>
++      <IntrinsicFunctions>true</IntrinsicFunctions>
++      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
++      <OmitFramePointers>true</OmitFramePointers>
+     </ClCompile>
+     <ResourceCompile>
+-      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <PreprocessorDefinitions>NDEBUG;$(UserDefines);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+       <Culture>0x0409</Culture>
+     </ResourceCompile>
++    <Lib />
+     <Lib>
+-      <SuppressStartupBanner>true</SuppressStartupBanner>
++      <LinkTimeCodeGeneration>true</LinkTimeCodeGeneration>
++      <TargetMachine>MachineX64</TargetMachine>
++      <AdditionalLibraryDirectories>$(UserLibraryDirectories);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
++      <AdditionalDependencies>$(UserDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+     </Lib>
+   </ItemDefinitionGroup>
+   <ItemGroup>
+@@ -1574,4 +1715,4 @@
+   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+   <ImportGroup Label="ExtensionTargets">
+   </ImportGroup>
+-</Project>
++</Project>
+\ No newline at end of file
+diff --git a/builds/windows/vc2010/index.html b/builds/windows/vc2010/index.html
+index 2b2b431..76bb824 100644
+--- a/builds/windows/vc2010/index.html
++++ b/builds/windows/vc2010/index.html
+@@ -17,11 +17,11 @@ FreeType 2.5.3 sources:</p>
+ <ul>
+   <pre>
+ freetype253.lib     - release build
+-freetype253_D.lib   - debug build
++freetype253d.lib    - debug build
+ freetype253ST.lib   - release build; single threaded
+-freetype253ST_D.lib - debug build;   single threaded
++freetype253STd.lib  - debug build;   single threaded
+ freetype253MT.lib   - release build; multi-threaded
+-freetype253MT_D.lib - debug build;   multi-threaded</pre>
++freetype253MTd.lib  - debug build;   multi-threaded</pre>
+ </ul>
+ 
+ <p>Both Win32 and x64 builds are supported.</p>
+@@ -30,13 +30,23 @@ freetype253MT_D.lib - debug build;   multi-threaded</pre>
+ archives are already stored this way, so no further action is required.  If
+ you use some <tt>.tar.*z</tt> archives, be sure to configure your extracting
+ tool to convert the line endings.  For example, with <a
+-href="http://www.winzip.com">WinZip</a>, you should activate the <it>TAR
+-file smart CR/LF Conversion</it> option.  Alternatively, you may consider
++href="http://www.winzip.com">WinZip</a>, you should activate the <em>TAR
++file smart CR/LF Conversion</em> option.  Alternatively, you may consider
+ using the <tt>unix2dos</tt> or <tt>u2d</tt> utilities that are floating
+ around, which specifically deal with this particular problem.
+ 
+-<p>Build directories are placed in the top-level <tt>objs</tt>
++<p>Build directories are placed in the top-level <tt>objs\vc2010</tt>
+ directory.</p>
+ 
++<p>Customization of the FreeType library is done by editing the
++<tt>ftoptions.h</tt> header file in the top-level <tt>devel</tt> path.
++Alternatively, you may copy the file to another directory and change the
++include directory in <tt>freetype.users.props</tt>.</p>
++
++<p>To configure library dependencies like <em>zlib</em> and <em>libpng</em>,
++edit the <tt>freetype.users.props</tt> file in this directory.  It also
++simplifies automated (command-line) builds using <a
++href="http://msdn.microsoft.com/library/dd393574%28v=vs.100%29.aspx">msbuild</a>.</p>
++
+ </body>
+ </html>
+diff --git a/devel/ftoption.h b/devel/ftoption.h
+index d7b6a63..10027bb 100644
+--- a/devel/ftoption.h
++++ b/devel/ftoption.h
+@@ -4,7 +4,7 @@
+ /*                                                                         */
+ /*    User-selectable configuration macros (specification only).           */
+ /*                                                                         */
+-/*  Copyright 1996-2013 by                                                 */
++/*  Copyright 1996-2014 by                                                 */
+ /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+ /*                                                                         */
+ /*  This file is part of the FreeType project, and may only be used,       */
+@@ -61,7 +61,7 @@ FT_BEGIN_HEADER
+   /*    that are statically linked to the library at compile time.  By     */
+   /*    default, this file is <config/ftmodule.h>.                         */
+   /*                                                                       */
+-  /*  We highly recommend using the third method whenever possible.        */
++  /* We highly recommend using the third method whenever possible.         */
+   /*                                                                       */
+   /*************************************************************************/
+ 
+@@ -205,7 +205,7 @@ FT_BEGIN_HEADER
+ 
+   /*************************************************************************/
+   /*                                                                       */
+-  /*  PNG bitmap support.                                                  */
++  /* PNG bitmap support.                                                   */
+   /*                                                                       */
+   /*   FreeType now handles loading color bitmap glyphs in the PNG format. */
+   /*   This requires help from the external libpng library.  Uncompressed  */
+@@ -219,7 +219,7 @@ FT_BEGIN_HEADER
+ 
+   /*************************************************************************/
+   /*                                                                       */
+-  /*  HarfBuzz support.                                                    */
++  /* HarfBuzz support.                                                     */
+   /*                                                                       */
+   /*   FreeType uses the HarfBuzz library to improve auto-hinting of       */
+   /*   OpenType fonts.  If available, many glyphs not directly addressable */
+@@ -773,6 +773,30 @@ FT_BEGIN_HEADER
+ 
+   /*************************************************************************/
+   /*                                                                       */
++  /* Using CFF_CONFIG_OPTION_DARKENING_PARAMETER_{X,Y}{1,2,3,4} it is      */
++  /* possible to set up the default values of the four control points that */
++  /* define the stem darkening behaviour of the (new) CFF engine.  For     */
++  /* more details please read the documentation of the                     */
++  /* `darkening-parameters' property of the cff driver module (file        */
++  /* `ftcffdrv.h'), which allows the control at run-time.                  */
++  /*                                                                       */
++  /* Do *not* undefine these macros!                                       */
++  /*                                                                       */
++#define CFF_CONFIG_OPTION_DARKENING_PARAMETER_X1   500
++#define CFF_CONFIG_OPTION_DARKENING_PARAMETER_Y1   400
++
++#define CFF_CONFIG_OPTION_DARKENING_PARAMETER_X2  1000
++#define CFF_CONFIG_OPTION_DARKENING_PARAMETER_Y2   275
++
++#define CFF_CONFIG_OPTION_DARKENING_PARAMETER_X3  1667
++#define CFF_CONFIG_OPTION_DARKENING_PARAMETER_Y3   275
++
++#define CFF_CONFIG_OPTION_DARKENING_PARAMETER_X4  2333
++#define CFF_CONFIG_OPTION_DARKENING_PARAMETER_Y4     0
++
++
++  /*************************************************************************/
++  /*                                                                       */
+   /* CFF_CONFIG_OPTION_OLD_ENGINE controls whether the pre-Adobe CFF       */
+   /* engine gets compiled into FreeType.  If defined, it is possible to    */
+   /* switch between the two engines using the `hinting-engine' property of */
+@@ -820,8 +844,8 @@ FT_BEGIN_HEADER
+ 
+ 
+   /*
+-   *  This macro is obsolete.  Support has been removed in FreeType
+-   *  version 2.5.
++   * This macro is obsolete.  Support has been removed in FreeType
++   * version 2.5.
+    */
+ /* #define FT_CONFIG_OPTION_OLD_INTERNALS */
+ 
+@@ -837,6 +861,35 @@ FT_BEGIN_HEADER
+ #define  TT_USE_BYTECODE_INTERPRETER
+ #endif
+ 
++
++  /*
++   * Check CFF darkening parameters.  The checks are the same as in function
++   * `cff_property_set' in file `cffdrivr.c'.
++   */
++#if CFF_CONFIG_OPTION_DARKENING_PARAMETER_X1 < 0   || \
++    CFF_CONFIG_OPTION_DARKENING_PARAMETER_X2 < 0   || \
++    CFF_CONFIG_OPTION_DARKENING_PARAMETER_X3 < 0   || \
++    CFF_CONFIG_OPTION_DARKENING_PARAMETER_X4 < 0   || \
++                                                      \
++    CFF_CONFIG_OPTION_DARKENING_PARAMETER_Y1 < 0   || \
++    CFF_CONFIG_OPTION_DARKENING_PARAMETER_Y2 < 0   || \
++    CFF_CONFIG_OPTION_DARKENING_PARAMETER_Y3 < 0   || \
++    CFF_CONFIG_OPTION_DARKENING_PARAMETER_Y4 < 0   || \
++                                                      \
++    CFF_CONFIG_OPTION_DARKENING_PARAMETER_X1 >        \
++      CFF_CONFIG_OPTION_DARKENING_PARAMETER_X2     || \
++    CFF_CONFIG_OPTION_DARKENING_PARAMETER_X2 >        \
++      CFF_CONFIG_OPTION_DARKENING_PARAMETER_X3     || \
++    CFF_CONFIG_OPTION_DARKENING_PARAMETER_X3 >        \
++      CFF_CONFIG_OPTION_DARKENING_PARAMETER_X4     || \
++                                                      \
++    CFF_CONFIG_OPTION_DARKENING_PARAMETER_Y1 > 500 || \
++    CFF_CONFIG_OPTION_DARKENING_PARAMETER_Y2 > 500 || \
++    CFF_CONFIG_OPTION_DARKENING_PARAMETER_Y3 > 500 || \
++    CFF_CONFIG_OPTION_DARKENING_PARAMETER_Y4 > 500
++#error "Invalid CFF darkening parameters!"
++#endif
++
+ FT_END_HEADER
+ 
+ 
 diff --git a/docs/CHANGES b/docs/CHANGES
 index 803f02d..51b829c 100644
 --- a/docs/CHANGES
@@ -1928,10 +3542,153 @@ index d98a311..22d70fd 100644
  #ifdef FT_MAKE_OPTION_SINGLE_OBJECT
  
  #define FT_LOCAL( x )      static  x
+diff --git a/include/config/ftoption.h b/include/config/ftoption.h
+index 5b11f0e..2b0b67e 100644
+--- a/include/config/ftoption.h
++++ b/include/config/ftoption.h
+@@ -4,7 +4,7 @@
+ /*                                                                         */
+ /*    User-selectable configuration macros (specification only).           */
+ /*                                                                         */
+-/*  Copyright 1996-2013 by                                                 */
++/*  Copyright 1996-2014 by                                                 */
+ /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+ /*                                                                         */
+ /*  This file is part of the FreeType project, and may only be used,       */
+@@ -61,7 +61,7 @@ FT_BEGIN_HEADER
+   /*    that are statically linked to the library at compile time.  By     */
+   /*    default, this file is <config/ftmodule.h>.                         */
+   /*                                                                       */
+-  /*  We highly recommend using the third method whenever possible.        */
++  /* We highly recommend using the third method whenever possible.         */
+   /*                                                                       */
+   /*************************************************************************/
+ 
+@@ -216,7 +216,7 @@ FT_BEGIN_HEADER
+ 
+   /*************************************************************************/
+   /*                                                                       */
+-  /*  PNG bitmap support.                                                  */
++  /* PNG bitmap support.                                                   */
+   /*                                                                       */
+   /*   FreeType now handles loading color bitmap glyphs in the PNG format. */
+   /*   This requires help from the external libpng library.  Uncompressed  */
+@@ -230,7 +230,7 @@ FT_BEGIN_HEADER
+ 
+   /*************************************************************************/
+   /*                                                                       */
+-  /*  HarfBuzz support.                                                    */
++  /* HarfBuzz support.                                                     */
+   /*                                                                       */
+   /*   FreeType uses the HarfBuzz library to improve auto-hinting of       */
+   /*   OpenType fonts.  If available, many glyphs not directly addressable */
+@@ -773,6 +773,30 @@ FT_BEGIN_HEADER
+ 
+   /*************************************************************************/
+   /*                                                                       */
++  /* Using CFF_CONFIG_OPTION_DARKENING_PARAMETER_{X,Y}{1,2,3,4} it is      */
++  /* possible to set up the default values of the four control points that */
++  /* define the stem darkening behaviour of the (new) CFF engine.  For     */
++  /* more details please read the documentation of the                     */
++  /* `darkening-parameters' property of the cff driver module (file        */
++  /* `ftcffdrv.h'), which allows the control at run-time.                  */
++  /*                                                                       */
++  /* Do *not* undefine these macros!                                       */
++  /*                                                                       */
++#define CFF_CONFIG_OPTION_DARKENING_PARAMETER_X1   500
++#define CFF_CONFIG_OPTION_DARKENING_PARAMETER_Y1   400
++
++#define CFF_CONFIG_OPTION_DARKENING_PARAMETER_X2  1000
++#define CFF_CONFIG_OPTION_DARKENING_PARAMETER_Y2   275
++
++#define CFF_CONFIG_OPTION_DARKENING_PARAMETER_X3  1667
++#define CFF_CONFIG_OPTION_DARKENING_PARAMETER_Y3   275
++
++#define CFF_CONFIG_OPTION_DARKENING_PARAMETER_X4  2333
++#define CFF_CONFIG_OPTION_DARKENING_PARAMETER_Y4     0
++
++
++  /*************************************************************************/
++  /*                                                                       */
+   /* CFF_CONFIG_OPTION_OLD_ENGINE controls whether the pre-Adobe CFF       */
+   /* engine gets compiled into FreeType.  If defined, it is possible to    */
+   /* switch between the two engines using the `hinting-engine' property of */
+@@ -820,8 +844,8 @@ FT_BEGIN_HEADER
+ 
+ 
+   /*
+-   *  This macro is obsolete.  Support has been removed in FreeType
+-   *  version 2.5.
++   * This macro is obsolete.  Support has been removed in FreeType
++   * version 2.5.
+    */
+ /* #define FT_CONFIG_OPTION_OLD_INTERNALS */
+ 
+@@ -837,6 +861,35 @@ FT_BEGIN_HEADER
+ #define  TT_USE_BYTECODE_INTERPRETER
+ #endif
+ 
++
++  /*
++   * Check CFF darkening parameters.  The checks are the same as in function
++   * `cff_property_set' in file `cffdrivr.c'.
++   */
++#if CFF_CONFIG_OPTION_DARKENING_PARAMETER_X1 < 0   || \
++    CFF_CONFIG_OPTION_DARKENING_PARAMETER_X2 < 0   || \
++    CFF_CONFIG_OPTION_DARKENING_PARAMETER_X3 < 0   || \
++    CFF_CONFIG_OPTION_DARKENING_PARAMETER_X4 < 0   || \
++                                                      \
++    CFF_CONFIG_OPTION_DARKENING_PARAMETER_Y1 < 0   || \
++    CFF_CONFIG_OPTION_DARKENING_PARAMETER_Y2 < 0   || \
++    CFF_CONFIG_OPTION_DARKENING_PARAMETER_Y3 < 0   || \
++    CFF_CONFIG_OPTION_DARKENING_PARAMETER_Y4 < 0   || \
++                                                      \
++    CFF_CONFIG_OPTION_DARKENING_PARAMETER_X1 >        \
++      CFF_CONFIG_OPTION_DARKENING_PARAMETER_X2     || \
++    CFF_CONFIG_OPTION_DARKENING_PARAMETER_X2 >        \
++      CFF_CONFIG_OPTION_DARKENING_PARAMETER_X3     || \
++    CFF_CONFIG_OPTION_DARKENING_PARAMETER_X3 >        \
++      CFF_CONFIG_OPTION_DARKENING_PARAMETER_X4     || \
++                                                      \
++    CFF_CONFIG_OPTION_DARKENING_PARAMETER_Y1 > 500 || \
++    CFF_CONFIG_OPTION_DARKENING_PARAMETER_Y2 > 500 || \
++    CFF_CONFIG_OPTION_DARKENING_PARAMETER_Y3 > 500 || \
++    CFF_CONFIG_OPTION_DARKENING_PARAMETER_Y4 > 500
++#error "Invalid CFF darkening parameters!"
++#endif
++
+ FT_END_HEADER
+ 
+ 
 diff --git a/include/freetype.h b/include/freetype.h
-index fb62b62..6a31502 100644
+index fb62b62..bb989ef 100644
 --- a/include/freetype.h
 +++ b/include/freetype.h
+@@ -1570,15 +1570,15 @@ FT_BEGIN_HEADER
+   /*                         change between calls of @FT_Load_Glyph and a  */
+   /*                         few other functions.                          */
+   /*                                                                       */
+-  /*    bitmap_left       :: This is the bitmap's left bearing expressed   */
+-  /*                         in integer pixels.  Of course, this is only   */
+-  /*                         valid if the format is                        */
+-  /*                         @FT_GLYPH_FORMAT_BITMAP.                      */
+-  /*                                                                       */
+-  /*    bitmap_top        :: This is the bitmap's top bearing expressed in */
+-  /*                         integer pixels.  Remember that this is the    */
+-  /*                         distance from the baseline to the top-most    */
+-  /*                         glyph scanline, upwards y~coordinates being   */
++  /*    bitmap_left       :: The bitmap's left bearing expressed in        */
++  /*                         integer pixels.  Only valid if the format is  */
++  /*                         @FT_GLYPH_FORMAT_BITMAP, this is, if the      */
++  /*                         glyph slot contains a bitmap.                 */
++  /*                                                                       */
++  /*    bitmap_top        :: The bitmap's top bearing expressed in integer */
++  /*                         pixels.  Remember that this is the distance   */
++  /*                         from the baseline to the top-most glyph       */
++  /*                         scanline, upwards y~coordinates being         */
+   /*                         *positive*.                                   */
+   /*                                                                       */
+   /*    outline           :: The outline descriptor for the current glyph  */
 @@ -1592,7 +1592,6 @@ FT_BEGIN_HEADER
    /*                         This field is only valid for the composite    */
    /*                         glyph format that should normally only be     */
@@ -2024,6 +3781,34 @@ index fb62b62..6a31502 100644
    FT_EXPORT( FT_Long )
    FT_DivFix( FT_Long  a,
               FT_Long  b );
+diff --git a/include/ftcffdrv.h b/include/ftcffdrv.h
+index e4d039d..49c1e6e 100644
+--- a/include/ftcffdrv.h
++++ b/include/ftcffdrv.h
+@@ -4,7 +4,7 @@
+ /*                                                                         */
+ /*    FreeType API for controlling the CFF driver (specification only).    */
+ /*                                                                         */
+-/*  Copyright 2013 by                                                      */
++/*  Copyright 2013, 2014 by                                                */
+ /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+ /*                                                                         */
+ /*  This file is part of the FreeType project, and may only be used,       */
+@@ -212,9 +212,11 @@ FT_BEGIN_HEADER
+    *     stem width >= 2.333px: darkening amount = 0px
+    *   }
+    *
+-   *   and piecewise linear in-between.  Using the `darkening-parameters'
+-   *   property, these four control points can be changed, as the following
+-   *   example demonstrates.
++   *   and piecewise linear in-between.  At configuration time, these four
++   *   control points can be set with the macro
++   *   `CFF_CONFIG_OPTION_DARKENING_PARAMETERS'.  At runtime, the control
++   *   points can be changed using the `darkening-parameters' property, as
++   *   the following example demonstrates.
+    *
+    *   {
+    *     FT_Library  library;
 diff --git a/include/fterrdef.h b/include/fterrdef.h
 index 76c7b9e..99b2fad 100644
 --- a/include/fterrdef.h
@@ -2361,7 +4146,7 @@ index 65143cb..9c7b543 100644
     */
    FT_EXPORT( void )
 diff --git a/include/internal/ftcalc.h b/include/internal/ftcalc.h
-index 03bd68e..95165bf 100644
+index 03bd68e..1d83d50 100644
 --- a/include/internal/ftcalc.h
 +++ b/include/internal/ftcalc.h
 @@ -4,7 +4,7 @@
@@ -2407,12 +4192,7 @@ index 03bd68e..95165bf 100644
 +  /* These must be defined `static __inline__' with GCC.             */
  
 +#if defined( __CC_ARM ) || defined( __ARMCC__ )  /* RVCT */
- 
--  /*************************************************************************/
--  /*                                                                       */
--  /* FT_MulDiv() and FT_MulFix() are declared in freetype.h.               */
--  /*                                                                       */
--  /*************************************************************************/
++
 +#define FT_MULFIX_ASSEMBLER  FT_MulFix_arm
 +
 +  /* documentation is in freetype.h */
@@ -2561,7 +4341,7 @@ index 03bd68e..95165bf 100644
 +  {
 +    /* Temporarily disable the warning that C90 doesn't support */
 +    /* `long long'.                                             */
-+#if ( __GNUC__ > 4 ) || ( ( __GNUC__ == 4 ) && ( __GNUC_MINOR__ >= 6 ) )
++#if __GNUC__ > 4 || ( __GNUC__ == 4 && __GNUC_MINOR__ >= 6 )
 +#pragma GCC diagnostic push
 +#pragma GCC diagnostic ignored "-Wlong-long"
 +#endif
@@ -2570,7 +4350,12 @@ index 03bd68e..95165bf 100644
 +    /* Technically not an assembly fragment, but GCC does a really good */
 +    /* job at inlining it and generating good machine code for it.      */
 +    long long  ret, tmp;
-+
+ 
+-  /*************************************************************************/
+-  /*                                                                       */
+-  /* FT_MulDiv() and FT_MulFix() are declared in freetype.h.               */
+-  /*                                                                       */
+-  /*************************************************************************/
 +
 +    ret  = (long long)a * b;
 +    tmp  = ret >> 63;
@@ -2603,7 +4388,7 @@ index 03bd68e..95165bf 100644
 +    return (FT_Int32)result;
 +#endif
 +
-+#if ( __GNUC__ > 4 ) || ( ( __GNUC__ == 4 ) && ( __GNUC_MINOR__ >= 6 ) )
++#if __GNUC__ > 4 || ( __GNUC__ == 4 && __GNUC_MINOR__ >= 6 )
 +#pragma GCC diagnostic pop
 +#endif
 +  }
@@ -2621,14 +4406,28 @@ index 03bd68e..95165bf 100644
  
  
    /*************************************************************************/
-@@ -139,9 +326,32 @@ FT_BEGIN_HEADER
+@@ -124,10 +311,11 @@ FT_BEGIN_HEADER
+                          FT_Pos  out_x,
+                          FT_Pos  out_y );
+ 
++
+   /*
+    *  Return TRUE if a corner is flat or nearly flat.  This is equivalent to
+-   *  saying that the angle difference between the `in' and `out' vectors is
+-   *  very small.
++   *  saying that the corner point is close to its neighbors, or inside an 
++   *  ellipse defined by the neighbor focal points to be more precise.
+    */
+   FT_BASE( FT_Int )
+   ft_corner_is_flat( FT_Pos  in_x,
+@@ -139,9 +327,31 @@ FT_BEGIN_HEADER
    /*
     *  Return the most significant bit index.
     */
 +
 +#ifndef  FT_CONFIG_OPTION_NO_ASSEMBLER
-+#if defined( __GNUC__ )
-+#if ( __GNUC__ > 3 ) || ( ( __GNUC__ == 3 ) && ( __GNUC_MINOR__ >= 4 ) )
++#if defined( __GNUC__ )                                          && \
++    ( __GNUC__ > 3 || ( __GNUC__ == 3 && __GNUC_MINOR__ >= 4 ) )
 +
 +#if FT_SIZEOF_INT == 4
 +
@@ -2640,7 +4439,6 @@ index 03bd68e..95165bf 100644
 +
 +#endif
 +
-+#endif
 +#endif /* __GNUC__ */
 +#endif /* !FT_CONFIG_OPTION_NO_ASSEMBLER */
 +
@@ -2654,10 +4452,22 @@ index 03bd68e..95165bf 100644
  
    /*
     *  Return sqrt(x*x+y*y), which is the same as `FT_Vector_Length' but uses
-@@ -152,6 +362,31 @@ FT_BEGIN_HEADER
+@@ -152,6 +362,43 @@ FT_BEGIN_HEADER
              FT_Fixed  y );
  
  
++  /*
++   *  Approximate sqrt(x*x+y*y) using the `alpha max plus beta min'
++   *  algorithm.  We use alpha = 1, beta = 3/8, giving us results with a
++   *  largest error less than 7% compared to the exact value.
++   */  
++#define FT_HYPOT( x, y )                 \
++          ( x = FT_ABS( x ),             \
++            y = FT_ABS( y ),             \
++            x > y ? x + ( 3 * y >> 3 )   \
++                  : y + ( 3 * x >> 3 ) )
++
++
 +#if 0
 +
 +  /*************************************************************************/
@@ -2705,8 +4515,79 @@ index 701c850..faa37f8 100644
     *  character classification functions -- since these are used to parse
     *  font files, we must not use those in <ctypes.h> which are
     *  locale-dependent
+diff --git a/src/autofit/afangles.c b/src/autofit/afangles.c
+index b44a5ba..f8b095b 100644
+--- a/src/autofit/afangles.c
++++ b/src/autofit/afangles.c
+@@ -20,66 +20,6 @@
+ #include "aftypes.h"
+ 
+ 
+-#if 0
+-
+-  FT_LOCAL_DEF( FT_Int )
+-  af_corner_is_flat( FT_Pos  x_in,
+-                     FT_Pos  y_in,
+-                     FT_Pos  x_out,
+-                     FT_Pos  y_out )
+-  {
+-    FT_Pos  ax = x_in;
+-    FT_Pos  ay = y_in;
+-
+-    FT_Pos  d_in, d_out, d_corner;
+-
+-
+-    if ( ax < 0 )
+-      ax = -ax;
+-    if ( ay < 0 )
+-      ay = -ay;
+-    d_in = ax + ay;
+-
+-    ax = x_out;
+-    if ( ax < 0 )
+-      ax = -ax;
+-    ay = y_out;
+-    if ( ay < 0 )
+-      ay = -ay;
+-    d_out = ax + ay;
+-
+-    ax = x_out + x_in;
+-    if ( ax < 0 )
+-      ax = -ax;
+-    ay = y_out + y_in;
+-    if ( ay < 0 )
+-      ay = -ay;
+-    d_corner = ax + ay;
+-
+-    return ( d_in + d_out - d_corner ) < ( d_corner >> 4 );
+-  }
+-
+-
+-  FT_LOCAL_DEF( FT_Int )
+-  af_corner_orientation( FT_Pos  x_in,
+-                         FT_Pos  y_in,
+-                         FT_Pos  x_out,
+-                         FT_Pos  y_out )
+-  {
+-    FT_Pos  delta;
+-
+-
+-    delta = x_in * y_out - y_in * x_out;
+-
+-    if ( delta == 0 )
+-      return 0;
+-    else
+-      return 1 - 2 * ( delta < 0 );
+-  }
+-
+-#endif /* 0 */
+-
+-
+   /*
+    *  We are not using `af_angle_atan' anymore, but we keep the source
+    *  code below just in case...
 diff --git a/src/autofit/afblue.c b/src/autofit/afblue.c
-index 6e214c8..f3526bf 100644
+index 6e214c8..811226e 100644
 --- a/src/autofit/afblue.c
 +++ b/src/autofit/afblue.c
 @@ -26,15 +26,21 @@
@@ -2736,7 +4617,7 @@ index 6e214c8..f3526bf 100644
      '\0',
      '\xCE', '\x93', '\xCE', '\x92', '\xCE', '\x95', '\xCE', '\x96', '\xCE', '\x98', '\xCE', '\x9F', '\xCE', '\xA9',  /* ΓΒΕΖΘΟΩ */
      '\0',
-@@ -46,26 +52,27 @@
+@@ -46,26 +52,31 @@
      '\0',
      '\xCE', '\xB2', '\xCE', '\xB3', '\xCE', '\xB7', '\xCE', '\xBC', '\xCF', '\x81', '\xCF', '\x86', '\xCF', '\x87', '\xCF', '\x88',  /* βγημρφχψ */
      '\0',
@@ -2762,6 +4643,10 @@ index 6e214c8..f3526bf 100644
 +    'x', 'z', 'r', 'o', 'e', 's', 'c',  /* xzroesc */
 +    '\0',
 +    'p', 'q', 'g', 'j', 'y',  /* pqgjy */
++    '\0',
++    '\xE0', '\xB0', '\x87', '\xE0', '\xB0', '\x8C', '\xE0', '\xB0', '\x99', '\xE0', '\xB0', '\x9E', '\xE0', '\xB0', '\xA3', '\xE0', '\xB0', '\xB1', '\xE0', '\xB1', '\xAF',  /* ఇ ఌ ఙ ఞ ణ ఱ ౯ */
++    '\0',
++    '\xE0', '\xB0', '\x85', '\xE0', '\xB0', '\x95', '\xE0', '\xB0', '\x9A', '\xE0', '\xB0', '\xB0', '\xE0', '\xB0', '\xBD', '\xE0', '\xB1', '\xA8', '\xE0', '\xB1', '\xAC',  /* అ క చ ర ఽ ౨ ౬ */
  #ifdef AF_CONFIG_OPTION_CJK
      '\0',
      '\xE4', '\xBB', '\x96', '\xE4', '\xBB', '\xAC', '\xE4', '\xBD', '\xA0', '\xE4', '\xBE', '\x86', '\xE5', '\x80', '\x91', '\xE5', '\x88', '\xB0', '\xE5', '\x92', '\x8C', '\xE5', '\x9C', '\xB0',  /* 他们你來們到和地 */
@@ -2773,7 +4658,7 @@ index 6e214c8..f3526bf 100644
      '\xE5', '\x86', '\x9B', '\xE5', '\x90', '\x8C', '\xE5', '\xB7', '\xB2', '\xE6', '\x84', '\xBF', '\xE6', '\x97', '\xA2', '\xE6', '\x98', '\x9F', '\xE6', '\x98', '\xAF', '\xE6', '\x99', '\xAF',  /* 军同已愿既星是景 */
      '\xE6', '\xB0', '\x91', '\xE7', '\x85', '\xA7', '\xE7', '\x8E', '\xB0', '\xE7', '\x8F', '\xBE', '\xE7', '\x90', '\x86', '\xE7', '\x94', '\xA8', '\xE7', '\xBD', '\xAE', '\xE8', '\xA6', '\x81',  /* 民照现現理用置要 */
      '\xE8', '\xBB', '\x8D', '\xE9', '\x82', '\xA3', '\xE9', '\x85', '\x8D', '\xE9', '\x87', '\x8C', '\xE9', '\x96', '\x8B', '\xE9', '\x9B', '\xB7', '\xE9', '\x9C', '\xB2', '\xE9', '\x9D', '\xA2',  /* 軍那配里開雷露面 */
-@@ -74,8 +81,7 @@
+@@ -74,8 +85,7 @@
      '\xE4', '\xB8', '\xAA', '\xE4', '\xB8', '\xBA', '\xE4', '\xBA', '\xBA', '\xE4', '\xBB', '\x96', '\xE4', '\xBB', '\xA5', '\xE4', '\xBB', '\xAC', '\xE4', '\xBD', '\xA0', '\xE4', '\xBE', '\x86',  /* 个为人他以们你來 */
      '\xE5', '\x80', '\x8B', '\xE5', '\x80', '\x91', '\xE5', '\x88', '\xB0', '\xE5', '\x92', '\x8C', '\xE5', '\xA4', '\xA7', '\xE5', '\xAF', '\xB9', '\xE5', '\xB0', '\x8D', '\xE5', '\xB0', '\xB1',  /* 個們到和大对對就 */
      '\xE6', '\x88', '\x91', '\xE6', '\x97', '\xB6', '\xE6', '\x99', '\x82', '\xE6', '\x9C', '\x89', '\xE6', '\x9D', '\xA5', '\xE7', '\x82', '\xBA', '\xE8', '\xA6', '\x81', '\xE8', '\xAA', '\xAA',  /* 我时時有来為要說 */
@@ -2783,7 +4668,7 @@ index 6e214c8..f3526bf 100644
      '\xE4', '\xB8', '\xBB', '\xE4', '\xBA', '\x9B', '\xE5', '\x9B', '\xA0', '\xE5', '\xAE', '\x83', '\xE6', '\x83', '\xB3', '\xE6', '\x84', '\x8F', '\xE7', '\x90', '\x86', '\xE7', '\x94', '\x9F',  /* 主些因它想意理生 */
      '\xE7', '\x95', '\xB6', '\xE7', '\x9C', '\x8B', '\xE7', '\x9D', '\x80', '\xE7', '\xBD', '\xAE', '\xE8', '\x80', '\x85', '\xE8', '\x87', '\xAA', '\xE8', '\x91', '\x97', '\xE8', '\xA3', '\xA1',  /* 當看着置者自著裡 */
      '\xE8', '\xBF', '\x87', '\xE8', '\xBF', '\x98', '\xE8', '\xBF', '\x9B', '\xE9', '\x80', '\xB2', '\xE9', '\x81', '\x8E', '\xE9', '\x81', '\x93', '\xE9', '\x82', '\x84', '\xE9', '\x87', '\x8C',  /* 过还进進過道還里 */
-@@ -85,8 +91,7 @@
+@@ -85,8 +95,7 @@
      '\xE4', '\xBA', '\x9B', '\xE4', '\xBB', '\xAC', '\xE4', '\xBD', '\xA0', '\xE4', '\xBE', '\x86', '\xE5', '\x80', '\x91', '\xE5', '\x88', '\xB0', '\xE5', '\x92', '\x8C', '\xE5', '\x9C', '\xB0',  /* 些们你來們到和地 */
      '\xE5', '\xA5', '\xB9', '\xE5', '\xB0', '\x86', '\xE5', '\xB0', '\x87', '\xE5', '\xB0', '\xB1', '\xE5', '\xB9', '\xB4', '\xE5', '\xBE', '\x97', '\xE6', '\x83', '\x85', '\xE6', '\x9C', '\x80',  /* 她将將就年得情最 */
      '\xE6', '\xA0', '\xB7', '\xE6', '\xA8', '\xA3', '\xE7', '\x90', '\x86', '\xE8', '\x83', '\xBD', '\xE8', '\xAA', '\xAA', '\xE8', '\xAF', '\xB4', '\xE8', '\xBF', '\x99', '\xE9', '\x80', '\x99',  /* 样樣理能說说这這 */
@@ -2793,7 +4678,7 @@ index 6e214c8..f3526bf 100644
      '\xE5', '\x8D', '\xB3', '\xE5', '\x90', '\x97', '\xE5', '\x90', '\xA7', '\xE5', '\x90', '\xAC', '\xE5', '\x91', '\xA2', '\xE5', '\x93', '\x81', '\xE5', '\x93', '\x8D', '\xE5', '\x97', '\x8E',  /* 即吗吧听呢品响嗎 */
      '\xE5', '\xB8', '\x88', '\xE5', '\xB8', '\xAB', '\xE6', '\x94', '\xB6', '\xE6', '\x96', '\xAD', '\xE6', '\x96', '\xB7', '\xE6', '\x98', '\x8E', '\xE7', '\x9C', '\xBC', '\xE9', '\x96', '\x93',  /* 师師收断斷明眼間 */
      '\xE9', '\x97', '\xB4', '\xE9', '\x99', '\x85', '\xE9', '\x99', '\x88', '\xE9', '\x99', '\x90', '\xE9', '\x99', '\xA4', '\xE9', '\x99', '\xB3', '\xE9', '\x9A', '\x8F', '\xE9', '\x9A', '\x9B',  /* 间际陈限除陳随際 */
-@@ -95,8 +100,7 @@
+@@ -95,8 +104,7 @@
      '\xE4', '\xBA', '\x8B', '\xE5', '\x89', '\x8D', '\xE5', '\xAD', '\xB8', '\xE5', '\xB0', '\x86', '\xE5', '\xB0', '\x87', '\xE6', '\x83', '\x85', '\xE6', '\x83', '\xB3', '\xE6', '\x88', '\x96',  /* 事前學将將情想或 */
      '\xE6', '\x94', '\xBF', '\xE6', '\x96', '\xAF', '\xE6', '\x96', '\xB0', '\xE6', '\xA0', '\xB7', '\xE6', '\xA8', '\xA3', '\xE6', '\xB0', '\x91', '\xE6', '\xB2', '\x92', '\xE6', '\xB2', '\xA1',  /* 政斯新样樣民沒没 */
      '\xE7', '\x84', '\xB6', '\xE7', '\x89', '\xB9', '\xE7', '\x8E', '\xB0', '\xE7', '\x8F', '\xBE', '\xE7', '\x90', '\x83', '\xE7', '\xAC', '\xAC', '\xE7', '\xB6', '\x93', '\xE8', '\xB0', '\x81',  /* 然特现現球第經谁 */
@@ -2803,7 +4688,7 @@ index 6e214c8..f3526bf 100644
      '\xE4', '\xBE', '\x8B', '\xE5', '\x88', '\xA5', '\xE5', '\x88', '\xAB', '\xE5', '\x88', '\xB6', '\xE5', '\x8A', '\xA8', '\xE5', '\x8B', '\x95', '\xE5', '\x90', '\x97', '\xE5', '\x97', '\x8E',  /* 例別别制动動吗嗎 */
      '\xE5', '\xA2', '\x9E', '\xE6', '\x8C', '\x87', '\xE6', '\x98', '\x8E', '\xE6', '\x9C', '\x9D', '\xE6', '\x9C', '\x9F', '\xE6', '\x9E', '\x84', '\xE7', '\x89', '\xA9', '\xE7', '\xA1', '\xAE',  /* 增指明朝期构物确 */
      '\xE7', '\xA7', '\x8D', '\xE8', '\xAA', '\xBF', '\xE8', '\xB0', '\x83', '\xE8', '\xB2', '\xBB', '\xE8', '\xB4', '\xB9', '\xE9', '\x82', '\xA3', '\xE9', '\x83', '\xBD', '\xE9', '\x96', '\x93',  /* 种調调費费那都間 */
-@@ -113,14 +117,21 @@
+@@ -113,14 +121,21 @@
    af_blue_stringsets[] =
    {
      /* */
@@ -2833,7 +4718,7 @@ index 6e214c8..f3526bf 100644
      { AF_BLUE_STRING_GREEK_CAPITAL_TOP,     AF_BLUE_PROPERTY_LATIN_TOP        },
      { AF_BLUE_STRING_GREEK_CAPITAL_BOTTOM,  0                                 },
      { AF_BLUE_STRING_GREEK_SMALL_BETA_TOP,  AF_BLUE_PROPERTY_LATIN_TOP        },
-@@ -129,35 +140,28 @@
+@@ -129,35 +144,31 @@
      { AF_BLUE_STRING_GREEK_SMALL,           0                                 },
      { AF_BLUE_STRING_GREEK_SMALL_DESCENDER, 0                                 },
      { AF_BLUE_STRING_MAX,                   0                                 },
@@ -2857,6 +4742,9 @@ index 6e214c8..f3526bf 100644
 +    { AF_BLUE_STRING_LATIN_SMALL,           0                                 },
 +    { AF_BLUE_STRING_LATIN_SMALL_DESCENDER, 0                                 },
 +    { AF_BLUE_STRING_MAX,                   0                                 },
++    { AF_BLUE_STRING_TELUGU_TOP,    AF_BLUE_PROPERTY_LATIN_TOP },
++    { AF_BLUE_STRING_TELUGU_BOTTOM, 0                          },
++    { AF_BLUE_STRING_MAX,           0                          },
  #ifdef AF_CONFIG_OPTION_CJK
 -    { AF_BLUE_STRING_CJK_TOP_FILL,      AF_BLUE_PROPERTY_CJK_TOP |
 -                                        AF_BLUE_PROPERTY_CJK_FILL    },
@@ -2884,7 +4772,7 @@ index 6e214c8..f3526bf 100644
  
    };
 diff --git a/src/autofit/afblue.dat b/src/autofit/afblue.dat
-index d488f3f..74a472d 100644
+index d488f3f..3f98c13 100644
 --- a/src/autofit/afblue.dat
 +++ b/src/autofit/afblue.dat
 @@ -2,7 +2,7 @@
@@ -2972,7 +4860,7 @@ index d488f3f..74a472d 100644
    AF_BLUE_STRING_HEBREW_TOP
      "בדהחךכםס"
    AF_BLUE_STRING_HEBREW_BOTTOM
-@@ -103,24 +108,33 @@ AF_BLUE_STRING_ENUM AF_BLUE_STRINGS_ARRAY AF_BLUE_STRING_MAX_LEN:
+@@ -103,24 +108,41 @@ AF_BLUE_STRING_ENUM AF_BLUE_STRINGS_ARRAY AF_BLUE_STRING_MAX_LEN:
    AF_BLUE_STRING_HEBREW_DESCENDER
      "קךןףץ"
  
@@ -2986,6 +4874,14 @@ index d488f3f..74a472d 100644
 +    "xzroesc"
 +  AF_BLUE_STRING_LATIN_SMALL_DESCENDER
 +    "pqgjy"
++
++  // we separate the letters with spaces to avoid ligatures;
++  // this is just for convenience to simplify reading
++  AF_BLUE_STRING_TELUGU_TOP
++    "ఇ ఌ ఙ ఞ ణ ఱ ౯"
++
++  AF_BLUE_STRING_TELUGU_BOTTOM
++    "అ క చ ర ఽ ౨ ౬"
 +
  #ifdef AF_CONFIG_OPTION_CJK
  
@@ -3012,7 +4908,7 @@ index d488f3f..74a472d 100644
      "主些因它想意理生"
      "當看着置者自著裡"
      "过还进進過道還里"
-@@ -128,22 +142,20 @@ AF_BLUE_STRING_ENUM AF_BLUE_STRINGS_ARRAY AF_BLUE_STRING_MAX_LEN:
+@@ -128,22 +150,20 @@ AF_BLUE_STRING_ENUM AF_BLUE_STRINGS_ARRAY AF_BLUE_STRING_MAX_LEN:
  
  #ifdef AF_CONFIG_OPTION_CJK_BLUE_HANI_VERT
  
@@ -3039,7 +4935,7 @@ index d488f3f..74a472d 100644
      "例別别制动動吗嗎"
      "增指明朝期构物确"
      "种調调費费那都間"
-@@ -154,17 +166,118 @@ AF_BLUE_STRING_ENUM AF_BLUE_STRINGS_ARRAY AF_BLUE_STRING_MAX_LEN:
+@@ -154,17 +174,118 @@ AF_BLUE_STRING_ENUM AF_BLUE_STRINGS_ARRAY AF_BLUE_STRING_MAX_LEN:
  #endif /* AF_CONFIG_OPTION_CJK                */
  
  
@@ -3167,7 +5063,7 @@ index d488f3f..74a472d 100644
  
    AF_BLUE_STRINGSET_GREK
      { AF_BLUE_STRING_GREEK_CAPITAL_TOP,     AF_BLUE_PROPERTY_LATIN_TOP        }
-@@ -176,15 +289,6 @@ AF_BLUE_STRINGSET_ENUM AF_BLUE_STRINGSETS_ARRAY AF_BLUE_STRINGSET_MAX_LEN:
+@@ -176,15 +297,6 @@ AF_BLUE_STRINGSET_ENUM AF_BLUE_STRINGSETS_ARRAY AF_BLUE_STRINGSET_MAX_LEN:
      { AF_BLUE_STRING_GREEK_SMALL_DESCENDER, 0                                 }
      { AF_BLUE_STRING_MAX,                   0                                 }
  
@@ -3183,7 +5079,7 @@ index d488f3f..74a472d 100644
    AF_BLUE_STRINGSET_HEBR
      { AF_BLUE_STRING_HEBREW_TOP,       AF_BLUE_PROPERTY_LATIN_TOP  |
                                         AF_BLUE_PROPERTY_LATIN_LONG   }
-@@ -192,25 +296,27 @@ AF_BLUE_STRINGSET_ENUM AF_BLUE_STRINGSETS_ARRAY AF_BLUE_STRINGSET_MAX_LEN:
+@@ -192,25 +304,32 @@ AF_BLUE_STRINGSET_ENUM AF_BLUE_STRINGSETS_ARRAY AF_BLUE_STRINGSET_MAX_LEN:
      { AF_BLUE_STRING_HEBREW_DESCENDER, 0                             }
      { AF_BLUE_STRING_MAX,              0                             }
  
@@ -3196,6 +5092,11 @@ index d488f3f..74a472d 100644
 +    { AF_BLUE_STRING_LATIN_SMALL,           0                                 }
 +    { AF_BLUE_STRING_LATIN_SMALL_DESCENDER, 0                                 }
 +    { AF_BLUE_STRING_MAX,                   0                                 }
++
++  AF_BLUE_STRINGSET_TELU
++    { AF_BLUE_STRING_TELUGU_TOP,    AF_BLUE_PROPERTY_LATIN_TOP }
++    { AF_BLUE_STRING_TELUGU_BOTTOM, 0                          }
++    { AF_BLUE_STRING_MAX,           0                          }
 +
  #ifdef AF_CONFIG_OPTION_CJK
  
@@ -3226,7 +5127,7 @@ index d488f3f..74a472d 100644
  #endif /* AF_CONFIG_OPTION_CJK                */
  
 diff --git a/src/autofit/afblue.h b/src/autofit/afblue.h
-index 6f336ab..d239e8e 100644
+index 6f336ab..a861841 100644
 --- a/src/autofit/afblue.h
 +++ b/src/autofit/afblue.h
 @@ -7,7 +7,7 @@
@@ -3238,7 +5139,7 @@ index 6f336ab..d239e8e 100644
  /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
  /*                                                                         */
  /*  This file is part of the FreeType project, and may only be used,       */
-@@ -67,42 +67,42 @@ FT_BEGIN_HEADER
+@@ -67,42 +67,44 @@ FT_BEGIN_HEADER
    /* At the bottommost level, we define strings for finding blue zones. */
  
  
@@ -3289,7 +5190,9 @@ index 6f336ab..d239e8e 100644
 +    AF_BLUE_STRING_LATIN_SMALL_F_TOP = 274,
 +    AF_BLUE_STRING_LATIN_SMALL = 282,
 +    AF_BLUE_STRING_LATIN_SMALL_DESCENDER = 290,
-+    af_blue_1_1 = 295,
++    AF_BLUE_STRING_TELUGU_TOP = 296,
++    AF_BLUE_STRING_TELUGU_BOTTOM = 318,
++    af_blue_1_1 = 339,
  #ifdef AF_CONFIG_OPTION_CJK
 -    AF_BLUE_STRING_CJK_TOP_FILL = af_blue_1_1 + 1,
 -    AF_BLUE_STRING_CJK_TOP_UNFILL = af_blue_1_1 + 77,
@@ -3308,7 +5211,7 @@ index 6f336ab..d239e8e 100644
      af_blue_1_1_2 = af_blue_1_1_1 + 304,
  #else
      af_blue_1_1_2 = af_blue_1_1_1 + 0,
-@@ -136,33 +136,34 @@ FT_BEGIN_HEADER
+@@ -136,33 +138,35 @@ FT_BEGIN_HEADER
    /* Properties are specific to a writing system.  We assume that a given  */
    /* blue string can't be used in more than a single writing system, which */
    /* is a safe bet.                                                        */
@@ -3346,7 +5249,8 @@ index 6f336ab..d239e8e 100644
 +    AF_BLUE_STRINGSET_GREK = 12,
 +    AF_BLUE_STRINGSET_HEBR = 19,
 +    AF_BLUE_STRINGSET_LATN = 23,
-+    af_blue_2_1 = 30,
++    AF_BLUE_STRINGSET_TELU = 30,
++    af_blue_2_1 = 33,
  #ifdef AF_CONFIG_OPTION_CJK
      AF_BLUE_STRINGSET_HANI = af_blue_2_1 + 0,
 -    af_blue_2_1_1 = af_blue_2_1 + 4,
@@ -4705,10 +6609,10 @@ index 73bf832..181cf55 100644
            module->fallback_style = ss;
            break;
 diff --git a/src/autofit/afranges.c b/src/autofit/afranges.c
-index 3d919b5..139a4c1 100644
+index 3d919b5..b2c504d 100644
 --- a/src/autofit/afranges.c
 +++ b/src/autofit/afranges.c
-@@ -21,51 +21,59 @@
+@@ -21,51 +21,69 @@
  
    const AF_Script_UniRangeRec  af_cyrl_uniranges[] =
    {
@@ -4720,9 +6624,19 @@ index 3d919b5..139a4c1 100644
      AF_UNIRANGE_REC(       0UL,       0UL )
    };
  
++  /* there are some characters in the Devanagari Unicode block that are    */
++  /* generic to Indic scripts; we omit them so that their presence doesn't */
++  /* trigger Devanagari                                                    */
++
 +  const AF_Script_UniRangeRec  af_deva_uniranges[] =
 +  {
-+    AF_UNIRANGE_REC(  0x0900UL,  0x097FUL ),  /* Devanagari       */
++    AF_UNIRANGE_REC(  0x0900UL,  0x093BUL ),  /* Devanagari       */
++    /* omitting U+093C nukta */
++    AF_UNIRANGE_REC(  0x093DUL,  0x0950UL ),
++    /* omitting U+0951 udatta, U+0952 anudatta */
++    AF_UNIRANGE_REC(  0x0953UL,  0x0963UL ),
++    /* omitting U+0964 danda, U+0965 double danda */
++    AF_UNIRANGE_REC(  0x0966UL,  0x097FUL ),
 +    AF_UNIRANGE_REC(  0x20B9UL,  0x20B9UL ),  /* (new) Rupee sign */
 +    AF_UNIRANGE_REC(       0UL,       0UL )
 +  };
@@ -4792,21 +6706,45 @@ index 3d919b5..139a4c1 100644
      AF_UNIRANGE_REC(       0UL,       0UL )
    };
  
-@@ -82,12 +90,6 @@
+@@ -74,17 +92,17 @@
+     AF_UNIRANGE_REC( 0UL, 0UL )
+   };
+ 
+-#ifdef AF_CONFIG_OPTION_INDIC
+-
+-  const AF_Script_UniRangeRec  af_beng_uniranges[] =
++  const AF_Script_UniRangeRec  af_telu_uniranges[] =
+   {
+-    AF_UNIRANGE_REC(  0x0980UL,  0x09FFUL ),  /* Bengali */
++    AF_UNIRANGE_REC(  0x0C00UL,  0x0C7FUL ),  /* Telugu */
      AF_UNIRANGE_REC(       0UL,       0UL )
    };
  
 -  const AF_Script_UniRangeRec  af_deva_uniranges[] =
--  {
++#ifdef AF_CONFIG_OPTION_INDIC
++
++  const AF_Script_UniRangeRec  af_beng_uniranges[] =
+   {
 -    AF_UNIRANGE_REC(  0x0900UL,  0x097FUL ),  /* Devanagari */
++    AF_UNIRANGE_REC(  0x0980UL,  0x09FFUL ),  /* Bengali */
+     AF_UNIRANGE_REC(       0UL,       0UL )
+   };
+ 
+@@ -148,12 +166,6 @@
+     AF_UNIRANGE_REC(       0UL,       0UL )
+   };
+ 
+-  const AF_Script_UniRangeRec  af_telu_uniranges[] =
+-  {
+-    AF_UNIRANGE_REC(  0x0C00UL,  0x0C7FUL ),  /* Telugu */
 -    AF_UNIRANGE_REC(       0UL,       0UL )
 -  };
 -
-   const AF_Script_UniRangeRec  af_gujr_uniranges[] =
+   const AF_Script_UniRangeRec  af_tibt_uniranges[] =
    {
-     AF_UNIRANGE_REC(  0x0A80UL,  0x0AFFUL ),  /* Gujarati */
+     AF_UNIRANGE_REC(  0x0F00UL,  0x0FFFUL ),  /* Tibetan */
 diff --git a/src/autofit/afscript.h b/src/autofit/afscript.h
-index ae20932..a418b05 100644
+index ae20932..efe8754 100644
 --- a/src/autofit/afscript.h
 +++ b/src/autofit/afscript.h
 @@ -31,6 +31,11 @@
@@ -4821,7 +6759,20 @@ index ae20932..a418b05 100644
    SCRIPT( grek, GREK,
            "Greek",
            HB_SCRIPT_GREEK,
-@@ -58,11 +63,6 @@
+@@ -51,6 +56,12 @@
+           HB_SCRIPT_INVALID,
+           0x0, 0x0, 0x0 )
+ 
++  /* there are no simple forms for letters; we thus use two digit shapes */
++  SCRIPT( telu, TELU,
++          "Telugu",
++          HB_SCRIPT_TELUGU,
++          0xC66, 0xC67, 0x0 ) /* ౦ ౧ */
++
+ #ifdef AF_CONFIG_OPTION_INDIC
+ 
+   SCRIPT( beng, BENG,
+@@ -58,11 +69,6 @@
            HB_SCRIPT_BENGALI,
            'o', 0x0, 0x0 ) /* XXX */
  
@@ -4833,8 +6784,20 @@ index ae20932..a418b05 100644
    SCRIPT( gujr, GUJR,
            "Gujarati",
            HB_SCRIPT_GUJARATI,
+@@ -113,11 +119,6 @@
+           HB_SCRIPT_TAMIL,
+           'o', 0x0, 0x0 ) /* XXX */
+ 
+-  SCRIPT( telu, TELU,
+-          "Telugu",
+-          HB_SCRIPT_TELUGU,
+-          'o', 0x0, 0x0 ) /* XXX */
+-
+   SCRIPT( tibt, TIBT,
+           "Tibetan",
+           HB_SCRIPT_TIBETAN,
 diff --git a/src/autofit/afstyles.h b/src/autofit/afstyles.h
-index 429da76..27fdd2e 100644
+index 429da76..f14d354 100644
 --- a/src/autofit/afstyles.h
 +++ b/src/autofit/afstyles.h
 @@ -81,7 +81,9 @@
@@ -4861,7 +6824,21 @@ index 429da76..27fdd2e 100644
  #ifdef FT_OPTION_AUTOFIT2
    STYLE( ltn2_dflt, LTN2_DFLT,
           "Latin 2 default style",
-@@ -119,7 +128,6 @@
+@@ -106,6 +115,13 @@
+          (AF_Blue_Stringset)0,
+          AF_COVERAGE_DEFAULT )
+ 
++  STYLE( telu_dflt, TELU_DFLT,
++         "Telugu default style",
++         AF_WRITING_SYSTEM_LATIN,
++         AF_SCRIPT_TELU,
++         AF_BLUE_STRINGSET_TELU,
++         AF_COVERAGE_DEFAULT )
++
+ #ifdef AF_CONFIG_OPTION_INDIC
+ 
+   /* no blue stringset support for the Indic writing system yet */
+@@ -119,7 +135,6 @@
                   AF_COVERAGE_DEFAULT )
  
    STYLE_DEFAULT_INDIC( beng, BENG, "Bengali" )
@@ -4869,6 +6846,14 @@ index 429da76..27fdd2e 100644
    STYLE_DEFAULT_INDIC( gujr, GUJR, "Gujarati" )
    STYLE_DEFAULT_INDIC( guru, GURU, "Gurmukhi" )
    STYLE_DEFAULT_INDIC( knda, KNDA, "Kannada" )
+@@ -130,7 +145,6 @@
+   STYLE_DEFAULT_INDIC( sund, SUND, "Sundanese" )
+   STYLE_DEFAULT_INDIC( sylo, SYLO, "Syloti Nagri" )
+   STYLE_DEFAULT_INDIC( taml, TAML, "Tamil" )
+-  STYLE_DEFAULT_INDIC( telu, TELU, "Telugu" )
+   STYLE_DEFAULT_INDIC( tibt, TIBT, "Tibetan" )
+ 
+ #endif /* AF_CONFIG_OPTION_INDIC */
 diff --git a/src/autofit/hbshim.c b/src/autofit/hbshim.c
 index 11fb743..cc04815 100644
 --- a/src/autofit/hbshim.c
@@ -4912,10 +6897,116 @@ index 11fb743..cc04815 100644
          gstyles[idx] = (FT_Byte)style_class->style;
  #ifdef FT_DEBUG_LEVEL_TRACE
 diff --git a/src/base/ftbbox.c b/src/base/ftbbox.c
-index 8d3f383..349cb95 100644
+index 8d3f383..fd3f198 100644
 --- a/src/base/ftbbox.c
 +++ b/src/base/ftbbox.c
-@@ -203,15 +203,48 @@
+@@ -4,7 +4,7 @@
+ /*                                                                         */
+ /*    FreeType bbox computation (body).                                    */
+ /*                                                                         */
+-/*  Copyright 1996-2002, 2004, 2006, 2010, 2013 by                         */
++/*  Copyright 1996-2002, 2004, 2006, 2010, 2013, 2014 by                   */
+ /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+ /*                                                                         */
+ /*  This file is part of the FreeType project, and may only be used        */
+@@ -42,16 +42,35 @@
+   } TBBox_Rec;
+ 
+ 
++#define FT_UPDATE_BBOX(p, bbox)       \
++  FT_BEGIN_STMNT                      \
++    if ( p->x < bbox.xMin )           \
++      bbox.xMin = p->x;               \
++    if ( p->x > bbox.xMax )           \
++      bbox.xMax = p->x;               \
++    if ( p->y < bbox.yMin )           \
++      bbox.yMin = p->y;               \
++    if ( p->y > bbox.yMax )           \
++      bbox.yMax = p->y;               \
++  FT_END_STMNT
++
++#define CHECK_X( p, bbox )  \
++          ( p->x < bbox.xMin || p->x > bbox.xMax )
++
++#define CHECK_Y( p, bbox )  \
++          ( p->y < bbox.yMin || p->y > bbox.yMax )
++
++
+   /*************************************************************************/
+   /*                                                                       */
+   /* <Function>                                                            */
+   /*    BBox_Move_To                                                       */
+   /*                                                                       */
+   /* <Description>                                                         */
+-  /*    This function is used as a `move_to' and `line_to' emitter during  */
++  /*    This function is used as a `move_to' emitter during                */
+   /*    FT_Outline_Decompose().  It simply records the destination point   */
+-  /*    in `user->last'; no further computations are necessary since we    */
+-  /*    use the cbox as the starting bbox which must be refined.           */
++  /*    in `user->last'. We also update bbox in case contour starts with   */
++  /*    an implicit `on' point.                                            */
+   /*                                                                       */
+   /* <Input>                                                               */
+   /*    to   :: A pointer to the destination vector.                       */
+@@ -66,17 +85,42 @@
+   BBox_Move_To( FT_Vector*  to,
+                 TBBox_Rec*  user )
+   {
++    FT_UPDATE_BBOX( to, user->bbox );
++ 
+     user->last = *to;
+ 
+     return 0;
+   }
+ 
+ 
+-#define CHECK_X( p, bbox )  \
+-          ( p->x < bbox.xMin || p->x > bbox.xMax )
++  /*************************************************************************/
++  /*                                                                       */
++  /* <Function>                                                            */
++  /*    BBox_Line_To                                                       */
++  /*                                                                       */
++  /* <Description>                                                         */
++  /*    This function is used as a `line_to' emitter during                */
++  /*    FT_Outline_Decompose().  It simply records the destination point   */
++  /*    in `user->last'; no further computations are necessary because     */
++  /*    bbox already contains both explicit ends of the line segment.      */
++  /*                                                                       */
++  /* <Input>                                                               */
++  /*    to   :: A pointer to the destination vector.                       */
++  /*                                                                       */
++  /* <InOut>                                                               */
++  /*    user :: A pointer to the current walk context.                     */
++  /*                                                                       */
++  /* <Return>                                                              */
++  /*    Always 0.  Needed for the interface only.                          */
++  /*                                                                       */
++  static int
++  BBox_Line_To( FT_Vector*  to,
++                TBBox_Rec*  user )
++  {
++    user->last = *to;
+ 
+-#define CHECK_Y( p, bbox )  \
+-          ( p->y < bbox.yMin || p->y > bbox.yMax )
++    return 0;
++  }
+ 
+ 
+   /*************************************************************************/
+@@ -155,8 +199,8 @@
+                  FT_Vector*  to,
+                  TBBox_Rec*  user )
+   {
+-    /* we don't need to check `to' since it is always an `on' point, thus */
+-    /* within the bbox                                                    */
++    /* in case `to' is implicit and not included in bbox yet */
++    FT_UPDATE_BBOX( to, user->bbox );
+ 
+     if ( CHECK_X( control, user->bbox ) )
+       BBox_Conic_Check( user->last.x,
+@@ -203,15 +247,48 @@
    /*    max :: The address of the current maximum.                         */
    /*                                                                       */
    static FT_Pos
@@ -4972,7 +7063,7 @@ index 8d3f383..349cb95 100644
      {
        /* determine which half contains the maximum and split */
        if ( q1 + q2 > q3 + q4 ) /* first half */
-@@ -240,17 +273,22 @@
+@@ -240,17 +317,22 @@
        /* check whether either end reached the maximum */
        if ( q1 == q2 && q1 >= q3 )
        {
@@ -4998,7 +7089,7 @@ index 8d3f383..349cb95 100644
    }
  
  
-@@ -262,65 +300,17 @@
+@@ -262,65 +344,17 @@
                      FT_Pos*  min,
                      FT_Pos*  max )
    {
@@ -5023,7 +7114,10 @@ index 8d3f383..349cb95 100644
 -      /* upscaling too much just wastes time */
 -      if ( shift > 2 )
 -        shift = 2;
--
++    /* the bbox that contains all on-points.  So at least one of the     */
++    /* conditions below holds and cubic_peak is called with at least one */
++    /* non-zero argument.                                                */
+ 
 -      p1 <<=  shift;
 -      p2 <<=  shift;
 -      p3 <<=  shift;
@@ -5040,10 +7134,7 @@ index 8d3f383..349cb95 100644
 -      nmin = *min >> -shift;
 -      nmax = *max >> -shift;
 -    }
-+    /* the bbox that contains all on-points.  So at least one of the     */
-+    /* conditions below holds and cubic_peak is called with at least one */
-+    /* non-zero argument.                                                */
- 
+-
 -    nmax =  update_cubic_max(  p1,  p2,  p3,  p4,  nmax );
 +    if ( p2 > *max || p3 > *max )
 +      *max += cubic_peak( p1 - *max, p2 - *max, p3 - *max, p4 - *max );
@@ -5071,6 +7162,62 @@ index 8d3f383..349cb95 100644
    }
  
  
+@@ -387,7 +421,7 @@
+ 
+ FT_DEFINE_OUTLINE_FUNCS(bbox_interface,
+     (FT_Outline_MoveTo_Func) BBox_Move_To,
+-    (FT_Outline_LineTo_Func) BBox_Move_To,
++    (FT_Outline_LineTo_Func) BBox_Line_To,
+     (FT_Outline_ConicTo_Func)BBox_Conic_To,
+     (FT_Outline_CubicTo_Func)BBox_Cubic_To,
+     0, 0
+@@ -399,8 +433,8 @@ FT_DEFINE_OUTLINE_FUNCS(bbox_interface,
+   FT_Outline_Get_BBox( FT_Outline*  outline,
+                        FT_BBox     *abbox )
+   {
+-    FT_BBox     cbox;
+-    FT_BBox     bbox;
++    FT_BBox     cbox = { 0x7FFFFFFF, 0x7FFFFFFF, -0x7FFFFFFF, -0x7FFFFFFF };
++    FT_BBox     bbox = { 0x7FFFFFFF, 0x7FFFFFFF, -0x7FFFFFFF, -0x7FFFFFFF };
+     FT_Vector*  vec;
+     FT_UShort   n;
+ 
+@@ -424,32 +458,13 @@ FT_DEFINE_OUTLINE_FUNCS(bbox_interface,
+     /* coincide, we exit immediately.                             */
+ 
+     vec = outline->points;
+-    bbox.xMin = bbox.xMax = cbox.xMin = cbox.xMax = vec->x;
+-    bbox.yMin = bbox.yMax = cbox.yMin = cbox.yMax = vec->y;
+-    vec++;
+ 
+-    for ( n = 1; n < outline->n_points; n++ )
++    for ( n = 0; n < outline->n_points; n++ )
+     {
+-      FT_Pos  x = vec->x;
+-      FT_Pos  y = vec->y;
+-
+-
+-      /* update control box */
+-      if ( x < cbox.xMin ) cbox.xMin = x;
+-      if ( x > cbox.xMax ) cbox.xMax = x;
+-
+-      if ( y < cbox.yMin ) cbox.yMin = y;
+-      if ( y > cbox.yMax ) cbox.yMax = y;
++      FT_UPDATE_BBOX( vec, cbox);
+ 
+       if ( FT_CURVE_TAG( outline->tags[n] ) == FT_CURVE_TAG_ON )
+-      {
+-        /* update bbox for `on' points only */
+-        if ( x < bbox.xMin ) bbox.xMin = x;
+-        if ( x > bbox.xMax ) bbox.xMax = x;
+-
+-        if ( y < bbox.yMin ) bbox.yMin = y;
+-        if ( y > bbox.yMax ) bbox.yMax = y;
+-      }
++        FT_UPDATE_BBOX( vec, bbox);
+ 
+       vec++;
+     }
 diff --git a/src/base/ftbitmap.c b/src/base/ftbitmap.c
 index 5606745..158a428 100644
 --- a/src/base/ftbitmap.c
@@ -5142,7 +7289,7 @@ index 5606745..158a428 100644
  
  
 diff --git a/src/base/ftcalc.c b/src/base/ftcalc.c
-index 6e65583..d0c43e0 100644
+index 6e65583..00071cb 100644
 --- a/src/base/ftcalc.c
 +++ b/src/base/ftcalc.c
 @@ -39,7 +39,8 @@
@@ -5740,6 +7887,92 @@ index 6e65583..d0c43e0 100644
  
  #endif /* FT_LONG64 */
  
+@@ -943,55 +858,40 @@
+                      FT_Pos  out_x,
+                      FT_Pos  out_y )
+   {
+-    FT_Pos  ax = in_x;
+-    FT_Pos  ay = in_y;
+-
+-    FT_Pos  d_in, d_out, d_corner;
+-
+-
+-    /* We approximate the Euclidean metric (sqrt(x^2 + y^2)) with */
+-    /* the Taxicab metric (|x| + |y|), which can be computed much */
+-    /* faster.  If one of the two vectors is much longer than the */
+-    /* other one, the direction of the shorter vector doesn't     */
+-    /* influence the result any more.                             */
+-    /*                                                            */
+-    /*                 corner                                     */
+-    /*       x---------------------------x                        */
+-    /*        \                      /                            */
+-    /*         \                /                                 */
+-    /*      in  \          /  out                                 */
+-    /*           \    /                                           */
+-    /*            o                                               */
+-    /*              Point                                         */
+-    /*                                                            */
+-
+-    if ( ax < 0 )
+-      ax = -ax;
+-    if ( ay < 0 )
+-      ay = -ay;
+-    d_in = ax + ay;  /* d_in = || in || */
+-
+-    ax = out_x;
+-    if ( ax < 0 )
+-      ax = -ax;
+-    ay = out_y;
+-    if ( ay < 0 )
+-      ay = -ay;
+-    d_out = ax + ay;  /* d_out = || out || */
+-
+-    ax = out_x + in_x;
+-    if ( ax < 0 )
+-      ax = -ax;
+-    ay = out_y + in_y;
+-    if ( ay < 0 )
+-      ay = -ay;
+-    d_corner = ax + ay;  /* d_corner = || in + out || */
++    FT_Pos  ax = in_x + out_x;
++    FT_Pos  ay = in_y + out_y;
++
++    FT_Pos  d_in, d_out, d_hypot;
++
++
++    /* The idea of this function is to compare the length of the */
++    /* hypotenuse with the `in' and `out' length.  The `corner'  */
++    /* represented by `in' and `out' is flat if the hypotenuse's */
++    /* length isn't too large.                                   */
++    /*                                                           */
++    /* This approach has the advantage that the angle between    */
++    /* `in' and `out' is not checked.  In case one of the two    */
++    /* vectors is `dominant', this is, much larger than the      */
++    /* other vector, we thus always have a flat corner.          */
++    /*                                                           */
++    /*                hypotenuse                                 */
++    /*       x---------------------------x                       */
++    /*        \                      /                           */
++    /*         \                /                                */
++    /*      in  \          /  out                                */
++    /*           \    /                                          */
++    /*            o                                              */
++    /*              Point                                        */
++
++    d_in    = FT_HYPOT(  in_x,  in_y );
++    d_out   = FT_HYPOT( out_x, out_y );
++    d_hypot = FT_HYPOT(    ax,    ay );
+ 
+     /* now do a simple length comparison: */
+     /*                                    */
+-    /*   d_in + d_out < 17/16 d_corner    */
++    /*   d_in + d_out < 17/16 d_hypot     */
+ 
+-    return ( d_in + d_out - d_corner ) < ( d_corner >> 4 );
++    return ( d_in + d_out - d_hypot ) < ( d_hypot >> 4 );
+   }
+ 
+ 
 diff --git a/src/base/ftlcdfil.c b/src/base/ftlcdfil.c
 index 852fb32..4aefb68 100644
 --- a/src/base/ftlcdfil.c
@@ -6097,6 +8330,45 @@ index 5853d77..81049f4 100644
          }
          else
          {
+diff --git a/src/cff/cffobjs.c b/src/cff/cffobjs.c
+index cac4ac2..f8267b3 100644
+--- a/src/cff/cffobjs.c
++++ b/src/cff/cffobjs.c
+@@ -1055,22 +1055,23 @@
+     CFF_Driver  driver = (CFF_Driver)module;
+ 
+ 
+-    /* set default property values, cf `ftcffdrv.h' */
++    /* set default property values, cf. `ftcffdrv.h' */
+ #ifdef CFF_CONFIG_OPTION_OLD_ENGINE
+-    driver->hinting_engine    = FT_CFF_HINTING_FREETYPE;
++    driver->hinting_engine = FT_CFF_HINTING_FREETYPE;
+ #else
+-    driver->hinting_engine    = FT_CFF_HINTING_ADOBE;
++    driver->hinting_engine = FT_CFF_HINTING_ADOBE;
+ #endif
++
+     driver->no_stem_darkening = FALSE;
+ 
+-    driver->darken_params[0] =  500;
+-    driver->darken_params[1] =  400;
+-    driver->darken_params[2] = 1000;
+-    driver->darken_params[3] =  275;
+-    driver->darken_params[4] = 1667;
+-    driver->darken_params[5] =  275;
+-    driver->darken_params[6] = 2333;
+-    driver->darken_params[7] =    0;
++    driver->darken_params[0] = CFF_CONFIG_OPTION_DARKENING_PARAMETER_X1;
++    driver->darken_params[1] = CFF_CONFIG_OPTION_DARKENING_PARAMETER_Y1;
++    driver->darken_params[2] = CFF_CONFIG_OPTION_DARKENING_PARAMETER_X2;
++    driver->darken_params[3] = CFF_CONFIG_OPTION_DARKENING_PARAMETER_Y2;
++    driver->darken_params[4] = CFF_CONFIG_OPTION_DARKENING_PARAMETER_X3;
++    driver->darken_params[5] = CFF_CONFIG_OPTION_DARKENING_PARAMETER_Y3;
++    driver->darken_params[6] = CFF_CONFIG_OPTION_DARKENING_PARAMETER_X4;
++    driver->darken_params[7] = CFF_CONFIG_OPTION_DARKENING_PARAMETER_Y4;
+ 
+     return FT_Err_Ok;
+   }
 diff --git a/src/gzip/inftrees.c b/src/gzip/inftrees.c
 index ef53652..56f52b1 100644
 --- a/src/gzip/inftrees.c
@@ -6257,7 +8529,7 @@ index 878de1f..9afbe5a 100644
      /* if we get here, then we have no choice but to abort ... */
    }
 diff --git a/src/sfnt/sfobjs.c b/src/sfnt/sfobjs.c
-index a31c77c..44aa467 100644
+index a31c77c..cfea9cd 100644
 --- a/src/sfnt/sfobjs.c
 +++ b/src/sfnt/sfobjs.c
 @@ -4,7 +4,7 @@
@@ -6344,6 +8616,14 @@ index a31c77c..44aa467 100644
  #undef WRITE_USHORT
  #undef WRITE_ULONG
  
+@@ -1015,7 +1016,6 @@
+     if ( is_apple_sbix )
+       has_outline = FALSE;
+ 
+-
+     /* if this font doesn't contain outlines, we try to load */
+     /* a `bhed' table                                        */
+     if ( !has_outline && sfnt->load_bhed )
 diff --git a/src/sfnt/ttcmap.c b/src/sfnt/ttcmap.c
 index c717f5f..f9acf5d 100644
 --- a/src/sfnt/ttcmap.c
@@ -6409,10 +8689,37 @@ index 47a85c0..99d8005 100644
  
  
 diff --git a/src/sfnt/ttsbit.c b/src/sfnt/ttsbit.c
-index 8ff7b9d..180d559 100644
+index 8ff7b9d..da6b01b 100644
 --- a/src/sfnt/ttsbit.c
 +++ b/src/sfnt/ttsbit.c
-@@ -256,7 +256,8 @@
+@@ -150,12 +150,25 @@
+           error = FT_THROW( Unknown_File_Format );
+           goto Exit;
+         }
+-        if ( flags != 0x0001 || num_strikes >= 0x10000UL )
++
++        /* Bit 0 must always be `1'.                            */
++        /* Bit 1 controls the overlay of bitmaps with outlines. */
++        /* All other bits should be zero.                       */
++        if ( !( flags == 1 || flags == 3 ) ||
++             num_strikes >= 0x10000UL      )
+         {
+           error = FT_THROW( Invalid_File_Format );
+           goto Exit;
+         }
+ 
++        /* we currently don't support bit 1; however, it is better to */
++        /* draw at least something...                                 */
++        if ( flags == 3 )
++          FT_TRACE1(( "tt_face_load_sbit_strikes:"
++                      " sbix overlay not supported yet\n"
++                      "                          "
++                      " expect bad rendering results\n" ));
++
+         /*
+          *  Count the number of strikes available in the table.  We are a bit
+          *  paranoid there and don't trust the data.
+@@ -256,7 +269,8 @@
      case TT_SBIT_TABLE_TYPE_SBIX:
        {
          FT_Stream       stream = face->root.stream;
@@ -6422,7 +8729,29 @@ index 8ff7b9d..180d559 100644
          TT_HoriHeader  *hori;
          FT_ULong        table_size;
  
-@@ -800,12 +801,12 @@
+@@ -504,13 +518,20 @@
+ 
+       p += 3;
+     }
++    else
++    {
++      /* avoid uninitialized data in case there is no vertical info -- */
++      metrics->vertBearingX = 0;
++      metrics->vertBearingY = 0;
++      metrics->vertAdvance  = 0;
++    }
+ 
+     decoder->metrics_loaded = 1;
+     *pp = p;
+     return FT_Err_Ok;
+ 
+   Fail:
+-    FT_TRACE1(( "tt_sbit_decoder_load_metrics: broken table" ));
++    FT_TRACE1(( "tt_sbit_decoder_load_metrics: broken table\n" ));
+     return FT_THROW( Invalid_Argument );
+   }
+ 
+@@ -800,12 +821,12 @@
      FT_Error  error = FT_Err_Ok;
      FT_UInt   num_components, nn;
  
@@ -6441,7 +8770,15 @@ index 8ff7b9d..180d559 100644
  
  
      if ( p + 2 > limit )
-@@ -1352,10 +1353,11 @@
+@@ -1334,6 +1355,7 @@
+ 
+     case FT_MAKE_TAG( 'j', 'p', 'g', ' ' ):
+     case FT_MAKE_TAG( 't', 'i', 'f', 'f' ):
++    case FT_MAKE_TAG( 'r', 'g', 'b', 'l' ): /* used on iOS 7.1 */
+       error = FT_THROW( Unknown_File_Format );
+       break;
+ 
+@@ -1352,10 +1374,11 @@
  
        tt_face_get_metrics( face, FALSE, glyph_index, &abearing, &aadvance );
  
@@ -6497,7 +8834,7 @@ index 58aa2a0..60fe696 100644
    $curr_offset += $count;
    $curr_elem_size += $count;
 diff --git a/src/truetype/ttgload.c b/src/truetype/ttgload.c
-index 5f676a2..ff2b339 100644
+index 5f676a2..2ab6f76 100644
 --- a/src/truetype/ttgload.c
 +++ b/src/truetype/ttgload.c
 @@ -4,7 +4,7 @@
@@ -6563,8 +8900,31 @@ index 5f676a2..ff2b339 100644
        }
  
        /* see whether the cvt program has disabled hinting */
+@@ -2366,15 +2373,18 @@
+           (void)tt_loader_init( &loader, size, glyph, load_flags, TRUE );
+           (void)load_truetype_glyph( &loader, glyph_index, 0, TRUE );
+           glyph->linearHoriAdvance = loader.linear;
+-          glyph->linearVertAdvance = loader.top_bearing + loader.bbox.yMax -
+-                                       loader.vadvance;
++          glyph->linearVertAdvance = loader.vadvance;
+ 
+-          /* sanity check: if `horiAdvance' in the sbit metric */
+-          /* structure isn't set, use `linearHoriAdvance'      */
++          /* sanity checks: if `xxxAdvance' in the sbit metric */
++          /* structure isn't set, use `linearXXXAdvance'      */
+           if ( !glyph->metrics.horiAdvance && glyph->linearHoriAdvance )
+             glyph->metrics.horiAdvance =
+               FT_MulFix( glyph->linearHoriAdvance,
+                          size->root.metrics.x_scale );
++          if ( !glyph->metrics.vertAdvance && glyph->linearVertAdvance )
++            glyph->metrics.vertAdvance =
++              FT_MulFix( glyph->linearVertAdvance,
++                         size->root.metrics.y_scale );
+         }
+ 
+         return FT_Err_Ok;
 diff --git a/src/truetype/ttinterp.c b/src/truetype/ttinterp.c
-index 56e8fa7..7d0248b 100644
+index 56e8fa7..43d88fd 100644
 --- a/src/truetype/ttinterp.c
 +++ b/src/truetype/ttinterp.c
 @@ -172,6 +172,9 @@
@@ -6617,7 +8977,155 @@ index 56e8fa7..7d0248b 100644
      return FT_MulFix( CUR.tt_metrics.ppem, CURRENT_Ratio() );
    }
  
-@@ -3089,7 +3093,7 @@
+@@ -2047,7 +2051,7 @@
+     if ( distance >= 0 )
+     {
+       val = distance + compensation;
+-      if ( distance && val < 0 )
++      if ( val < 0 )
+         val = 0;
+     }
+     else
+@@ -2087,10 +2091,8 @@
+ 
+     if ( distance >= 0 )
+     {
+-      val = distance + compensation + 32;
+-      if ( distance && val > 0 )
+-        val &= ~63;
+-      else
++      val = FT_PIX_ROUND( distance + compensation );
++      if ( val < 0 )
+         val = 0;
+     }
+     else
+@@ -2132,14 +2134,14 @@
+     if ( distance >= 0 )
+     {
+       val = FT_PIX_FLOOR( distance + compensation ) + 32;
+-      if ( distance && val < 0 )
+-        val = 0;
++      if ( val < 0 )
++        val = 32;
+     }
+     else
+     {
+       val = -( FT_PIX_FLOOR( compensation - distance ) + 32 );
+       if ( val > 0 )
+-        val = 0;
++        val = -32;
+     }
+ 
+     return val;
+@@ -2173,15 +2175,13 @@
+ 
+     if ( distance >= 0 )
+     {
+-      val = distance + compensation;
+-      if ( distance && val > 0 )
+-        val &= ~63;
+-      else
++      val = FT_PIX_FLOOR( distance + compensation );
++      if ( val < 0 )
+         val = 0;
+     }
+     else
+     {
+-      val = -( ( compensation - distance ) & -64 );
++      val = -FT_PIX_FLOOR( compensation - distance );
+       if ( val > 0 )
+         val = 0;
+     }
+@@ -2217,10 +2217,8 @@
+ 
+     if ( distance >= 0 )
+     {
+-      val = distance + compensation + 63;
+-      if ( distance && val > 0 )
+-        val &= ~63;
+-      else
++      val = FT_PIX_CEIL( distance + compensation );
++      if ( val < 0 )
+         val = 0;
+     }
+     else
+@@ -2261,10 +2259,8 @@
+ 
+     if ( distance >= 0 )
+     {
+-      val = distance + compensation + 16;
+-      if ( distance && val > 0 )
+-        val &= ~31;
+-      else
++      val = FT_PAD_ROUND( distance + compensation, 32 );
++      if ( val < 0 )
+         val = 0;
+     }
+     else
+@@ -2311,17 +2307,17 @@
+     {
+       val = ( distance - CUR.phase + CUR.threshold + compensation ) &
+               -CUR.period;
+-      if ( distance && val < 0 )
+-        val = 0;
+       val += CUR.phase;
++      if ( val < 0 )
++        val = CUR.phase;
+     }
+     else
+     {
+       val = -( ( CUR.threshold - CUR.phase - distance + compensation ) &
+                -CUR.period );
+-      if ( val > 0 )
+-        val = 0;
+       val -= CUR.phase;
++      if ( val > 0 )
++        val = -CUR.phase;
+     }
+ 
+     return val;
+@@ -2359,17 +2355,17 @@
+     {
+       val = ( ( distance - CUR.phase + CUR.threshold + compensation ) /
+                 CUR.period ) * CUR.period;
+-      if ( distance && val < 0 )
+-        val = 0;
+       val += CUR.phase;
++      if ( val < 0 )
++        val = CUR.phase;
+     }
+     else
+     {
+       val = -( ( ( CUR.threshold - CUR.phase - distance + compensation ) /
+                    CUR.period ) * CUR.period );
+-      if ( val > 0 )
+-        val = 0;
+       val -= CUR.phase;
++      if ( val > 0 )
++        val = -CUR.phase;
+     }
+ 
+     return val;
+@@ -3077,19 +3073,22 @@
+     CUR.GS.auto_flip = FALSE;
+ 
+ 
+-#define DO_SDB                             \
+-    CUR.GS.delta_base = (FT_Short)args[0];
++#define DO_SDB                              \
++    CUR.GS.delta_base = (FT_UShort)args[0];
+ 
+ 
+-#define DO_SDS                              \
+-    CUR.GS.delta_shift = (FT_Short)args[0];
++#define DO_SDS                                 \
++    if ( (FT_ULong)args[0] > 6UL )             \
++      CUR.error = FT_THROW( Bad_Argument );    \
++    else                                       \
++      CUR.GS.delta_shift = (FT_UShort)args[0];
+ 
+ 
+ #define DO_MD  /* nothing */
  
  
  #define DO_MPPEM              \
@@ -6626,7 +9134,7 @@ index 56e8fa7..7d0248b 100644
  
  
    /* Note: The pointSize should be irrelevant in a given font program; */
-@@ -3102,7 +3106,7 @@
+@@ -3102,7 +3101,7 @@
  #else
  
  #define DO_MPS                \
@@ -6635,7 +9143,7 @@ index 56e8fa7..7d0248b 100644
  
  #endif /* 0 */
  
-@@ -7487,9 +7491,9 @@
+@@ -7487,9 +7486,9 @@
    static void
    Ins_DELTAP( INS_ARG )
    {
@@ -6647,7 +9155,7 @@ index 56e8fa7..7d0248b 100644
      FT_Long    B;
  #ifdef TT_CONFIG_OPTION_SUBPIXEL_HINTING
      FT_UShort  B1, B2;
-@@ -7523,6 +7527,7 @@
+@@ -7523,6 +7522,7 @@
      }
  #endif
  
@@ -6655,7 +9163,7 @@ index 56e8fa7..7d0248b 100644
      nump = (FT_ULong)args[0];   /* some points theoretically may occur more
                                     than once, thus UShort isn't enough */
  
-@@ -7567,7 +7572,7 @@
+@@ -7567,12 +7567,12 @@
  
          C += CUR.GS.delta_base;
  
@@ -6664,7 +9172,13 @@ index 56e8fa7..7d0248b 100644
          {
            B = ( (FT_ULong)B & 0xF ) - 8;
            if ( B >= 0 )
-@@ -7596,9 +7601,9 @@
+             B++;
+-          B = B * 64 / ( 1L << CUR.GS.delta_shift );
++          B *= 1L << ( 6 - CUR.GS.delta_shift );
+ 
+ #ifdef TT_CONFIG_OPTION_SUBPIXEL_HINTING
+ 
+@@ -7596,9 +7596,9 @@
              else if ( CUR.ignore_x_mode )
              {
                if ( CUR.GS.freeVector.y != 0 )
@@ -6676,7 +9190,7 @@ index 56e8fa7..7d0248b 100644
  
  #if 0
                /* Standard Subpixel Hinting: Allow y move.       */
-@@ -7615,7 +7620,7 @@
+@@ -7615,7 +7615,7 @@
                     !( CUR.sph_tweak_flags & SPH_TWEAK_ALWAYS_SKIP_DELTAP ) )
                {
                  /* save the y value of the point now; compare after move */
@@ -6685,7 +9199,7 @@ index 56e8fa7..7d0248b 100644
  
                  if ( CUR.sph_tweak_flags & SPH_TWEAK_ROUND_NONPIXEL_Y_MOVES )
                    B = FT_PIX_ROUND( B1 + B ) - B1;
-@@ -7627,7 +7632,7 @@
+@@ -7627,7 +7627,7 @@
                    CUR_Func_move( &CUR.zp0, A, B );
                }
  
@@ -6694,7 +9208,7 @@ index 56e8fa7..7d0248b 100644
  
                /* Reverse this move if it results in a disallowed move */
                if ( CUR.GS.freeVector.y != 0                           &&
-@@ -7667,7 +7672,7 @@
+@@ -7667,7 +7667,7 @@
    Ins_DELTAC( INS_ARG )
    {
      FT_ULong  nump, k;
@@ -6703,7 +9217,7 @@ index 56e8fa7..7d0248b 100644
      FT_Long   B;
  
  
-@@ -7691,6 +7696,7 @@
+@@ -7691,6 +7691,7 @@
      }
  #endif
  
@@ -6711,7 +9225,7 @@ index 56e8fa7..7d0248b 100644
      nump = (FT_ULong)args[0];
  
      for ( k = 1; k <= nump; k++ )
-@@ -7736,7 +7742,7 @@
+@@ -7736,12 +7737,12 @@
  
          C += CUR.GS.delta_base;
  
@@ -6720,7 +9234,13 @@ index 56e8fa7..7d0248b 100644
          {
            B = ( (FT_ULong)B & 0xF ) - 8;
            if ( B >= 0 )
-@@ -8269,11 +8275,12 @@
+             B++;
+-          B = B * 64 / ( 1L << CUR.GS.delta_shift );
++          B *= 1L << ( 6 - CUR.GS.delta_shift );
+ 
+           CUR_Func_move_cvt( A, B );
+         }
+@@ -8269,11 +8270,12 @@
      CUR.iup_called = FALSE;
  #endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
  
@@ -6734,7 +9254,7 @@ index 56e8fa7..7d0248b 100644
        CUR.func_read_cvt  = Read_CVT_Stretched;
        CUR.func_write_cvt = Write_CVT_Stretched;
        CUR.func_move_cvt  = Move_CVT_Stretched;
-@@ -8281,6 +8288,7 @@
+@@ -8281,6 +8283,7 @@
      else
      {
        /* square pixels, use normal routines */
@@ -6742,7 +9262,7 @@ index 56e8fa7..7d0248b 100644
        CUR.func_read_cvt  = Read_CVT;
        CUR.func_write_cvt = Write_CVT;
        CUR.func_move_cvt  = Move_CVT;
-@@ -9035,10 +9043,13 @@
+@@ -9035,10 +9038,13 @@
      /* If any errors have occurred, function tables may be broken. */
      /* Force a re-execution of `prep' and `fpgm' tables if no      */
      /* bytecode debugger is run.                                   */
@@ -6804,7 +9324,7 @@ index 1d8825d..3cfc859 100644
      TT_Set_CVT_Func    func_write_cvt; /* write a cvt entry (in pixels) */
      TT_Set_CVT_Func    func_move_cvt;  /* incr a cvt entry (in pixels)  */
 diff --git a/src/truetype/ttobjs.c b/src/truetype/ttobjs.c
-index 4adba58..05a121c 100644
+index 4adba58..46f1332 100644
 --- a/src/truetype/ttobjs.c
 +++ b/src/truetype/ttobjs.c
 @@ -813,6 +813,8 @@
@@ -6847,7 +9367,13 @@ index 4adba58..05a121c 100644
    }
  
  
-@@ -974,8 +974,8 @@
+@@ -968,14 +968,13 @@
+     TT_Size    size = (TT_Size)ftsize;
+     TT_Face    face = (TT_Face)ftsize->face;
+     FT_Memory  memory = face->root.memory;
+-    FT_Int     i;
+ 
+     FT_UShort       n_twilight;
      TT_MaxProfile*  maxp = &face->max_profile;
  
  
@@ -6858,7 +9384,22 @@ index 4adba58..05a121c 100644
  
      size->max_function_defs    = maxp->maxFunctionDefs;
      size->max_instruction_defs = maxp->maxInstructionDefs;
-@@ -1052,15 +1052,14 @@
+@@ -997,9 +996,11 @@
+       metrics->rotated   = FALSE;
+       metrics->stretched = FALSE;
+ 
+-      /* set default compensation (all 0) */
+-      for ( i = 0; i < 4; i++ )
+-        metrics->compensations[i] = 0;
++      /* set default engine compensation */
++      metrics->compensations[0] = 0;   /* gray     */
++      metrics->compensations[1] = 0;   /* black    */
++      metrics->compensations[2] = 0;   /* white    */
++      metrics->compensations[3] = 0;   /* reserved */
+     }
+ 
+     /* allocate function defs, instruction defs, cvt, and storage area */
+@@ -1052,15 +1053,14 @@
      FT_Error  error = FT_Err_Ok;
  
  
@@ -6879,7 +9420,7 @@ index 4adba58..05a121c 100644
      {
        FT_UInt  i;
        TT_Face  face = (TT_Face)size->root.face;
-@@ -1087,8 +1086,6 @@
+@@ -1087,8 +1087,6 @@
        size->GS = tt_default_graphics_state;
  
        error = tt_size_run_prep( size, pedantic );
@@ -6888,7 +9429,7 @@ index 4adba58..05a121c 100644
      }
  
    Exit:
-@@ -1119,8 +1116,8 @@
+@@ -1119,8 +1117,8 @@
      FT_Error  error = FT_Err_Ok;
  
  #ifdef TT_USE_BYTECODE_INTERPRETER
@@ -6899,7 +9440,7 @@ index 4adba58..05a121c 100644
  #endif
  
      size->ttmetrics.valid = FALSE;
-@@ -1148,7 +1145,7 @@
+@@ -1148,7 +1146,7 @@
  
  
  #ifdef TT_USE_BYTECODE_INTERPRETER
@@ -6908,7 +9449,7 @@ index 4adba58..05a121c 100644
        tt_size_done_bytecode( ttsize );
  #endif
  
-@@ -1229,7 +1226,7 @@
+@@ -1229,7 +1227,7 @@
      }
  
  #ifdef TT_USE_BYTECODE_INTERPRETER
@@ -6918,7 +9459,7 @@ index 4adba58..05a121c 100644
  
      if ( !error )
 diff --git a/src/truetype/ttobjs.h b/src/truetype/ttobjs.h
-index a11dd37..47d50d9 100644
+index a11dd37..859164f 100644
 --- a/src/truetype/ttobjs.h
 +++ b/src/truetype/ttobjs.h
 @@ -4,7 +4,7 @@
@@ -6930,6 +9471,17 @@ index a11dd37..47d50d9 100644
  /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
  /*                                                                         */
  /*  This file is part of the FreeType project, and may only be used,       */
+@@ -95,8 +95,8 @@ FT_BEGIN_HEADER
+     FT_F26Dot6     control_value_cutin;
+     FT_F26Dot6     single_width_cutin;
+     FT_F26Dot6     single_width_value;
+-    FT_Short       delta_base;
+-    FT_Short       delta_shift;
++    FT_UShort      delta_base;
++    FT_UShort      delta_shift;
+ 
+     FT_Byte        instruct_control;
+     /* According to Greg Hitchcock from Microsoft, the `scan_control'     */
 @@ -333,8 +333,10 @@ FT_BEGIN_HEADER
      FT_Bool            debug;
      TT_ExecContext     context;
