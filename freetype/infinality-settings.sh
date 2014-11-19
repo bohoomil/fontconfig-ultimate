@@ -1,5 +1,3 @@
-#!/bin/bash
-
 ###          freetype2-infinality-ultimate settings          ###
 ###           rev. 0.4.8.1, for freetype2 v.2.5.x            ###
 ###                                                          ###
