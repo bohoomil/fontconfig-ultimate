@@ -162,10 +162,17 @@ index a4e583d..17a8820 100644
  
  # Packaging
 diff --git a/ChangeLog b/ChangeLog
-index ea1eb4a..630771b 100644
+index ea1eb4a..ee27f70 100644
 --- a/ChangeLog
 +++ b/ChangeLog
-@@ -1,3 +1,1134 @@
+@@ -1,3 +1,1141 @@
++2014-11-21  Werner Lemberg  <wl@gnu.org>
++
++	[type1, type42] Fix Savannah bug #43655.
++
++	* src/type1/t1load.c (parse_charstrings), src/type42/t42parse.c
++	(t42_parse_charstrings): Fix boundary testing.
++
 +2014-11-21  Werner Lemberg  <wl@gnu.org>
 +
 +	* src/pcf/pcfread.c (pcf_get_metrics): Sanitize invalid metrics.
@@ -10433,8 +10440,6 @@ index 425911a..94c5462 100644
  
          /* Avoid possible arithmetic overflow below by splitting. */
          if ( L > 32767 )
-diff --git a/src/tools/afblue.pl b/src/tools/afblue.pl
-index 58aa2a0..60fe696 100644
 --- a/src/tools/afblue.pl
 +++ b/src/tools/afblue.pl
 @@ -63,8 +63,8 @@ my $enum_element_re = qr/ ^ \s* ( [A-Za-z0-9_]+ ) \s* $ /x;
@@ -11212,3 +11217,29 @@ index 697288d..2602bdb 100644
      }
  
      return retval;
+diff --git a/src/type1/t1load.c b/src/type1/t1load.c
+index fd06432..caa75bd 100644
+--- a/src/type1/t1load.c
++++ b/src/type1/t1load.c
+@@ -1604,7 +1604,7 @@
+         FT_PtrDist  len;
+ 
+ 
+-        if ( cur + 1 >= limit )
++        if ( cur + 2 >= limit )
+         {
+           error = FT_THROW( Invalid_File_Format );
+           goto Fail;
+diff --git a/src/type42/t42parse.c b/src/type42/t42parse.c
+index 9b66888..a60e216 100644
+--- a/src/type42/t42parse.c
++++ b/src/type42/t42parse.c
+@@ -858,7 +858,7 @@
+         FT_PtrDist  len;
+ 
+ 
+-        if ( cur + 1 >= limit )
++        if ( cur + 2 >= limit )
+         {
+           FT_ERROR(( "t42_parse_charstrings: out of bounds\n" ));
+           error = FT_THROW( Invalid_File_Format );
