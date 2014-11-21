@@ -162,10 +162,225 @@ index a4e583d..17a8820 100644
  
  # Packaging
 diff --git a/ChangeLog b/ChangeLog
-index ea1eb4a..069fe4f 100644
+index ea1eb4a..630771b 100644
 --- a/ChangeLog
 +++ b/ChangeLog
-@@ -1,3 +1,919 @@
+@@ -1,3 +1,1134 @@
++2014-11-21  Werner Lemberg  <wl@gnu.org>
++
++	* src/pcf/pcfread.c (pcf_get_metrics): Sanitize invalid metrics.
++
++2014-11-21  Werner Lemberg  <wl@gnu.org>
++
++	[ftlcdfil] Obey flow direction.
++
++	* src/base/ftlcdfil.c (_ft_lcd_filter_fir, _ft_lcd_filter_legacy):
++	Handle `up' flow.
++
++2014-11-21  Werner Lemberg  <wl@gnu.org>
++
++	* src/base/ftbitmap.c (FT_Bitmap_Convert): Improve.
++
++	This commit completes argument checks and adds support for different
++	flow directions.
++
++2014-11-21  Werner Lemberg  <wl@gnu.org>
++
++	* src/base/ftbitmap.c (FT_Bitmap_Copy): Improve.
++
++	This commit adds argument checks and support for different flow
++	directions.
++
++2014-11-20  Werner Lemberg  <wl@gnu.org>
++
++	* src/base/ftbitmap.c (FT_Bitmap_New): Check argument.
++
++2014-11-19  Werner Lemberg  <wl@gnu.org>
++
++	Change some fields in `FT_Bitmap' to unsigned type.
++
++	This doesn't break ABI.
++
++	* include/ftimage.h (FT_Bitmap): Make `rows', `width', `num_grays',
++	`pixel_mode', and `palette_mode' unsigned types.
++
++	* src/base/ftbitmap.c: Updated.
++	(FT_Bitmap_Copy): Fix casts.
++
++	* src/cache/ftcsbits.c, src/raster/ftraster.c, src/sfnt/pngshim.c:
++	Updated.
++
++2014-11-19  Werner Lemberg  <wl@gnu.org>
++
++	Make `FT_Bitmap_Convert' correctly handle negative `pitch' values.
++
++	* src/base/ftbitmap.c (FT_Bitmap_Convert): Always use positive value
++	for the pitch while copying data.
++	Correctly set pitch sign in target bitmap.
++
++2014-11-19  Werner Lemberg  <wl@gnu.org>
++
++	Minor code improvement in `FT_Bitmap_Embolden'.
++
++	* src/base/ftbitmap.c (FT_Bitmap_Embolden) <FT_PIXEL_MODE_GRAY[24]>:
++	Fix thinko.
++
++2014-11-19  Alexei Podtelezhnikov  <apodtele@gmail.com>
++
++	* src/base/fttrigon.c: Use dedicated `FT_Angle' for arctan table.
++
++2014-11-19  Behdad Esfahbod  <behdad@behdad.org>
++
++	Avoid compiler warnings on x86-64 for `FT_MulFix'.
++
++	`FT_MulFix' takes `FT_Long' parameters as defined in `freetype.h',
++	but several inline implementations of it in `ftcalc.h' take
++	`FT_Int32' arguments.  This is causing compiler warnings on x86-64:
++	If parameters of type `FT_Fixed' (= `FT_Long') are passed to the
++	inline implementation of this function, integer values are truncated
++	from 64bit to 32bit.
++
++	* include/internal/ftcalc.h (FT_MulFix) [FT_MULFIX_ASSEMBLER]: Add
++	casts.
++
++2014-11-15  Werner Lemberg  <wl@gnu.org>
++
++	[sfnt] Fix Savannah bug #43597.
++
++	* src/sfnt/pngshim.c (Load_SBit_Png): Protect against too large
++	bitmaps.
++
++2014-11-12  Werner Lemberg  <wl@gnu.org>
++
++	[sfnt] Fix Savannah bug #43591.
++
++	* src/sfnt/ttsbit.c (tt_sbit_decoder_init): Protect against addition
++	and multiplication overflow.
++
++2014-11-12  Werner Lemberg  <wl@gnu.org>
++
++	[sfnt] Fix Savannah bug #43590.
++
++	* src/sfnt/ttload.c (check_table_dir, tt_face_load_font_dir):
++	Protect against addition overflow.
++
++2014-11-12  Werner Lemberg  <wl@gnu.org>
++
++	[sfnt] Fix Savannah bug #43589.
++
++	* src/sfnt/sfobjs.c (woff_open_font): Protect against addition
++	overflow.
++
++2014-11-12  Werner Lemberg  <wl@gnu.org>
++
++	[sfnt] Fix Savannah bug #43588.
++
++	* src/sfnt/ttcmap.c (tt_cmap8_validate, tt_cmap10_validate,
++	tt_cmap12_validate, tt_cmap13_validate, tt_cmap14_validate): Protect
++	against overflow in additions and multiplications.
++
++2014-11-10  Alexei Podtelezhnikov  <apodtele@gmail.com>
++
++	[base] CORDIC improvements.
++
++	The scaling between the hypotenuse and its CORDIC approximation is
++	based on regression analysis. The smaller padding for `theta' is
++	justifed by its maximum error of less than 6.
++
++	* src/base/fttrigon.c (ft_trig_downscale): Borrow code from
++	./ftcalc.c (ft_multo64), change linear intercept.
++	(ft_trig_pseudo_polarize): Decrease `theta' padding.
++
++2014-11-09  Werner Lemberg  <wl@gnu.org>
++
++	* src/base/ftstroke.c (ft_stroker_inside): Fix border intersections.
++
++	One more place to check whether `radius' is zero.
++
++	Problem reported by Marco Wertz <marco.wertz@gmx.de>.
++
++2014-11-07  Werner Lemberg  <wl@gnu.org>
++
++	[bdf] Fix Savannah bug #43535.
++
++	* src/bdf/bdflib.c (_bdf_strncmp): New macro that checks one
++	character more than `strncmp'.
++	s/ft_strncmp/_bdf_strncmp/ everywhere.
++
++2014-11-06  Werner Lemberg  <wl@gnu.org>
++
++	[pcf] Fix Savannah bug #43548.
++
++	* src/pcf/pcfread.c (pcf_get_encodings): Add sanity checks for row
++	and column values.
++
++2014-11-06  Werner Lemberg  <wl@gnu.org>
++
++	[pcf] Fix Savannah bug #43547.
++
++	* src/pcf/pcfread.c (pcf_read_TOC): Check `size' and `offset'
++	values.
++
++2014-11-06  Werner Lemberg  <wl@gnu.org>
++
++	* src/pcf/pcfread.c (pcf_read_TOC): Avoid memory leak.
++
++2014-11-03  Infinality  <infinality@infinality.net>
++
++	* src/truetype/ttsubpix.c (COMPATIBILITY_MODE_Rules): Updated.
++
++	The previous commit deteriorates rendering of DejaVu and similar
++	fonts; this gets compensated with this rule.
++
++2014-11-03  Werner Lemberg  <wl@gnu.org>
++
++	* src/truetype/ttinterp.c (Ins_DELTAP): Fix subpixel hinting.
++
++	Before this patch, it was impossible to ever call DELTAP[123] in
++	subpixel hinting mode as described in the ClearType whitepaper; it
++	only worked if in `compatibility mode'.  However, compatibility mode
++	essentially disables SHPIX, completely ruining hinting of
++	ttfautohint output, for example.
++
++	We now follow the whitepaper more closely so that DELTAP[123]
++	instructions for touched points in the non-subpixel direction are
++	executed.
++
++2014-10-31  Alexei Podtelezhnikov  <apodtele@gmail.com>
++
++	[smooth] Improve code readability.
++
++	* src/smooth/ftsmooth.c (ft_smooth_render_generic): Rearrange code.
++
++2014-10-31  Alexei Podtelezhnikov  <apodtele@gmail.com>
++
++	[smooth] Reduce outline translations during rendering.
++
++	* src/smooth/ftsmooth.c (ft_smooth_render_generic): Translate origin
++	virtually by modifying cbox, actually translate outline if cumulative
++	shift is not zero.
++
++2014-10-30  Alexei Podtelezhnikov  <apodtele@gmail.com>
++
++	[smooth] Fix Savannah bug #35604 (cont'd).
++
++	* src/smooth/ftsmooth.c (ft_smooth_render_generic): Remove checks and
++	casts that became unnecessary after the variable type upgrades.
++
++2014-10-29  Alexei Podtelezhnikov  <apodtele@gmail.com>
++
++	[smooth] Improve code readability.
++
++	* src/smooth/ftsmooth.c (ft_smooth_render_generic): Rearrange code.
++
++2014-10-29  Alexei Podtelezhnikov  <apodtele@gmail.com>
++
++	Unify hypotenuse approximations.
++
++	* include/internal/ftcalc.h (FT_HYPOT): Move macro from here...
++	* include/internal/ftobjs.h: ... to here, next to required `FT_ABS'.
++	* src/smooth/ftgrays.c (gray_render_cubic): Use it here.
++
 +2014-10-25  Werner Lemberg  <wl@gnu.org>
 +
 +	[cff] Test valid darkening parameter macros in `ftoption.h'.
@@ -3781,6 +3996,40 @@ index fb62b62..bb989ef 100644
    FT_EXPORT( FT_Long )
    FT_DivFix( FT_Long  a,
               FT_Long  b );
+diff --git a/include/ftbitmap.h b/include/ftbitmap.h
+index 7dbf5ba..eae7169 100644
+--- a/include/ftbitmap.h
++++ b/include/ftbitmap.h
+@@ -4,7 +4,7 @@
+ /*                                                                         */
+ /*    FreeType utility functions for bitmaps (specification).              */
+ /*                                                                         */
+-/*  Copyright 2004-2006, 2008, 2013 by                                     */
++/*  Copyright 2004-2006, 2008, 2013, 2014 by                               */
+ /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+ /*                                                                         */
+ /*  This file is part of the FreeType project, and may only be used,       */
+@@ -45,7 +45,9 @@ FT_BEGIN_HEADER
+   /*    Handling FT_Bitmap objects.                                        */
+   /*                                                                       */
+   /* <Description>                                                         */
+-  /*    This section contains functions for converting FT_Bitmap objects.  */
++  /*    This section contains functions for handling @FT_Bitmap objects.   */
++  /*    Note that none of the functions changes the bitmap's `flow' (as    */
++  /*    indicated by the sign of the `pitch' field in `FT_Bitmap').        */
+   /*                                                                       */
+   /*************************************************************************/
+ 
+@@ -122,6 +124,9 @@ FT_BEGIN_HEADER
+   /*    If you want to embolden the bitmap owned by a @FT_GlyphSlotRec,    */
+   /*    you should call @FT_GlyphSlot_Own_Bitmap on the slot first.        */
+   /*                                                                       */
++  /*    Bitmaps in @FT_PIXEL_MODE_GRAY2 and @FT_PIXEL_MODE_GRAY@ format    */
++  /*    are converted to @FT_PIXEL_MODE_GRAY format (i.e., 8bpp).          */
++  /*                                                                       */
+   FT_EXPORT( FT_Error )
+   FT_Bitmap_Embolden( FT_Library  library,
+                       FT_Bitmap*  bitmap,
 diff --git a/include/ftcffdrv.h b/include/ftcffdrv.h
 index e4d039d..49c1e6e 100644
 --- a/include/ftcffdrv.h
@@ -4123,6 +4372,77 @@ index 76c7b9e..99b2fad 100644
                  "Font glyphs corrupted or missing fields" )
  
  
+diff --git a/include/ftimage.h b/include/ftimage.h
+index ea71a78..b66f036 100644
+--- a/include/ftimage.h
++++ b/include/ftimage.h
+@@ -318,13 +318,13 @@ FT_BEGIN_HEADER
+   /*                                                                       */
+   typedef struct  FT_Bitmap_
+   {
+-    int             rows;
+-    int             width;
++    unsigned int    rows;
++    unsigned int    width;
+     int             pitch;
+     unsigned char*  buffer;
+-    short           num_grays;
+-    char            pixel_mode;
+-    char            palette_mode;
++    unsigned short  num_grays;
++    unsigned char   pixel_mode;
++    unsigned char   palette_mode;
+     void*           palette;
+ 
+   } FT_Bitmap;
+diff --git a/include/ftoutln.h b/include/ftoutln.h
+index 6c6d3f9..46b0b2f 100644
+--- a/include/ftoutln.h
++++ b/include/ftoutln.h
+@@ -535,7 +535,7 @@ FT_BEGIN_HEADER
+   *
+   * @description:
+   *   This function analyzes a glyph outline and tries to compute its
+-  *   fill orientation (see @FT_Orientation).  This is done by integrating 
++  *   fill orientation (see @FT_Orientation).  This is done by integrating
+   *   the total area covered by the outline. The positive integral
+   *   corresponds to the clockwise orientation and @FT_ORIENTATION_POSTSCRIPT
+   *   is returned. The negative integral corresponds to the counter-clockwise
+diff --git a/include/ftstroke.h b/include/ftstroke.h
+index a498e4a..ad2a900 100644
+--- a/include/ftstroke.h
++++ b/include/ftstroke.h
+@@ -4,7 +4,7 @@
+ /*                                                                         */
+ /*    FreeType path stroker (specification).                               */
+ /*                                                                         */
+-/*  Copyright 2002-2006, 2008, 2009, 2011-2012 by                          */
++/*  Copyright 2002-2006, 2008, 2009, 2011-2012, 2014 by                    */
+ /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+ /*                                                                         */
+ /*  This file is part of the FreeType project, and may only be used,       */
+@@ -276,6 +276,8 @@ FT_BEGIN_HEADER
+    * @note:
+    *   The radius is expressed in the same units as the outline
+    *   coordinates.
++   *
++   *   This function calls @FT_Stroker_Rewind automatically.
+    */
+   FT_EXPORT( void )
+   FT_Stroker_Set( FT_Stroker           stroker,
+@@ -570,10 +572,10 @@ FT_BEGIN_HEADER
+    *   receive all new data.
+    *
+    *   When an outline, or a sub-path, is `closed', the stroker generates
+-   *   two independent `border' outlines, named `left' and `right'
++   *   two independent `border' outlines, named `left' and `right'.
+    *
+    *   When the outline, or a sub-path, is `opened', the stroker merges
+-   *   the `border' outlines with caps. The `left' border receives all
++   *   the `border' outlines with caps.  The `left' border receives all
+    *   points, while the `right' border becomes empty.
+    *
+    *   Use the function @FT_Stroker_Export instead if you want to
 diff --git a/include/fttrigon.h b/include/fttrigon.h
 index 65143cb..9c7b543 100644
 --- a/include/fttrigon.h
@@ -4146,7 +4466,7 @@ index 65143cb..9c7b543 100644
     */
    FT_EXPORT( void )
 diff --git a/include/internal/ftcalc.h b/include/internal/ftcalc.h
-index 03bd68e..1d83d50 100644
+index 03bd68e..14ec37b 100644
 --- a/include/internal/ftcalc.h
 +++ b/include/internal/ftcalc.h
 @@ -4,7 +4,7 @@
@@ -4192,7 +4512,12 @@ index 03bd68e..1d83d50 100644
 +  /* These must be defined `static __inline__' with GCC.             */
  
 +#if defined( __CC_ARM ) || defined( __ARMCC__ )  /* RVCT */
-+
+ 
+-  /*************************************************************************/
+-  /*                                                                       */
+-  /* FT_MulDiv() and FT_MulFix() are declared in freetype.h.               */
+-  /*                                                                       */
+-  /*************************************************************************/
 +#define FT_MULFIX_ASSEMBLER  FT_MulFix_arm
 +
 +  /* documentation is in freetype.h */
@@ -4350,12 +4675,7 @@ index 03bd68e..1d83d50 100644
 +    /* Technically not an assembly fragment, but GCC does a really good */
 +    /* job at inlining it and generating good machine code for it.      */
 +    long long  ret, tmp;
- 
--  /*************************************************************************/
--  /*                                                                       */
--  /* FT_MulDiv() and FT_MulFix() are declared in freetype.h.               */
--  /*                                                                       */
--  /*************************************************************************/
++
 +
 +    ret  = (long long)a * b;
 +    tmp  = ret >> 63;
@@ -4400,7 +4720,7 @@ index 03bd68e..1d83d50 100644
 +
 +#ifdef FT_CONFIG_OPTION_INLINE_MULFIX
 +#ifdef FT_MULFIX_ASSEMBLER
-+#define FT_MulFix( a, b )  FT_MULFIX_ASSEMBLER( a, b )
++#define FT_MulFix( a, b )  FT_MULFIX_ASSEMBLER( (FT_Int32)(a), (FT_Int32)(b) )
 +#endif
 +#endif
  
@@ -4415,7 +4735,7 @@ index 03bd68e..1d83d50 100644
     *  Return TRUE if a corner is flat or nearly flat.  This is equivalent to
 -   *  saying that the angle difference between the `in' and `out' vectors is
 -   *  very small.
-+   *  saying that the corner point is close to its neighbors, or inside an 
++   *  saying that the corner point is close to its neighbors, or inside an
 +   *  ellipse defined by the neighbor focal points to be more precise.
     */
    FT_BASE( FT_Int )
@@ -4452,22 +4772,10 @@ index 03bd68e..1d83d50 100644
  
    /*
     *  Return sqrt(x*x+y*y), which is the same as `FT_Vector_Length' but uses
-@@ -152,6 +362,43 @@ FT_BEGIN_HEADER
+@@ -152,6 +362,31 @@ FT_BEGIN_HEADER
              FT_Fixed  y );
  
  
-+  /*
-+   *  Approximate sqrt(x*x+y*y) using the `alpha max plus beta min'
-+   *  algorithm.  We use alpha = 1, beta = 3/8, giving us results with a
-+   *  largest error less than 7% compared to the exact value.
-+   */  
-+#define FT_HYPOT( x, y )                 \
-+          ( x = FT_ABS( x ),             \
-+            y = FT_ABS( y ),             \
-+            x > y ? x + ( 3 * y >> 3 )   \
-+                  : y + ( 3 * x >> 3 ) )
-+
-+
 +#if 0
 +
 +  /*************************************************************************/
@@ -4497,10 +4805,27 @@ index 03bd68e..1d83d50 100644
  #define INT_TO_F2DOT14( x )    ( (FT_Long)(x) << 14 )
  #define INT_TO_FIXED( x )      ( (FT_Long)(x) << 16 )
 diff --git a/include/internal/ftobjs.h b/include/internal/ftobjs.h
-index 701c850..faa37f8 100644
+index 701c850..b45a5ed 100644
 --- a/include/internal/ftobjs.h
 +++ b/include/internal/ftobjs.h
-@@ -83,14 +83,6 @@ FT_BEGIN_HEADER
+@@ -72,6 +72,16 @@ FT_BEGIN_HEADER
+ 
+ #define FT_ABS( a )     ( (a) < 0 ? -(a) : (a) )
+ 
++  /*
++   *  Approximate sqrt(x*x+y*y) using the `alpha max plus beta min'
++   *  algorithm.  We use alpha = 1, beta = 3/8, giving us results with a
++   *  largest error less than 7% compared to the exact value.
++   */
++#define FT_HYPOT( x, y )                 \
++          ( x = FT_ABS( x ),             \
++            y = FT_ABS( y ),             \
++            x > y ? x + ( 3 * y >> 3 )   \
++                  : y + ( 3 * x >> 3 ) )
+ 
+ #define FT_PAD_FLOOR( x, n )  ( (x) & ~((n)-1) )
+ #define FT_PAD_ROUND( x, n )  FT_PAD_FLOOR( (x) + ((n)/2), n )
+@@ -83,14 +93,6 @@ FT_BEGIN_HEADER
  
  
    /*
@@ -6855,7 +7180,7 @@ index 429da76..f14d354 100644
  
  #endif /* AF_CONFIG_OPTION_INDIC */
 diff --git a/src/autofit/hbshim.c b/src/autofit/hbshim.c
-index 11fb743..cc04815 100644
+index 11fb743..a705cef 100644
 --- a/src/autofit/hbshim.c
 +++ b/src/autofit/hbshim.c
 @@ -247,6 +247,7 @@
@@ -6870,7 +7195,7 @@ index 11fb743..cc04815 100644
       * out whether a glyph gets shifted vertically, but this is something I
       * would like to avoid if not really necessary.
       *
-+     * Note that we don't follow this logic for the default coverage. 
++     * Note that we don't follow this logic for the default coverage.
 +     * Complex scripts like Devanagari have mandatory GPOS features to
 +     * position many glyph elements, using mark-to-base or mark-to-ligature
 +     * tables; the number of glyphs missed due to condition (b) would be far
@@ -6897,7 +7222,7 @@ index 11fb743..cc04815 100644
          gstyles[idx] = (FT_Byte)style_class->style;
  #ifdef FT_DEBUG_LEVEL_TRACE
 diff --git a/src/base/ftbbox.c b/src/base/ftbbox.c
-index 8d3f383..fd3f198 100644
+index 8d3f383..c775d5c 100644
 --- a/src/base/ftbbox.c
 +++ b/src/base/ftbbox.c
 @@ -4,7 +4,7 @@
@@ -6953,7 +7278,7 @@ index 8d3f383..fd3f198 100644
                  TBBox_Rec*  user )
    {
 +    FT_UPDATE_BBOX( to, user->bbox );
-+ 
++
      user->last = *to;
  
      return 0;
@@ -7106,7 +7431,10 @@ index 8d3f383..fd3f198 100644
 -    /* to be downscaled to avoid overflows during bisection.             */
 -    /* The control off-point outside the bbox is likely to have the top  */
 -    /* absolute value among arguments.                                   */
--
++    /* the bbox that contains all on-points.  So at least one of the     */
++    /* conditions below holds and cubic_peak is called with at least one */
++    /* non-zero argument.                                                */
+ 
 -    shift = 27 - FT_MSB( FT_ABS( p2 ) | FT_ABS( p3 ) );
 -
 -    if ( shift > 0 )
@@ -7114,10 +7442,7 @@ index 8d3f383..fd3f198 100644
 -      /* upscaling too much just wastes time */
 -      if ( shift > 2 )
 -        shift = 2;
-+    /* the bbox that contains all on-points.  So at least one of the     */
-+    /* conditions below holds and cubic_peak is called with at least one */
-+    /* non-zero argument.                                                */
- 
+-
 -      p1 <<=  shift;
 -      p2 <<=  shift;
 -      p3 <<=  shift;
@@ -7219,10 +7544,243 @@ index 8d3f383..fd3f198 100644
        vec++;
      }
 diff --git a/src/base/ftbitmap.c b/src/base/ftbitmap.c
-index 5606745..158a428 100644
+index 5606745..5dd33a2 100644
 --- a/src/base/ftbitmap.c
 +++ b/src/base/ftbitmap.c
-@@ -378,11 +378,8 @@
+@@ -33,7 +33,8 @@
+   FT_EXPORT_DEF( void )
+   FT_Bitmap_New( FT_Bitmap  *abitmap )
+   {
+-    *abitmap = null_bitmap;
++    if ( abitmap )
++      *abitmap = null_bitmap;
+   }
+ 
+ 
+@@ -44,25 +45,42 @@
+                   const FT_Bitmap  *source,
+                   FT_Bitmap        *target)
+   {
+-    FT_Memory  memory = library->memory;
++    FT_Memory  memory;
+     FT_Error   error  = FT_Err_Ok;
+-    FT_Int     pitch  = source->pitch;
+-    FT_ULong   size;
+ 
++    FT_Int    pitch;
++    FT_ULong  size;
++
++    FT_Int  source_pitch_sign, target_pitch_sign;
++
++
++    if ( !library )
++      return FT_THROW( Invalid_Library_Handle );
++
++    if ( !source || !target )
++      return FT_THROW( Invalid_Argument );
+ 
+     if ( source == target )
+       return FT_Err_Ok;
+ 
++    source_pitch_sign = source->pitch < 0 ? -1 : 1;
++    target_pitch_sign = target->pitch < 0 ? -1 : 1;
++
+     if ( source->buffer == NULL )
+     {
+       *target = *source;
++      if ( source_pitch_sign != target_pitch_sign )
++        target->pitch = -target->pitch;
+ 
+       return FT_Err_Ok;
+     }
+ 
++    memory = library->memory;
++    pitch  = source->pitch;
++
+     if ( pitch < 0 )
+       pitch = -pitch;
+-    size = (FT_ULong)( pitch * source->rows );
++    size = (FT_ULong)pitch * source->rows;
+ 
+     if ( target->buffer )
+     {
+@@ -70,9 +88,9 @@
+       FT_ULong  target_size;
+ 
+ 
+-      if ( target_pitch < 0  )
++      if ( target_pitch < 0 )
+         target_pitch = -target_pitch;
+-      target_size = (FT_ULong)( target_pitch * target->rows );
++      target_size = (FT_ULong)target_pitch * target->rows;
+ 
+       if ( target_size != size )
+         (void)FT_QREALLOC( target->buffer, target_size, size );
+@@ -89,13 +107,35 @@
+       *target = *source;
+       target->buffer = p;
+ 
+-      FT_MEM_COPY( target->buffer, source->buffer, size );
++      if ( source_pitch_sign == target_pitch_sign )
++        FT_MEM_COPY( target->buffer, source->buffer, size );
++      else
++      {
++        /* take care of bitmap flow */
++        FT_UInt   i;
++        FT_Byte*  s = source->buffer;
++        FT_Byte*  t = target->buffer;
++
++
++        t += pitch * ( target->rows - 1 );
++
++        for ( i = target->rows; i > 0; i-- )
++        {
++          FT_ARRAY_COPY( t, s, pitch );
++
++          s += pitch;
++          t -= pitch;
++        }
++      }
+     }
+ 
+     return error;
+   }
+ 
+ 
++  /* Enlarge `bitmap' horizontally and vertically by `xpixels' */
++  /* and `ypixels', respectively.                              */
++
+   static FT_Error
+   ft_bitmap_assure_buffer( FT_Memory   memory,
+                            FT_Bitmap*  bitmap,
+@@ -106,7 +146,7 @@
+     int             pitch;
+     int             new_pitch;
+     FT_UInt         bpp;
+-    FT_Int          i, width, height;
++    FT_UInt         i, width, height;
+     unsigned char*  buffer = NULL;
+ 
+ 
+@@ -144,17 +184,17 @@
+     if ( ypixels == 0 && new_pitch <= pitch )
+     {
+       /* zero the padding */
+-      FT_Int  bit_width = pitch * 8;
+-      FT_Int  bit_last  = ( width + xpixels ) * bpp;
++      FT_UInt  bit_width = pitch * 8;
++      FT_UInt  bit_last  = ( width + xpixels ) * bpp;
+ 
+ 
+       if ( bit_last < bit_width )
+       {
+         FT_Byte*  line  = bitmap->buffer + ( bit_last >> 3 );
+         FT_Byte*  end   = bitmap->buffer + pitch;
+-        FT_Int    shift = bit_last & 7;
++        FT_UInt   shift = bit_last & 7;
+         FT_UInt   mask  = 0xFF00U >> shift;
+-        FT_Int    count = height;
++        FT_UInt   count = height;
+ 
+ 
+         for ( ; count > 0; count--, line += pitch, end += pitch )
+@@ -168,19 +208,22 @@
+             write++;
+           }
+           if ( write < end )
+-            FT_MEM_ZERO( write, end-write );
++            FT_MEM_ZERO( write, end - write );
+         }
+       }
+ 
+       return FT_Err_Ok;
+     }
+ 
++    /* otherwise allocate new buffer */
+     if ( FT_QALLOC_MULT( buffer, new_pitch, bitmap->rows + ypixels ) )
+       return error;
+ 
++    /* new rows get added at the top of the bitmap, */
++    /* thus take care of the flow direction         */
+     if ( bitmap->pitch > 0 )
+     {
+-      FT_Int  len = ( width * bpp + 7 ) >> 3;
++      FT_UInt  len = ( width * bpp + 7 ) >> 3;
+ 
+ 
+       for ( i = 0; i < bitmap->rows; i++ )
+@@ -189,7 +232,7 @@
+     }
+     else
+     {
+-      FT_Int  len = ( width * bpp + 7 ) >> 3;
++      FT_UInt  len = ( width * bpp + 7 ) >> 3;
+ 
+ 
+       for ( i = 0; i < bitmap->rows; i++ )
+@@ -220,7 +263,8 @@
+   {
+     FT_Error        error;
+     unsigned char*  p;
+-    FT_Int          i, x, y, pitch;
++    FT_Int          i, x, pitch;
++    FT_UInt         y;
+     FT_Int          xstr, ystr;
+ 
+ 
+@@ -248,17 +292,11 @@
+     case FT_PIXEL_MODE_GRAY4:
+       {
+         FT_Bitmap  tmp;
+-        FT_Int     align;
+-
+ 
+-        if ( bitmap->pixel_mode == FT_PIXEL_MODE_GRAY2 )
+-          align = ( bitmap->width + xstr + 3 ) / 4;
+-        else
+-          align = ( bitmap->width + xstr + 1 ) / 2;
+ 
++        /* convert to 8bpp */
+         FT_Bitmap_New( &tmp );
+-
+-        error = FT_Bitmap_Convert( library, bitmap, &tmp, align );
++        error = FT_Bitmap_Convert( library, bitmap, &tmp, 1 );
+         if ( error )
+           return error;
+ 
+@@ -289,6 +327,7 @@
+     if ( error )
+       return error;
+ 
++    /* take care of bitmap flow */
+     pitch = bitmap->pitch;
+     if ( pitch > 0 )
+       p = bitmap->buffer + pitch * ystr;
+@@ -309,7 +348,7 @@
+        */
+       for ( x = pitch - 1; x >= 0; x-- )
+       {
+-        unsigned char tmp;
++        unsigned char  tmp;
+ 
+ 
+         tmp = p[x];
+@@ -334,12 +373,12 @@
+             {
+               if ( p[x] + p[x - i] > bitmap->num_grays - 1 )
+               {
+-                p[x] = (unsigned char)(bitmap->num_grays - 1);
++                p[x] = (unsigned char)( bitmap->num_grays - 1 );
+                 break;
+               }
+               else
+               {
+-                p[x] = (unsigned char)(p[x] + p[x-i]);
++                p[x] = (unsigned char)( p[x] + p[x - i] );
+                 if ( p[x] == bitmap->num_grays - 1 )
+                   break;
+               }
+@@ -378,14 +417,11 @@
    static FT_Byte
    ft_gray_for_premultiplied_srgb_bgra( const FT_Byte*  bgra )
    {
@@ -7235,16 +7793,23 @@ index 5606745..158a428 100644
 +    FT_UInt  l;
  
  
-     /* Short-circuit transparent color to avoid div-by-zero. */
-@@ -397,38 +394,30 @@
+-    /* Short-circuit transparent color to avoid div-by-zero. */
++    /* Short-circuit transparent color to avoid division by zero. */
+     if ( !a )
+       return 0;
+ 
+@@ -395,40 +431,32 @@
+      * A gamma of 2.2 is fair to assume.  And then, we need to
+      * undo the premultiplication too.
       *
-      * http://accessibility.kde.org/hsl-adjusted.php
-      *
--     * We do the computation with integers only.
+-     * http://accessibility.kde.org/hsl-adjusted.php
++     *   http://accessibility.kde.org/hsl-adjusted.php
++     *
 +     * We do the computation with integers only, applying a gamma of 2.0.
 +     * We guarantee 32-bit arithmetic to avoid overflow but the resulting
-+     * luminosity fits into 16 bits. 
-+     *
++     * luminosity fits into 16 bits.
+      *
+-     * We do the computation with integers only.
       */
  
 -    /* Undo premultification, get the number in a 16.16 form. */
@@ -7288,8 +7853,205 @@ index 5606745..158a428 100644
    }
  
  
+@@ -443,10 +471,16 @@
+     FT_Error   error = FT_Err_Ok;
+     FT_Memory  memory;
+ 
++    FT_Byte*  s;
++    FT_Byte*  t;
++
+ 
+     if ( !library )
+       return FT_THROW( Invalid_Library_Handle );
+ 
++    if ( !source || !target )
++      return FT_THROW( Invalid_Argument );
++
+     memory = library->memory;
+ 
+     switch ( source->pixel_mode )
+@@ -459,13 +493,15 @@
+     case FT_PIXEL_MODE_LCD_V:
+     case FT_PIXEL_MODE_BGRA:
+       {
+-        FT_Int   pad;
+-        FT_Long  old_size;
++        FT_Int    pad, old_target_pitch, target_pitch;
++        FT_ULong  old_size;
+ 
+ 
+-        old_size = target->rows * target->pitch;
+-        if ( old_size < 0 )
+-          old_size = -old_size;
++        old_target_pitch = target->pitch;
++        if ( old_target_pitch < 0 )
++          old_target_pitch = -old_target_pitch;
++
++        old_size = target->rows * old_target_pitch;
+ 
+         target->pixel_mode = FT_PIXEL_MODE_GRAY;
+         target->rows       = source->rows;
+@@ -479,16 +515,18 @@
+             pad = alignment - pad;
+         }
+ 
+-        target->pitch = source->width + pad;
++        target_pitch = source->width + pad;
+ 
+-        if ( target->pitch > 0                                     &&
+-             (FT_ULong)target->rows > FT_ULONG_MAX / target->pitch )
++        if ( target_pitch > 0                                     &&
++             (FT_ULong)target->rows > FT_ULONG_MAX / target_pitch )
+           return FT_THROW( Invalid_Argument );
+ 
+-        if ( target->rows * target->pitch > old_size             &&
++        if ( target->rows * target_pitch > old_size               &&
+              FT_QREALLOC( target->buffer,
+-                          old_size, target->rows * target->pitch ) )
++                          old_size, target->rows * target_pitch ) )
+           return error;
++
++        target->pitch = target->pitch < 0 ? -target_pitch : target_pitch;
+       }
+       break;
+ 
+@@ -496,13 +534,20 @@
+       error = FT_THROW( Invalid_Argument );
+     }
+ 
++    s = source->buffer;
++    t = target->buffer;
++
++    /* take care of bitmap flow */
++    if ( source->pitch < 0 )
++      s -= source->pitch * ( source->rows - 1 );
++    if ( target->pitch < 0 )
++      t -= target->pitch * ( target->rows - 1 );
++
+     switch ( source->pixel_mode )
+     {
+     case FT_PIXEL_MODE_MONO:
+       {
+-        FT_Byte*  s = source->buffer;
+-        FT_Byte*  t = target->buffer;
+-        FT_Int    i;
++        FT_UInt  i;
+ 
+ 
+         target->num_grays = 2;
+@@ -511,7 +556,7 @@
+         {
+           FT_Byte*  ss = s;
+           FT_Byte*  tt = t;
+-          FT_Int    j;
++          FT_UInt   j;
+ 
+ 
+           /* get the full bytes */
+@@ -559,12 +604,8 @@
+     case FT_PIXEL_MODE_LCD:
+     case FT_PIXEL_MODE_LCD_V:
+       {
+-        FT_Int    width   = source->width;
+-        FT_Byte*  s       = source->buffer;
+-        FT_Byte*  t       = target->buffer;
+-        FT_Int    s_pitch = source->pitch;
+-        FT_Int    t_pitch = target->pitch;
+-        FT_Int    i;
++        FT_Int   width = source->width;
++        FT_UInt  i;
+ 
+ 
+         target->num_grays = 256;
+@@ -573,8 +614,8 @@
+         {
+           FT_ARRAY_COPY( t, s, width );
+ 
+-          s += s_pitch;
+-          t += t_pitch;
++          s += source->pitch;
++          t += target->pitch;
+         }
+       }
+       break;
+@@ -582,9 +623,7 @@
+ 
+     case FT_PIXEL_MODE_GRAY2:
+       {
+-        FT_Byte*  s = source->buffer;
+-        FT_Byte*  t = target->buffer;
+-        FT_Int    i;
++        FT_UInt  i;
+ 
+ 
+         target->num_grays = 4;
+@@ -593,7 +632,7 @@
+         {
+           FT_Byte*  ss = s;
+           FT_Byte*  tt = t;
+-          FT_Int    j;
++          FT_UInt   j;
+ 
+ 
+           /* get the full bytes */
+@@ -634,9 +673,7 @@
+ 
+     case FT_PIXEL_MODE_GRAY4:
+       {
+-        FT_Byte*  s = source->buffer;
+-        FT_Byte*  t = target->buffer;
+-        FT_Int    i;
++        FT_UInt  i;
+ 
+ 
+         target->num_grays = 16;
+@@ -645,7 +682,7 @@
+         {
+           FT_Byte*  ss = s;
+           FT_Byte*  tt = t;
+-          FT_Int    j;
++          FT_UInt   j;
+ 
+ 
+           /* get the full bytes */
+@@ -670,13 +707,10 @@
+       }
+       break;
+ 
++
+     case FT_PIXEL_MODE_BGRA:
+       {
+-        FT_Byte*  s       = source->buffer;
+-        FT_Byte*  t       = target->buffer;
+-        FT_Int    s_pitch = source->pitch;
+-        FT_Int    t_pitch = target->pitch;
+-        FT_Int    i;
++        FT_UInt  i;
+ 
+ 
+         target->num_grays = 256;
+@@ -685,7 +719,7 @@
+         {
+           FT_Byte*  ss = s;
+           FT_Byte*  tt = t;
+-          FT_Int    j;
++          FT_UInt   j;
+ 
+ 
+           for ( j = source->width; j > 0; j-- )
+@@ -696,8 +730,8 @@
+             tt += 1;
+           }
+ 
+-          s += s_pitch;
+-          t += t_pitch;
++          s += source->pitch;
++          t += target->pitch;
+         }
+       }
+       break;
 diff --git a/src/base/ftcalc.c b/src/base/ftcalc.c
-index 6e65583..00071cb 100644
+index 6e65583..f3ef8c5 100644
 --- a/src/base/ftcalc.c
 +++ b/src/base/ftcalc.c
 @@ -39,7 +39,8 @@
@@ -7477,7 +8239,7 @@ index 6e65583..00071cb 100644
        return (FT_UInt32)0x7FFFFFFFL;
  
 -    i = 32;
-+    /* We shift as many bits as we can into the high register, perform     */ 
++    /* We shift as many bits as we can into the high register, perform     */
 +    /* 32-bit division with modulo there, then work through the remaining  */
 +    /* bits with long division. This optimization is especially noticeable */
 +    /* for smaller dividends that barely use the high register.            */
@@ -7748,7 +8510,7 @@ index 6e65583..00071cb 100644
  
 -      temp.hi  = (FT_Int32)( a >> 16 );
 -      temp.lo  = (FT_UInt32)a << 16;
-+      temp.hi  = a >> 16; 
++      temp.hi  = a >> 16;
 +      temp.lo  = a << 16;
        temp2.hi = 0;
 -      temp2.lo = (FT_UInt32)( b >> 1 );
@@ -7758,7 +8520,7 @@ index 6e65583..00071cb 100644
 -
 -    return ( s < 0 ? -(FT_Int32)q : (FT_Int32)q );
 -  }
-+      temp2.lo = b >> 1; 
++      temp2.lo = b >> 1;
  
 -
 -#if 0
@@ -7974,7 +8736,7 @@ index 6e65583..00071cb 100644
  
  
 diff --git a/src/base/ftlcdfil.c b/src/base/ftlcdfil.c
-index 852fb32..4aefb68 100644
+index 852fb32..1f23c4c 100644
 --- a/src/base/ftlcdfil.c
 +++ b/src/base/ftlcdfil.c
 @@ -4,7 +4,7 @@
@@ -7986,10 +8748,14 @@ index 852fb32..4aefb68 100644
  /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
  /*                                                                         */
  /*  This file is part of the FreeType project, and may only be used,       */
-@@ -46,9 +46,12 @@
+@@ -46,9 +46,16 @@
        FT_Byte*  line = bitmap->buffer;
  
  
++      /* take care of bitmap flow */
++      if ( bitmap->pitch < 0 )
++        line -= bitmap->pitch * ( bitmap->rows - 1 );
++
 +      /* `fir' and `pix' must be at least 32 bit wide, since the sum of */
 +      /* the values in `weights' can exceed 0xFF                        */
 +
@@ -8000,7 +8766,7 @@ index 852fb32..4aefb68 100644
          FT_UInt  val1, xx;
  
  
-@@ -57,7 +60,6 @@
+@@ -57,7 +64,6 @@
          fir[1] = weights[3] * val1;
          fir[2] = weights[4] * val1;
          fir[3] = 0;
@@ -8008,7 +8774,7 @@ index 852fb32..4aefb68 100644
  
          val1    = line[1];
          fir[0] += weights[1] * val1;
-@@ -78,7 +80,7 @@
+@@ -78,7 +84,7 @@
            fir[3] =          weights[4] * val;
  
            pix        >>= 8;
@@ -8017,7 +8783,7 @@ index 852fb32..4aefb68 100644
            line[xx - 2] = (FT_Byte)pix;
          }
  
-@@ -87,11 +89,11 @@
+@@ -87,11 +93,11 @@
  
  
            pix          = fir[0] >> 8;
@@ -8031,7 +8797,14 @@ index 852fb32..4aefb68 100644
            line[xx - 1] = (FT_Byte)pix;
          }
        }
-@@ -107,7 +109,7 @@
+@@ -104,10 +110,14 @@
+       FT_Int    pitch  = bitmap->pitch;
+ 
+ 
++      /* take care of bitmap flow */
++      if ( bitmap->pitch < 0 )
++        column -= bitmap->pitch * ( bitmap->rows - 1 );
++
        for ( ; width > 0; width--, column++ )
        {
          FT_Byte*  col = column;
@@ -8040,7 +8813,7 @@ index 852fb32..4aefb68 100644
          FT_UInt   val1, yy;
  
  
-@@ -116,7 +118,6 @@
+@@ -116,7 +126,6 @@
          fir[1] = weights[3] * val1;
          fir[2] = weights[4] * val1;
          fir[3] = 0;
@@ -8048,7 +8821,7 @@ index 852fb32..4aefb68 100644
          col   += pitch;
  
          val1    = col[0];
-@@ -139,7 +140,7 @@
+@@ -139,7 +148,7 @@
            fir[3] =          weights[4] * val;
  
            pix           >>= 8;
@@ -8057,7 +8830,7 @@ index 852fb32..4aefb68 100644
            col[-2 * pitch] = (FT_Byte)pix;
            col            += pitch;
          }
-@@ -149,11 +150,11 @@
+@@ -149,11 +158,11 @@
  
  
            pix             = fir[0] >> 8;
@@ -8071,11 +8844,41 @@ index 852fb32..4aefb68 100644
            col[-pitch] = (FT_Byte)pix;
          }
        }
+@@ -189,6 +198,10 @@
+       FT_Byte*  line = bitmap->buffer;
+ 
+ 
++      /* take care of bitmap flow */
++      if ( bitmap->pitch < 0 )
++        line -= bitmap->pitch * ( bitmap->rows - 1 );
++
+       for ( ; height > 0; height--, line += pitch )
+       {
+         FT_UInt  xx;
+@@ -228,6 +241,10 @@
+       FT_Byte*  column = bitmap->buffer;
+ 
+ 
++      /* take care of bitmap flow */
++      if ( bitmap->pitch < 0 )
++        column -= bitmap->pitch * ( bitmap->rows - 1 );
++
+       for ( ; width > 0; width--, column++ )
+       {
+         FT_Byte*  col     = column;
 diff --git a/src/base/ftobjs.c b/src/base/ftobjs.c
-index 6f32336..cc56105 100644
+index 6f32336..315ad12 100644
 --- a/src/base/ftobjs.c
 +++ b/src/base/ftobjs.c
-@@ -4881,6 +4881,8 @@
+@@ -4107,6 +4107,7 @@
+ 
+       FT_Bitmap_New( &bitmap );
+ 
++      /* this also converts the bitmap flow to `down' (i.e., pitch > 0) */
+       err = FT_Bitmap_Convert( library, &slot->bitmap, &bitmap, 1 );
+       if ( !err )
+       {
+@@ -4881,6 +4882,8 @@
        *p_arg1      = subg->arg1;
        *p_arg2      = subg->arg2;
        *p_transform = subg->transform;
@@ -8099,18 +8902,178 @@ index 4a39dcd..632b6d2 100644
      xshift = FT_MSB( FT_ABS( cbox.xMax ) | FT_ABS( cbox.xMin ) ) - 14;
      xshift = FT_MAX( xshift, 0 );
  
+diff --git a/src/base/ftstroke.c b/src/base/ftstroke.c
+index ee61cec..dd75e32 100644
+--- a/src/base/ftstroke.c
++++ b/src/base/ftstroke.c
+@@ -4,7 +4,7 @@
+ /*                                                                         */
+ /*    FreeType path stroker (body).                                        */
+ /*                                                                         */
+-/*  Copyright 2002-2006, 2008-2011, 2013 by                                */
++/*  Copyright 2002-2006, 2008-2011, 2013, 2014 by                          */
+ /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+ /*                                                                         */
+ /*  This file is part of the FreeType project, and may only be used,       */
+@@ -1002,7 +1002,8 @@
+                                                     FT_Tan( theta ) ) );
+ 
+ 
+-      intersect = FT_BOOL( stroker->line_length >= min_length &&
++      intersect = FT_BOOL( min_length                         &&
++                           stroker->line_length >= min_length &&
+                            line_length          >= min_length );
+     }
+ 
 diff --git a/src/base/fttrigon.c b/src/base/fttrigon.c
-index 4ffdcb7..e3ce8a6 100644
+index 4ffdcb7..64317fa 100644
 --- a/src/base/fttrigon.c
 +++ b/src/base/fttrigon.c
-@@ -111,6 +111,7 @@
+@@ -4,7 +4,7 @@
+ /*                                                                         */
+ /*    FreeType trigonometric functions (body).                             */
+ /*                                                                         */
+-/*  Copyright 2001-2005, 2012-2013 by                                      */
++/*  Copyright 2001-2005, 2012-2014 by                                      */
+ /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+ /*                                                                         */
+ /*  This file is part of the FreeType project, and may only be used,       */
+@@ -45,7 +45,7 @@
+   /* this table was generated for FT_PI = 180L << 16, i.e. degrees */
+ #define FT_TRIG_MAX_ITERS  23
+ 
+-  static const FT_Fixed
++  static const FT_Angle
+   ft_trig_arctan_table[] =
+   {
+     1740967L, 919879L, 466945L, 234379L, 117304L, 58666L, 29335L,
+@@ -60,15 +60,18 @@
+   static FT_Fixed
+   ft_trig_downscale( FT_Fixed  val )
+   {
+-    FT_Fixed  s;
+-    FT_Int64  v;
++    FT_Int  s = 1;
+ 
+ 
+-    s   = val;
+-    val = FT_ABS( val );
++    if ( val < 0 )
++    {
++       val = -val;
++       s = -1;
++    }
+ 
+-    v   = ( val * (FT_Int64)FT_TRIG_SCALE ) + 0x100000000UL;
+-    val = (FT_Fixed)( v >> 32 );
++    /* 0x40000000 comes from regression analysis between true */
++    /* and CORDIC hypotenuse, so it minimizes the error       */
++    val = (FT_Fixed)( ( (FT_Int64)val * FT_TRIG_SCALE + 0x40000000UL ) >> 32 );
+ 
+     return ( s >= 0 ) ? val : -val;
+   }
+@@ -79,29 +82,43 @@
+   static FT_Fixed
+   ft_trig_downscale( FT_Fixed  val )
+   {
+-    FT_Fixed   s;
+-    FT_UInt32  v1, v2, k1, k2, hi, lo1, lo2, lo3;
++    FT_Int     s = 1;
++    FT_UInt32  lo1, hi1, lo2, hi2, lo, hi, i1, i2;
++
++
++    if ( val < 0 )
++    {
++       val = -val;
++       s = -1;
++    }
+ 
++    lo1 = val & 0x0000FFFFU;
++    hi1 = val >> 16;
++    lo2 = FT_TRIG_SCALE & 0x0000FFFFU;
++    hi2 = FT_TRIG_SCALE >> 16;
+ 
+-    s   = val;
+-    val = FT_ABS( val );
++    lo = lo1 * lo2;
++    i1 = lo1 * hi2;
++    i2 = lo2 * hi1;
++    hi = hi1 * hi2;
+ 
+-    v1 = (FT_UInt32)val >> 16;
+-    v2 = (FT_UInt32)( val & 0xFFFFL );
++    /* Check carry overflow of i1 + i2 */
++    i1 += i2;
++    hi += (FT_UInt32)( i1 < i2 ) << 16;
+ 
+-    k1 = (FT_UInt32)FT_TRIG_SCALE >> 16;           /* constant */
+-    k2 = (FT_UInt32)( FT_TRIG_SCALE & 0xFFFFL );   /* constant */
++    hi += i1 >> 16;
++    i1  = i1 << 16;
+ 
+-    hi   = k1 * v1;
+-    lo1  = k1 * v2 + k2 * v1;       /* can't overflow */
++    /* Check carry overflow of i1 + lo */
++    lo += i1;
++    hi += ( lo < i1 );
+ 
+-    lo2  = ( k2 * v2 ) >> 16;
+-    lo3  = FT_MAX( lo1, lo2 );
+-    lo1 += lo2;
++    /* 0x40000000 comes from regression analysis between true */
++    /* and CORDIC hypotenuse, so it minimizes the error       */
+ 
+-    hi  += lo1 >> 16;
+-    if ( lo1 < lo3 )
+-      hi += (FT_UInt32)0x10000UL;
++    /* Check carry overflow of lo + 0x40000000 */
++    lo += 0x40000000U;
++    hi += ( lo < 0x40000000U );
+ 
+     val  = (FT_Fixed)hi;
+ 
+@@ -111,6 +128,7 @@
  #endif /* !FT_LONG64 */
  
  
-+  /* undefined and never called for zero vector */  
++  /* undefined and never called for zero vector */
    static FT_Int
    ft_trig_prenorm( FT_Vector*  vec )
    {
+@@ -147,7 +165,7 @@
+   {
+     FT_Int           i;
+     FT_Fixed         x, y, xtemp, b;
+-    const FT_Fixed  *arctanptr;
++    const FT_Angle  *arctanptr;
+ 
+ 
+     x = vec->x;
+@@ -202,7 +220,7 @@
+     FT_Angle         theta;
+     FT_Int           i;
+     FT_Fixed         x, y, xtemp, b;
+-    const FT_Fixed  *arctanptr;
++    const FT_Angle  *arctanptr;
+ 
+ 
+     x = vec->x;
+@@ -261,11 +279,12 @@
+       }
+     }
+ 
+-    /* round theta */
++    /* round theta to acknowledge its error that mostly comes */
++    /* from accumulated rounding errors in the arctan table   */
+     if ( theta >= 0 )
+-      theta = FT_PAD_ROUND( theta, 32 );
++      theta = FT_PAD_ROUND( theta, 16 );
+     else
+-      theta = -FT_PAD_ROUND( -theta, 32 );
++      theta = -FT_PAD_ROUND( -theta, 16 );
+ 
+     vec->x = x;
+     vec->y = theta;
 diff --git a/src/base/ftutil.c b/src/base/ftutil.c
 index 879d027..9f37189 100644
 --- a/src/base/ftutil.c
@@ -8143,7 +9106,7 @@ index 879d027..9f37189 100644
 -
  /* END */
 diff --git a/src/bdf/bdfdrivr.c b/src/bdf/bdfdrivr.c
-index 5a1c296..d7649ab 100644
+index 5a1c296..c270d59 100644
 --- a/src/bdf/bdfdrivr.c
 +++ b/src/bdf/bdfdrivr.c
 @@ -182,7 +182,7 @@ THE SOFTWARE.
@@ -8155,6 +9118,242 @@ index 5a1c296..d7649ab 100644
    const FT_CMap_ClassRec  bdf_cmap_class =
    {
      sizeof ( BDF_CMapRec ),
+@@ -384,7 +384,7 @@ THE SOFTWARE.
+       BDF_Face_Done( bdfface );
+       return FT_THROW( Invalid_Argument );
+     }
+- 
++
+     {
+       bdf_property_t*  prop = NULL;
+ 
+diff --git a/src/bdf/bdflib.c b/src/bdf/bdflib.c
+index 2eda11c..c128526 100644
+--- a/src/bdf/bdflib.c
++++ b/src/bdf/bdflib.c
+@@ -169,6 +169,18 @@
+                         sizeof ( _bdf_properties[0] );
+ 
+ 
++  /* An auxiliary macro to parse properties, to be used in conditionals. */
++  /* It behaves like `strncmp' but also tests the following character    */
++  /* whether it is a whitespace or NULL.                                 */
++  /* `property' is a constant string of length `n' to compare with.      */
++#define _bdf_strncmp( name, property, n )      \
++          ( ft_strncmp( name, property, n ) || \
++            !( name[n] == ' '  ||              \
++               name[n] == '\0' ||              \
++               name[n] == '\n' ||              \
++               name[n] == '\r' ||              \
++               name[n] == '\t' )            )
++
+   /* Auto correction messages. */
+ #define ACMSG1   "FONT_ASCENT property missing.  " \
+                  "Added `FONT_ASCENT %hd'.\n"
+@@ -1408,7 +1420,7 @@
+ 
+     /* If the property happens to be a comment, then it doesn't need */
+     /* to be added to the internal hash table.                       */
+-    if ( ft_strncmp( name, "COMMENT", 7 ) != 0 )
++    if ( _bdf_strncmp( name, "COMMENT", 7 ) != 0 )
+     {
+       /* Add the property to the font property table. */
+       error = hash_insert( fp->name,
+@@ -1426,13 +1438,13 @@
+     /* FONT_ASCENT and FONT_DESCENT need to be assigned if they are        */
+     /* present, and the SPACING property should override the default       */
+     /* spacing.                                                            */
+-    if ( ft_strncmp( name, "DEFAULT_CHAR", 12 ) == 0 )
++    if ( _bdf_strncmp( name, "DEFAULT_CHAR", 12 ) == 0 )
+       font->default_char = fp->value.l;
+-    else if ( ft_strncmp( name, "FONT_ASCENT", 11 ) == 0 )
++    else if ( _bdf_strncmp( name, "FONT_ASCENT", 11 ) == 0 )
+       font->font_ascent = fp->value.l;
+-    else if ( ft_strncmp( name, "FONT_DESCENT", 12 ) == 0 )
++    else if ( _bdf_strncmp( name, "FONT_DESCENT", 12 ) == 0 )
+       font->font_descent = fp->value.l;
+-    else if ( ft_strncmp( name, "SPACING", 7 ) == 0 )
++    else if ( _bdf_strncmp( name, "SPACING", 7 ) == 0 )
+     {
+       if ( !fp->value.atom )
+       {
+@@ -1490,7 +1502,7 @@
+     memory = font->memory;
+ 
+     /* Check for a comment. */
+-    if ( ft_strncmp( line, "COMMENT", 7 ) == 0 )
++    if ( _bdf_strncmp( line, "COMMENT", 7 ) == 0 )
+     {
+       linelen -= 7;
+ 
+@@ -1507,7 +1519,7 @@
+     /* The very first thing expected is the number of glyphs. */
+     if ( !( p->flags & _BDF_GLYPHS ) )
+     {
+-      if ( ft_strncmp( line, "CHARS", 5 ) != 0 )
++      if ( _bdf_strncmp( line, "CHARS", 5 ) != 0 )
+       {
+         FT_ERROR(( "_bdf_parse_glyphs: " ERRMSG1, lineno, "CHARS" ));
+         error = FT_THROW( Missing_Chars_Field );
+@@ -1541,7 +1553,7 @@
+     }
+ 
+     /* Check for the ENDFONT field. */
+-    if ( ft_strncmp( line, "ENDFONT", 7 ) == 0 )
++    if ( _bdf_strncmp( line, "ENDFONT", 7 ) == 0 )
+     {
+       /* Sort the glyphs by encoding. */
+       ft_qsort( (char *)font->glyphs,
+@@ -1555,7 +1567,7 @@
+     }
+ 
+     /* Check for the ENDCHAR field. */
+-    if ( ft_strncmp( line, "ENDCHAR", 7 ) == 0 )
++    if ( _bdf_strncmp( line, "ENDCHAR", 7 ) == 0 )
+     {
+       p->glyph_enc = 0;
+       p->flags    &= ~_BDF_GLYPH_BITS;
+@@ -1571,7 +1583,7 @@
+       goto Exit;
+ 
+     /* Check for the STARTCHAR field. */
+-    if ( ft_strncmp( line, "STARTCHAR", 9 ) == 0 )
++    if ( _bdf_strncmp( line, "STARTCHAR", 9 ) == 0 )
+     {
+       /* Set the character name in the parse info first until the */
+       /* encoding can be checked for an unencoded character.      */
+@@ -1605,7 +1617,7 @@
+     }
+ 
+     /* Check for the ENCODING field. */
+-    if ( ft_strncmp( line, "ENCODING", 8 ) == 0 )
++    if ( _bdf_strncmp( line, "ENCODING", 8 ) == 0 )
+     {
+       if ( !( p->flags & _BDF_GLYPH ) )
+       {
+@@ -1791,7 +1803,7 @@
+     }
+ 
+     /* Expect the SWIDTH (scalable width) field next. */
+-    if ( ft_strncmp( line, "SWIDTH", 6 ) == 0 )
++    if ( _bdf_strncmp( line, "SWIDTH", 6 ) == 0 )
+     {
+       if ( !( p->flags & _BDF_ENCODING ) )
+         goto Missing_Encoding;
+@@ -1807,7 +1819,7 @@
+     }
+ 
+     /* Expect the DWIDTH (scalable width) field next. */
+-    if ( ft_strncmp( line, "DWIDTH", 6 ) == 0 )
++    if ( _bdf_strncmp( line, "DWIDTH", 6 ) == 0 )
+     {
+       if ( !( p->flags & _BDF_ENCODING ) )
+         goto Missing_Encoding;
+@@ -1835,7 +1847,7 @@
+     }
+ 
+     /* Expect the BBX field next. */
+-    if ( ft_strncmp( line, "BBX", 3 ) == 0 )
++    if ( _bdf_strncmp( line, "BBX", 3 ) == 0 )
+     {
+       if ( !( p->flags & _BDF_ENCODING ) )
+         goto Missing_Encoding;
+@@ -1903,7 +1915,7 @@
+     }
+ 
+     /* And finally, gather up the bitmap. */
+-    if ( ft_strncmp( line, "BITMAP", 6 ) == 0 )
++    if ( _bdf_strncmp( line, "BITMAP", 6 ) == 0 )
+     {
+       unsigned long  bitmap_size;
+ 
+@@ -1978,7 +1990,7 @@
+     p    = (_bdf_parse_t *)    client_data;
+ 
+     /* Check for the end of the properties. */
+-    if ( ft_strncmp( line, "ENDPROPERTIES", 13 ) == 0 )
++    if ( _bdf_strncmp( line, "ENDPROPERTIES", 13 ) == 0 )
+     {
+       /* If the FONT_ASCENT or FONT_DESCENT properties have not been      */
+       /* encountered yet, then make sure they are added as properties and */
+@@ -2019,12 +2031,12 @@
+     }
+ 
+     /* Ignore the _XFREE86_GLYPH_RANGES properties. */
+-    if ( ft_strncmp( line, "_XFREE86_GLYPH_RANGES", 21 ) == 0 )
++    if ( _bdf_strncmp( line, "_XFREE86_GLYPH_RANGES", 21 ) == 0 )
+       goto Exit;
+ 
+     /* Handle COMMENT fields and properties in a special way to preserve */
+     /* the spacing.                                                      */
+-    if ( ft_strncmp( line, "COMMENT", 7 ) == 0 )
++    if ( _bdf_strncmp( line, "COMMENT", 7 ) == 0 )
+     {
+       name = value = line;
+       value += 7;
+@@ -2088,7 +2100,7 @@
+ 
+     /* Check for a comment.  This is done to handle those fonts that have */
+     /* comments before the STARTFONT line for some reason.                */
+-    if ( ft_strncmp( line, "COMMENT", 7 ) == 0 )
++    if ( _bdf_strncmp( line, "COMMENT", 7 ) == 0 )
+     {
+       if ( p->opts->keep_comments != 0 && p->font != 0 )
+       {
+@@ -2114,7 +2126,7 @@
+     {
+       memory = p->memory;
+ 
+-      if ( ft_strncmp( line, "STARTFONT", 9 ) != 0 )
++      if ( _bdf_strncmp( line, "STARTFONT", 9 ) != 0 )
+       {
+         /* we don't emit an error message since this code gets */
+         /* explicitly caught one level higher                  */
+@@ -2162,7 +2174,7 @@
+     }
+ 
+     /* Check for the start of the properties. */
+-    if ( ft_strncmp( line, "STARTPROPERTIES", 15 ) == 0 )
++    if ( _bdf_strncmp( line, "STARTPROPERTIES", 15 ) == 0 )
+     {
+       if ( !( p->flags & _BDF_FONT_BBX ) )
+       {
+@@ -2191,7 +2203,7 @@
+     }
+ 
+     /* Check for the FONTBOUNDINGBOX field. */
+-    if ( ft_strncmp( line, "FONTBOUNDINGBOX", 15 ) == 0 )
++    if ( _bdf_strncmp( line, "FONTBOUNDINGBOX", 15 ) == 0 )
+     {
+       if ( !( p->flags & _BDF_SIZE ) )
+       {
+@@ -2222,7 +2234,7 @@
+     }
+ 
+     /* The next thing to check for is the FONT field. */
+-    if ( ft_strncmp( line, "FONT", 4 ) == 0 )
++    if ( _bdf_strncmp( line, "FONT", 4 ) == 0 )
+     {
+       error = _bdf_list_split( &p->list, (char *)" +", line, linelen );
+       if ( error )
+@@ -2257,7 +2269,7 @@
+     }
+ 
+     /* Check for the SIZE field. */
+-    if ( ft_strncmp( line, "SIZE", 4 ) == 0 )
++    if ( _bdf_strncmp( line, "SIZE", 4 ) == 0 )
+     {
+       if ( !( p->flags & _BDF_FONT_NAME ) )
+       {
+@@ -2311,7 +2323,7 @@
+     }
+ 
+     /* Check for the CHARS field -- font properties are optional */
+-    if ( ft_strncmp( line, "CHARS", 5 ) == 0 )
++    if ( _bdf_strncmp( line, "CHARS", 5 ) == 0 )
+     {
+       char  nbuf[128];
+ 
 diff --git a/src/cache/ftcbasic.c b/src/cache/ftcbasic.c
 index 84d336d..01be88c 100644
 --- a/src/cache/ftcbasic.c
@@ -8257,6 +9456,35 @@ index 4eb2c5b..a65f94d 100644
    const FTC_MruListClassRec  ftc_face_list_class =
    {
      sizeof ( FTC_FaceNodeRec),
+diff --git a/src/cache/ftcsbits.c b/src/cache/ftcsbits.c
+index 6df1c19..59727d1 100644
+--- a/src/cache/ftcsbits.c
++++ b/src/cache/ftcsbits.c
+@@ -4,7 +4,7 @@
+ /*                                                                         */
+ /*    FreeType sbits manager (body).                                       */
+ /*                                                                         */
+-/*  Copyright 2000-2006, 2009-2011, 2013 by                                */
++/*  Copyright 2000-2006, 2009-2011, 2013, 2014 by                          */
+ /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+ /*                                                                         */
+ /*  This file is part of the FreeType project, and may only be used,       */
+@@ -142,12 +142,12 @@
+         goto BadGlyph;
+       }
+ 
+-      /* Check that our values fit into 8-bit containers!       */
++      /* Check whether our values fit into 8-bit containers!    */
+       /* If this is not the case, our bitmap is too large       */
+       /* and we will leave it as `missing' with sbit.buffer = 0 */
+ 
+-#define CHECK_CHAR( d )  ( temp = (FT_Char)d, temp == d )
+-#define CHECK_BYTE( d )  ( temp = (FT_Byte)d, temp == d )
++#define CHECK_CHAR( d )  ( temp = (FT_Char)d, (FT_Int) temp == (FT_Int) d )
++#define CHECK_BYTE( d )  ( temp = (FT_Byte)d, (FT_UInt)temp == (FT_UInt)d )
+ 
+       /* horizontal advance in pixels */
+       xadvance = ( slot->advance.x + 32 ) >> 6;
 diff --git a/src/cff/cf2font.c b/src/cff/cf2font.c
 index 6e99dc2..3d2c22a 100644
 --- a/src/cff/cf2font.c
@@ -8417,6 +9645,109 @@ index 748cbca..5183f6f 100644
    const FT_CMap_ClassRec  pcf_cmap_class =
    {
      sizeof ( PCF_CMapRec ),
+diff --git a/src/pcf/pcfread.c b/src/pcf/pcfread.c
+index d936c58..998cbed 100644
+--- a/src/pcf/pcfread.c
++++ b/src/pcf/pcfread.c
+@@ -144,13 +144,31 @@ THE SOFTWARE.
+ 
+         if ( ( tables[i].size   > tables[i + 1].offset )                  ||
+              ( tables[i].offset > tables[i + 1].offset - tables[i].size ) )
+-          return FT_THROW( Invalid_Offset );
++        {
++          error = FT_THROW( Invalid_Offset );
++          goto Exit;
++        }
+       }
+ 
+       if ( !have_change )
+         break;
+     }
+ 
++    /* we now check whether the `size' and `offset' values are reasonable: */
++    /* `offset' + `size' must not exceed the stream size                   */
++    tables = face->toc.tables;
++    for ( n = 0; n < toc->count; n++ )
++    {
++      /* we need two checks to avoid overflow */
++      if ( ( tables->size   > stream->size                ) ||
++           ( tables->offset > stream->size - tables->size ) )
++      {
++        error = FT_THROW( Invalid_Table );
++        goto Exit;
++      }
++      tables++;
++    }
++
+ #ifdef FT_DEBUG_LEVEL_TRACE
+ 
+     {
+@@ -631,24 +649,40 @@ THE SOFTWARE.
+       return FT_THROW( Out_Of_Memory );
+ 
+     metrics = face->metrics;
+-    for ( i = 0; i < nmetrics; i++ )
++    for ( i = 0; i < nmetrics; i++, metrics++ )
+     {
+-      error = pcf_get_metric( stream, format, metrics + i );
++      error = pcf_get_metric( stream, format, metrics );
+ 
+-      metrics[i].bits = 0;
++      metrics->bits = 0;
+ 
+       FT_TRACE5(( "  idx %d: width=%d, "
+                   "lsb=%d, rsb=%d, ascent=%d, descent=%d, swidth=%d\n",
+                   i,
+-                  ( metrics + i )->characterWidth,
+-                  ( metrics + i )->leftSideBearing,
+-                  ( metrics + i )->rightSideBearing,
+-                  ( metrics + i )->ascent,
+-                  ( metrics + i )->descent,
+-                  ( metrics + i )->attributes ));
++                  metrics->characterWidth,
++                  metrics->leftSideBearing,
++                  metrics->rightSideBearing,
++                  metrics->ascent,
++                  metrics->descent,
++                  metrics->attributes ));
+ 
+       if ( error )
+         break;
++
++      /* sanity checks -- those values are used in `PCF_Glyph_Load' to     */
++      /* compute a glyph's bitmap dimensions, thus setting them to zero in */
++      /* case of an error disables this particular glyph only              */
++      if ( metrics->rightSideBearing < metrics->leftSideBearing ||
++           metrics->ascent + metrics->descent < 0               )
++      {
++        metrics->characterWidth   = 0;
++        metrics->leftSideBearing  = 0;
++        metrics->rightSideBearing = 0;
++        metrics->ascent           = 0;
++        metrics->descent          = 0;
++
++        FT_TRACE0(( "pcf_get_metrics:"
++                    " invalid metrics for glyph %d\n", i ));
++      }
+     }
+ 
+     if ( error )
+@@ -812,6 +846,15 @@ THE SOFTWARE.
+     if ( !PCF_FORMAT_MATCH( format, PCF_DEFAULT_FORMAT ) )
+       return FT_THROW( Invalid_File_Format );
+ 
++    /* sanity checks */
++    if ( firstCol < 0       ||
++         firstCol > lastCol ||
++         lastCol  > 0xFF    ||
++         firstRow < 0       ||
++         firstRow > lastRow ||
++         lastRow  > 0xFF    )
++      return FT_THROW( Invalid_Table );
++
+     FT_TRACE4(( "pdf_get_encodings:\n" ));
+ 
+     FT_TRACE4(( "  firstCol %d, lastCol %d, firstRow %d, lastRow %d\n",
 diff --git a/src/pfr/pfrdrivr.c b/src/pfr/pfrdrivr.c
 index 4c43947..188aa0d 100644
 --- a/src/pfr/pfrdrivr.c
@@ -8469,6 +9800,19 @@ index 194d2df..0c89242 100644
          FT_UInt    probe       = power * size;
          FT_UInt    extra       = count - power;
          FT_Byte*   base        = stream->cursor;
+diff --git a/src/pfr/pfrsbit.c b/src/pfr/pfrsbit.c
+index 2da1500..eb7507f 100644
+--- a/src/pfr/pfrsbit.c
++++ b/src/pfr/pfrsbit.c
+@@ -59,7 +59,7 @@
+ 
+     if ( !decreasing )
+     {
+-      writer->line += writer->pitch * ( target->rows-1 );
++      writer->line += writer->pitch * ( target->rows - 1 );
+       writer->pitch = -writer->pitch;
+     }
+   }
 diff --git a/src/psaux/psconv.c b/src/psaux/psconv.c
 index d0d8861..7792a62 100644
 --- a/src/psaux/psconv.c
@@ -8484,7 +9828,7 @@ index d0d8861..7792a62 100644
            decimal = decimal * 10 + c;
  
 diff --git a/src/raster/ftraster.c b/src/raster/ftraster.c
-index ddecc80..abbecb7 100644
+index ddecc80..b4b9393 100644
 --- a/src/raster/ftraster.c
 +++ b/src/raster/ftraster.c
 @@ -2284,6 +2284,8 @@
@@ -8506,8 +9850,48 @@ index ddecc80..abbecb7 100644
        e2 = e1;
      else
        e2 = TRUNC( FLOOR( x2 ) );
+@@ -2550,7 +2553,7 @@
+ 
+         e1 = TRUNC( e1 );
+ 
+-        if ( e1 >= 0 && e1 < ras.target.rows )
++        if ( e1 >= 0 && (ULong)e1 < ras.target.rows )
+         {
+           PByte  p;
+ 
+@@ -2644,7 +2647,7 @@
+         /* bounding box instead                                           */
+         if ( pxl < 0 )
+           pxl = e1;
+-        else if ( TRUNC( pxl ) >= ras.target.rows )
++        else if ( (ULong)( TRUNC( pxl ) ) >= ras.target.rows )
+           pxl = e2;
+ 
+         /* check that the other pixel isn't set */
+@@ -2659,9 +2662,9 @@
+         if ( ras.target.pitch > 0 )
+           bits += ( ras.target.rows - 1 ) * ras.target.pitch;
+ 
+-        if ( e1 >= 0              &&
+-             e1 < ras.target.rows &&
+-             *bits & f1           )
++        if ( e1 >= 0                     &&
++             (ULong)e1 < ras.target.rows &&
++             *bits & f1                  )
+           return;
+       }
+       else
+@@ -2673,7 +2676,7 @@
+ 
+     e1 = TRUNC( pxl );
+ 
+-    if ( e1 >= 0 && e1 < ras.target.rows )
++    if ( e1 >= 0 && (ULong)e1 < ras.target.rows )
+     {
+       bits -= e1 * ras.target.pitch;
+       if ( ras.target.pitch > 0 )
 diff --git a/src/sfnt/pngshim.c b/src/sfnt/pngshim.c
-index 878de1f..9afbe5a 100644
+index 878de1f..9bfcc2a 100644
 --- a/src/sfnt/pngshim.c
 +++ b/src/sfnt/pngshim.c
 @@ -4,7 +4,7 @@
@@ -8528,8 +9912,40 @@ index 878de1f..9afbe5a 100644
  #endif
      /* if we get here, then we have no choice but to abort ... */
    }
+@@ -205,11 +205,11 @@
+       goto Exit;
+     }
+ 
+-    if ( !populate_map_and_metrics                   &&
+-         ( x_offset + metrics->width  > map->width ||
+-           y_offset + metrics->height > map->rows  ||
+-           pix_bits != 32                          ||
+-           map->pixel_mode != FT_PIXEL_MODE_BGRA   ) )
++    if ( !populate_map_and_metrics                            &&
++         ( (FT_UInt)x_offset + metrics->width  > map->width ||
++           (FT_UInt)y_offset + metrics->height > map->rows  ||
++           pix_bits != 32                                   ||
++           map->pixel_mode != FT_PIXEL_MODE_BGRA            ) )
+     {
+       error = FT_THROW( Invalid_Argument );
+       goto Exit;
+@@ -269,6 +269,14 @@
+       map->pitch      = map->width * 4;
+       map->num_grays  = 256;
+ 
++      /* reject too large bitmaps similarly to the rasterizer */
++      if ( map->rows > 0x7FFF || map->width > 0x7FFF )
++      {
++        error = FT_THROW( Array_Too_Large );
++        goto DestroyExit;
++      }
++
++      /* this doesn't overflow: 0x7FFF * 0x7FFF * 4 < 2^32 */
+       size = map->rows * map->pitch;
+ 
+       error = ft_glyphslot_alloc_bitmap( slot, size );
 diff --git a/src/sfnt/sfobjs.c b/src/sfnt/sfobjs.c
-index a31c77c..cfea9cd 100644
+index a31c77c..70b988d 100644
 --- a/src/sfnt/sfobjs.c
 +++ b/src/sfnt/sfobjs.c
 @@ -4,7 +4,7 @@
@@ -8585,7 +10001,20 @@ index a31c77c..cfea9cd 100644
            } while ( 0 )
  
  
-@@ -661,6 +654,8 @@
+@@ -574,8 +567,10 @@
+ 
+ 
+       if ( table->Offset != woff_offset                         ||
+-           table->Offset + table->CompLength > woff.length      ||
+-           sfnt_offset + table->OrigLength > woff.totalSfntSize ||
++           table->CompLength > woff.length                      ||
++           table->Offset > woff.length - table->CompLength      ||
++           table->OrigLength > woff.totalSfntSize               ||
++           sfnt_offset > woff.totalSfntSize - table->OrigLength ||
+            table->CompLength > table->OrigLength                )
+       {
+         error = FT_THROW( Invalid_Table );
+@@ -661,6 +656,8 @@
        }
        else
        {
@@ -8594,7 +10023,7 @@ index a31c77c..cfea9cd 100644
          /* Uncompress with zlib. */
          FT_ULong  output_len = table->OrigLength;
  
-@@ -675,6 +670,13 @@
+@@ -675,6 +672,13 @@
            error = FT_THROW( Invalid_Table );
            goto Exit;
          }
@@ -8608,7 +10037,7 @@ index a31c77c..cfea9cd 100644
        }
  
        FT_FRAME_EXIT();
-@@ -717,7 +719,6 @@
+@@ -717,7 +721,6 @@
    }
  
  
@@ -8616,7 +10045,7 @@ index a31c77c..cfea9cd 100644
  #undef WRITE_USHORT
  #undef WRITE_ULONG
  
-@@ -1015,7 +1016,6 @@
+@@ -1015,7 +1018,6 @@
      if ( is_apple_sbix )
        has_outline = FALSE;
  
@@ -8625,10 +10054,112 @@ index a31c77c..cfea9cd 100644
      /* a `bhed' table                                        */
      if ( !has_outline && sfnt->load_bhed )
 diff --git a/src/sfnt/ttcmap.c b/src/sfnt/ttcmap.c
-index c717f5f..f9acf5d 100644
+index c717f5f..712bd4f 100644
 --- a/src/sfnt/ttcmap.c
 +++ b/src/sfnt/ttcmap.c
-@@ -3473,10 +3473,9 @@
+@@ -1669,7 +1669,8 @@
+     p          = is32  + 8192;          /* skip `is32' array */
+     num_groups = TT_NEXT_ULONG( p );
+ 
+-    if ( p + num_groups * 12 > valid->limit )
++    /* p + num_groups * 12 > valid->limit ? */
++    if ( num_groups > (FT_UInt32)( valid->limit - p ) / 12 )
+       FT_INVALID_TOO_SHORT;
+ 
+     /* check groups, they must be in increasing order */
+@@ -1694,7 +1695,12 @@
+ 
+         if ( valid->level >= FT_VALIDATE_TIGHT )
+         {
+-          if ( start_id + end - start >= TT_VALID_GLYPH_COUNT( valid ) )
++          FT_UInt32  d = end - start;
++
++
++          /* start_id + end - start >= TT_VALID_GLYPH_COUNT( valid ) ? */
++          if ( d > TT_VALID_GLYPH_COUNT( valid )             ||
++               start_id >= TT_VALID_GLYPH_COUNT( valid ) - d )
+             FT_INVALID_GLYPH_ID;
+ 
+           count = (FT_UInt32)( end - start + 1 );
+@@ -1892,7 +1898,9 @@
+     count  = TT_NEXT_ULONG( p );
+ 
+     if ( length > (FT_ULong)( valid->limit - table ) ||
+-         length < 20 + count * 2                     )
++         /* length < 20 + count * 2 ? */
++         length < 20                                 ||
++         ( length - 20 ) / 2 < count                 )
+       FT_INVALID_TOO_SHORT;
+ 
+     /* check glyph indices */
+@@ -2079,7 +2087,9 @@
+     num_groups = TT_NEXT_ULONG( p );
+ 
+     if ( length > (FT_ULong)( valid->limit - table ) ||
+-         length < 16 + 12 * num_groups               )
++         /* length < 16 + 12 * num_groups ? */
++         length < 16                                 ||
++         ( length - 16 ) / 12 < num_groups           )
+       FT_INVALID_TOO_SHORT;
+ 
+     /* check groups, they must be in increasing order */
+@@ -2101,7 +2111,12 @@
+ 
+         if ( valid->level >= FT_VALIDATE_TIGHT )
+         {
+-          if ( start_id + end - start >= TT_VALID_GLYPH_COUNT( valid ) )
++          FT_UInt32  d = end - start;
++
++
++          /* start_id + end - start >= TT_VALID_GLYPH_COUNT( valid ) ? */
++          if ( d > TT_VALID_GLYPH_COUNT( valid )             ||
++               start_id >= TT_VALID_GLYPH_COUNT( valid ) - d )
+             FT_INVALID_GLYPH_ID;
+         }
+ 
+@@ -2401,7 +2416,9 @@
+     num_groups = TT_NEXT_ULONG( p );
+ 
+     if ( length > (FT_ULong)( valid->limit - table ) ||
+-         length < 16 + 12 * num_groups               )
++         /* length < 16 + 12 * num_groups ? */
++         length < 16                                 ||
++         ( length - 16 ) / 12 < num_groups           )
+       FT_INVALID_TOO_SHORT;
+ 
+     /* check groups, they must be in increasing order */
+@@ -2787,7 +2804,9 @@
+     num_selectors = TT_NEXT_ULONG( p );
+ 
+     if ( length > (FT_ULong)( valid->limit - table ) ||
+-         length < 10 + 11 * num_selectors            )
++         /* length < 10 + 11 * num_selectors ? */
++         length < 10                                 ||
++         ( length - 10 ) / 11 < num_selectors        )
+       FT_INVALID_TOO_SHORT;
+ 
+     /* check selectors, they must be in increasing order */
+@@ -2823,7 +2842,8 @@
+           FT_ULong  lastBase  = 0;
+ 
+ 
+-          if ( defp + numRanges * 4 > valid->limit )
++          /* defp + numRanges * 4 > valid->limit ? */
++          if ( numRanges > (FT_ULong)( valid->limit - defp ) / 4 )
+             FT_INVALID_TOO_SHORT;
+ 
+           for ( i = 0; i < numRanges; ++i )
+@@ -2850,7 +2870,8 @@
+           FT_ULong  i, lastUni  = 0;
+ 
+ 
+-          if ( numMappings * 4 > (FT_ULong)( valid->limit - ndp ) )
++          /* numMappings * 4 > (FT_ULong)( valid->limit - ndp ) ? */
++          if ( numMappings > ( (FT_ULong)( valid->limit - ndp ) ) / 4 )
+             FT_INVALID_TOO_SHORT;
+ 
+           for ( i = 0; i < numMappings; ++i )
+@@ -3473,10 +3494,9 @@
      /* only recognize format 0 */
      if ( TT_NEXT_USHORT( p ) != 0 )
      {
@@ -8640,6 +10171,43 @@ index c717f5f..f9acf5d 100644
        return FT_THROW( Invalid_Table );
      }
  
+diff --git a/src/sfnt/ttload.c b/src/sfnt/ttload.c
+index 0a3cd29..8338150 100644
+--- a/src/sfnt/ttload.c
++++ b/src/sfnt/ttload.c
+@@ -5,7 +5,7 @@
+ /*    Load the basic TrueType tables, i.e., tables that can be either in   */
+ /*    TTF or OTF fonts (body).                                             */
+ /*                                                                         */
+-/*  Copyright 1996-2010, 2012, 2013 by                                     */
++/*  Copyright 1996-2010, 2012-2014 by                                      */
+ /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+ /*                                                                         */
+ /*  This file is part of the FreeType project, and may only be used,       */
+@@ -207,7 +207,10 @@
+       }
+ 
+       /* we ignore invalid tables */
+-      if ( table.Offset + table.Length > stream->size )
++
++      /* table.Offset + table.Length > stream->size ? */
++      if ( table.Length > stream->size                ||
++           table.Offset > stream->size - table.Length )
+       {
+         FT_TRACE2(( "check_table_dir: table entry %d invalid\n", nn ));
+         continue;
+@@ -395,7 +398,10 @@
+       entry->Length   = FT_GET_ULONG();
+ 
+       /* ignore invalid tables */
+-      if ( entry->Offset + entry->Length > stream->size )
++
++      /* entry->Offset + entry->Length > stream->size ? */
++      if ( entry->Length > stream->size                 ||
++           entry->Offset > stream->size - entry->Length )
+         continue;
+       else
+       {
 diff --git a/src/sfnt/ttpost.c b/src/sfnt/ttpost.c
 index 47a85c0..99d8005 100644
 --- a/src/sfnt/ttpost.c
@@ -8689,7 +10257,7 @@ index 47a85c0..99d8005 100644
  
  
 diff --git a/src/sfnt/ttsbit.c b/src/sfnt/ttsbit.c
-index 8ff7b9d..da6b01b 100644
+index 8ff7b9d..b37bd7d 100644
 --- a/src/sfnt/ttsbit.c
 +++ b/src/sfnt/ttsbit.c
 @@ -150,12 +150,25 @@
@@ -8729,7 +10297,22 @@ index 8ff7b9d..da6b01b 100644
          TT_HoriHeader  *hori;
          FT_ULong        table_size;
  
-@@ -504,13 +518,20 @@
+@@ -380,9 +394,11 @@
+       p                          += 34;
+       decoder->bit_depth          = *p;
+ 
+-      if ( decoder->strike_index_array > face->sbit_table_size             ||
+-           decoder->strike_index_array + 8 * decoder->strike_index_count >
+-             face->sbit_table_size                                         )
++      /* decoder->strike_index_array +                               */
++      /*   8 * decoder->strike_index_count > face->sbit_table_size ? */
++      if ( decoder->strike_index_array > face->sbit_table_size           ||
++           decoder->strike_index_count >
++             ( face->sbit_table_size - decoder->strike_index_array ) / 8 )
+         error = FT_THROW( Invalid_File_Format );
+     }
+ 
+@@ -504,13 +520,20 @@
  
        p += 3;
      }
@@ -8751,7 +10334,7 @@ index 8ff7b9d..da6b01b 100644
      return FT_THROW( Invalid_Argument );
    }
  
-@@ -800,12 +821,12 @@
+@@ -800,12 +823,12 @@
      FT_Error  error = FT_Err_Ok;
      FT_UInt   num_components, nn;
  
@@ -8770,7 +10353,7 @@ index 8ff7b9d..da6b01b 100644
  
  
      if ( p + 2 > limit )
-@@ -1334,6 +1355,7 @@
+@@ -1334,6 +1357,7 @@
  
      case FT_MAKE_TAG( 'j', 'p', 'g', ' ' ):
      case FT_MAKE_TAG( 't', 'i', 'f', 'f' ):
@@ -8778,7 +10361,7 @@ index 8ff7b9d..da6b01b 100644
        error = FT_THROW( Unknown_File_Format );
        break;
  
-@@ -1352,10 +1374,11 @@
+@@ -1352,10 +1376,11 @@
  
        tt_face_get_metrics( face, FALSE, glyph_index, &abearing, &aadvance );
  
@@ -8795,7 +10378,7 @@ index 8ff7b9d..da6b01b 100644
  
      return error;
 diff --git a/src/smooth/ftgrays.c b/src/smooth/ftgrays.c
-index 425911a..27be966 100644
+index 425911a..94c5462 100644
 --- a/src/smooth/ftgrays.c
 +++ b/src/smooth/ftgrays.c
 @@ -98,6 +98,9 @@
@@ -8808,6 +10391,48 @@ index 425911a..27be966 100644
  
    /* define this to dump debugging information */
  /* #define FT_DEBUG_LEVEL_TRACE */
+@@ -1088,37 +1091,10 @@ typedef ptrdiff_t  FT_PtrDist;
+ 
+ 
+         /* dx and dy are x and y components of the P0-P3 chord vector. */
+-        dx = arc[3].x - arc[0].x;
+-        dy = arc[3].y - arc[0].y;
+-
+-        /* L is an (under)estimate of the Euclidean distance P0-P3.       */
+-        /*                                                                */
+-        /* If dx >= dy, then r = sqrt(dx^2 + dy^2) can be overestimated   */
+-        /* with least maximum error by                                    */
+-        /*                                                                */
+-        /*   r_upperbound = dx + (sqrt(2) - 1) * dy  ,                    */
+-        /*                                                                */
+-        /* where sqrt(2) - 1 can be (over)estimated by 107/256, giving an */
+-        /* error of no more than 8.4%.                                    */
+-        /*                                                                */
+-        /* Similarly, some elementary calculus shows that r can be        */
+-        /* underestimated with least maximum error by                     */
+-        /*                                                                */
+-        /*   r_lowerbound = sqrt(2 + sqrt(2)) / 2 * dx                    */
+-        /*                  + sqrt(2 - sqrt(2)) / 2 * dy  .               */
+-        /*                                                                */
+-        /* 236/256 and 97/256 are (under)estimates of the two algebraic   */
+-        /* numbers, giving an error of no more than 8.1%.                 */
+-
+-        dx_ = FT_ABS( dx );
+-        dy_ = FT_ABS( dy );
+-
+-        /* This is the same as                     */
+-        /*                                         */
+-        /*   L = ( 236 * FT_MAX( dx_, dy_ )        */
+-        /*       + 97 * FT_MIN( dx_, dy_ ) ) >> 8; */
+-        L = ( dx_ > dy_ ? 236 * dx_ +  97 * dy_
+-                        :  97 * dx_ + 236 * dy_ ) >> 8;
++        dx = dx_ = arc[3].x - arc[0].x;
++        dy = dy_ = arc[3].y - arc[0].y;
++
++        L = FT_HYPOT( dx_, dy_ );
+ 
+         /* Avoid possible arithmetic overflow below by splitting. */
+         if ( L > 32767 )
 diff --git a/src/tools/afblue.pl b/src/tools/afblue.pl
 index 58aa2a0..60fe696 100644
 --- a/src/tools/afblue.pl
@@ -8924,7 +10549,7 @@ index 5f676a2..2ab6f76 100644
  
          return FT_Err_Ok;
 diff --git a/src/truetype/ttinterp.c b/src/truetype/ttinterp.c
-index 56e8fa7..43d88fd 100644
+index 56e8fa7..75c67ef 100644
 --- a/src/truetype/ttinterp.c
 +++ b/src/truetype/ttinterp.c
 @@ -172,6 +172,9 @@
@@ -9178,28 +10803,66 @@ index 56e8fa7..43d88fd 100644
  
  #ifdef TT_CONFIG_OPTION_SUBPIXEL_HINTING
  
-@@ -7596,9 +7596,9 @@
-             else if ( CUR.ignore_x_mode )
+@@ -7581,42 +7581,33 @@
+             /*
+              *  Allow delta move if
+              *
+-             *  - not using ignore_x_mode rendering
+-             *  - glyph is specifically set to allow it
+-             *  - glyph is composite and freedom vector is not subpixel
+-             *    vector
++             *  - not using ignore_x_mode rendering,
++             *  - glyph is specifically set to allow it, or
++             *  - glyph is composite and freedom vector is not in subpixel
++             *    direction.
+              */
+             if ( !CUR.ignore_x_mode                                   ||
+                  ( CUR.sph_tweak_flags & SPH_TWEAK_ALWAYS_DO_DELTAP ) ||
+                  ( CUR.is_composite && CUR.GS.freeVector.y != 0 )     )
+               CUR_Func_move( &CUR.zp0, A, B );
+ 
+-            /* Otherwise apply subpixel hinting and */
+-            /* compatibility mode rules             */
+-            else if ( CUR.ignore_x_mode )
++            /* Otherwise, apply subpixel hinting and compatibility mode */
++            /* rules, always skipping deltas in subpixel direction.     */
++            else if ( CUR.ignore_x_mode && CUR.GS.freeVector.y != 0 )
              {
-               if ( CUR.GS.freeVector.y != 0 )
+-              if ( CUR.GS.freeVector.y != 0 )
 -                B1 = CUR.zp0.cur[A].y;
-+                B1 = (FT_UShort)CUR.zp0.cur[A].y;
-               else
+-              else
 -                B1 = CUR.zp0.cur[A].x;
-+                B1 = (FT_UShort)CUR.zp0.cur[A].x;
++              /* save the y value of the point now; compare after move */
++              B1 = (FT_UShort)CUR.zp0.cur[A].y;
  
- #if 0
-               /* Standard Subpixel Hinting: Allow y move.       */
-@@ -7615,7 +7615,7 @@
-                    !( CUR.sph_tweak_flags & SPH_TWEAK_ALWAYS_SKIP_DELTAP ) )
+-#if 0
+-              /* Standard Subpixel Hinting: Allow y move.       */
+-              /* This messes up dejavu and may not be needed... */
+-              if ( !CUR.face->sph_compatibility_mode &&
+-                   CUR.GS.freeVector.y != 0          )
++              /* Standard subpixel hinting: Allow y move for y-touched */
++              /* points.  This messes up DejaVu ...                    */
++              if ( !CUR.face->sph_compatibility_mode          &&
++                   ( CUR.zp0.tags[A] & FT_CURVE_TAG_TOUCH_Y ) )
+                 CUR_Func_move( &CUR.zp0, A, B );
+-              else
+-#endif /* 0 */
+ 
+-              /* Compatibility Mode: Allow x or y move if point touched in */
+-              /* Y direction.                                              */
+-              if ( CUR.face->sph_compatibility_mode                      &&
+-                   !( CUR.sph_tweak_flags & SPH_TWEAK_ALWAYS_SKIP_DELTAP ) )
++              /* compatibility mode */
++              else if ( CUR.face->sph_compatibility_mode                      &&
++                        !( CUR.sph_tweak_flags & SPH_TWEAK_ALWAYS_SKIP_DELTAP ) )
                {
-                 /* save the y value of the point now; compare after move */
+-                /* save the y value of the point now; compare after move */
 -                B1 = CUR.zp0.cur[A].y;
-+                B1 = (FT_UShort)CUR.zp0.cur[A].y;
- 
+-
                  if ( CUR.sph_tweak_flags & SPH_TWEAK_ROUND_NONPIXEL_Y_MOVES )
                    B = FT_PIX_ROUND( B1 + B ) - B1;
-@@ -7627,7 +7627,7 @@
+ 
+@@ -7627,7 +7618,7 @@
                    CUR_Func_move( &CUR.zp0, A, B );
                }
  
@@ -9208,7 +10871,7 @@ index 56e8fa7..43d88fd 100644
  
                /* Reverse this move if it results in a disallowed move */
                if ( CUR.GS.freeVector.y != 0                           &&
-@@ -7667,7 +7667,7 @@
+@@ -7667,7 +7658,7 @@
    Ins_DELTAC( INS_ARG )
    {
      FT_ULong  nump, k;
@@ -9217,7 +10880,7 @@ index 56e8fa7..43d88fd 100644
      FT_Long   B;
  
  
-@@ -7691,6 +7691,7 @@
+@@ -7691,6 +7682,7 @@
      }
  #endif
  
@@ -9225,7 +10888,7 @@ index 56e8fa7..43d88fd 100644
      nump = (FT_ULong)args[0];
  
      for ( k = 1; k <= nump; k++ )
-@@ -7736,12 +7737,12 @@
+@@ -7736,12 +7728,12 @@
  
          C += CUR.GS.delta_base;
  
@@ -9240,7 +10903,7 @@ index 56e8fa7..43d88fd 100644
  
            CUR_Func_move_cvt( A, B );
          }
-@@ -8269,11 +8270,12 @@
+@@ -8269,11 +8261,12 @@
      CUR.iup_called = FALSE;
  #endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
  
@@ -9254,7 +10917,7 @@ index 56e8fa7..43d88fd 100644
        CUR.func_read_cvt  = Read_CVT_Stretched;
        CUR.func_write_cvt = Write_CVT_Stretched;
        CUR.func_move_cvt  = Move_CVT_Stretched;
-@@ -8281,6 +8283,7 @@
+@@ -8281,6 +8274,7 @@
      else
      {
        /* square pixels, use normal routines */
@@ -9262,7 +10925,7 @@ index 56e8fa7..43d88fd 100644
        CUR.func_read_cvt  = Read_CVT;
        CUR.func_write_cvt = Write_CVT;
        CUR.func_move_cvt  = Move_CVT;
-@@ -9035,10 +9038,13 @@
+@@ -9035,10 +9029,13 @@
      /* If any errors have occurred, function tables may be broken. */
      /* Force a re-execution of `prep' and `fpgm' tables if no      */
      /* bytecode debugger is run.                                   */
@@ -9496,9 +11159,18 @@ index a11dd37..859164f 100644
  #endif /* TT_USE_BYTECODE_INTERPRETER */
  
 diff --git a/src/truetype/ttsubpix.c b/src/truetype/ttsubpix.c
-index 28470ad..9871994 100644
+index 28470ad..ca60451 100644
 --- a/src/truetype/ttsubpix.c
 +++ b/src/truetype/ttsubpix.c
+@@ -282,7 +282,7 @@
+   const SPH_TweakRule  COMPATIBILITY_MODE_Rules
+                        [COMPATIBILITY_MODE_RULES_SIZE] =
+   {
+-    { "-", 0, "", 0 },
++    { "Verdana Clones", 0, "", 0 },
+   };
+ 
+ 
 @@ -956,7 +956,7 @@
        if ( loader->exec->rasterizer_version != TT_INTERPRETER_VERSION_35 )
        {
