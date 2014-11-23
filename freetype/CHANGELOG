@@ -6,13 +6,25 @@ CHANGELOG
 ---------
 
 
+2014-11-23
+~~~~~~~~~~
+
+### freetype2-infinality-ultimate, rev. 2.5.3-15 (inc. multilib)
+
+* Merged with the recent upstream code base.
+* Several bug fixes, including issue #53 (rendering and stability issues during
+  playback of `*.mkv` video files with embedded TTF fonts).
+
+
 2014-10-29
 ~~~~~~~~~~
 
 ### freetype2-infinality-ultimate, rev. 2.5.3-14 (inc. multilib)
 
 * Merged with the recent upstream code base.
-* `infinality-settings` was moved to `/etc/X11/xinit/xinitrc.d` to ensure that `xrdb` sets `Xft` variables when an X server is already running.
+* `infinality-settings` was moved to `/etc/X11/xinit/xinitrc.d` to ensure that
+  `xrdb` sets `Xft` variables when an X server is already running.
+
 
 2014-10-16
 ~~~~~~~~~~
@@ -21,13 +33,16 @@ CHANGELOG
 
 * Merged with the recent upstream code base.
 
+
 2014-09-14
 ~~~~~~~~~~
 
 ### freetype2-infinality-ultimate, rev. 2.5.3-12 (inc. multilib)
 
-* Bug #40 (affecting Urxvt): do not track cur_width through setenv (by goddesse, contributed by estar).
+* Bug #40 (affecting Urxvt): do not track cur_width through setenv (by goddesse,
+  contributed by estar).
 * Merged with the recent upstream code base.
+
 
 2014-09-09
 ~~~~~~~~~~
@@ -39,9 +54,11 @@ CHANGELOG
   * Bug #38: Fix another small memory leak (by goddesse).
   * Bug #39: Set have_outline_shifted properly in ftsmooth.c (by goddesse).
 * `infinality-settings.sh` was updated to v.0.4.8.0.
-  * All styles were revised and updated, providing a smoother and more distinctive transition between visual variants, from sharp and light to dark and bold.
+  * All styles were revised and updated, providing a smoother and more distinctive
+    transition between visual variants, from sharp and light to dark and bold.
   * Core rendering settings were simplified and remain stable for all styles.
 * New upstream changes were merged with freetype2 code base.
+
 
 2014-08-15
 ~~~~~~~~~~
@@ -49,6 +66,7 @@ CHANGELOG
 ### freetype2-infinality-ultimate, rev. 2.5.3-10 (incl. multilib)
 
 * Merging with most recent upstream commits.
+
 
 2014-07-29
 ~~~~~~~~~~
@@ -58,6 +76,7 @@ CHANGELOG
 * Merging with most recent upstream commits.
 * `infinality-settings.sh` was updated to v. 0.4.7.5.
 
+
 2014-07-08
 ~~~~~~~~~~
 
@@ -66,12 +85,15 @@ CHANGELOG
 * Merging with most recent upstream commits.
 * Updating Infinality patchset accordingly.
 
+
 2014-05-15
 ~~~~~~~~~~
 
 ### freetype2-infinality-ultimate, rev. 2.5.3-5 (incl. multilib)
 
-* Semi-major upgrade, introducing most changes and fixes present in the development branch of the upstream `freetype2`.
+* Semi-major upgrade, introducing most changes and fixes present in the
+  development branch of the upstream `freetype2`.
+
 
 2014-03-21
 ~~~~~~~~~~
@@ -81,6 +103,7 @@ CHANGELOG
 * `infinality-settings.sh`: revised and updated rendering styles.
 * Updated dependencies.
 
+
 2013-12-09
 ~~~~~~~~~~
 
@@ -89,12 +112,14 @@ CHANGELOG
 * Upstream version upgrade to 2.5.1
 * Revised and updated Infinality patchset.
 
+
 2013-10-11
 ~~~~~~~~~~
 
 ### freetype2-infinality-ultimate, rev. 2.5.0.1-7
 
 * Added `libpng` dependency.
+
 
 2013-07-24
 ~~~~~~~~~~
@@ -103,12 +128,14 @@ CHANGELOG
 
 Minor changes to `infinality-settings.sh` meant to prevent inaccurate kerning issues.
 
+
 2013-07-11
 ~~~~~~~~~~
 
 ### freetype2-infinality-ultimate, rev. 2.5.0.1-5
 
 * `infinality-settings.sh`: taking measures against blurriness.
+
 
 2013-06-21
 ~~~~~~~~~~
