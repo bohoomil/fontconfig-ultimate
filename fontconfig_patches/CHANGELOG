@@ -9,6 +9,28 @@ CHANGELOG
 2014-10-29
 ~~~~~~~~~~
 
+### fontconfig-infinality-ultimate, rev. 2.11.1-23
+
+* Added feature request #51 (enable setting rendering parameters on per-user basis).
+* Improved rendering of fonts >> 24.5px, << Regular.
+* Improved rendering of Courier (Apple OS X branch).
+* Improved rendering of Lucida Console.
+* Improved rendering of Arial Black.
+* Improved rendering of Verdana.
+* Proxima Nova and Proxima Nova Condensed moved to CFF group.
+
+### infinality-bundle-fonts
+
+* Updated packages (tweaked rendering of fonts << 12.5px):
+    * `ttf-dejavu-ib`
+    * `ttf-liberation-ib`
+    * `ttf-meslo-fonts-ibx`
+
+* Montserrat family (`otf-montserrat-ibx`) was added to the repository.
+
+2014-10-29
+~~~~~~~~~~
+
 ### fontconfig-infinality-ultimate, rev. 2.11.1-22
 
 * Fixed missing umlauts in DejaVu Sans Mono and Menlo, < 13.5 px (bug #50).
