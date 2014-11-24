@@ -1,0 +1,44 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=otf-montserrat-ibx
+pkgver=1.0
+pkgrel=1
+depends=('fontconfig')
+pkgdesc="Montserrat, by Julieta Ulanovsky, aims to rescue the beauty of urban typography from the first half of the 20th century."
+url="http://www.fontsquirrel.com/"
+arch=('any')
+license=('OFL-1.1')
+groups=('infinality-bundle-fonts-extra')
+source=(montserrat.zip::"http://www.fontsquirrel.com/fonts/download/montserrat"
+        45-montserrat.conf
+        90-non-tt-montserrat.conf
+        Montserrat-Hairline_fixed.otf)
+install=${pkgname}.install
+sha1sums=('41015224796857f87f33f17c77117f75c8f6a713'
+          '305c20dd89f9dafb62a19cc3a9d8c661342ec374'
+          '186ebde7a24155c3275f9553850999a9ee1871ae'
+          '500cabc30a634370515b3af18fe43203945e9ed2')
+
+package() {
+  cd "${srcdir}"
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 "SIL Open Font License.txt" \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
+
+  install -d -m755 "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 Montserrat-{Light,Regular,Bold,Black,Hairline_fixed}.otf \
+    "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-montserrat.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-montserrat.conf
+  install -m644 90-non-tt-montserrat.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-montserrat.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-montserrat.conf .
+  ln -s ../conf.avail/90-non-tt-montserrat.conf .
+}
+
