@@ -6,8 +6,8 @@
 _pkgbasename=freetype2
 pkgname=lib32-$_pkgbasename-infinality-ultimate
 pkgver=2.5.3
-pkgrel=11
-_patchrel=2014.08.28
+pkgrel=15
+_patchrel=2014.11.21
 pkgdesc="TrueType font rendering library with Infinality patches and custom settings by bohoomil (32-bit, infinality-bundle)."
 arch=(x86_64)
 license=('GPL' 'MIT')
@@ -25,8 +25,8 @@ source=(http://download.savannah.gnu.org/releases/freetype/freetype-${pkgver}.ta
         "infinality-2.5.3-${_patchrel}.patch")
 sha1sums=('d3c26cc17ec7fe6c36f4efc02ef92ab6aa3f4b46'
           'abf7a8f726ad6359533651a8942636880febf9f6'
-          'd3d04a9e263e1868ac74c634ccd14c027c846b2a'
-          '7df648c3188cad78dfafe90ee4687b31c256d1c1')
+          'b8334216edba1c80b99766a1d23cf1ced20390f2'
+          '8b2fa8bbebed1d39dfc4329c606f098a092cff77')
 
 prepare() {
   cd "freetype-${pkgver}"
