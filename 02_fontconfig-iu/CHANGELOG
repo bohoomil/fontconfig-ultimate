@@ -6,6 +6,87 @@ CHANGELOG
 ---------
 
 
+2014-10-29
+~~~~~~~~~~
+
+### fontconfig-infinality-ultimate, rev. 2.11.1-23
+
+* Added feature request #51 (enable setting rendering parameters on per-user basis).
+* Improved rendering of fonts >> 24.5px, << Regular.
+* Improved rendering of Courier (Apple OS X branch).
+* Improved rendering of Lucida Console.
+* Improved rendering of Arial Black.
+* Improved rendering of Verdana.
+* Proxima Nova and Proxima Nova Condensed moved to CFF group.
+
+### infinality-bundle-fonts
+
+* Updated packages (tweaked rendering of fonts << 12.5px):
+    * `ttf-dejavu-ib`
+    * `ttf-liberation-ib`
+    * `ttf-meslo-fonts-ibx`
+
+* Montserrat family (`otf-montserrat-ibx`) was added to the repository.
+
+2014-10-29
+~~~~~~~~~~
+
+### fontconfig-infinality-ultimate, rev. 2.11.1-22
+
+* Fixed missing umlauts in DejaVu Sans Mono and Menlo, < 13.5 px (bug #50).
+* Palatino Linotype global hinting set to full.
+
+### infinality-bundle-fonts
+
+* `ttf-dejavu-ib`: fixed missing umlauts in DejaVu Sans Mono, < 13.5 px (bug #50).
+
+
+2014-10-16
+~~~~~~~~~~
+
+### fontconfig-infinality-ultimate, rev. 2.11.1-21
+
+* `37-repl-webfonts.conf` was added for replacing remote Web fonts with local copies.
+* A new `combi-minimal` configuration was added which makes it possible to use all installed font families directly with only a minimal number of corrective replacements.
+* Optional configuration templates available in `/usr/share/doc/fontconfig-infinality-ultimate` were revised and split into a global and local group.
+* Rendering of several proprietary fonts was improved or fixed, including Arial, Franklin Gothic, Proxima Nova and Stag.
+* Luxi Sans was set as a new replacement for Tahoma in the `free` preset (DejaVu Sans Condensed remains a fallback option).
+
+### infinality-bundle-fonts
+
+Updated and fixed font families:
+
+* `otf-cantarell-ib`
+    * version upgrade (0.0.16-1)
+    * fixed rendering: weight < Medium, 10.5px > 13.5px
+* `otf-inconsolatazi4-ibx`
+    * fixed rendering: weight < Medium, 14.5px > 17.5px
+* `ttf-bh-ib`
+    * version upgrade (1.2-1)
+    * fixed rendering: Luxi Sans, weight < Medium, < 14.5px
+* `ttf-gelasio-ib`
+    * fixed rendering:
+        - weight < Medium, < 12.5px
+        - weight > Medium, < 12.5px
+        - weight > Medium, 12.5px > 14.5px
+        - 16.5px > 18.5
+* `ttf-lato-ibx`: fixed weight identification bug in Hairline, Light and Thin variants
+* `ttf-opensans-ib`
+    * fixed rendering:
+        - weight = Regular, 18.5 > 21.5px
+        - weight < Regular, < 15.5px
+        - weight > Medium, < 11.5px, and 14.5px > 17.5px
+* `ttf-oxygen-ibx`
+    * version upgrade (1:5.1.0.1-1)
+
+Packages added to the repository:
+
+* `otf-erewhon-ibx`
+* `otf-lobster-two-ibx`
+* `ttf-antonio-ibx`
+* `ttf-playfair-display-ibx`
+
+
 2014-09-15
 ~~~~~~~~~~
 

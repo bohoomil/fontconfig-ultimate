@@ -3,12 +3,12 @@
 
 pkgname=fontconfig-infinality-ultimate
 _basename=fontconfig
-_gitname=fontconfig-ultimate
 pkgdesc="A library for configuring and customizing font access (includes generic fontconfig package and ultimate settings by bohoomil)."
 url=('http://www.fontconfig.org/release/')
 license=('custom' 'MIT')
 pkgver=2.11.1
-pkgrel=20
+pkgrel=23
+_master_name=fontconfig-ultimate-master
 arch=('i686' 'x86_64')
 changelog=CHANGELOG
 groups=('infinality-bundle')
@@ -23,20 +23,16 @@ backup=('etc/fonts/fonts.conf'
         'etc/fonts/conf.avail.infinality/combi/65-non-latin-combi.conf'
         'etc/fonts/conf.avail.infinality/combi/66-aliases-wine-combi.conf'
         'etc/fonts/conf.avail.infinality/35-repl-custom.conf'
-        'etc/fonts/conf.avail.infinality/36-repl-missing-glyphs.conf')
+        'etc/fonts/conf.avail.infinality/36-repl-missing-glyphs.conf'
+        'etc/fonts/conf.avail.infinality/37-repl-webfonts.conf')
 install=fontconfig-ultimate.install
 source=(http://www.fontconfig.org/release/${_basename}-${pkgver}.tar.bz2
-        'fontconfig-ultimate::git+http://github.com/bohoomil/fontconfig-ultimate#branch=master')
+        master.zip::https://github.com/bohoomil/fontconfig-ultimate/archive/master.tar.gz)
 sha1sums=('08565feea5a4e6375f9d8a7435dac04e52620ff2'
-          'SKIP')
+          '6ec8c6f6a0c67aeb3d68a3ece65c411e5779ac80')
 
 # a nice page to test font matching:
 # http://zipcon.net/~swhite/docs/computers/browsers/fonttest.html
-
-#version() {
-#  cd $_gitname
-#  git log -1 --format="%cd" --date=short | sed 's|-|.|g'
-#}
 
 prepare() {
   patches=(00-fonts.conf.in.patch
@@ -47,7 +43,7 @@ prepare() {
            05-Makefile.am.in.patch)
 
   # copy fontconfig-ib patches & stuff
-  cd "${_gitname}"
+  cd "${_master_name}"
 
   cp -r conf.d.infinality "${srcdir}/${_basename}-${pkgver}"/conf.d.infinality
   cp -r fontconfig_patches/*.patch "${srcdir}/${_basename}-${pkgver}"
@@ -84,10 +80,10 @@ build() {
   make
 }
 
-check() {
-  cd "${_basename}-${pkgver}"
-  make -k check
-}
+#check() {
+  #cd "${_basename}-${pkgver}"
+  #make -k check
+#}
 
 package() {
   cd "${_basename}-${pkgver}"
@@ -98,7 +94,7 @@ package() {
   install -m644 COPYING "${pkgdir}"/usr/share/licenses/"${_basename}"
 
   #install infinality stuff
-  cd "${srcdir}/${_gitname}"
+  cd "${srcdir}/${_master_name}"
 
   # copy presets
   cp -r fontconfig_patches/{combi,free,ms} \
@@ -116,7 +112,7 @@ package() {
   install -m755 -d "${pkgdir}"/usr/share/doc/"${pkgname}"
   cp -r doc "${pkgdir}"/usr/share/
 
-  # install infinality-settings.sh
+  # install infinality-settings
   install -m755 -d "${pkgdir}"/usr/share/doc/"${pkgname}"/freetype
   install -m755 freetype/infinality-settings.sh \
     "${pkgdir}"/usr/share/doc/"${pkgname}"/freetype/infinality-settings.sh
