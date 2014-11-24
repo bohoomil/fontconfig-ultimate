@@ -4,7 +4,7 @@
 
 pkgname=ttf-dejavu-ib
 pkgver=2.34
-pkgrel=10
+pkgrel=12
 pkgdesc="Font family based on the Bitstream Vera Fonts with a wider range of characters. Re-packed for infinality-bundle-fonts. TrueType version."
 url="http://dejavu-fonts.org/wiki/Main_Page"
 arch=('any')
@@ -19,7 +19,7 @@ source=(http://downloads.sourceforge.net/project/dejavu/dejavu/${pkgver}/dejavu-
         90-tt-dejavu.conf)
 sha1sums=('33fa825aa1dd44ce23a11af92b3078e978ff513d'
           '4072385eb6d18754f932bda5634da259ab875a1b'
-          '7a0caf5968ac1768c1d9cde83c5ce20f5bc132bf')
+          'a6332f56d9d95636e9ac99643b3a241ba08f3499')
 
 package() {
   install=${pkgname}.install
