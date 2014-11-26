@@ -162,10 +162,252 @@ index a4e583d..17a8820 100644
  
  # Packaging
 diff --git a/ChangeLog b/ChangeLog
-index ea1eb4a..ee27f70 100644
+index ea1eb4a..d040ac7 100644
 --- a/ChangeLog
 +++ b/ChangeLog
-@@ -1,3 +1,1141 @@
+@@ -1,3 +1,1383 @@
++2014-11-26  suzuki toshiya  <mpsuzuki@hiroshima-u.ac.jp>
++
++	* src/base/ftobj.c (Mac_Read_POST_Resource): Additional
++	overflow check in the summation of POST fragment lengths,
++	suggested by Mateusz Jurczyk <mjurczyk@google.com>.
++
++2014-11-26  suzuki toshiya  <mpsuzuki@hiroshima-u.ac.jp>
++
++	* src/base/ftobjs.c (Mac_Read_POST_Resource): Insert comments
++	and fold too long tracing messages.
++
++2014-11-26  suzuki toshiya  <mpsuzuki@hiroshima-u.ac.jp>
++
++	Fix Savannah bug #43540.
++
++	* src/base/ftmac.c (parse_fond): Prevent a buffer overrun
++	caused by a font including too many (> 63) strings to store
++	names[] table.
++
++2014-11-26  suzuki toshiya  <mpsuzuki@hiroshima-u.ac.jp>
++
++	* src/base/ftobjs.c (Mac_Read_POST_Resource): Use unsigned long
++	variables to read the lengths in POST fragments.  Suggested by
++	Mateusz Jurczyk <mjurczyk@google.com>.
++
++2014-11-26  suzuki toshiya  <mpsuzuki@hiroshima-u.ac.jp>
++
++	Fix Savannah bug #43539.
++
++	* src/base/ftobjs.c (Mac_Read_POST_Resource): Fix integer overflow
++	by a broken POST table in resource-fork.
++
++2014-11-26  suzuki toshiya  <mpsuzuki@hiroshima-u.ac.jp>
++
++	Fix Savannah bug #43538.
++
++	* src/base/ftobjs.c (Mac_Read_POST_Resource): Fix integer overflow
++	by a broken POST table in resource-fork.
++
++2014-11-26  suzuki toshiya  <mpsuzuki@hiroshima-u.ac.jp>
++
++	* src/base/ftobjs.c (Mac_Read_POST_Resource): Avoid memory leak
++	by a broken POST table in resource-fork.  Return after freeing
++	the buffered POST table when it is found to be broken.
++
++2014-11-25  Werner Lemberg  <wl@gnu.org>
++
++	*/*: s/Invalid_Argument/Invalid_Size_Handle/ where appropriate.
++
++2014-11-25  Werner Lemberg  <wl@gnu.org>
++
++	*/*: s/Invalid_Argument/Invalid_Stream_Handle/ where appropriate.
++
++2014-11-25  Werner Lemberg  <wl@gnu.org>
++
++	*/*: s/Invalid_Argument/Invalid_Library_Handle/ where appropriate.
++
++2014-11-25  Werner Lemberg  <wl@gnu.org>
++
++	*/*: s/Invalid_Argument/Invalid_Outline/ where appropriate.
++
++2014-11-25  Werner Lemberg  <wl@gnu.org>
++
++	*/*: s/Invalid_Argument/Invalid_Face_Handle/ where appropriate.
++
++2014-11-24  Werner Lemberg  <wl@gnu.org>
++
++	[Savannah bug #43682] Adjust some renderer callbacks.
++
++	* src/raster/ftraster.c (ft_black_set_mode): Change return type to
++	`int' to stay in sync with `FT_Renderer_SetModeFunc' prototype.
++
++	* src/smooth/ftgrays.c (gray_raster_set_mode): New dummy function
++	for orthogonality.
++	(ft_grays_raster): Use it.
++
++2014-11-25  Werner Lemberg  <wl@gnu.org>
++
++	[Savannah bug #43682] Properly handle missing return errors.
++
++	The functions in this patch *do* return non-trivial errors that must
++	be taken care of.
++
++	* src/autofit/afloader.c (af_loader_load_g), src/base/ftobjs.c
++	(FT_Render_Glyph_Internal), src/base/ftoutln.c (FT_Outline_Render),
++	src/cff/cffgload.c (cff_decoder_parse_charstrings) <cff_op_endchar>,
++	src/psaux/psobjs.c (ps_parser_load_field_table), src/psaux/t1decode
++	(t1_decoder_parse_charstrings) <op_endchar>, src/truetype/ttgload.c
++	(load_truetype_glyph <subglyph loop>, tt_loader_init,
++	TT_Load_Glyph), src/truetype/ttgxvar.c (TT_Set_MM_Blend),
++	src/truetype/ttobjs.c (tt_size_run_fpgm, tt_size_run_prep): Do it.
++
++2014-11-25  Werner Lemberg  <wl@gnu.org>
++
++	[Savannah bug #43682] Add/remove `void' casts to some functions.
++
++	We use a cast to indicate that we intentionally ignore a function's
++	return value.  However, this doesn't apply to API functions where
++	errors can only happen for trivially invalid input.
++
++	* src/base/ftstroke.c (FT_Glyph_Stroke, FT_Glyph_StrokeBorder),
++	src/base/ftsynth.c (FT_GlyphSlot_Embolden), src/cff/cffgload.c
++	(cff_slot_load), src/pfr/pfrdrivr.c (pfr_get_kerning),
++	src/type1/t1load.c (parse_encoding), src/type42/t42parse.c
++	(t42_parse_encoding): Do it.
++
++2014-11-25  Werner Lemberg  <wl@gnu.org>
++
++	[Savannah bug #43682] Change some signatures to `void' return type.
++
++	* include/internal/pshints.h (PSH_Globals_SetScaleFunc),
++	include/internal/sfnt.h (TT_Get_Metrics_Func),
++	src/pshinter/pshglob.c (psh_globals_set_scale),
++	src/pshinter/pshrec.c (ps_hints_init), src/sfnt/ttmtx.c
++	(tt_face_get_metrics), src/truetype/ttinterp.c (TT_Goto_CodeRange,
++	TT_Set_CodeRange, TT_Clear_CodeRange, TT_Done_Context,
++	TT_Save_Context): Do it.
++
++	* src/pshinter/pshglob.h, src/pshinter/pshrec.h, src/sfnt/ttmtx.h,
++	src/truetype/ttgload.c (TT_Hint_Glyph), src/truetype/ttinterp.c
++	(TT_Run_Context), src/truetype/ttinterp.h, src/truetype/ttobjs.c
++	(tt_size_run_fpgm, tt_size_run_prep): Updated.
++
++2014-11-24  Werner Lemberg  <wl@gnu.org>
++
++	Remove all code related to FT_MAX_CHARMAP_CACHEABLE.
++
++	This is no longer used.
++
++	* src/base/ftobjs.c, src/cache/ftccmap.c, src/cff/cffobjs.c,
++	src/sfnt/ttcmap.c: Do it.
++
++2014-11-24  Werner Lemberg  <wl@gnu.org>
++
++	[sfnt] Fix Savannah bug #43680.
++
++	This adds an additional constraint to make the fix from 2013-01-25
++	really work.
++
++	* src/sfnt/ttsbit.c (tt_sbit_decoder_load_image) <index_format==4>:
++	Check `p' before `num_glyphs'.
++
++2014-11-24  Werner Lemberg  <wl@gnu.org>
++
++	[truetype] Fix Savannah bug #43679.
++
++	* src/truetype/ttpload.c (tt_face_load_hdmx): Check minimum size of
++	`record_size'.
++
++2014-11-24  Jarkko Pöyry  <jarkko.poyry@gmail.com>
++
++	[cff, pfr, psaux, winfonts] Fix Savannah bug #43676.
++
++	Don't cast cmap init function pointers to an incompatible type. 
++
++	Without this patch, the number of parameters between declaration and
++	the real signature differs.  Calling such a function results in
++	undefined behavior.
++
++	  ISO/IEC 9899:TC3 (Committee Draft September 7, 2007)
++	    6.5.2.2 Function calls
++	      9 If the function is defined with a type that is not
++	        compatible with the type (of the expression) pointed to by
++	        the expression that denotes the called function, the
++	        behavior is undefined.
++
++	On certain platforms (c -> js with emscripten) this causes
++	termination of execution or invalid calls because in the emscripten
++	implementation, function pointers of different types are stored in
++	different pointer arrays.  Incorrect pointer type here results in
++	indexing of an incorrect array.
++
++	* src/cff/cffcmap.c (cff_cmap_encoding_init, cff_cmap_unicode_init),
++	src/pfr/pfrcmap.c (pfr_cmap_init), src/psaux/t1cmap.c
++	t1_cmap_standard_init, t1_cmap_expert_init, t1_cmap_custom_init,
++	t1_cmap_unicode_init), src/winfonts/winfnt.c (fnt_cmap_init): Fix
++	signature.
++
++2014-11-24  Werner Lemberg  <wl@gnu.org>
++
++	[sfnt] Fix Savannah bug #43672.
++
++	* src/sfnt/ttkern.c (tt_face_load_kern): Use correct value for
++	minimum table length test.
++
++2014-11-24  Werner Lemberg  <wl@gnu.org>
++
++	[type1, type42] Another fix for Savannah bug #43655.
++
++	* src/type1/t1load.c (parse_charstrings), src/type42/t42parse.c
++	(t42_parse_charstrings): Add another boundary testing.
++
++2014-11-24  Werner Lemberg  <wl@gnu.org>
++
++	[docmaker] Formatting, copyright, improved documentation.
++
++	* src/tools/docmaker/*: No code changes besides trivial
++	modifications.
++
++2014-11-22  Werner Lemberg  <wl@gnu.org>
++
++	[bdf] Fix Savannah bug #43660.
++
++	* src/bdf/bdflib.c (_bdf_parse_glyphs) <"ENDFONT">: Check
++	`_BDF_GLYPH_BITS'.
++
++2014-11-22  Werner Lemberg  <wl@gnu.org>
++
++	[type42] Allow only embedded TrueType fonts.
++
++	This is a follow-up to Savannah bug #43659.
++
++	* src/type42/t42objs.c (T42_Face_Init): Exclusively use the
++	`truetype' font driver for loading the font contained in the `sfnts'
++	array.
++
++2014-11-22  Werner Lemberg  <wl@gnu.org>
++
++	[type42] Fix Savannah bug #43659.
++
++	* src/type42/t42objs.c (T42_Open_Face): Initialize `face->ttf_size'.
++
++	* src/type42/t42parse.c (t42_parse_sfnts): Always set
++	`face->ttf_size' directly.  This ensures a correct stream size in
++	the call to `FT_Open_Face', which follows after parsing, even for
++	buggy input data.
++	Fix error messages.
++
++2014-11-22  Werner Lemberg  <wl@gnu.org>
++
++	[cff] Fix Savannah bug #43658.
++
++	* src/cff/cf2ft.c (cf2_builder_lineTo, cf2_builder_cubeTo): Handle
++	return values of point allocation routines.
++
++2014-11-22  Werner Lemberg  <wl@gnu.org>
++
++	[sfnt] Fix Savannah bug #43656.
++
++	* src/sfnt/ttcmap.c (tt_cmap4_validate): Fix order of validity
++	tests.
++
 +2014-11-21  Werner Lemberg  <wl@gnu.org>
 +
 +	[type1, type42] Fix Savannah bug #43655.
@@ -3883,10 +4125,29 @@ index 5b11f0e..2b0b67e 100644
  
  
 diff --git a/include/freetype.h b/include/freetype.h
-index fb62b62..bb989ef 100644
+index fb62b62..ff92d9f 100644
 --- a/include/freetype.h
 +++ b/include/freetype.h
-@@ -1570,15 +1570,15 @@ FT_BEGIN_HEADER
+@@ -190,15 +190,16 @@ FT_BEGIN_HEADER
+   /*    FT_LOAD_NO_SCALE                                                   */
+   /*    FT_LOAD_NO_HINTING                                                 */
+   /*    FT_LOAD_NO_BITMAP                                                  */
+-  /*    FT_LOAD_CROP_BITMAP                                                */
+   /*                                                                       */
+   /*    FT_LOAD_VERTICAL_LAYOUT                                            */
+   /*    FT_LOAD_IGNORE_TRANSFORM                                           */
+-  /*    FT_LOAD_IGNORE_GLOBAL_ADVANCE_WIDTH                                */
+   /*    FT_LOAD_FORCE_AUTOHINT                                             */
+   /*    FT_LOAD_NO_RECURSE                                                 */
+   /*    FT_LOAD_PEDANTIC                                                   */
+   /*                                                                       */
++  /*    FT_LOAD_CROP_BITMAP                                                */
++  /*    FT_LOAD_IGNORE_GLOBAL_ADVANCE_WIDTH                                */
++  /*                                                                       */
+   /*    FT_LOAD_TARGET_NORMAL                                              */
+   /*    FT_LOAD_TARGET_LIGHT                                               */
+   /*    FT_LOAD_TARGET_MONO                                                */
+@@ -1570,15 +1571,15 @@ FT_BEGIN_HEADER
    /*                         change between calls of @FT_Load_Glyph and a  */
    /*                         few other functions.                          */
    /*                                                                       */
@@ -3894,16 +4155,15 @@ index fb62b62..bb989ef 100644
 -  /*                         in integer pixels.  Of course, this is only   */
 -  /*                         valid if the format is                        */
 -  /*                         @FT_GLYPH_FORMAT_BITMAP.                      */
--  /*                                                                       */
--  /*    bitmap_top        :: This is the bitmap's top bearing expressed in */
--  /*                         integer pixels.  Remember that this is the    */
--  /*                         distance from the baseline to the top-most    */
--  /*                         glyph scanline, upwards y~coordinates being   */
 +  /*    bitmap_left       :: The bitmap's left bearing expressed in        */
 +  /*                         integer pixels.  Only valid if the format is  */
 +  /*                         @FT_GLYPH_FORMAT_BITMAP, this is, if the      */
 +  /*                         glyph slot contains a bitmap.                 */
-+  /*                                                                       */
+   /*                                                                       */
+-  /*    bitmap_top        :: This is the bitmap's top bearing expressed in */
+-  /*                         integer pixels.  Remember that this is the    */
+-  /*                         distance from the baseline to the top-most    */
+-  /*                         glyph scanline, upwards y~coordinates being   */
 +  /*    bitmap_top        :: The bitmap's top bearing expressed in integer */
 +  /*                         pixels.  Remember that this is the distance   */
 +  /*                         from the baseline to the top-most glyph       */
@@ -3911,7 +4171,7 @@ index fb62b62..bb989ef 100644
    /*                         *positive*.                                   */
    /*                                                                       */
    /*    outline           :: The outline descriptor for the current glyph  */
-@@ -1592,7 +1592,6 @@ FT_BEGIN_HEADER
+@@ -1592,7 +1593,6 @@ FT_BEGIN_HEADER
    /*                         This field is only valid for the composite    */
    /*                         glyph format that should normally only be     */
    /*                         loaded with the @FT_LOAD_NO_RECURSE flag.     */
@@ -3919,9 +4179,25 @@ index fb62b62..bb989ef 100644
    /*                                                                       */
    /*    subglyphs         :: An array of subglyph descriptors for          */
    /*                         composite glyphs.  There are `num_subglyphs'  */
-@@ -2560,14 +2559,11 @@ FT_BEGIN_HEADER
-    *     Ignored.  Deprecated.
+@@ -2541,11 +2541,6 @@ FT_BEGIN_HEADER
+    *     Indicates that the auto-hinter is preferred over the font's native
+    *     hinter.  See also the note below.
     *
+-   *   FT_LOAD_CROP_BITMAP ::
+-   *     Indicates that the font driver should crop the loaded bitmap glyph
+-   *     (i.e., remove all space around its black bits).  Not all drivers
+-   *     implement this.
+-   *
+    *   FT_LOAD_PEDANTIC ::
+    *     Indicates that the font driver should perform pedantic verifications
+    *     during glyph loading.  This is mostly used to detect broken glyphs
+@@ -2556,18 +2551,12 @@ FT_BEGIN_HEADER
+    *     result in partially hinted or distorted glyphs in case a glyph's
+    *     bytecode is buggy.
+    *
+-   *   FT_LOAD_IGNORE_GLOBAL_ADVANCE_WIDTH ::
+-   *     Ignored.  Deprecated.
+-   *
     *   FT_LOAD_NO_RECURSE ::
 -   *     This flag is only used internally.  It merely indicates that the
 -   *     font driver should not load composite glyphs recursively.  Instead,
@@ -3939,7 +4215,20 @@ index fb62b62..bb989ef 100644
     *
     *     This flag implies @FT_LOAD_NO_SCALE and @FT_LOAD_IGNORE_TRANSFORM.
     *
-@@ -3065,9 +3061,8 @@ FT_BEGIN_HEADER
+@@ -2600,6 +2589,12 @@ FT_BEGIN_HEADER
+    *     bitmaps transparently.  Those bitmaps will be in the
+    *     @FT_PIXEL_MODE_GRAY format.
+    *
++   *   FT_LOAD_CROP_BITMAP ::
++   *     Ignored.  Deprecated.
++   *
++   *   FT_LOAD_IGNORE_GLOBAL_ADVANCE_WIDTH ::
++   *     Ignored.  Deprecated.
++   *
+    * @note:
+    *   By default, hinting is enabled and the font's native hinter (see
+    *   @FT_FACE_FLAG_HINTER) is preferred over the auto-hinter.  You can
+@@ -3065,9 +3060,8 @@ FT_BEGIN_HEADER
    /*    glyph index~0 always corresponds to the `missing glyph' (called    */
    /*    `.notdef').                                                        */
    /*                                                                       */
@@ -3951,7 +4240,7 @@ index fb62b62..bb989ef 100644
    /*                                                                       */
    FT_EXPORT( FT_Error )
    FT_Get_Glyph_Name( FT_Face     face,
-@@ -3767,12 +3762,6 @@ FT_BEGIN_HEADER
+@@ -3767,12 +3761,6 @@ FT_BEGIN_HEADER
               FT_Long  c );
  
  
@@ -3964,7 +4253,7 @@ index fb62b62..bb989ef 100644
    /*************************************************************************/
    /*                                                                       */
    /* <Function>                                                            */
-@@ -3806,17 +3795,6 @@ FT_BEGIN_HEADER
+@@ -3806,17 +3794,6 @@ FT_BEGIN_HEADER
    FT_MulFix( FT_Long  a,
               FT_Long  b );
  
@@ -3982,7 +4271,7 @@ index fb62b62..bb989ef 100644
  
    /*************************************************************************/
    /*                                                                       */
-@@ -3829,18 +3807,12 @@ FT_BEGIN_HEADER
+@@ -3829,18 +3806,12 @@ FT_BEGIN_HEADER
    /*    used to divide a given value by a 16.16 fixed-point factor.        */
    /*                                                                       */
    /* <Input>                                                               */
@@ -4811,6 +5100,47 @@ index 03bd68e..14ec37b 100644
  #define INT_TO_F26DOT6( x )    ( (FT_Long)(x) << 6  )
  #define INT_TO_F2DOT14( x )    ( (FT_Long)(x) << 14 )
  #define INT_TO_FIXED( x )      ( (FT_Long)(x) << 16 )
+diff --git a/include/internal/ftgloadr.h b/include/internal/ftgloadr.h
+index ce4dc6c..f70774f 100644
+--- a/include/internal/ftgloadr.h
++++ b/include/internal/ftgloadr.h
+@@ -121,20 +121,22 @@ FT_BEGIN_HEADER
+                               FT_UInt         n_contours );
+ 
+ 
+-#define FT_GLYPHLOADER_CHECK_P( _loader, _count )                         \
+-   ( (_count) == 0 || ((_loader)->base.outline.n_points    +              \
+-                       (_loader)->current.outline.n_points +              \
+-                       (unsigned long)(_count)) <= (_loader)->max_points )
+-
+-#define FT_GLYPHLOADER_CHECK_C( _loader, _count )                          \
+-  ( (_count) == 0 || ((_loader)->base.outline.n_contours    +              \
+-                      (_loader)->current.outline.n_contours +              \
+-                      (unsigned long)(_count)) <= (_loader)->max_contours )
+-
+-#define FT_GLYPHLOADER_CHECK_POINTS( _loader, _points,_contours )      \
+-  ( ( FT_GLYPHLOADER_CHECK_P( _loader, _points )   &&                  \
+-      FT_GLYPHLOADER_CHECK_C( _loader, _contours ) )                   \
+-    ? 0                                                                \
++#define FT_GLYPHLOADER_CHECK_P( _loader, _count )           \
++  ( (_count) == 0                                        || \
++    ( (_loader)->base.outline.n_points    +                 \
++      (_loader)->current.outline.n_points +                 \
++      (unsigned long)(_count) ) <= (_loader)->max_points )
++
++#define FT_GLYPHLOADER_CHECK_C( _loader, _count )            \
++  ( (_count) == 0                                         || \
++    ( (_loader)->base.outline.n_contours    +                \
++      (_loader)->current.outline.n_contours +                \
++      (unsigned long)(_count)) <= (_loader)->max_contours )
++
++#define FT_GLYPHLOADER_CHECK_POINTS( _loader, _points, _contours )      \
++  ( ( FT_GLYPHLOADER_CHECK_P( _loader, _points )   &&                   \
++      FT_GLYPHLOADER_CHECK_C( _loader, _contours ) )                    \
++    ? 0                                                                 \
+     : FT_GlyphLoader_CheckPoints( (_loader), (_points), (_contours) ) )
+ 
+ 
 diff --git a/include/internal/ftobjs.h b/include/internal/ftobjs.h
 index 701c850..b45a5ed 100644
 --- a/include/internal/ftobjs.h
@@ -4847,6 +5177,65 @@ index 701c850..b45a5ed 100644
     *  character classification functions -- since these are used to parse
     *  font files, we must not use those in <ctypes.h> which are
     *  locale-dependent
+diff --git a/include/internal/pshints.h b/include/internal/pshints.h
+index 3fb18dc..f05ea68 100644
+--- a/include/internal/pshints.h
++++ b/include/internal/pshints.h
+@@ -6,7 +6,7 @@
+ /*    recorders (specification only).  These are used to support native    */
+ /*    T1/T2 hints in the `type1', `cid', and `cff' font drivers.           */
+ /*                                                                         */
+-/*  Copyright 2001-2003, 2005-2007, 2009, 2012 by                          */
++/*  Copyright 2001-2003, 2005-2007, 2009, 2012, 2014 by                    */
+ /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+ /*                                                                         */
+ /*  This file is part of the FreeType project, and may only be used,       */
+@@ -45,7 +45,7 @@ FT_BEGIN_HEADER
+                           T1_Private*   private_dict,
+                           PSH_Globals*  aglobals );
+ 
+-  typedef FT_Error
++  typedef void
+   (*PSH_Globals_SetScaleFunc)( PSH_Globals  globals,
+                                FT_Fixed     x_scale,
+                                FT_Fixed     y_scale,
+diff --git a/include/internal/sfnt.h b/include/internal/sfnt.h
+index 6b5e41f..d558e86 100644
+--- a/include/internal/sfnt.h
++++ b/include/internal/sfnt.h
+@@ -4,7 +4,7 @@
+ /*                                                                         */
+ /*    High-level `sfnt' driver interface (specification).                  */
+ /*                                                                         */
+-/*  Copyright 1996-2006, 2009, 2012-2013 by                                */
++/*  Copyright 1996-2006, 2009, 2012-2014 by                                */
+ /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+ /*                                                                         */
+ /*  This file is part of the FreeType project, and may only be used,       */
+@@ -405,14 +405,18 @@ FT_BEGIN_HEADER
+   /* <Input>                                                               */
+   /*    face     :: A handle to the target face object.                    */
+   /*                                                                       */
+-  /*    stream   :: The input stream.                                      */
+-  /*                                                                       */
+   /*    vertical :: A boolean flag.  If set, load vertical metrics.        */
+   /*                                                                       */
+-  /* <Return>                                                              */
+-  /*    FreeType error code.  0 means success.                             */
++  /*    gindex   :: The glyph index.                                       */
+   /*                                                                       */
+-  typedef FT_Error
++  /* <Output>                                                              */
++  /*    abearing :: The horizontal (or vertical) bearing.  Set to zero in  */
++  /*                case of error.                                         */
++  /*                                                                       */
++  /*    aadvance :: The horizontal (or vertical) advance.  Set to zero in  */
++  /*                case of error.                                         */
++  /*                                                                       */
++  typedef void
+   (*TT_Get_Metrics_Func)( TT_Face     face,
+                           FT_Bool     vertical,
+                           FT_UInt     gindex,
 diff --git a/src/autofit/afangles.c b/src/autofit/afangles.c
 index b44a5ba..f8b095b 100644
 --- a/src/autofit/afangles.c
@@ -6925,10 +7314,43 @@ index 930fa98..07590b3 100644
          seg->edge_next = seg;
        }
        else
+diff --git a/src/autofit/afloader.c b/src/autofit/afloader.c
+index 0fa3c12..fb15c87 100644
+--- a/src/autofit/afloader.c
++++ b/src/autofit/afloader.c
+@@ -131,8 +131,8 @@
+       loader->trans_delta  = internal->glyph_delta;
+ 
+       inverse = loader->trans_matrix;
+-      FT_Matrix_Invert( &inverse );
+-      FT_Vector_Transform( &loader->trans_delta, &inverse );
++      if ( !FT_Matrix_Invert( &inverse ) )
++        FT_Vector_Transform( &loader->trans_delta, &inverse );
+     }
+ 
+     switch ( slot->format )
+@@ -508,7 +508,7 @@
+ 
+ 
+     if ( !size )
+-      return FT_THROW( Invalid_Argument );
++      return FT_THROW( Invalid_Size_Handle );
+ 
+     FT_ZERO( &scaler );
+ 
 diff --git a/src/autofit/afmodule.c b/src/autofit/afmodule.c
-index 73bf832..181cf55 100644
+index 73bf832..81ece38 100644
 --- a/src/autofit/afmodule.c
 +++ b/src/autofit/afmodule.c
+@@ -55,7 +55,7 @@
+ 
+ 
+     if ( !face )
+-      return FT_THROW( Invalid_Argument );
++      return FT_THROW( Invalid_Face_Handle );
+ 
+     globals = (AF_FaceGlobals)face->autohint.data;
+     if ( !globals )
 @@ -103,8 +103,8 @@
          AF_StyleClass  style_class = AF_STYLE_CLASSES_GET[ss];
  
@@ -7228,6 +7650,39 @@ index 11fb743..a705cef 100644
        if ( gstyles[idx] == AF_STYLE_UNASSIGNED )
          gstyles[idx] = (FT_Byte)style_class->style;
  #ifdef FT_DEBUG_LEVEL_TRACE
+diff --git a/src/base/ftadvanc.c b/src/base/ftadvanc.c
+index 5207847..18884ef 100644
+--- a/src/base/ftadvanc.c
++++ b/src/base/ftadvanc.c
+@@ -4,7 +4,7 @@
+ /*                                                                         */
+ /*    Quick computation of advance widths (body).                          */
+ /*                                                                         */
+-/*  Copyright 2008, 2009, 2011, 2013 by                                    */
++/*  Copyright 2008, 2009, 2011, 2013, 2014 by                              */
+ /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+ /*                                                                         */
+ /*  This file is part of the FreeType project, and may only be used,       */
+@@ -80,6 +80,9 @@
+     if ( !face )
+       return FT_THROW( Invalid_Face_Handle );
+ 
++    if ( !padvance )
++      return FT_THROW( Invalid_Argument );
++
+     if ( gindex >= (FT_UInt)face->num_glyphs )
+       return FT_THROW( Invalid_Glyph_Index );
+ 
+@@ -118,6 +121,9 @@
+     if ( !face )
+       return FT_THROW( Invalid_Face_Handle );
+ 
++    if ( !padvances )
++      return FT_THROW( Invalid_Argument );
++
+     num = (FT_UInt)face->num_glyphs;
+     end = start + count;
+     if ( start >= num || end < start || end > num )
 diff --git a/src/base/ftbbox.c b/src/base/ftbbox.c
 index 8d3f383..c775d5c 100644
 --- a/src/base/ftbbox.c
@@ -7550,6 +8005,88 @@ index 8d3f383..c775d5c 100644
  
        vec++;
      }
+diff --git a/src/base/ftbdf.c b/src/base/ftbdf.c
+index 5755f85..6b53432 100644
+--- a/src/base/ftbdf.c
++++ b/src/base/ftbdf.c
+@@ -4,7 +4,7 @@
+ /*                                                                         */
+ /*    FreeType API for accessing BDF-specific strings (body).              */
+ /*                                                                         */
+-/*  Copyright 2002-2004, 2013 by                                           */
++/*  Copyright 2002-2004, 2013, 2014 by                                     */
+ /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+ /*                                                                         */
+ /*  This file is part of the FreeType project, and may only be used,       */
+@@ -17,6 +17,8 @@
+ 
+ 
+ #include <ft2build.h>
++#include FT_INTERNAL_DEBUG_H
++
+ #include FT_INTERNAL_OBJECTS_H
+ #include FT_SERVICE_BDF_H
+ 
+@@ -32,19 +34,16 @@
+     const char*  encoding = NULL;
+     const char*  registry = NULL;
+ 
++    FT_Service_BDF  service;
+ 
+-    error = FT_ERR( Invalid_Argument );
+-
+-    if ( face )
+-    {
+-      FT_Service_BDF  service;
+ 
++    if ( !face )
++      return FT_THROW( Invalid_Face_Handle );
+ 
+-      FT_FACE_FIND_SERVICE( face, service, BDF );
++    FT_FACE_FIND_SERVICE( face, service, BDF );
+ 
+-      if ( service && service->get_charset_id )
+-        error = service->get_charset_id( face, &encoding, &registry );
+-    }
++    if ( service && service->get_charset_id )
++      error = service->get_charset_id( face, &encoding, &registry );
+ 
+     if ( acharset_encoding )
+       *acharset_encoding = encoding;
+@@ -65,23 +64,23 @@
+   {
+     FT_Error  error;
+ 
++    FT_Service_BDF  service;
+ 
+-    error = FT_ERR( Invalid_Argument );
+ 
+-    aproperty->type = BDF_PROPERTY_TYPE_NONE;
++    if ( !face )
++      return FT_THROW( Invalid_Face_Handle );
+ 
+-    if ( face )
+-    {
+-      FT_Service_BDF  service;
++    if ( !aproperty )
++      return FT_THROW( Invalid_Argument );
+ 
++    aproperty->type = BDF_PROPERTY_TYPE_NONE;
+ 
+-      FT_FACE_FIND_SERVICE( face, service, BDF );
++    FT_FACE_FIND_SERVICE( face, service, BDF );
+ 
+-      if ( service && service->get_property )
+-        error = service->get_property( face, prop_name, aproperty );
+-    }
++    if ( service && service->get_property )
++      error = service->get_property( face, prop_name, aproperty );
+ 
+-    return  error;
++    return error;
+   }
+ 
+ 
 diff --git a/src/base/ftbitmap.c b/src/base/ftbitmap.c
 index 5606745..5dd33a2 100644
 --- a/src/base/ftbitmap.c
@@ -8743,7 +9280,7 @@ index 6e65583..f3ef8c5 100644
  
  
 diff --git a/src/base/ftlcdfil.c b/src/base/ftlcdfil.c
-index 852fb32..1f23c4c 100644
+index 852fb32..d8bcbbf 100644
 --- a/src/base/ftlcdfil.c
 +++ b/src/base/ftlcdfil.c
 @@ -4,7 +4,7 @@
@@ -8873,11 +9410,347 @@ index 852fb32..1f23c4c 100644
        for ( ; width > 0; width--, column++ )
        {
          FT_Byte*  col     = column;
+@@ -272,7 +289,10 @@
+   FT_Library_SetLcdFilterWeights( FT_Library      library,
+                                   unsigned char  *weights )
+   {
+-    if ( !library || !weights )
++    if ( !library )
++      return FT_THROW( Invalid_Library_Handle );
++
++    if ( !weights )
+       return FT_THROW( Invalid_Argument );
+ 
+     ft_memcpy( library->lcd_weights, weights, 5 );
+@@ -294,7 +314,7 @@
+ 
+ 
+     if ( !library )
+-      return FT_THROW( Invalid_Argument );
++      return FT_THROW( Invalid_Library_Handle );
+ 
+     switch ( filter )
+     {
+diff --git a/src/base/ftmac.c b/src/base/ftmac.c
+index 9b49da8..184a2e1 100644
+--- a/src/base/ftmac.c
++++ b/src/base/ftmac.c
+@@ -440,9 +440,10 @@
+       style = (StyleTable*)p;
+       p += sizeof ( StyleTable );
+       string_count = EndianS16_BtoN( *(short*)(p) );
++      string_count = FT_MIN( 64, string_count );
+       p += sizeof ( short );
+ 
+-      for ( i = 0; i < string_count && i < 64; i++ )
++      for ( i = 0; i < string_count; i++ )
+       {
+         names[i] = p;
+         p       += names[i][0];
+@@ -459,7 +460,7 @@
+           ps_name[ps_name_len] = 0;
+         }
+         if ( style->indexes[face_index] > 1 &&
+-             style->indexes[face_index] <= FT_MIN( string_count, 64 ) )
++             style->indexes[face_index] <= string_count )
+         {
+           unsigned char*  suffixes = names[style->indexes[face_index] - 1];
+ 
 diff --git a/src/base/ftobjs.c b/src/base/ftobjs.c
-index 6f32336..315ad12 100644
+index 6f32336..b28216a 100644
 --- a/src/base/ftobjs.c
 +++ b/src/base/ftobjs.c
-@@ -4107,6 +4107,7 @@
+@@ -408,7 +408,10 @@
+     FT_GlyphSlot     slot = NULL;
+ 
+ 
+-    if ( !face || !face->driver )
++    if ( !face )
++      return FT_THROW( Invalid_Face_Handle );
++
++    if ( !face->driver )
+       return FT_THROW( Invalid_Argument );
+ 
+     driver = face->driver;
+@@ -1040,14 +1043,6 @@
+              ( cur[0]->platform_id == TT_PLATFORM_APPLE_UNICODE &&
+                cur[0]->encoding_id == TT_APPLE_ID_UNICODE_32    ) )
+         {
+-#ifdef FT_MAX_CHARMAP_CACHEABLE
+-          if ( cur - first > FT_MAX_CHARMAP_CACHEABLE )
+-          {
+-            FT_ERROR(( "find_unicode_charmap: UCS-4 cmap is found "
+-                       "at too late position (%d)\n", cur - first ));
+-            continue;
+-          }
+-#endif
+           face->charmap = cur[0];
+           return FT_Err_Ok;
+         }
+@@ -1062,14 +1057,6 @@
+     {
+       if ( cur[0]->encoding == FT_ENCODING_UNICODE )
+       {
+-#ifdef FT_MAX_CHARMAP_CACHEABLE
+-        if ( cur - first > FT_MAX_CHARMAP_CACHEABLE )
+-        {
+-          FT_ERROR(( "find_unicode_charmap: UCS-2 cmap is found "
+-                     "at too late position (%d)\n", cur - first ));
+-          continue;
+-        }
+-#endif
+         face->charmap = cur[0];
+         return FT_Err_Ok;
+       }
+@@ -1111,17 +1098,7 @@
+       if ( cur[0]->platform_id == TT_PLATFORM_APPLE_UNICODE    &&
+            cur[0]->encoding_id == TT_APPLE_ID_VARIANT_SELECTOR &&
+            FT_Get_CMap_Format( cur[0] ) == 14                  )
+-      {
+-#ifdef FT_MAX_CHARMAP_CACHEABLE
+-        if ( cur - first > FT_MAX_CHARMAP_CACHEABLE )
+-        {
+-          FT_ERROR(( "find_unicode_charmap: UVS cmap is found "
+-                     "at too late position (%d)\n", cur - first ));
+-          continue;
+-        }
+-#endif
+         return cur[0];
+-      }
+     }
+ 
+     return NULL;
+@@ -1583,9 +1560,9 @@
+     FT_Memory  memory = library->memory;
+     FT_Byte*   pfb_data = NULL;
+     int        i, type, flags;
+-    FT_Long    len;
+-    FT_Long    pfb_len, pfb_pos, pfb_lenpos;
+-    FT_Long    rlen, temp;
++    FT_ULong   len;
++    FT_ULong   pfb_len, pfb_pos, pfb_lenpos;
++    FT_ULong   rlen, temp;
+ 
+ 
+     if ( face_index == -1 )
+@@ -1601,11 +1578,34 @@
+       error = FT_Stream_Seek( stream, offsets[i] );
+       if ( error )
+         goto Exit;
+-      if ( FT_READ_LONG( temp ) )
++      if ( FT_READ_ULONG( temp ) )
+         goto Exit;
++
++      /* FT2 allocator takes signed long buffer length,
++       * too large value causing overflow should be checked
++       */
++      FT_TRACE4(( "                 POST fragment #%d: length=0x%08x\n",
++                  i, temp));
++      if ( 0x7FFFFFFFUL < temp || pfb_len + temp + 6 < pfb_len )
++      {
++        FT_TRACE2(( "             too long fragment length makes"
++                    " pfb_len confused: temp=0x%08x\n", temp ));
++        error = FT_THROW( Invalid_Offset );
++        goto Exit;
++      }
++
+       pfb_len += temp + 6;
+     }
+ 
++    FT_TRACE2(( "             total buffer size to concatenate %d"
++                " POST fragments: 0x%08x\n",
++                 resource_cnt, pfb_len + 2));
++    if ( pfb_len + 2 < 6 ) {
++      FT_TRACE2(( "             too long fragment length makes"
++                  " pfb_len confused: pfb_len=0x%08x\n", pfb_len ));
++      error = FT_THROW( Array_Too_Large );
++      goto Exit;
++    }
+     if ( FT_ALLOC( pfb_data, (FT_Long)pfb_len + 2 ) )
+       goto Exit;
+ 
+@@ -1625,16 +1625,30 @@
+       error = FT_Stream_Seek( stream, offsets[i] );
+       if ( error )
+         goto Exit2;
+-      if ( FT_READ_LONG( rlen ) )
+-        goto Exit;
++      if ( FT_READ_ULONG( rlen ) )
++        goto Exit2;
++
++      /* FT2 allocator takes signed long buffer length,
++       * too large fragment length causing overflow should be checked
++       */
++      if ( 0x7FFFFFFFUL < rlen )
++      {
++        error = FT_THROW( Invalid_Offset );
++        goto Exit2;
++      }
++
+       if ( FT_READ_USHORT( flags ) )
+-        goto Exit;
++        goto Exit2;
+       FT_TRACE3(( "POST fragment[%d]: offsets=0x%08x, rlen=0x%08x, flags=0x%04x\n",
+                    i, offsets[i], rlen, flags ));
+ 
++      error = FT_ERR( Array_Too_Large );
+       /* postpone the check of rlen longer than buffer until FT_Stream_Read() */
+       if ( ( flags >> 8 ) == 0 )        /* Comment, should not be loaded */
++      {
++        FT_TRACE3(( "    Skip POST fragment #%d because it is a comment\n", i ));
+         continue;
++      }
+ 
+       /* the flags are part of the resource, so rlen >= 2.  */
+       /* but some fonts declare rlen = 0 for empty fragment */
+@@ -1647,6 +1661,8 @@
+         len += rlen;
+       else
+       {
++        FT_TRACE3(( "    Write POST fragment #%d header (4-byte) to buffer"
++                    " 0x%p + 0x%08x\n", i, pfb_data, pfb_lenpos ));
+         if ( pfb_lenpos + 3 > pfb_len + 2 )
+           goto Exit2;
+         pfb_data[pfb_lenpos    ] = (FT_Byte)( len );
+@@ -1657,6 +1673,8 @@
+         if ( ( flags >> 8 ) == 5 )      /* End of font mark */
+           break;
+ 
++        FT_TRACE3(( "    Write POST fragment #%d header (6-byte) to buffer"
++                    " 0x%p + 0x%08x\n", i, pfb_data, pfb_pos ));
+         if ( pfb_pos + 6 > pfb_len + 2 )
+           goto Exit2;
+         pfb_data[pfb_pos++] = 0x80;
+@@ -1672,16 +1690,18 @@
+         pfb_data[pfb_pos++] = 0;
+       }
+ 
+-      error = FT_ERR( Cannot_Open_Resource );
+       if ( pfb_pos > pfb_len || pfb_pos + rlen > pfb_len )
+         goto Exit2;
+ 
++      FT_TRACE3(( "    Load POST fragment #%d (%d byte) to buffer"
++                  " 0x%p + 0x%08x\n", i, rlen, pfb_data, pfb_pos ));
+       error = FT_Stream_Read( stream, (FT_Byte *)pfb_data + pfb_pos, rlen );
+       if ( error )
+         goto Exit2;
+       pfb_pos += rlen;
+     }
+ 
++    error = FT_ERR( Array_Too_Large );
+     if ( pfb_pos + 2 > pfb_len + 2 )
+       goto Exit2;
+     pfb_data[pfb_pos++] = 0x80;
+@@ -1702,6 +1722,13 @@
+                                   aface );
+ 
+   Exit2:
++    if ( error == FT_ERR( Array_Too_Large ) )
++      FT_TRACE2(( "  Abort due to too-short buffer to store"
++                  " all POST fragments\n" ));
++    else if ( error == FT_ERR( Invalid_Offset ) )
++      FT_TRACE2(( "  Abort due to invalid offset in a POST fragment\n" ));
++    if ( error )
++      error = FT_ERR( Cannot_Open_Resource );
+     FT_FREE( pfb_data );
+ 
+   Exit:
+@@ -3122,15 +3149,6 @@
+     {
+       if ( cur[0]->encoding == encoding )
+       {
+-#ifdef FT_MAX_CHARMAP_CACHEABLE
+-        if ( cur - face->charmaps > FT_MAX_CHARMAP_CACHEABLE )
+-        {
+-          FT_ERROR(( "FT_Select_Charmap: requested charmap is found (%d), "
+-                     "but in too late position to cache\n",
+-                     cur - face->charmaps ));
+-          continue;
+-        }
+-#endif
+         face->charmap = cur[0];
+         return 0;
+       }
+@@ -3165,15 +3183,6 @@
+     {
+       if ( cur[0] == charmap )
+       {
+-#ifdef FT_MAX_CHARMAP_CACHEABLE
+-        if ( cur - face->charmaps > FT_MAX_CHARMAP_CACHEABLE )
+-        {
+-          FT_ERROR(( "FT_Set_Charmap: requested charmap is found (%d), "
+-                     "but in too late position to cache\n",
+-                     cur - face->charmaps ));
+-          continue;
+-        }
+-#endif
+         face->charmap = cur[0];
+         return 0;
+       }
+@@ -3199,15 +3208,6 @@
+ 
+     FT_ASSERT( i < charmap->face->num_charmaps );
+ 
+-#ifdef FT_MAX_CHARMAP_CACHEABLE
+-    if ( i > FT_MAX_CHARMAP_CACHEABLE )
+-    {
+-      FT_ERROR(( "FT_Get_Charmap_Index: requested charmap is found (%d), "
+-                 "but in too late position to cache\n",
+-                 i ));
+-      return -i;
+-    }
+-#endif
+     return i;
+   }
+ 
+@@ -3683,7 +3683,7 @@
+   FT_Get_Sfnt_Table( FT_Face      face,
+                      FT_Sfnt_Tag  tag )
+   {
+-    void*                  table = 0;
++    void*                  table = NULL;
+     FT_Service_SFNT_Table  service;
+ 
+ 
+@@ -3800,12 +3800,12 @@
+     FT_Face  face;
+ 
+ 
+-    if ( size == NULL )
+-      return FT_THROW( Invalid_Argument );
++    if ( !size )
++      return FT_THROW( Invalid_Size_Handle );
+ 
+     face = size->face;
+-    if ( face == NULL || face->driver == NULL )
+-      return FT_THROW( Invalid_Argument );
++    if ( !face || !face->driver )
++      return FT_THROW( Invalid_Face_Handle );
+ 
+     /* we don't need anything more complex than that; all size objects */
+     /* are already listed by the face                                  */
+@@ -4090,7 +4090,11 @@
+         /* if we changed the current renderer for the glyph image format */
+         /* we need to select it as the next current one                  */
+         if ( !error && update && renderer )
+-          FT_Set_Renderer( library, renderer, 0, 0 );
++        {
++          error = FT_Set_Renderer( library, renderer, 0, 0 );
++          if ( error )
++            break;
++        }
+       }
+     }
+ 
+@@ -4100,6 +4104,7 @@
+ #define FT_COMPONENT  trace_bitmap
+ 
+     /* we convert to a single bitmap format for computing the checksum */
++    if ( !error )
+     {
+       FT_Bitmap  bitmap;
+       FT_Error   err;
+@@ -4107,6 +4112,7 @@
  
        FT_Bitmap_New( &bitmap );
  
@@ -8885,7 +9758,7 @@ index 6f32336..315ad12 100644
        err = FT_Bitmap_Convert( library, &slot->bitmap, &bitmap, 1 );
        if ( !err )
        {
-@@ -4881,6 +4882,8 @@
+@@ -4881,6 +4887,8 @@
        *p_arg1      = subg->arg1;
        *p_arg2      = subg->arg2;
        *p_transform = subg->transform;
@@ -8895,10 +9768,52 @@ index 6f32336..315ad12 100644
  
      return error;
 diff --git a/src/base/ftoutln.c b/src/base/ftoutln.c
-index 4a39dcd..632b6d2 100644
+index 4a39dcd..a2445b4 100644
 --- a/src/base/ftoutln.c
 +++ b/src/base/ftoutln.c
-@@ -1045,6 +1045,10 @@
+@@ -73,7 +73,10 @@
+     FT_Pos   delta;
+ 
+ 
+-    if ( !outline || !func_interface )
++    if ( !outline )
++      return FT_THROW( Invalid_Outline );
++
++    if ( !func_interface )
+       return FT_THROW( Invalid_Argument );
+ 
+     shift = func_interface->shift;
+@@ -614,7 +617,10 @@
+     if ( !library )
+       return FT_THROW( Invalid_Library_Handle );
+ 
+-    if ( !outline || !params )
++    if ( !outline )
++      return FT_THROW( Invalid_Outline );
++
++    if ( !params )
+       return FT_THROW( Invalid_Argument );
+ 
+     renderer = library->cur_renderer;
+@@ -643,7 +649,7 @@
+     /* if we changed the current renderer for the glyph image format */
+     /* we need to select it as the next current one                  */
+     if ( !error && update && renderer )
+-      FT_Set_Renderer( library, renderer, 0, 0 );
++      error = FT_Set_Renderer( library, renderer, 0, 0 );
+ 
+     return error;
+   }
+@@ -911,7 +917,7 @@
+ 
+ 
+     if ( !outline )
+-      return FT_THROW( Invalid_Argument );
++      return FT_THROW( Invalid_Outline );
+ 
+     xstrength /= 2;
+     ystrength /= 2;
+@@ -1045,6 +1051,10 @@
  
      FT_Outline_Get_CBox( outline, &cbox );
  
@@ -8909,8 +9824,57 @@ index 4a39dcd..632b6d2 100644
      xshift = FT_MSB( FT_ABS( cbox.xMax ) | FT_ABS( cbox.xMin ) ) - 14;
      xshift = FT_MAX( xshift, 0 );
  
+diff --git a/src/base/ftpfr.c b/src/base/ftpfr.c
+index 0ba955f..ddb58c1 100644
+--- a/src/base/ftpfr.c
++++ b/src/base/ftpfr.c
+@@ -4,7 +4,7 @@
+ /*                                                                         */
+ /*    FreeType API for accessing PFR-specific data (body).                 */
+ /*                                                                         */
+-/*  Copyright 2002-2004, 2008, 2010, 2013 by                               */
++/*  Copyright 2002-2004, 2008, 2010, 2013, 2014 by                         */
+ /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+ /*                                                                         */
+ /*  This file is part of the FreeType project, and may only be used,       */
+@@ -50,7 +50,7 @@
+ 
+ 
+     if ( !face )
+-      return FT_THROW( Invalid_Argument );
++      return FT_THROW( Invalid_Face_Handle );
+ 
+     service = ft_pfr_check( face );
+     if ( service )
+@@ -106,7 +106,7 @@
+ 
+ 
+     if ( !face )
+-      return FT_THROW( Invalid_Argument );
++      return FT_THROW( Invalid_Face_Handle );
+ 
+     service = ft_pfr_check( face );
+     if ( service )
+diff --git a/src/base/ftstream.c b/src/base/ftstream.c
+index d965333..759fd8f 100644
+--- a/src/base/ftstream.c
++++ b/src/base/ftstream.c
+@@ -728,9 +728,12 @@
+     FT_Byte*  cursor;
+ 
+ 
+-    if ( !fields || !stream )
++    if ( !fields )
+       return FT_THROW( Invalid_Argument );
+ 
++    if ( !stream )
++      return FT_THROW( Invalid_Stream_Handle );
++
+     cursor = stream->cursor;
+ 
+     error = FT_Err_Ok;
 diff --git a/src/base/ftstroke.c b/src/base/ftstroke.c
-index ee61cec..dd75e32 100644
+index ee61cec..c63e138 100644
 --- a/src/base/ftstroke.c
 +++ b/src/base/ftstroke.c
 @@ -4,7 +4,7 @@
@@ -8922,6 +9886,15 @@ index ee61cec..dd75e32 100644
  /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
  /*                                                                         */
  /*  This file is part of the FreeType project, and may only be used,       */
+@@ -795,7 +795,7 @@
+ 
+ 
+     if ( !library )
+-      return FT_THROW( Invalid_Argument );
++      return FT_THROW( Invalid_Library_Handle );
+ 
+     memory = library->memory;
+ 
 @@ -1002,7 +1002,8 @@
                                                      FT_Tan( theta ) ) );
  
@@ -8932,6 +9905,64 @@ index ee61cec..dd75e32 100644
                             line_length          >= min_length );
      }
  
+@@ -2059,7 +2060,10 @@
+     FT_Int      tag;       /* current point's state           */
+ 
+ 
+-    if ( !outline || !stroker )
++    if ( !outline )
++      return FT_THROW( Invalid_Outline );
++
++    if ( !stroker )
+       return FT_THROW( Invalid_Argument );
+ 
+     FT_Stroker_Rewind( stroker );
+@@ -2293,7 +2297,7 @@
+       if ( error )
+         goto Fail;
+ 
+-      (void)FT_Stroker_GetCounts( stroker, &num_points, &num_contours );
++      FT_Stroker_GetCounts( stroker, &num_points, &num_contours );
+ 
+       FT_Outline_Done( glyph->library, outline );
+ 
+@@ -2379,8 +2383,8 @@
+       if ( error )
+         goto Fail;
+ 
+-      (void)FT_Stroker_GetBorderCounts( stroker, border,
+-                                        &num_points, &num_contours );
++      FT_Stroker_GetBorderCounts( stroker, border,
++                                  &num_points, &num_contours );
+ 
+       FT_Outline_Done( glyph->library, outline );
+ 
+diff --git a/src/base/ftsynth.c b/src/base/ftsynth.c
+index 3098a60..fbe805d 100644
+--- a/src/base/ftsynth.c
++++ b/src/base/ftsynth.c
+@@ -4,7 +4,7 @@
+ /*                                                                         */
+ /*    FreeType synthesizing code for emboldening and slanting (body).      */
+ /*                                                                         */
+-/*  Copyright 2000-2006, 2010, 2012, 2013 by                               */
++/*  Copyright 2000-2006, 2010, 2012-2014 by                                */
+ /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+ /*                                                                         */
+ /*  This file is part of the FreeType project, and may only be used,       */
+@@ -100,10 +100,8 @@
+     ystr = xstr;
+ 
+     if ( slot->format == FT_GLYPH_FORMAT_OUTLINE )
+-    {
+-      /* ignore error */
+-      (void)FT_Outline_EmboldenXY( &slot->outline, xstr, ystr );
+-    }
++      FT_Outline_EmboldenXY( &slot->outline, xstr, ystr );
++
+     else /* slot->format == FT_GLYPH_FORMAT_BITMAP */
+     {
+       /* round to full pixels */
 diff --git a/src/base/fttrigon.c b/src/base/fttrigon.c
 index 4ffdcb7..64317fa 100644
 --- a/src/base/fttrigon.c
@@ -9113,7 +10144,7 @@ index 879d027..9f37189 100644
 -
  /* END */
 diff --git a/src/bdf/bdfdrivr.c b/src/bdf/bdfdrivr.c
-index 5a1c296..c270d59 100644
+index 5a1c296..55a428c 100644
 --- a/src/bdf/bdfdrivr.c
 +++ b/src/bdf/bdfdrivr.c
 @@ -182,7 +182,7 @@ THE SOFTWARE.
@@ -9134,8 +10165,23 @@ index 5a1c296..c270d59 100644
      {
        bdf_property_t*  prop = NULL;
  
+@@ -679,7 +679,13 @@ THE SOFTWARE.
+     FT_UNUSED( load_flags );
+ 
+ 
+-    if ( !face || glyph_index >= (FT_UInt)face->num_glyphs )
++    if ( !face )
++    {
++      error = FT_THROW( Invalid_Face_Handle );
++      goto Exit;
++    }
++
++    if ( glyph_index >= (FT_UInt)face->num_glyphs )
+     {
+       error = FT_THROW( Invalid_Argument );
+       goto Exit;
 diff --git a/src/bdf/bdflib.c b/src/bdf/bdflib.c
-index 2eda11c..c128526 100644
+index 2eda11c..369c111 100644
 --- a/src/bdf/bdflib.c
 +++ b/src/bdf/bdflib.c
 @@ -169,6 +169,18 @@
@@ -9202,16 +10248,25 @@ index 2eda11c..c128526 100644
        {
          FT_ERROR(( "_bdf_parse_glyphs: " ERRMSG1, lineno, "CHARS" ));
          error = FT_THROW( Missing_Chars_Field );
-@@ -1541,7 +1553,7 @@
+@@ -1541,8 +1553,16 @@
      }
  
      /* Check for the ENDFONT field. */
 -    if ( ft_strncmp( line, "ENDFONT", 7 ) == 0 )
 +    if ( _bdf_strncmp( line, "ENDFONT", 7 ) == 0 )
      {
++      if ( p->flags & _BDF_GLYPH_BITS )
++      {
++        /* Missing ENDCHAR field. */
++        FT_ERROR(( "_bdf_parse_glyphs: " ERRMSG1, lineno, "ENDCHAR" ));
++        error = FT_THROW( Corrupted_Font_Glyphs );
++        goto Exit;
++      }
++
        /* Sort the glyphs by encoding. */
        ft_qsort( (char *)font->glyphs,
-@@ -1555,7 +1567,7 @@
+                 font->glyphs_used,
+@@ -1555,7 +1575,7 @@
      }
  
      /* Check for the ENDCHAR field. */
@@ -9220,7 +10275,7 @@ index 2eda11c..c128526 100644
      {
        p->glyph_enc = 0;
        p->flags    &= ~_BDF_GLYPH_BITS;
-@@ -1571,7 +1583,7 @@
+@@ -1571,7 +1591,7 @@
        goto Exit;
  
      /* Check for the STARTCHAR field. */
@@ -9229,7 +10284,7 @@ index 2eda11c..c128526 100644
      {
        /* Set the character name in the parse info first until the */
        /* encoding can be checked for an unencoded character.      */
-@@ -1605,7 +1617,7 @@
+@@ -1605,7 +1625,7 @@
      }
  
      /* Check for the ENCODING field. */
@@ -9238,7 +10293,7 @@ index 2eda11c..c128526 100644
      {
        if ( !( p->flags & _BDF_GLYPH ) )
        {
-@@ -1791,7 +1803,7 @@
+@@ -1791,7 +1811,7 @@
      }
  
      /* Expect the SWIDTH (scalable width) field next. */
@@ -9247,7 +10302,7 @@ index 2eda11c..c128526 100644
      {
        if ( !( p->flags & _BDF_ENCODING ) )
          goto Missing_Encoding;
-@@ -1807,7 +1819,7 @@
+@@ -1807,7 +1827,7 @@
      }
  
      /* Expect the DWIDTH (scalable width) field next. */
@@ -9256,7 +10311,7 @@ index 2eda11c..c128526 100644
      {
        if ( !( p->flags & _BDF_ENCODING ) )
          goto Missing_Encoding;
-@@ -1835,7 +1847,7 @@
+@@ -1835,7 +1855,7 @@
      }
  
      /* Expect the BBX field next. */
@@ -9265,7 +10320,7 @@ index 2eda11c..c128526 100644
      {
        if ( !( p->flags & _BDF_ENCODING ) )
          goto Missing_Encoding;
-@@ -1903,7 +1915,7 @@
+@@ -1903,7 +1923,7 @@
      }
  
      /* And finally, gather up the bitmap. */
@@ -9274,7 +10329,7 @@ index 2eda11c..c128526 100644
      {
        unsigned long  bitmap_size;
  
-@@ -1978,7 +1990,7 @@
+@@ -1978,7 +1998,7 @@
      p    = (_bdf_parse_t *)    client_data;
  
      /* Check for the end of the properties. */
@@ -9283,7 +10338,7 @@ index 2eda11c..c128526 100644
      {
        /* If the FONT_ASCENT or FONT_DESCENT properties have not been      */
        /* encountered yet, then make sure they are added as properties and */
-@@ -2019,12 +2031,12 @@
+@@ -2019,12 +2039,12 @@
      }
  
      /* Ignore the _XFREE86_GLYPH_RANGES properties. */
@@ -9298,7 +10353,7 @@ index 2eda11c..c128526 100644
      {
        name = value = line;
        value += 7;
-@@ -2088,7 +2100,7 @@
+@@ -2088,7 +2108,7 @@
  
      /* Check for a comment.  This is done to handle those fonts that have */
      /* comments before the STARTFONT line for some reason.                */
@@ -9307,7 +10362,7 @@ index 2eda11c..c128526 100644
      {
        if ( p->opts->keep_comments != 0 && p->font != 0 )
        {
-@@ -2114,7 +2126,7 @@
+@@ -2114,7 +2134,7 @@
      {
        memory = p->memory;
  
@@ -9316,7 +10371,7 @@ index 2eda11c..c128526 100644
        {
          /* we don't emit an error message since this code gets */
          /* explicitly caught one level higher                  */
-@@ -2162,7 +2174,7 @@
+@@ -2162,7 +2182,7 @@
      }
  
      /* Check for the start of the properties. */
@@ -9325,7 +10380,7 @@ index 2eda11c..c128526 100644
      {
        if ( !( p->flags & _BDF_FONT_BBX ) )
        {
-@@ -2191,7 +2203,7 @@
+@@ -2191,7 +2211,7 @@
      }
  
      /* Check for the FONTBOUNDINGBOX field. */
@@ -9334,7 +10389,7 @@ index 2eda11c..c128526 100644
      {
        if ( !( p->flags & _BDF_SIZE ) )
        {
-@@ -2222,7 +2234,7 @@
+@@ -2222,7 +2242,7 @@
      }
  
      /* The next thing to check for is the FONT field. */
@@ -9343,7 +10398,7 @@ index 2eda11c..c128526 100644
      {
        error = _bdf_list_split( &p->list, (char *)" +", line, linelen );
        if ( error )
-@@ -2257,7 +2269,7 @@
+@@ -2257,7 +2277,7 @@
      }
  
      /* Check for the SIZE field. */
@@ -9352,7 +10407,7 @@ index 2eda11c..c128526 100644
      {
        if ( !( p->flags & _BDF_FONT_NAME ) )
        {
-@@ -2311,7 +2323,7 @@
+@@ -2311,7 +2331,7 @@
      }
  
      /* Check for the CHARS field -- font properties are optional */
@@ -9411,7 +10466,7 @@ index 84d336d..01be88c 100644
    {
      {
 diff --git a/src/cache/ftccmap.c b/src/cache/ftccmap.c
-index 848349b..b2e9609 100644
+index 848349b..ad0ad2d 100644
 --- a/src/cache/ftccmap.c
 +++ b/src/cache/ftccmap.c
 @@ -4,7 +4,7 @@
@@ -9432,6 +10487,19 @@ index 848349b..b2e9609 100644
    const FTC_CacheClassRec  ftc_cmap_cache_class =
    {
      ftc_cmap_node_new,
+@@ -301,12 +301,6 @@
+       if ( error )
+         goto Exit;
+ 
+-#ifdef FT_MAX_CHARMAP_CACHEABLE
+-      /* something rotten can happen with rogue clients */
+-      if ( cmap_index > FT_MAX_CHARMAP_CACHEABLE )
+-        return 0; /* XXX: should return appropriate error */
+-#endif
+-
+       if ( (FT_UInt)cmap_index < (FT_UInt)face->num_charmaps )
+       {
+         FT_CharMap  old, cmap  = NULL;
 diff --git a/src/cache/ftcmanag.c b/src/cache/ftcmanag.c
 index 4eb2c5b..a65f94d 100644
 --- a/src/cache/ftcmanag.c
@@ -9552,6 +10620,92 @@ index 6e99dc2..3d2c22a 100644
        /* now apply the darkening parameters */
  
        if ( scaledStem < cf2_intToFixed( x1 ) )
+diff --git a/src/cff/cf2ft.c b/src/cff/cf2ft.c
+index cb8d31c..ebba469 100644
+--- a/src/cff/cf2ft.c
++++ b/src/cff/cf2ft.c
+@@ -142,6 +142,8 @@
+   cf2_builder_lineTo( CF2_OutlineCallbacks      callbacks,
+                       const CF2_CallbackParams  params )
+   {
++    FT_Error  error;
++
+     /* downcast the object pointer */
+     CF2_Outline   outline = (CF2_Outline)callbacks;
+     CFF_Builder*  builder;
+@@ -156,15 +158,27 @@
+     {
+       /* record the move before the line; also check points and set */
+       /* `path_begun'                                               */
+-      cff_builder_start_point( builder,
+-                               params->pt0.x,
+-                               params->pt0.y );
++      error = cff_builder_start_point( builder,
++                                       params->pt0.x,
++                                       params->pt0.y );
++      if ( error )
++      {
++        if ( !*callbacks->error )
++          *callbacks->error =  error;
++        return;
++      }
+     }
+ 
+     /* `cff_builder_add_point1' includes a check_points call for one point */
+-    cff_builder_add_point1( builder,
+-                            params->pt1.x,
+-                            params->pt1.y );
++    error = cff_builder_add_point1( builder,
++                                    params->pt1.x,
++                                    params->pt1.y );
++    if ( error )
++    {
++      if ( !*callbacks->error )
++        *callbacks->error =  error;
++      return;
++    }
+   }
+ 
+ 
+@@ -172,6 +186,8 @@
+   cf2_builder_cubeTo( CF2_OutlineCallbacks      callbacks,
+                       const CF2_CallbackParams  params )
+   {
++    FT_Error  error;
++
+     /* downcast the object pointer */
+     CF2_Outline   outline = (CF2_Outline)callbacks;
+     CFF_Builder*  builder;
+@@ -186,13 +202,25 @@
+     {
+       /* record the move before the line; also check points and set */
+       /* `path_begun'                                               */
+-      cff_builder_start_point( builder,
+-                               params->pt0.x,
+-                               params->pt0.y );
++      error = cff_builder_start_point( builder,
++                                       params->pt0.x,
++                                       params->pt0.y );
++      if ( error )
++      {
++        if ( !*callbacks->error )
++          *callbacks->error =  error;
++        return;
++      }
+     }
+ 
+     /* prepare room for 3 points: 2 off-curve, 1 on-curve */
+-    cff_check_points( builder, 3 );
++    error = cff_check_points( builder, 3 );
++    if ( error )
++    {
++      if ( !*callbacks->error )
++        *callbacks->error =  error;
++      return;
++    }
+ 
+     cff_builder_add_point( builder,
+                            params->pt1.x,
 diff --git a/src/cff/cf2hints.c b/src/cff/cf2hints.c
 index 5853d77..81049f4 100644
 --- a/src/cff/cf2hints.c
@@ -9565,11 +10719,178 @@ index 5853d77..81049f4 100644
          }
          else
          {
+diff --git a/src/cff/cffcmap.c b/src/cff/cffcmap.c
+index f6e03c6..52248b2 100644
+--- a/src/cff/cffcmap.c
++++ b/src/cff/cffcmap.c
+@@ -33,12 +33,15 @@
+   /*************************************************************************/
+ 
+   FT_CALLBACK_DEF( FT_Error )
+-  cff_cmap_encoding_init( CFF_CMapStd  cmap )
++  cff_cmap_encoding_init( CFF_CMapStd  cmap,
++                          FT_Pointer   pointer )
+   {
+     TT_Face       face     = (TT_Face)FT_CMAP_FACE( cmap );
+     CFF_Font      cff      = (CFF_Font)face->extra.data;
+     CFF_Encoding  encoding = &cff->encoding;
+ 
++    FT_UNUSED( pointer );
++
+ 
+     cmap->gids  = encoding->codes;
+ 
+@@ -135,7 +138,8 @@
+ 
+ 
+   FT_CALLBACK_DEF( FT_Error )
+-  cff_cmap_unicode_init( PS_Unicodes  unicodes )
++  cff_cmap_unicode_init( PS_Unicodes  unicodes,
++                         FT_Pointer   pointer )
+   {
+     TT_Face             face    = (TT_Face)FT_CMAP_FACE( unicodes );
+     FT_Memory           memory  = FT_FACE_MEMORY( face );
+@@ -143,6 +147,8 @@
+     CFF_Charset         charset = &cff->charset;
+     FT_Service_PsCMaps  psnames = (FT_Service_PsCMaps)cff->psnames;
+ 
++    FT_UNUSED( pointer );
++
+ 
+     /* can't build Unicode map for CID-keyed font */
+     /* because we don't know glyph names.         */
+diff --git a/src/cff/cffgload.c b/src/cff/cffgload.c
+index c8e9f91..577375d 100644
+--- a/src/cff/cffgload.c
++++ b/src/cff/cffgload.c
+@@ -4,7 +4,7 @@
+ /*                                                                         */
+ /*    OpenType Glyph Loader (body).                                        */
+ /*                                                                         */
+-/*  Copyright 1996-2013 by                                                 */
++/*  Copyright 1996-2014 by                                                 */
+ /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+ /*                                                                         */
+ /*  This file is part of the FreeType project, and may only be used,       */
+@@ -1989,9 +1989,6 @@
+           }
+           else
+           {
+-            if ( !error )
+-              error = FT_Err_Ok;
+-
+             cff_builder_close_contour( builder );
+ 
+             /* close hints recording session */
+@@ -2002,10 +1999,12 @@
+                 goto Syntax_Error;
+ 
+               /* apply hints to the loaded glyph outline now */
+-              hinter->apply( hinter->hints,
+-                             builder->current,
+-                             (PSH_Globals)builder->hints_globals,
+-                             decoder->hint_mode );
++              error = hinter->apply( hinter->hints,
++                                     builder->current,
++                                     (PSH_Globals)builder->hints_globals,
++                                     decoder->hint_mode );
++              if ( error )
++                goto Fail;
+             }
+ 
+             /* add current outline to the glyph slot */
+@@ -2711,10 +2710,10 @@
+ 
+           /* compute linear advance widths */
+ 
+-          ( (SFNT_Service)face->sfnt )->get_metrics( face, 0,
+-                                                     glyph_index,
+-                                                     &dummy,
+-                                                     &advance );
++          (void)( (SFNT_Service)face->sfnt )->get_metrics( face, 0,
++                                                           glyph_index,
++                                                           &dummy,
++                                                           &advance );
+           glyph->root.linearHoriAdvance = advance;
+ 
+           has_vertical_info = FT_BOOL(
+@@ -2724,10 +2723,10 @@
+           /* get the vertical metrics from the vtmx table if we have one */
+           if ( has_vertical_info )
+           {
+-            ( (SFNT_Service)face->sfnt )->get_metrics( face, 1,
+-                                                       glyph_index,
+-                                                       &dummy,
+-                                                       &advance );
++            (void)( (SFNT_Service)face->sfnt )->get_metrics( face, 1,
++                                                             glyph_index,
++                                                             &dummy,
++                                                             &advance );
+             glyph->root.linearVertAdvance = advance;
+           }
+           else
+@@ -2964,10 +2963,10 @@
+           FT_UShort  vertAdvance  = 0;
+ 
+ 
+-          ( (SFNT_Service)face->sfnt )->get_metrics( face, 1,
+-                                                     glyph_index,
+-                                                     &vertBearingY,
+-                                                     &vertAdvance );
++          (void)( (SFNT_Service)face->sfnt )->get_metrics( face, 1,
++                                                           glyph_index,
++                                                           &vertBearingY,
++                                                           &vertAdvance );
+           metrics->vertBearingY = vertBearingY;
+           metrics->vertAdvance  = vertAdvance;
+         }
 diff --git a/src/cff/cffobjs.c b/src/cff/cffobjs.c
-index cac4ac2..f8267b3 100644
+index cac4ac2..da3d019 100644
 --- a/src/cff/cffobjs.c
 +++ b/src/cff/cffobjs.c
-@@ -1055,22 +1055,23 @@
+@@ -4,7 +4,7 @@
+ /*                                                                         */
+ /*    OpenType objects manager (body).                                     */
+ /*                                                                         */
+-/*  Copyright 1996-2013 by                                                 */
++/*  Copyright 1996-2014 by                                                 */
+ /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+ /*                                                                         */
+ /*  This file is part of the FreeType project, and may only be used,       */
+@@ -943,16 +943,6 @@
+         if ( pure_cff && cff->top_font.font_dict.cid_registry != 0xFFFFU )
+           goto Exit;
+ 
+-#ifdef FT_MAX_CHARMAP_CACHEABLE
+-        if ( nn + 1 > FT_MAX_CHARMAP_CACHEABLE )
+-        {
+-          FT_ERROR(( "cff_face_init: no Unicode cmap is found, "
+-                     "and too many subtables (%d) to add synthesized cmap\n",
+-                     nn ));
+-          goto Exit;
+-        }
+-#endif
+-
+         /* we didn't find a Unicode charmap -- synthesize one */
+         cmaprec.face        = cffface;
+         cmaprec.platform_id = TT_PLATFORM_MICROSOFT;
+@@ -973,15 +963,6 @@
+           cffface->charmap = cffface->charmaps[nn];
+ 
+       Skip_Unicode:
+-#ifdef FT_MAX_CHARMAP_CACHEABLE
+-        if ( nn > FT_MAX_CHARMAP_CACHEABLE )
+-        {
+-          FT_ERROR(( "cff_face_init: Unicode cmap is found, "
+-                     "but too many preceding subtables (%d) to access\n",
+-                     nn - 1 ));
+-          goto Exit;
+-        }
+-#endif
+         if ( encoding->count > 0 )
+         {
+           FT_CMap_Class  clazz;
+@@ -1055,22 +1036,23 @@
      CFF_Driver  driver = (CFF_Driver)module;
  
  
@@ -9631,7 +10952,7 @@ index ef53652..56f52b1 100644
    uIntf *xp;                    /* pointer into x */
    int y;                        /* number of dummy codes added */
 diff --git a/src/pcf/pcfdrivr.c b/src/pcf/pcfdrivr.c
-index 748cbca..5183f6f 100644
+index 748cbca..96f6912 100644
 --- a/src/pcf/pcfdrivr.c
 +++ b/src/pcf/pcfdrivr.c
 @@ -2,7 +2,7 @@
@@ -9652,6 +10973,21 @@ index 748cbca..5183f6f 100644
    const FT_CMap_ClassRec  pcf_cmap_class =
    {
      sizeof ( PCF_CMapRec ),
+@@ -494,7 +494,13 @@ THE SOFTWARE.
+ 
+     FT_TRACE1(( "PCF_Glyph_Load: glyph index %d\n", glyph_index ));
+ 
+-    if ( !face || glyph_index >= (FT_UInt)face->root.num_glyphs )
++    if ( !face )
++    {
++      error = FT_THROW( Invalid_Face_Handle );
++      goto Exit;
++    }
++
++    if ( glyph_index >= (FT_UInt)face->root.num_glyphs )
+     {
+       error = FT_THROW( Invalid_Argument );
+       goto Exit;
 diff --git a/src/pcf/pcfread.c b/src/pcf/pcfread.c
 index d936c58..998cbed 100644
 --- a/src/pcf/pcfread.c
@@ -9755,8 +11091,28 @@ index d936c58..998cbed 100644
      FT_TRACE4(( "pdf_get_encodings:\n" ));
  
      FT_TRACE4(( "  firstCol %d, lastCol %d, firstRow %d, lastRow %d\n",
+diff --git a/src/pfr/pfrcmap.c b/src/pfr/pfrcmap.c
+index 1f05640..90ba010 100644
+--- a/src/pfr/pfrcmap.c
++++ b/src/pfr/pfrcmap.c
+@@ -25,11 +25,14 @@
+ 
+ 
+   FT_CALLBACK_DEF( FT_Error )
+-  pfr_cmap_init( PFR_CMap  cmap )
++  pfr_cmap_init( PFR_CMap    cmap,
++                 FT_Pointer  pointer )
+   {
+     FT_Error  error = FT_Err_Ok;
+     PFR_Face  face  = (PFR_Face)FT_CMAP_FACE( cmap );
+ 
++    FT_UNUSED( pointer );
++
+ 
+     cmap->num_chars = face->phy_font.num_chars;
+     cmap->chars     = face->phy_font.chars;
 diff --git a/src/pfr/pfrdrivr.c b/src/pfr/pfrdrivr.c
-index 4c43947..188aa0d 100644
+index 4c43947..db66281 100644
 --- a/src/pfr/pfrdrivr.c
 +++ b/src/pfr/pfrdrivr.c
 @@ -4,7 +4,7 @@
@@ -9768,6 +11124,15 @@ index 4c43947..188aa0d 100644
  /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
  /*                                                                         */
  /*  This file is part of the FreeType project, and may only be used,       */
+@@ -37,7 +37,7 @@
+     PFR_PhyFont  phys = &face->phy_font;
+ 
+ 
+-    pfr_face_get_kerning( pfrface, left, right, avector );
++    (void)pfr_face_get_kerning( pfrface, left, right, avector );
+ 
+     /* convert from metrics to outline units when necessary */
+     if ( phys->outline_resolution != phys->metrics_resolution )
 @@ -134,7 +134,7 @@
    }
  
@@ -9834,8 +11199,227 @@ index d0d8861..7792a62 100644
          {
            decimal = decimal * 10 + c;
  
+diff --git a/src/psaux/psobjs.c b/src/psaux/psobjs.c
+index b4b7d45..7ec3b4c 100644
+--- a/src/psaux/psobjs.c
++++ b/src/psaux/psobjs.c
+@@ -1338,7 +1338,15 @@
+     {
+       parser->cursor = token->start;
+       parser->limit  = token->limit;
+-      ps_parser_load_field( parser, &fieldrec, objects, max_objects, 0 );
++
++      error = ps_parser_load_field( parser,
++                                    &fieldrec,
++                                    objects,
++                                    max_objects,
++                                    0 );
++      if ( error )
++        break;
++
+       fieldrec.offset += fieldrec.size;
+     }
+ 
+diff --git a/src/psaux/t1cmap.c b/src/psaux/t1cmap.c
+index 9e5bd34..fb1353a 100644
+--- a/src/psaux/t1cmap.c
++++ b/src/psaux/t1cmap.c
+@@ -120,8 +120,12 @@
+ 
+ 
+   FT_CALLBACK_DEF( FT_Error )
+-  t1_cmap_standard_init( T1_CMapStd  cmap )
++  t1_cmap_standard_init( T1_CMapStd  cmap,
++                         FT_Pointer  pointer )
+   {
++    FT_UNUSED( pointer );
++
++
+     t1_cmap_std_init( cmap, 0 );
+     return 0;
+   }
+@@ -142,8 +146,12 @@
+ 
+ 
+   FT_CALLBACK_DEF( FT_Error )
+-  t1_cmap_expert_init( T1_CMapStd  cmap )
++  t1_cmap_expert_init( T1_CMapStd  cmap,
++                       FT_Pointer  pointer )
+   {
++    FT_UNUSED( pointer );
++
++
+     t1_cmap_std_init( cmap, 1 );
+     return 0;
+   }
+@@ -172,11 +180,14 @@
+ 
+ 
+   FT_CALLBACK_DEF( FT_Error )
+-  t1_cmap_custom_init( T1_CMapCustom  cmap )
++  t1_cmap_custom_init( T1_CMapCustom  cmap,
++                       FT_Pointer     pointer )
+   {
+     T1_Face      face     = (T1_Face)FT_CMAP_FACE( cmap );
+     T1_Encoding  encoding = &face->type1.encoding;
+ 
++    FT_UNUSED( pointer );
++
+ 
+     cmap->first   = encoding->code_first;
+     cmap->count   = (FT_UInt)( encoding->code_last - cmap->first );
+@@ -272,12 +283,15 @@
+ 
+ 
+   FT_CALLBACK_DEF( FT_Error )
+-  t1_cmap_unicode_init( PS_Unicodes  unicodes )
++  t1_cmap_unicode_init( PS_Unicodes  unicodes,
++                        FT_Pointer   pointer )
+   {
+     T1_Face             face    = (T1_Face)FT_CMAP_FACE( unicodes );
+     FT_Memory           memory  = FT_FACE_MEMORY( face );
+     FT_Service_PsCMaps  psnames = (FT_Service_PsCMaps)face->psnames;
+ 
++    FT_UNUSED( pointer );
++
+ 
+     return psnames->unicodes_init( memory,
+                                    unicodes,
+diff --git a/src/psaux/t1decode.c b/src/psaux/t1decode.c
+index 6ce370b..d67a05e 100644
+--- a/src/psaux/t1decode.c
++++ b/src/psaux/t1decode.c
+@@ -4,7 +4,7 @@
+ /*                                                                         */
+ /*    PostScript Type 1 decoding routines (body).                          */
+ /*                                                                         */
+-/*  Copyright 2000-2013 by                                                 */
++/*  Copyright 2000-2014 by                                                 */
+ /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+ /*                                                                         */
+ /*  This file is part of the FreeType project, and may only be used,       */
+@@ -1098,10 +1098,12 @@
+               goto Syntax_Error;
+ 
+             /* apply hints to the loaded glyph outline now */
+-            hinter->apply( hinter->hints,
+-                           builder->current,
+-                           (PSH_Globals)builder->hints_globals,
+-                           decoder->hint_mode );
++            error = hinter->apply( hinter->hints,
++                                   builder->current,
++                                   (PSH_Globals)builder->hints_globals,
++                                   decoder->hint_mode );
++            if ( error )
++              goto Fail;
+           }
+ 
+           /* add current outline to the glyph slot */
+diff --git a/src/pshinter/pshglob.c b/src/pshinter/pshglob.c
+index f75bae4..1bcc481 100644
+--- a/src/pshinter/pshglob.c
++++ b/src/pshinter/pshglob.c
+@@ -5,7 +5,7 @@
+ /*    PostScript hinter global hinting management (body).                  */
+ /*    Inspired by the new auto-hinter module.                              */
+ /*                                                                         */
+-/*  Copyright 2001-2004, 2006, 2010, 2012, 2013 by                         */
++/*  Copyright 2001-2004, 2006, 2010, 2012-2014 by                          */
+ /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+ /*                                                                         */
+ /*  This file is part of the FreeType project, and may only be used        */
+@@ -750,7 +750,7 @@
+   }
+ 
+ 
+-  FT_LOCAL_DEF( FT_Error )
++  FT_LOCAL_DEF( void )
+   psh_globals_set_scale( PSH_Globals  globals,
+                          FT_Fixed     x_scale,
+                          FT_Fixed     y_scale,
+@@ -780,8 +780,6 @@
+       psh_globals_scale_widths( globals, 1 );
+       psh_blues_scale_zones( &globals->blues, y_scale, y_delta );
+     }
+-
+-    return 0;
+   }
+ 
+ 
+diff --git a/src/pshinter/pshglob.h b/src/pshinter/pshglob.h
+index c511626..94d972a 100644
+--- a/src/pshinter/pshglob.h
++++ b/src/pshinter/pshglob.h
+@@ -4,7 +4,7 @@
+ /*                                                                         */
+ /*    PostScript hinter global hinting management.                         */
+ /*                                                                         */
+-/*  Copyright 2001, 2002, 2003 by                                          */
++/*  Copyright 2001, 2002, 2003, 2014 by                                    */
+ /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+ /*                                                                         */
+ /*  This file is part of the FreeType project, and may only be used,       */
+@@ -167,7 +167,7 @@ FT_BEGIN_HEADER
+                             FT_Int         org_width );
+ #endif
+ 
+-  FT_LOCAL( FT_Error )
++  FT_LOCAL( void )
+   psh_globals_set_scale( PSH_Globals  globals,
+                          FT_Fixed     x_scale,
+                          FT_Fixed     y_scale,
+diff --git a/src/pshinter/pshrec.c b/src/pshinter/pshrec.c
+index cd66ea8..73a18ff 100644
+--- a/src/pshinter/pshrec.c
++++ b/src/pshinter/pshrec.c
+@@ -4,7 +4,7 @@
+ /*                                                                         */
+ /*    FreeType PostScript hints recorder (body).                           */
+ /*                                                                         */
+-/*  Copyright 2001-2004, 2007, 2009, 2013 by                               */
++/*  Copyright 2001-2004, 2007, 2009, 2013, 2014 by                         */
+ /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+ /*                                                                         */
+ /*  This file is part of the FreeType project, and may only be used,       */
+@@ -797,13 +797,12 @@
+   }
+ 
+ 
+-  FT_LOCAL( FT_Error )
++  FT_LOCAL( void )
+   ps_hints_init( PS_Hints   hints,
+                  FT_Memory  memory )
+   {
+     FT_MEM_ZERO( hints, sizeof ( *hints ) );
+     hints->memory = memory;
+-    return FT_Err_Ok;
+   }
+ 
+ 
+diff --git a/src/pshinter/pshrec.h b/src/pshinter/pshrec.h
+index dcb3197..a88fe6e 100644
+--- a/src/pshinter/pshrec.h
++++ b/src/pshinter/pshrec.h
+@@ -4,7 +4,7 @@
+ /*                                                                         */
+ /*    Postscript (Type1/Type2) hints recorder (specification).             */
+ /*                                                                         */
+-/*  Copyright 2001, 2002, 2003, 2006, 2008 by                              */
++/*  Copyright 2001, 2002, 2003, 2006, 2008, 2014 by                        */
+ /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+ /*                                                                         */
+ /*  This file is part of the FreeType project, and may only be used,       */
+@@ -141,7 +141,7 @@ FT_BEGIN_HEADER
+   /* */
+ 
+   /* initialize hints recorder */
+-  FT_LOCAL( FT_Error )
++  FT_LOCAL( void )
+   ps_hints_init( PS_Hints   hints,
+                  FT_Memory  memory );
+ 
 diff --git a/src/raster/ftraster.c b/src/raster/ftraster.c
-index ddecc80..b4b9393 100644
+index ddecc80..b06ac33 100644
 --- a/src/raster/ftraster.c
 +++ b/src/raster/ftraster.c
 @@ -2284,6 +2284,8 @@
@@ -9897,6 +11481,24 @@ index ddecc80..b4b9393 100644
      {
        bits -= e1 * ras.target.pitch;
        if ( ras.target.pitch > 0 )
+@@ -3539,7 +3542,7 @@
+   }
+ 
+ 
+-  static void
++  static int
+   ft_black_set_mode( black_PRaster  raster,
+                      unsigned long  mode,
+                      const char*    palette )
+@@ -3563,6 +3566,8 @@
+     FT_UNUSED( palette );
+ 
+ #endif
++
++    return 0;
+   }
+ 
+ 
 diff --git a/src/sfnt/pngshim.c b/src/sfnt/pngshim.c
 index 878de1f..9bfcc2a 100644
 --- a/src/sfnt/pngshim.c
@@ -10061,9 +11663,29 @@ index a31c77c..70b988d 100644
      /* a `bhed' table                                        */
      if ( !has_outline && sfnt->load_bhed )
 diff --git a/src/sfnt/ttcmap.c b/src/sfnt/ttcmap.c
-index c717f5f..712bd4f 100644
+index c717f5f..ece9ef1 100644
 --- a/src/sfnt/ttcmap.c
 +++ b/src/sfnt/ttcmap.c
+@@ -845,9 +845,6 @@
+     p      = table + 2;           /* skip format */
+     length = TT_NEXT_USHORT( p );
+ 
+-    if ( length < 16 )
+-      FT_INVALID_TOO_SHORT;
+-
+     /* in certain fonts, the `length' field is invalid and goes */
+     /* out of bound.  We try to correct this here...            */
+     if ( table + length > valid->limit )
+@@ -858,6 +855,9 @@
+       length = (FT_UInt)( valid->limit - table );
+     }
+ 
++    if ( length < 16 )
++      FT_INVALID_TOO_SHORT;
++
+     p        = table + 6;
+     num_segs = TT_NEXT_USHORT( p );   /* read segCountX2 */
+ 
 @@ -1669,7 +1669,8 @@
      p          = is32  + 8192;          /* skip `is32' array */
      num_groups = TT_NEXT_ULONG( p );
@@ -10166,7 +11788,7 @@ index c717f5f..712bd4f 100644
              FT_INVALID_TOO_SHORT;
  
            for ( i = 0; i < numMappings; ++i )
-@@ -3473,10 +3494,9 @@
+@@ -3473,23 +3494,14 @@
      /* only recognize format 0 */
      if ( TT_NEXT_USHORT( p ) != 0 )
      {
@@ -10178,6 +11800,32 @@ index c717f5f..712bd4f 100644
        return FT_THROW( Invalid_Table );
      }
  
+     num_cmaps = TT_NEXT_USHORT( p );
+ 
+-#ifdef FT_MAX_CHARMAP_CACHEABLE
+-    if ( num_cmaps > FT_MAX_CHARMAP_CACHEABLE )
+-      FT_ERROR(( "tt_face_build_cmaps: too many cmap subtables (%d)\n"
+-                 "                     subtable #%d and higher are loaded"
+-                 "                     but cannot be searched\n",
+-                 num_cmaps, FT_MAX_CHARMAP_CACHEABLE + 1 ));
+-#endif
+-
+     for ( ; num_cmaps > 0 && p + 8 <= limit; num_cmaps-- )
+     {
+       FT_CharMapRec  charmap;
+diff --git a/src/sfnt/ttkern.c b/src/sfnt/ttkern.c
+index 32c4008..455e7b5 100644
+--- a/src/sfnt/ttkern.c
++++ b/src/sfnt/ttkern.c
+@@ -99,7 +99,7 @@
+       length   = FT_NEXT_USHORT( p );
+       coverage = FT_NEXT_USHORT( p );
+ 
+-      if ( length <= 6 )
++      if ( length <= 6 + 8 )
+         break;
+ 
+       p_next += length;
 diff --git a/src/sfnt/ttload.c b/src/sfnt/ttload.c
 index 0a3cd29..8338150 100644
 --- a/src/sfnt/ttload.c
@@ -10215,6 +11863,59 @@ index 0a3cd29..8338150 100644
          continue;
        else
        {
+diff --git a/src/sfnt/ttmtx.c b/src/sfnt/ttmtx.c
+index a8cc63a..bb31957 100644
+--- a/src/sfnt/ttmtx.c
++++ b/src/sfnt/ttmtx.c
+@@ -4,7 +4,7 @@
+ /*                                                                         */
+ /*    Load the metrics tables common to TTF and OTF fonts (body).          */
+ /*                                                                         */
+-/*  Copyright 2006-2009, 2011-2013 by                                      */
++/*  Copyright 2006-2009, 2011-2014 by                                      */
+ /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+ /*                                                                         */
+ /*  This file is part of the FreeType project, and may only be used,       */
+@@ -201,7 +201,7 @@
+   /*    aadvance :: The advance width or advance height, depending on      */
+   /*                the `vertical' flag.                                   */
+   /*                                                                       */
+-  FT_LOCAL_DEF( FT_Error )
++  FT_LOCAL_DEF( void )
+   tt_face_get_metrics( TT_Face     face,
+                        FT_Bool     vertical,
+                        FT_UInt     gindex,
+@@ -274,8 +274,6 @@
+       *abearing = 0;
+       *aadvance = 0;
+     }
+-
+-    return FT_Err_Ok;
+   }
+ 
+ 
+diff --git a/src/sfnt/ttmtx.h b/src/sfnt/ttmtx.h
+index 8b91a11..fb04039 100644
+--- a/src/sfnt/ttmtx.h
++++ b/src/sfnt/ttmtx.h
+@@ -4,7 +4,7 @@
+ /*                                                                         */
+ /*    Load the metrics tables common to TTF and OTF fonts (specification). */
+ /*                                                                         */
+-/*  Copyright 2006 by                                                      */
++/*  Copyright 2006, 2014 by                                                */
+ /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+ /*                                                                         */
+ /*  This file is part of the FreeType project, and may only be used,       */
+@@ -40,7 +40,7 @@ FT_BEGIN_HEADER
+                      FT_Bool    vertical );
+ 
+ 
+-  FT_LOCAL( FT_Error )
++  FT_LOCAL( void )
+   tt_face_get_metrics( TT_Face     face,
+                        FT_Bool     vertical,
+                        FT_UInt     gindex,
 diff --git a/src/sfnt/ttpost.c b/src/sfnt/ttpost.c
 index 47a85c0..99d8005 100644
 --- a/src/sfnt/ttpost.c
@@ -10264,7 +11965,7 @@ index 47a85c0..99d8005 100644
  
  
 diff --git a/src/sfnt/ttsbit.c b/src/sfnt/ttsbit.c
-index 8ff7b9d..b37bd7d 100644
+index 8ff7b9d..c2db96c 100644
 --- a/src/sfnt/ttsbit.c
 +++ b/src/sfnt/ttsbit.c
 @@ -150,12 +150,25 @@
@@ -10360,7 +12061,17 @@ index 8ff7b9d..b37bd7d 100644
  
  
      if ( p + 2 > limit )
-@@ -1334,6 +1357,7 @@
+@@ -1147,7 +1170,8 @@
+         num_glyphs = FT_NEXT_ULONG( p );
+ 
+         /* overflow check for p + ( num_glyphs + 1 ) * 4 */
+-        if ( num_glyphs > (FT_ULong)( ( ( p_limit - p ) >> 2 ) - 1 ) )
++        if ( p + 4 > p_limit                                         ||
++             num_glyphs > (FT_ULong)( ( ( p_limit - p ) >> 2 ) - 1 ) )
+           goto NoBitmap;
+ 
+         for ( mm = 0; mm < num_glyphs; mm++ )
+@@ -1334,6 +1358,7 @@
  
      case FT_MAKE_TAG( 'j', 'p', 'g', ' ' ):
      case FT_MAKE_TAG( 't', 'i', 'f', 'f' ):
@@ -10368,7 +12079,7 @@ index 8ff7b9d..b37bd7d 100644
        error = FT_THROW( Unknown_File_Format );
        break;
  
-@@ -1352,10 +1376,11 @@
+@@ -1352,10 +1377,11 @@
  
        tt_face_get_metrics( face, FALSE, glyph_index, &abearing, &aadvance );
  
@@ -10385,7 +12096,7 @@ index 8ff7b9d..b37bd7d 100644
  
      return error;
 diff --git a/src/smooth/ftgrays.c b/src/smooth/ftgrays.c
-index 425911a..94c5462 100644
+index 425911a..9d37d64 100644
 --- a/src/smooth/ftgrays.c
 +++ b/src/smooth/ftgrays.c
 @@ -98,6 +98,9 @@
@@ -10440,6 +12151,46 @@ index 425911a..94c5462 100644
  
          /* Avoid possible arithmetic overflow below by splitting. */
          if ( L > 32767 )
+@@ -1539,7 +1515,10 @@ typedef ptrdiff_t  FT_PtrDist;
+     TPos  delta;
+ 
+ 
+-    if ( !outline || !func_interface )
++    if ( !outline )
++      return FT_THROW( Invalid_Outline );
++
++    if ( !func_interface )
+       return FT_THROW( Invalid_Argument );
+ 
+     shift = func_interface->shift;
+@@ -2121,12 +2100,26 @@ typedef ptrdiff_t  FT_PtrDist;
+   }
+ 
+ 
++  static int
++  gray_raster_set_mode( FT_Raster      raster,
++                        unsigned long  mode,
++                        void*          args )
++  {
++    FT_UNUSED( raster );
++    FT_UNUSED( mode );
++    FT_UNUSED( args );
++
++
++    return 0; /* nothing to do */
++  }
++
++
+   FT_DEFINE_RASTER_FUNCS(ft_grays_raster,
+     FT_GLYPH_FORMAT_OUTLINE,
+ 
+     (FT_Raster_New_Func)     gray_raster_new,
+     (FT_Raster_Reset_Func)   gray_raster_reset,
+-    (FT_Raster_Set_Mode_Func)0,
++    (FT_Raster_Set_Mode_Func)gray_raster_set_mode,
+     (FT_Raster_Render_Func)  gray_raster_render,
+     (FT_Raster_Done_Func)    gray_raster_done
+   )
 --- a/src/tools/afblue.pl
 +++ b/src/tools/afblue.pl
 @@ -63,8 +63,8 @@ my $enum_element_re = qr/ ^ \s* ( [A-Za-z0-9_]+ ) \s* $ /x;
@@ -10463,8 +12214,1373 @@ index 425911a..94c5462 100644
    my $count = $s =~ s/\G(.)/'$1', /g;
    $curr_offset += $count;
    $curr_elem_size += $count;
+diff --git a/src/tools/docmaker/content.py b/src/tools/docmaker/content.py
+index 98025e6..9aa85ba 100644
+--- a/src/tools/docmaker/content.py
++++ b/src/tools/docmaker/content.py
+@@ -1,57 +1,81 @@
+-#  Content (c) 2002, 2004, 2006-2009, 2012, 2013
+-#    David Turner <david@freetype.org>
+ #
+-#  This file contains routines used to parse the content of documentation
+-#  comment blocks and build more structured objects out of them.
++#  content.py
++#
++#    Parse comment blocks to build content blocks (library file).
++#
++#  Copyright 2002, 2004, 2006-2009, 2012-2014 by
++#  David Turner.
++#
++#  This file is part of the FreeType project, and may only be used,
++#  modified, and distributed under the terms of the FreeType project
++#  license, LICENSE.TXT.  By continuing to use, modify, or distribute
++#  this file you indicate that you have read the license and
++#  understand and accept it fully.
++
++#
++# This file contains routines to parse documentation comment blocks,
++# building more structured objects out of them.
+ #
+ 
++
+ from sources import *
+-from utils import *
++from utils   import *
++
+ import string, re
+ 
+ 
+-# this regular expression is used to detect code sequences. these
+-# are simply code fragments embedded in '{' and '}' like in:
+ #
+-#  {
+-#    x = y + z;
+-#    if ( zookoo == 2 )
+-#    {
+-#      foobar();
+-#    }
+-#  }
++# Regular expressions to detect code sequences.  `Code sequences' are simply
++# code fragments embedded in '{' and '}', as demonstrated in the following
++# example.
+ #
+-# note that indentation of the starting and ending accolades must be
+-# exactly the same. the code sequence can contain accolades at greater
+-# indentation
++#   {
++#     x = y + z;
++#     if ( zookoo == 2 )
++#     {
++#       foobar();
++#     }
++#   }
++#
++# Note that the indentation of the first opening brace and the last closing
++# brace must be exactly the same.  The code sequence itself should have a
++# larger indentation than the surrounding braces.
+ #
+ re_code_start = re.compile( r"(\s*){\s*$" )
+ re_code_end   = re.compile( r"(\s*)}\s*$" )
+ 
+ 
+-# this regular expression is used to isolate identifiers from
+-# other text
+ #
+-re_identifier = re.compile( r'((?:\w|-)*)' )
+-
+-
+-# we collect macros ending in `_H'; while outputting the object data, we use
+-# this info together with the object's file location to emit the appropriate
+-# header file macro and name before the object itself
++# A regular expression to isolate identifiers from other text.
+ #
+-re_header_macro = re.compile( r'^#define\s{1,}(\w{1,}_H)\s{1,}<(.*)>' )
++re_identifier = re.compile( r'((?:\w|-)*)' )
+ 
+ 
+-#############################################################################
+ #
+-# The DocCode class is used to store source code lines.
++# We collect macro names ending in `_H' (group 1), as defined in
++# `config/ftheader.h'.  While outputting the object data, we use this info
++# together with the object's file location (group 2) to emit the appropriate
++# header file macro and its associated file name before the object itself.
+ #
+-#   'self.lines' contains a set of source code lines that will be dumped as
+-#   HTML in a <PRE> tag.
++# Example:
+ #
+-#   The object is filled line by line by the parser; it strips the leading
+-#   "margin" space from each input line before storing it in 'self.lines'.
++#   #define FT_FREETYPE_H <freetype.h>
+ #
++re_header_macro = re.compile( r'^#define\s{1,}(\w{1,}_H)\s{1,}<(.*)>' )
++
++
++################################################################
++##
++##  DOC CODE CLASS
++##
++##  The `DocCode' class is used to store source code lines.
++##
++##  `self.lines' contains a set of source code lines that will be dumped as
++##  HTML in a <PRE> tag.
++##
++##  The object is filled line by line by the parser; it strips the leading
++##  `margin' space from each input line before storing it in `self.lines'.
++##
+ class  DocCode:
+ 
+     def  __init__( self, margin, lines ):
+@@ -77,12 +101,14 @@ class  DocCode:
+ 
+ 
+ 
+-#############################################################################
+-#
+-# The DocPara class is used to store "normal" text paragraph.
+-#
+-#   'self.words' contains the list of words that make up the paragraph
+-#
++################################################################
++##
++##  DOC PARA CLASS
++##
++##  `Normal' text paragraphs are stored in the `DocPara' class.
++##
++##  `self.words' contains the list of words that make up the paragraph.
++##
+ class  DocPara:
+ 
+     def  __init__( self, lines ):
+@@ -123,17 +149,18 @@ class  DocPara:
+         return result
+ 
+ 
+-
+-#############################################################################
+-#
+-#  The DocField class is used to store a list containing either DocPara or
+-#  DocCode objects. Each DocField also has an optional "name" which is used
+-#  when the object corresponds to a field or value definition
+-#
++################################################################
++##
++##  DOC FIELD CLASS
++##
++##  The `DocField' class stores a list containing either `DocPara' or
++##  `DocCode' objects.  Each DocField object also has an optional `name'
++##  that is used when the object corresponds to a field or value definition.
++##
+ class  DocField:
+ 
+     def  __init__( self, name, lines ):
+-        self.name  = name  # can be None for normal paragraphs/sources
++        self.name  = name  # can be `None' for normal paragraphs/sources
+         self.items = []    # list of items
+ 
+         mode_none  = 0     # start parsing mode
+@@ -143,14 +170,14 @@ class  DocField:
+         margin     = -1    # current code sequence indentation
+         cur_lines  = []
+ 
+-        # now analyze the markup lines to see if they contain paragraphs,
+-        # code sequences or fields definitions
++        # analyze the markup lines to check whether they contain paragraphs,
++        # code sequences, or fields definitions
+         #
+         start = 0
+         mode  = mode_none
+ 
+         for l in lines:
+-            # are we parsing a code sequence ?
++            # are we parsing a code sequence?
+             if mode == mode_code:
+                 m = re_code_end.match( l )
+                 if m and len( m.group( 1 ) ) <= margin:
+@@ -161,10 +188,10 @@ class  DocField:
+                     cur_lines = []
+                     mode      = mode_none
+                 else:
+-                    # nope, continue the code sequence
++                    # otherwise continue the code sequence
+                     cur_lines.append( l[margin:] )
+             else:
+-                # start of code sequence ?
++                # start of code sequence?
+                 m = re_code_start.match( l )
+                 if m:
+                     # save current lines
+@@ -222,13 +249,29 @@ class  DocField:
+         return result
+ 
+ 
+-
+-# this regular expression is used to detect field definitions
+ #
+-re_field = re.compile( r"\s*(\w*|\w(\w|\.)*\w)\s*::" )
+-
+-
+-
++# A regular expression to detect field definitions.
++#
++# Examples:
++#
++#   foo     ::
++#   foo.bar ::
++#
++re_field = re.compile( r"""
++                         \s*
++                           (
++                             \w*
++                           |
++                             \w (\w | \.)* \w
++                           )
++                         \s* ::
++                       """, re.VERBOSE )
++
++
++################################################################
++##
++##  DOC MARKUP CLASS
++##
+ class  DocMarkup:
+ 
+     def  __init__( self, tag, lines ):
+@@ -242,7 +285,7 @@ class  DocMarkup:
+         for l in lines:
+             m = re_field.match( l )
+             if m:
+-                # we detected the start of a new field definition
++                # We detected the start of a new field definition.
+ 
+                 # first, save the current one
+                 if cur_lines:
+@@ -275,7 +318,10 @@ class  DocMarkup:
+         print " " * margin + "</" + self.tag + ">"
+ 
+ 
+-
++################################################################
++##
++##  DOC CHAPTER CLASS
++##
+ class  DocChapter:
+ 
+     def  __init__( self, block ):
+@@ -291,7 +337,10 @@ class  DocChapter:
+             self.order = []
+ 
+ 
+-
++################################################################
++##
++##  DOC SECTION CLASS
++##
+ class  DocSection:
+ 
+     def  __init__( self, name = "Other" ):
+@@ -327,7 +376,10 @@ class  DocSection:
+         self.block_names = sort_order_list( self.block_names, self.order )
+ 
+ 
+-
++################################################################
++##
++##  CONTENT PROCESSOR CLASS
++##
+ class  ContentProcessor:
+ 
+     def  __init__( self ):
+@@ -463,7 +515,10 @@ class  ContentProcessor:
+             self.chapters.append( chap )
+ 
+ 
+-
++################################################################
++##
++##  DOC BLOCK CLASS
++##
+ class  DocBlock:
+ 
+     def  __init__( self, source, follow, processor ):
+diff --git a/src/tools/docmaker/docmaker.py b/src/tools/docmaker/docmaker.py
+index bf75c5d..4df0c98 100644
+--- a/src/tools/docmaker/docmaker.py
++++ b/src/tools/docmaker/docmaker.py
+@@ -1,16 +1,26 @@
+ #!/usr/bin/env python
+ #
+-#  DocMaker (c) 2002, 2004, 2008, 2013 David Turner <david@freetype.org>
++#  docmaker.py
+ #
+-# This program is a re-write of the original DocMaker tool used
+-# to generate the API Reference of the FreeType font engine
+-# by converting in-source comments into structured HTML.
++#    Convert source code markup to HTML documentation.
+ #
+-# This new version is capable of outputting XML data, as well
+-# as accepts more liberal formatting options.
++#  Copyright 2002, 2004, 2008, 2013, 2014 by
++#  David Turner.
+ #
+-# It also uses regular expression matching and substitution
+-# to speed things significantly.
++#  This file is part of the FreeType project, and may only be used,
++#  modified, and distributed under the terms of the FreeType project
++#  license, LICENSE.TXT.  By continuing to use, modify, or distribute
++#  this file you indicate that you have read the license and
++#  understand and accept it fully.
++
++#
++# This program is a re-write of the original DocMaker tool used to generate
++# the API Reference of the FreeType font rendering engine by converting
++# in-source comments into structured HTML.
++#
++# This new version is capable of outputting XML data as well as accepting
++# more liberal formatting options.  It also uses regular expression matching
++# and substitution to speed up operation significantly.
+ #
+ 
+ from sources   import *
+@@ -44,8 +54,8 @@ def  main( argv ):
+     global output_dir
+ 
+     try:
+-        opts, args = getopt.getopt( sys.argv[1:], \
+-                                    "ht:o:p:",    \
++        opts, args = getopt.getopt( sys.argv[1:],
++                                    "ht:o:p:",
+                                     ["help", "title=", "output=", "prefix="] )
+     except getopt.GetoptError:
+         usage()
+@@ -56,7 +66,6 @@ def  main( argv ):
+         sys.exit( 1 )
+ 
+     # process options
+-    #
+     project_title  = "Project"
+     project_prefix = None
+     output_dir     = None
+@@ -90,7 +99,9 @@ def  main( argv ):
+     # process sections
+     content_processor.finish()
+ 
+-    formatter = HtmlFormatter( content_processor, project_title, project_prefix )
++    formatter = HtmlFormatter( content_processor,
++                               project_title,
++                               project_prefix )
+ 
+     formatter.toc_dump()
+     formatter.index_dump()
+@@ -98,9 +109,7 @@ def  main( argv ):
+ 
+ 
+ # if called from the command line
+-#
+ if __name__ == '__main__':
+     main( sys.argv )
+ 
+-
+ # eof
+diff --git a/src/tools/docmaker/formatter.py b/src/tools/docmaker/formatter.py
+index f62ce67..7cb68b2 100644
+--- a/src/tools/docmaker/formatter.py
++++ b/src/tools/docmaker/formatter.py
+@@ -1,19 +1,37 @@
+-#  Formatter (c) 2002, 2004, 2007, 2008 David Turner <david@freetype.org>
+ #
++#  formatter.py
++#
++#    Convert parsed content blocks to a structured document (library file).
++#
++#  Copyright 2002, 2004, 2007, 2008, 2014 by
++#  David Turner.
++#
++#  This file is part of the FreeType project, and may only be used,
++#  modified, and distributed under the terms of the FreeType project
++#  license, LICENSE.TXT.  By continuing to use, modify, or distribute
++#  this file you indicate that you have read the license and
++#  understand and accept it fully.
++
++#
++# This is the base Formatter class.  Its purpose is to convert a content
++# processor's data into specific documents (i.e., table of contents, global
++# index, and individual API reference indices).
++#
++# You need to sub-class it to output anything sensible.  For example, the
++# file `tohtml.py' contains the definition of the `HtmlFormatter' sub-class
++# to output HTML.
++#
++
+ 
+ from sources import *
+ from content import *
+ from utils   import *
+ 
+-# This is the base Formatter class.  Its purpose is to convert
+-# a content processor's data into specific documents (i.e., table of
+-# contents, global index, and individual API reference indices).
+-#
+-# You need to sub-class it to output anything sensible.  For example,
+-# the file tohtml.py contains the definition of the HtmlFormatter sub-class
+-# used to output -- you guessed it -- HTML.
+-#
+ 
++################################################################
++##
++##  FORMATTER CLASS
++##
+ class  Formatter:
+ 
+     def  __init__( self, processor ):
+@@ -41,15 +59,17 @@ class  Formatter:
+     def  add_identifier( self, name, block ):
+         if self.identifiers.has_key( name ):
+             # duplicate name!
+-            sys.stderr.write(                                           \
+-               "WARNING: duplicate definition for '" + name + "' in " + \
+-               block.location() + ", previous definition in " +         \
+-               self.identifiers[name].location() + "\n" )
++            sys.stderr.write( "WARNING: duplicate definition for"
++                              + " '" + name + "' "
++                              + "in " + block.location() + ", "
++                              + "previous definition in "
++                              + self.identifiers[name].location()
++                              + "\n" )
+         else:
+             self.identifiers[name] = block
+ 
+     #
+-    #  Formatting the table of contents
++    # formatting the table of contents
+     #
+     def  toc_enter( self ):
+         pass
+@@ -97,7 +117,7 @@ class  Formatter:
+             close_output( output )
+ 
+     #
+-    #  Formatting the index
++    # formatting the index
+     #
+     def  index_enter( self ):
+         pass
+@@ -128,7 +148,7 @@ class  Formatter:
+             close_output( output )
+ 
+     #
+-    #  Formatting a section
++    # formatting a section
+     #
+     def  section_enter( self, section ):
+         pass
+diff --git a/src/tools/docmaker/sources.py b/src/tools/docmaker/sources.py
+index dab8349..61af985 100644
+--- a/src/tools/docmaker/sources.py
++++ b/src/tools/docmaker/sources.py
+@@ -1,62 +1,70 @@
+-#  Sources (c) 2002-2004, 2006-2009, 2012, 2013
+-#    David Turner <david@freetype.org>
+ #
++#  sources.py
+ #
+-# this file contains definitions of classes needed to decompose
+-# C sources files into a series of multi-line "blocks". There are
+-# two kinds of blocks:
++#    Convert source code comments to multi-line blocks (library file).
+ #
+-#   - normal blocks, which contain source code or ordinary comments
++#  Copyright 2002-2004, 2006-2009, 2012-2014 by
++#  David Turner.
+ #
+-#   - documentation blocks, which have restricted formatting, and
+-#     whose text always start with a documentation markup tag like
+-#     "<Function>", "<Type>", etc..
++#  This file is part of the FreeType project, and may only be used,
++#  modified, and distributed under the terms of the FreeType project
++#  license, LICENSE.TXT.  By continuing to use, modify, or distribute
++#  this file you indicate that you have read the license and
++#  understand and accept it fully.
++
++#
++# This library file contains definitions of classes needed to decompose C
++# source code files into a series of multi-line `blocks'.  There are two
++# kinds of blocks.
++#
++#   - Normal blocks, which contain source code or ordinary comments.
+ #
+-# the routines used to process the content of documentation blocks
+-# are not contained here, but in "content.py"
++#   - Documentation blocks, which have restricted formatting, and whose text
++#     always start with a documentation markup tag like `<Function>',
++#     `<Type>', etc.
+ #
+-# the classes and methods found here only deal with text parsing
+-# and basic documentation block extraction
++# The routines to process the content of documentation blocks are contained
++# in file `content.py'; the classes and methods found here only deal with
++# text parsing and basic documentation block extraction.
+ #
+ 
+-import fileinput, re, sys, os, string
+ 
++import fileinput, re, sys, os, string
+ 
+ 
+ ################################################################
+ ##
+-##  BLOCK FORMAT PATTERN
++##  SOURCE BLOCK FORMAT CLASS
++##
++##  A simple class containing compiled regular expressions to detect
++##  potential documentation format block comments within C source code.
+ ##
+-##   A simple class containing compiled regular expressions used
+-##   to detect potential documentation format block comments within
+-##   C source code
++##  The `column' pattern must contain a group to `unbox' the content of
++##  documentation comment blocks.
+ ##
+-##   note that the 'column' pattern must contain a group that will
+-##   be used to "unbox" the content of documentation comment blocks
++##  Later on, paragraphs are converted to long lines, which simplifies the
++##  regular expressions that act upon the text.
+ ##
+ class  SourceBlockFormat:
+ 
+     def  __init__( self, id, start, column, end ):
+-        """create a block pattern, used to recognize special documentation blocks"""
++        """Create a block pattern, used to recognize special documentation
++           blocks."""
+         self.id     = id
+         self.start  = re.compile( start, re.VERBOSE )
+         self.column = re.compile( column, re.VERBOSE )
+         self.end    = re.compile( end, re.VERBOSE )
+ 
+ 
+-
+ #
+-# format 1 documentation comment blocks look like the following:
++# Format 1 documentation comment blocks.
+ #
+-#    /************************************/
++#    /************************************/ (at least 2 asterisks)
+ #    /*                                  */
+ #    /*                                  */
+ #    /*                                  */
+-#    /************************************/
+-#
+-# we define a few regular expressions here to detect them
++#    /************************************/ (at least 2 asterisks)
+ #
+-
+ start = r'''
+   \s*      # any number of whitespace
+   /\*{2,}/ # followed by '/' and at least two asterisks then '/'
+@@ -75,16 +83,13 @@ re_source_block_format1 = SourceBlockFormat( 1, start, column, start )
+ 
+ 
+ #
+-# format 2 documentation comment blocks look like the following:
++# Format 2 documentation comment blocks.
+ #
+ #    /************************************ (at least 2 asterisks)
+ #     *
++#     *                                    (1 asterisk)
+ #     *
+-#     *
+-#     *
+-#     **/       (1 or more asterisks at the end)
+-#
+-# we define a few regular expressions here to detect them
++#     */                                   (1 or more asterisks)
+ #
+ start = r'''
+   \s*     # any number of whitespace
+@@ -107,47 +112,56 @@ re_source_block_format2 = SourceBlockFormat( 2, start, column, end )
+ 
+ 
+ #
+-# the list of supported documentation block formats, we could add new ones
+-# relatively easily
++# The list of supported documentation block formats.  We could add new ones
++# quite easily.
+ #
+ re_source_block_formats = [re_source_block_format1, re_source_block_format2]
+ 
+ 
+ #
+-# the following regular expressions corresponds to markup tags
+-# within the documentation comment blocks. they're equivalent
+-# despite their different syntax
++# The following regular expressions correspond to markup tags within the
++# documentation comment blocks.  They are equivalent despite their different
++# syntax.
++#
++# A markup tag consists of letters or character `-', to be found in group 1.
+ #
+-# notice how each markup tag _must_ begin a new line
++# Notice that a markup tag _must_ begin a new paragraph.
+ #
+ re_markup_tag1 = re.compile( r'''\s*<((?:\w|-)*)>''' )  # <xxxx> format
+ re_markup_tag2 = re.compile( r'''\s*@((?:\w|-)*):''' )  # @xxxx: format
+ 
+ #
+-# the list of supported markup tags, we could add new ones relatively
+-# easily
++# The list of supported markup tags.  We could add new ones quite easily.
+ #
+ re_markup_tags = [re_markup_tag1, re_markup_tag2]
+ 
++
+ #
+-# used to detect a cross-reference, after markup tags have been stripped
++# A regular expression to detect a cross reference, after markup tags have
++# been stripped off.  Group 1 is the reference, group 2 the rest of the
++# line.
++#
++# A cross reference consists of letters, digits, or characters `-' and `_'.
+ #
+ re_crossref = re.compile( r'@((?:\w|-)*)(.*)' )    #  @foo
+ 
+ #
+-# used to detect italic and bold styles in paragraph text
++# Two regular expressions to detect italic and bold markup, respectively.
++# Group 1 is the markup, group 3 the rest of the line.
++#
++# Note that the markup is limited to words consisting of letters, digits,
++# the character `_', or an apostrophe (but not as the first character).
+ #
+ re_italic = re.compile( r"_(\w(\w|')*)_(.*)" )     #  _italic_
+ re_bold   = re.compile( r"\*(\w(\w|')*)\*(.*)" )   #  *bold*
+ 
+ #
+-# this regular expression code to identify an URL has been taken from
++# This regular expression code to identify an URL has been taken from
+ #
+ #   http://mail.python.org/pipermail/tutor/2002-September/017228.html
+ #
+-# (with slight modifications)
++# (with slight modifications).
+ #
+-
+ urls = r'(?:https?|telnet|gopher|file|wais|ftp)'
+ ltrs = r'\w'
+ gunk = r'/#~:.?+=&%@!\-'
+@@ -177,17 +191,22 @@ url  = r"""
+ re_url = re.compile( url, re.VERBOSE | re.MULTILINE )
+ 
+ #
+-# used to detect the end of commented source lines
++# A regular expression that stops collection of comments for the current
++# block.
+ #
+-re_source_sep = re.compile( r'\s*/\*\s*\*/' )
++re_source_sep = re.compile( r'\s*/\*\s*\*/' )   #  /* */
+ 
+ #
+-# used to perform cross-reference within source output
++# A regular expression to find possible C identifiers while outputting
++# source code verbatim, covering things like `*foo' or `(bar'.  Group 1 is
++# the prefix, group 2 the identifier -- since we scan lines from left to
++# right, sequentially splitting the source code into prefix and identifier
++# is fully sufficient for our purposes.
+ #
+ re_source_crossref = re.compile( r'(\W*)(\w*)' )
+ 
+ #
+-# a list of reserved source keywords
++# A regular expression that matches a list of reserved C source keywords.
+ #
+ re_source_keywords = re.compile( '''\\b ( typedef   |
+                                           struct    |
+@@ -215,24 +234,16 @@ re_source_keywords = re.compile( '''\\b ( typedef   |
+ ##
+ ##  SOURCE BLOCK CLASS
+ ##
+-##   A SourceProcessor is in charge of reading a C source file
+-##   and decomposing it into a series of different "SourceBlocks".
+-##   each one of these blocks can be made of the following data:
+-##
+-##   - A documentation comment block that starts with "/**" and
+-##     whose exact format will be discussed later
+-##
+-##   - normal sources lines, including comments
++##  There are two important fields in a `SourceBlock' object.
+ ##
+-##   the important fields in a text block are the following ones:
++##    self.lines
++##      A list of text lines for the corresponding block.
+ ##
+-##     self.lines   : a list of text lines for the corresponding block
+-##
+-##     self.content : for documentation comment blocks only, this is the
+-##                    block content that has been "unboxed" from its
+-##                    decoration. This is None for all other blocks
+-##                    (i.e. sources or ordinary comments with no starting
+-##                     markup tag)
++##    self.content
++##      For documentation comment blocks only, this is the block content
++##      that has been `unboxed' from its decoration.  This is `None' for all
++##      other blocks (i.e., sources or ordinary comments with no starting
++##      markup tag)
+ ##
+ class  SourceBlock:
+ 
+@@ -269,7 +280,7 @@ class  SourceBlock:
+     def  location( self ):
+         return "(" + self.filename + ":" + repr( self.lineno ) + ")"
+ 
+-    # debugging only - not used in normal operations
++    # debugging only -- not used in normal operations
+     def  dump( self ):
+         if self.content:
+             print "{{{content start---"
+@@ -286,39 +297,38 @@ class  SourceBlock:
+             print line
+ 
+ 
+-
+ ################################################################
+ ##
+ ##  SOURCE PROCESSOR CLASS
+ ##
+-##   The SourceProcessor is in charge of reading a C source file
+-##   and decomposing it into a series of different "SourceBlock"
+-##   objects.
++##  The `SourceProcessor' is in charge of reading a C source file and
++##  decomposing it into a series of different `SourceBlock' objects.
+ ##
+-##   each one of these blocks can be made of the following data:
++##  A SourceBlock object consists of the following data.
+ ##
+-##   - A documentation comment block that starts with "/**" and
+-##     whose exact format will be discussed later
++##    - A documentation comment block using one of the layouts above.  Its
++##      exact format will be discussed later.
+ ##
+-##   - normal sources lines, include comments
++##    - Normal sources lines, including comments.
+ ##
+ ##
+ class  SourceProcessor:
+ 
+     def  __init__( self ):
+-        """initialize a source processor"""
++        """Initialize a source processor."""
+         self.blocks   = []
+         self.filename = None
+         self.format   = None
+         self.lines    = []
+ 
+     def  reset( self ):
+-        """reset a block processor, clean all its blocks"""
++        """Reset a block processor and clean up all its blocks."""
+         self.blocks = []
+         self.format = None
+ 
+     def  parse_file( self, filename ):
+-        """parse a C source file, and add its blocks to the processor's list"""
++        """Parse a C source file and add its blocks to the processor's
++           list."""
+         self.reset()
+ 
+         self.filename = filename
+@@ -337,16 +347,16 @@ class  SourceProcessor:
+                 self.process_normal_line( line )
+             else:
+                 if self.format.end.match( line ):
+-                    # that's a normal block end, add it to 'lines' and
+-                    # create a new block
++                    # A normal block end.  Add it to `lines' and create a
++                    # new block
+                     self.lines.append( line )
+                     self.add_block_lines()
+                 elif self.format.column.match( line ):
+-                    # that's a normal column line, add it to 'lines'
++                    # A normal column line.  Add it to `lines'.
+                     self.lines.append( line )
+                 else:
+-                    # humm.. this is an unexpected block end,
+-                    # create a new block, but don't process the line
++                    # An unexpected block end.  Create a new block, but
++                    # don't process the line.
+                     self.add_block_lines()
+ 
+                     # we need to process the line again
+@@ -356,7 +366,8 @@ class  SourceProcessor:
+         self.add_block_lines()
+ 
+     def  process_normal_line( self, line ):
+-        """process a normal line and check whether it is the start of a new block"""
++        """Process a normal line and check whether it is the start of a new
++           block."""
+         for f in re_source_block_formats:
+             if f.start.match( line ):
+                 self.add_block_lines()
+@@ -366,9 +377,12 @@ class  SourceProcessor:
+         self.lines.append( line )
+ 
+     def  add_block_lines( self ):
+-        """add the current accumulated lines and create a new block"""
++        """Add the current accumulated lines and create a new block."""
+         if self.lines != []:
+-            block = SourceBlock( self, self.filename, self.lineno, self.lines )
++            block = SourceBlock( self,
++                                 self.filename,
++                                 self.lineno,
++                                 self.lines )
+ 
+             self.blocks.append( block )
+             self.format = None
+@@ -376,7 +390,7 @@ class  SourceProcessor:
+ 
+     # debugging only, not used in normal operations
+     def  dump( self ):
+-        """print all blocks in a processor"""
++        """Print all blocks in a processor."""
+         for b in self.blocks:
+             b.dump()
+ 
+diff --git a/src/tools/docmaker/tohtml.py b/src/tools/docmaker/tohtml.py
+index 7944f1c..2e44f84 100644
+--- a/src/tools/docmaker/tohtml.py
++++ b/src/tools/docmaker/tohtml.py
+@@ -1,5 +1,19 @@
+-#  ToHTML (c) 2002, 2003, 2005-2008, 2013
+-#    David Turner <david@freetype.org>
++#
++#  tohtml.py
++#
++#    A sub-class container of the `Formatter' class to produce HTML.
++#
++#  Copyright 2002, 2003, 2005-2008, 2013, 2014 by
++#  David Turner.
++#
++#  This file is part of the FreeType project, and may only be used,
++#  modified, and distributed under the terms of the FreeType project
++#  license, LICENSE.TXT.  By continuing to use, modify, or distribute
++#  this file you indicate that you have read the license and
++#  understand and accept it fully.
++
++# The parent class is contained in file `formatter.py'.
++
+ 
+ from sources import *
+ from content import *
+@@ -8,7 +22,7 @@ from formatter import *
+ import time
+ 
+ 
+-# The following defines the HTML header used by all generated pages.
++# The following strings define the HTML header used by all generated pages.
+ html_header_1 = """\
+ <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+ "http://www.w3.org/TR/html4/loose.dtd">
+@@ -158,7 +172,7 @@ toc_footer_end = """\
+ """
+ 
+ 
+-# source language keyword coloration/styling
++# Source language keyword coloration and styling.
+ keyword_prefix = '<span class="keyword">'
+ keyword_suffix = '</span>'
+ 
+@@ -166,16 +180,20 @@ section_synopsis_header = '<h2>Synopsis</h2>'
+ section_synopsis_footer = ''
+ 
+ 
+-# Translate a single line of source to HTML.  This will convert
+-# a "<" into "&lt.", ">" into "&gt.", etc.
++# Translate a single line of source to HTML.  This converts `<', `>', and
++# `&' into `&lt;',`&gt;', and `&amp;'.
++#
+ def  html_quote( line ):
+-    result = string.replace( line, "&", "&amp;" )
+-    result = string.replace( result, "<", "&lt;" )
+-    result = string.replace( result, ">", "&gt;" )
++    result = string.replace( line,   "&", "&amp;" )
++    result = string.replace( result, "<", "&lt;"  )
++    result = string.replace( result, ">", "&gt;"  )
+     return result
+ 
+ 
+-
++################################################################
++##
++##  HTML FORMATTER CLASS
++##
+ class  HtmlFormatter( Formatter ):
+ 
+     def  __init__( self, processor, project_title, file_prefix ):
+@@ -189,31 +207,32 @@ class  HtmlFormatter( Formatter ):
+         else:
+             file_prefix = ""
+ 
+-        self.headers           = processor.headers
+-        self.project_title     = project_title
+-        self.file_prefix       = file_prefix
+-        self.html_header       = html_header_1 + project_title +              \
+-                                 html_header_2 +                              \
+-                                 html_header_3 + file_prefix + "index.html" + \
+-                                 html_header_4 + file_prefix + "toc.html" +   \
+-                                 html_header_5 + project_title +              \
+-                                 html_header_6
+-
+-        self.html_index_header = html_header_1 + project_title +             \
+-                                 html_header_2 +                             \
+-                                 html_header_3i + file_prefix + "toc.html" + \
+-                                 html_header_5 + project_title +             \
+-                                 html_header_6
+-
+-        self.html_toc_header   = html_header_1 + project_title +              \
+-                                 html_header_2 +                              \
+-                                 html_header_3 + file_prefix + "index.html" + \
+-                                 html_header_5t + project_title +             \
+-                                 html_header_6
+-
+-        self.html_footer       = "<center><font size=""-2"">generated on " +     \
+-                                 time.asctime( time.localtime( time.time() ) ) + \
+-                                 "</font></center>" + html_footer
++        self.headers       = processor.headers
++        self.project_title = project_title
++        self.file_prefix   = file_prefix
++        self.html_header   = (
++          html_header_1 + project_title
++          + html_header_2
++          + html_header_3 + file_prefix + "index.html"
++          + html_header_4 + file_prefix + "toc.html"
++          + html_header_5 + project_title
++          + html_header_6 )
++        self.html_index_header = (
++          html_header_1 + project_title
++          + html_header_2
++          + html_header_3i + file_prefix + "toc.html"
++          + html_header_5 + project_title
++          + html_header_6 )
++        self.html_toc_header = (
++          html_header_1 + project_title
++          + html_header_2
++          + html_header_3 + file_prefix + "index.html"
++          + html_header_5t + project_title
++          + html_header_6 )
++        self.html_footer = (
++          "<center><font size=""-2"">generated on "
++          + time.asctime( time.localtime( time.time() ) )
++          + "</font></center>" + html_footer )
+ 
+         self.columns = 3
+ 
+@@ -224,8 +243,8 @@ class  HtmlFormatter( Formatter ):
+         return self.make_section_url( block.section ) + "#" + block.name
+ 
+     def  make_html_word( self, word ):
+-        """analyze a simple word to detect cross-references and styling"""
+-        # look for cross-references
++        """Analyze a simple word to detect cross-references and markup."""
++        # handle cross-references
+         m = re_crossref.match( word )
+         if m:
+             try:
+@@ -236,11 +255,11 @@ class  HtmlFormatter( Formatter ):
+                 return '<a href="' + url + '">' + name + '</a>' + rest
+             except:
+                 # we detected a cross-reference to an unknown item
+-                sys.stderr.write( \
+-                   "WARNING: undefined cross reference '" + name + "'.\n" )
++                sys.stderr.write( "WARNING: undefined cross reference"
++                                  + " '" + name + "'.\n" )
+                 return '?' + name + '?' + rest
+ 
+-        # look for italics and bolds
++        # handle markup for italic and bold
+         m = re_italic.match( word )
+         if m:
+             name = m.group( 1 )
+@@ -256,7 +275,8 @@ class  HtmlFormatter( Formatter ):
+         return html_quote( word )
+ 
+     def  make_html_para( self, words ):
+-        """ convert words of a paragraph into tagged HTML text, handle xrefs """
++        """Convert words of a paragraph into tagged HTML text.  Also handle
++           cross references."""
+         line = ""
+         if words:
+             line = self.make_html_word( words[0] )
+@@ -265,8 +285,8 @@ class  HtmlFormatter( Formatter ):
+             # handle hyperlinks
+             line = re_url.sub( r'<a href="\1">\1</a>', line )
+             # convert `...' quotations into real left and right single quotes
+-            line = re.sub( r"(^|\W)`(.*?)'(\W|$)",  \
+-                           r'\1&lsquo;\2&rsquo;\3', \
++            line = re.sub( r"(^|\W)`(.*?)'(\W|$)",
++                           r'\1&lsquo;\2&rsquo;\3',
+                            line )
+             # convert tilde into non-breakable space
+             line = string.replace( line, "~", "&nbsp;" )
+@@ -274,7 +294,7 @@ class  HtmlFormatter( Formatter ):
+         return para_header + line + para_footer
+ 
+     def  make_html_code( self, lines ):
+-        """ convert a code sequence to HTML """
++        """Convert a code sequence to HTML."""
+         line = code_header + '\n'
+         for l in lines:
+             line = line + html_quote( l ) + '\n'
+@@ -282,7 +302,7 @@ class  HtmlFormatter( Formatter ):
+         return line + code_footer
+ 
+     def  make_html_items( self, items ):
+-        """ convert a field's content into some valid HTML """
++        """Convert a field's content into HTML."""
+         lines = []
+         for item in items:
+             if item.lines:
+@@ -297,7 +317,9 @@ class  HtmlFormatter( Formatter ):
+ 
+     def  print_html_field( self, field ):
+         if field.name:
+-            print "<table><tr valign=top><td><b>" + field.name + "</b></td><td>"
++            print( "<table><tr valign=top><td><b>"
++                   + field.name
++                   + "</b></td><td>" )
+ 
+         print self.make_html_items( field.items )
+ 
+@@ -318,12 +340,14 @@ class  HtmlFormatter( Formatter ):
+                     result = result + prefix + '<b>' + name + '</b>'
+                 elif re_source_keywords.match( name ):
+                     # this is a C keyword
+-                    result = result + prefix + keyword_prefix + name + keyword_suffix
++                    result = ( result + prefix
++                               + keyword_prefix + name + keyword_suffix )
+                 elif self.identifiers.has_key( name ):
+                     # this is a known identifier
+                     block = self.identifiers[name]
+-                    result = result + prefix + '<a href="' + \
+-                             self.make_block_url( block ) + '">' + name + '</a>'
++                    result = ( result + prefix
++                               + '<a href="' + self.make_block_url( block )
++                               + '">' + name + '</a>' )
+                 else:
+                     result = result + html_quote( line[:length] )
+ 
+@@ -339,10 +363,14 @@ class  HtmlFormatter( Formatter ):
+         print "<table cellpadding=3 border=0>"
+         for field in fields:
+             if len( field.name ) > 22:
+-              print "<tr valign=top><td colspan=0><b>" + field.name + "</b></td></tr>"
++              print( "<tr valign=top><td colspan=0><b>"
++                     + field.name
++                     + "</b></td></tr>" )
+               print "<tr valign=top><td></td><td>"
+             else:
+-              print "<tr valign=top><td><b>" + field.name + "</b></td><td>"
++              print( "<tr valign=top><td><b>"
++                     + field.name
++                     + "</b></td><td>" )
+ 
+             self.print_html_items( field.items )
+             print "</td></tr>"
+@@ -352,10 +380,9 @@ class  HtmlFormatter( Formatter ):
+         table_fields = []
+         for field in markup.fields:
+             if field.name:
+-                # we begin a new series of field or value definitions, we
+-                # will record them in the 'table_fields' list before outputting
+-                # all of them as a single table
+-                #
++                # We begin a new series of field or value definitions.  We
++                # record them in the `table_fields' list before outputting
++                # all of them as a single table.
+                 table_fields.append( field )
+             else:
+                 if table_fields:
+@@ -368,7 +395,7 @@ class  HtmlFormatter( Formatter ):
+             self.print_html_field_list( table_fields )
+ 
+     #
+-    #  Formatting the index
++    # formatting the index
+     #
+     def  index_enter( self ):
+         print self.html_index_header
+@@ -380,7 +407,7 @@ class  HtmlFormatter( Formatter ):
+         self.index_items[name] = url
+ 
+     def  index_exit( self ):
+-        # block_index already contains the sorted list of index names
++        # `block_index' already contains the sorted list of index names
+         count = len( self.block_index )
+         rows  = ( count + self.columns - 1 ) / self.columns
+ 
+@@ -392,7 +419,8 @@ class  HtmlFormatter( Formatter ):
+                 if i < count:
+                     bname = self.block_index[r + c * rows]
+                     url   = self.index_items[bname]
+-                    line = line + '<td><a href="' + url + '">' + bname + '</a></td>'
++                    line  = ( line + '<td><a href="' + url + '">'
++                              + bname + '</a></td>' )
+                 else:
+                     line = line + '<td></td>'
+             line = line + "</tr>"
+@@ -400,9 +428,9 @@ class  HtmlFormatter( Formatter ):
+ 
+         print "</table>"
+ 
+-        print index_footer_start +            \
+-              self.file_prefix + "toc.html" + \
+-              index_footer_end
++        print( index_footer_start
++               + self.file_prefix + "toc.html"
++               + index_footer_end )
+ 
+         print self.html_footer
+ 
+@@ -415,20 +443,20 @@ class  HtmlFormatter( Formatter ):
+         Formatter.index_dump( self, index_filename )
+ 
+     #
+-    #  Formatting the table of content
++    # formatting the table of contents
+     #
+     def  toc_enter( self ):
+         print self.html_toc_header
+         print "<center><h1>Table of Contents</h1></center>"
+ 
+     def  toc_chapter_enter( self, chapter ):
+-        print  chapter_header + string.join( chapter.title ) + chapter_inter
++        print chapter_header + string.join( chapter.title ) + chapter_inter
+         print "<table cellpadding=5>"
+ 
+     def  toc_section_enter( self, section ):
+         print '<tr valign=top><td class="left">'
+-        print '<a href="' + self.make_section_url( section ) + '">' + \
+-               section.title + '</a></td><td>'
++        print( '<a href="' + self.make_section_url( section ) + '">'
++               + section.title + '</a></td><td>' )
+ 
+         print self.make_html_para( section.abstract )
+ 
+@@ -440,14 +468,14 @@ class  HtmlFormatter( Formatter ):
+         print chapter_footer
+ 
+     def  toc_index( self, index_filename ):
+-        print chapter_header +                                      \
+-              '<a href="' + index_filename + '">Global Index</a>' + \
+-              chapter_inter + chapter_footer
++        print( chapter_header
++               + '<a href="' + index_filename + '">Global Index</a>'
++               + chapter_inter + chapter_footer )
+ 
+     def  toc_exit( self ):
+-        print toc_footer_start +                \
+-              self.file_prefix + "index.html" + \
+-              toc_footer_end
++        print( toc_footer_start
++               + self.file_prefix + "index.html"
++               + toc_footer_end )
+ 
+         print self.html_footer
+ 
+@@ -461,7 +489,7 @@ class  HtmlFormatter( Formatter ):
+         Formatter.toc_dump( self, toc_filename, index_filename )
+ 
+     #
+-    #  Formatting sections
++    # formatting sections
+     #
+     def  section_enter( self, section ):
+         print self.html_header
+@@ -495,7 +523,8 @@ class  HtmlFormatter( Formatter ):
+                     line = line + '<td></td><td>'
+                     if i < count:
+                         name = section.block_names[i]
+-                        line = line + '<a href="#' + name + '">' + name + '</a>'
++                        line = ( line + '<a href="#' + name + '">'
++                                 + name + '</a>' )
+ 
+                     line = line + '</td>'
+                 line = line + "</tr>"
+@@ -513,7 +542,8 @@ class  HtmlFormatter( Formatter ):
+ 
+         # place html anchor if needed
+         if block.name:
+-            print '<h4><a name="' + block.name + '">' + block.name + '</a></h4>'
++            print( '<h4><a name="' + block.name + '">'
++                   + block.name + '</a></h4>' )
+ 
+         # dump the block C source lines now
+         if block.code:
+@@ -524,8 +554,9 @@ class  HtmlFormatter( Formatter ):
+                     break;
+ 
+ #           if not header:
+-#               sys.stderr.write( \
+-#                 'WARNING: No header macro for ' + block.source.filename + '.\n' )
++#               sys.stderr.write(
++#                 "WARNING: No header macro for"
++#                 + " '" + block.source.filename + "'.\n" )
+ 
+             if header:
+                 print header_location_header
+@@ -552,15 +583,16 @@ class  HtmlFormatter( Formatter ):
+             print marker_footer
+ 
+     def  block_exit( self, block ):
+-        print block_footer_start + self.file_prefix + "index.html" + \
+-              block_footer_middle + self.file_prefix + "toc.html" +  \
+-              block_footer_end
++        print( block_footer_start + self.file_prefix + "index.html"
++               + block_footer_middle + self.file_prefix + "toc.html"
++               + block_footer_end )
+ 
+     def  section_exit( self, section ):
+         print html_footer
+ 
+     def  section_dump_all( self ):
+         for section in self.sections:
+-            self.section_dump( section, self.file_prefix + section.name + '.html' )
++            self.section_dump( section,
++                               self.file_prefix + section.name + '.html' )
+ 
+ # eof
+diff --git a/src/tools/docmaker/utils.py b/src/tools/docmaker/utils.py
+index 1d96658..c75dd2d 100644
+--- a/src/tools/docmaker/utils.py
++++ b/src/tools/docmaker/utils.py
+@@ -1,15 +1,28 @@
+-#  Utils (c) 2002, 2004, 2007, 2008  David Turner <david@freetype.org>
+ #
++#  utils.py
++#
++#    Auxiliary functions for the `docmaker' tool (library file).
++#
++#  Copyright 2002, 2004, 2007, 2008, 2014 by
++#  David Turner.
++#
++#  This file is part of the FreeType project, and may only be used,
++#  modified, and distributed under the terms of the FreeType project
++#  license, LICENSE.TXT.  By continuing to use, modify, or distribute
++#  this file you indicate that you have read the license and
++#  understand and accept it fully.
++
+ 
+ import string, sys, os, glob
+ 
++
+ # current output directory
+ #
+ output_dir = None
+ 
+ 
+-# This function is used to sort the index.  It is a simple lexicographical
+-# sort, except that it places capital letters before lowercase ones.
++# A function to sort the index.  It is a simple lexicographical sort, except
++# that it places capital letters before lowercase ones.
+ #
+ def  index_sort( s1, s2 ):
+     if not s1:
+@@ -42,7 +55,7 @@ def  index_sort( s1, s2 ):
+     return 0
+ 
+ 
+-# Sort input_list, placing the elements of order_list in front.
++# Sort `input_list', placing the elements of `order_list' in front.
+ #
+ def  sort_order_list( input_list, order_list ):
+     new_list = order_list[:]
+@@ -52,9 +65,9 @@ def  sort_order_list( input_list, order_list ):
+     return new_list
+ 
+ 
+-# Open the standard output to a given project documentation file.  Use
+-# "output_dir" to determine the filename location if necessary and save the
+-# old stdout in a tuple that is returned by this function.
++# Divert standard output to a given project documentation file.  Use
++# `output_dir' to determine the filename location if necessary and save the
++# old stdout handle in a tuple that is returned by this function.
+ #
+ def  open_output( filename ):
+     global output_dir
+@@ -69,7 +82,7 @@ def  open_output( filename ):
+     return ( new_file, old_stdout )
+ 
+ 
+-# Close the output that was returned by "close_output".
++# Close the output that was returned by `open_output'.
+ #
+ def  close_output( output ):
+     output[0].close()
+@@ -83,15 +96,16 @@ def  check_output():
+     if output_dir:
+         if output_dir != "":
+             if not os.path.isdir( output_dir ):
+-                sys.stderr.write( "argument" + " '" + output_dir + "' " + \
+-                                  "is not a valid directory" )
++                sys.stderr.write( "argument"
++                                  + " '" + output_dir + "' "
++                                  + "is not a valid directory" )
+                 sys.exit( 2 )
+         else:
+             output_dir = None
+ 
+ 
+ def  file_exists( pathname ):
+-    """checks that a given file exists"""
++    """Check that a given file exists."""
+     result = 1
+     try:
+         file = open( pathname, "r" )
+@@ -104,12 +118,12 @@ def  file_exists( pathname ):
+ 
+ 
+ def  make_file_list( args = None ):
+-    """builds a list of input files from command-line arguments"""
++    """Build a list of input files from command-line arguments."""
+     file_list = []
+     # sys.stderr.write( repr( sys.argv[1 :] ) + '\n' )
+ 
+     if not args:
+-        args = sys.argv[1 :]
++        args = sys.argv[1:]
+ 
+     for pathname in args:
+         if string.find( pathname, '*' ) >= 0:
+diff --git a/src/truetype/ttdriver.c b/src/truetype/ttdriver.c
+index 36d23a2..64e433d 100644
+--- a/src/truetype/ttdriver.c
++++ b/src/truetype/ttdriver.c
+@@ -4,7 +4,7 @@
+ /*                                                                         */
+ /*    TrueType font driver implementation (body).                          */
+ /*                                                                         */
+-/*  Copyright 1996-2013 by                                                 */
++/*  Copyright 1996-2014 by                                                 */
+ /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+ /*                                                                         */
+ /*  This file is part of the FreeType project, and may only be used,       */
+@@ -267,7 +267,7 @@
+       /* use the scaled metrics, even when tt_size_reset fails */
+       FT_Select_Metrics( size->face, strike_index );
+ 
+-      tt_size_reset( ttsize );
++      tt_size_reset( ttsize ); /* ignore return value */
+     }
+     else
+     {
+@@ -370,7 +370,7 @@
+       return FT_THROW( Invalid_Size_Handle );
+ 
+     if ( !face )
+-      return FT_THROW( Invalid_Argument );
++      return FT_THROW( Invalid_Face_Handle );
+ 
+ #ifdef FT_CONFIG_OPTION_INCREMENTAL
+     if ( glyph_index >= (FT_UInt)face->num_glyphs &&
 diff --git a/src/truetype/ttgload.c b/src/truetype/ttgload.c
-index 5f676a2..2ab6f76 100644
+index 5f676a2..c5841c3 100644
 --- a/src/truetype/ttgload.c
 +++ b/src/truetype/ttgload.c
 @@ -4,7 +4,7 @@
@@ -10492,16 +13608,78 @@ index 5f676a2..2ab6f76 100644
        *ah  = face->horizontal.Ascender - face->horizontal.Descender;
      }
  
-@@ -2120,7 +2120,7 @@
+@@ -801,10 +801,8 @@
+       FT_Outline      current_outline = gloader->current.outline;
+ 
+ 
+-      error = TT_Set_CodeRange( loader->exec, tt_coderange_glyph,
+-                                loader->exec->glyphIns, n_ins );
+-      if ( error )
+-        return error;
++      TT_Set_CodeRange( loader->exec, tt_coderange_glyph,
++                        loader->exec->glyphIns, n_ins );
+ 
+       loader->exec->is_composite = is_composite;
+       loader->exec->pts          = *zone;
+@@ -1789,8 +1787,12 @@
+           /* (1): exists from the beginning                               */
+           /* (2): components that have been loaded so far                 */
+           /* (3): the newly loaded component                              */
+-          TT_Process_Composite_Component( loader, subglyph, start_point,
+-                                          num_base_points );
++          error = TT_Process_Composite_Component( loader,
++                                                  subglyph,
++                                                  start_point,
++                                                  num_base_points );
++          if ( error )
++            goto Exit;
+         }
+ 
+         loader->stream   = old_stream;
+@@ -1799,16 +1801,17 @@
+         /* process the glyph */
+         loader->ins_pos = ins_pos;
+         if ( IS_HINTED( loader->load_flags ) &&
+-
+ #ifdef TT_USE_BYTECODE_INTERPRETER
+-
+              subglyph->flags & WE_HAVE_INSTR &&
+-
+ #endif
+-
+              num_points > start_point )
+-          TT_Process_Composite_Glyph( loader, start_point, start_contour );
+-
++        {
++          error = TT_Process_Composite_Glyph( loader,
++                                              start_point,
++                                              start_contour );
++          if ( error )
++            goto Exit;
++        }
+       }
+     }
+     else
+@@ -2083,6 +2086,8 @@
+                   FT_Int32      load_flags,
+                   FT_Bool       glyf_table_only )
+   {
++    FT_Error  error;
++
+     TT_Face    face;
+     FT_Stream  stream;
+ #ifdef TT_USE_BYTECODE_INTERPRETER
+@@ -2120,14 +2125,16 @@
        FT_Bool  reexecute = FALSE;
  
  
 -      if ( !size->cvt_ready )
 +      if ( size->bytecode_ready < 0 || size->cvt_ready < 0 )
        {
-         FT_Error  error = tt_size_ready_bytecode( size, pedantic );
- 
-@@ -2128,6 +2128,10 @@
+-        FT_Error  error = tt_size_ready_bytecode( size, pedantic );
+-
+-
++        error = tt_size_ready_bytecode( size, pedantic );
          if ( error )
            return error;
        }
@@ -10512,14 +13690,18 @@ index 5f676a2..2ab6f76 100644
  
        /* query new execution context */
        exec = size->debug ? size->context
-@@ -2238,12 +2242,15 @@
+@@ -2191,7 +2198,9 @@
+                              FT_RENDER_MODE_MONO );
+       }
  
-       if ( reexecute )
-       {
--        FT_UInt  i;
-+        FT_UInt   i;
-+        FT_Error  error;
+-      TT_Load_Context( exec, face, size );
++      error = TT_Load_Context( exec, face, size );
++      if ( error )
++        return error;
  
+ #ifdef TT_CONFIG_OPTION_SUBPIXEL_HINTING
+ 
+@@ -2243,7 +2252,9 @@
  
          for ( i = 0; i < size->cvt_size; i++ )
            size->cvt[i] = FT_MulFix( face->cvt[i], size->ttmetrics.scale );
@@ -10530,7 +13712,17 @@ index 5f676a2..2ab6f76 100644
        }
  
        /* see whether the cvt program has disabled hinting */
-@@ -2366,15 +2373,18 @@
+@@ -2274,8 +2285,7 @@
+ #endif
+ 
+     {
+-      FT_Error  error = face->goto_table( face, TTAG_glyf, stream, 0 );
+-
++      error = face->goto_table( face, TTAG_glyf, stream, 0 );
+ 
+       if ( FT_ERR_EQ( error, Table_Missing ) )
+         loader->glyf_offset = 0;
+@@ -2366,15 +2376,18 @@
            (void)tt_loader_init( &loader, size, glyph, load_flags, TRUE );
            (void)load_truetype_glyph( &loader, glyph_index, 0, TRUE );
            glyph->linearHoriAdvance = loader.linear;
@@ -10553,8 +13745,46 @@ index 5f676a2..2ab6f76 100644
          }
  
          return FT_Err_Ok;
+@@ -2454,7 +2467,7 @@
+ 
+ #endif /* TT_USE_BYTECODE_INTERPRETER */
+ 
+-      compute_glyph_metrics( &loader, glyph_index );
++      error = compute_glyph_metrics( &loader, glyph_index );
+     }
+ 
+     /* Set the `high precision' bit flag.                           */
+diff --git a/src/truetype/ttgxvar.c b/src/truetype/ttgxvar.c
+index 7899d36..1b35539 100644
+--- a/src/truetype/ttgxvar.c
++++ b/src/truetype/ttgxvar.c
+@@ -4,7 +4,7 @@
+ /*                                                                         */
+ /*    TrueType GX Font Variation loader                                    */
+ /*                                                                         */
+-/*  Copyright 2004-2013 by                                                 */
++/*  Copyright 2004-2014 by                                                 */
+ /*  David Turner, Robert Wilhelm, Werner Lemberg, and George Williams.     */
+ /*                                                                         */
+ /*  This file is part of the FreeType project, and may only be used,       */
+@@ -938,13 +938,13 @@
+         FT_FREE( face->cvt );
+         face->cvt = NULL;
+ 
+-        tt_face_load_cvt( face, face->root.stream );
++        error = tt_face_load_cvt( face, face->root.stream );
+         break;
+ 
+       case mcvt_modify:
+         /* The original cvt table is in memory.  All we need to do is */
+         /* apply the `cvar' table (if any).                           */
+-        tt_face_vary_cvt( face, face->root.stream );
++        error = tt_face_vary_cvt( face, face->root.stream );
+         break;
+ 
+       case mcvt_retain:
 diff --git a/src/truetype/ttinterp.c b/src/truetype/ttinterp.c
-index 56e8fa7..75c67ef 100644
+index 56e8fa7..405de02 100644
 --- a/src/truetype/ttinterp.c
 +++ b/src/truetype/ttinterp.c
 @@ -172,6 +172,9 @@
@@ -10580,7 +13810,135 @@ index 56e8fa7..75c67ef 100644
  #define INS_SxVTL( a, b, c, d ) \
            Ins_SxVTL( EXEC_ARG_ a, b, c, d )
  
-@@ -1446,7 +1443,7 @@
+@@ -282,10 +279,7 @@
+   /* <InOut>                                                               */
+   /*    exec  :: The target execution context.                             */
+   /*                                                                       */
+-  /* <Return>                                                              */
+-  /*    FreeType error code.  0 means success.                             */
+-  /*                                                                       */
+-  FT_LOCAL_DEF( FT_Error )
++  FT_LOCAL_DEF( void )
+   TT_Goto_CodeRange( TT_ExecContext  exec,
+                      FT_Int          range,
+                      FT_Long         IP )
+@@ -309,8 +303,6 @@
+     exec->codeSize = coderange->size;
+     exec->IP       = IP;
+     exec->curRange = range;
+-
+-    return FT_Err_Ok;
+   }
+ 
+ 
+@@ -332,10 +324,7 @@
+   /* <InOut>                                                               */
+   /*    exec   :: The target execution context.                            */
+   /*                                                                       */
+-  /* <Return>                                                              */
+-  /*    FreeType error code.  0 means success.                             */
+-  /*                                                                       */
+-  FT_LOCAL_DEF( FT_Error )
++  FT_LOCAL_DEF( void )
+   TT_Set_CodeRange( TT_ExecContext  exec,
+                     FT_Int          range,
+                     void*           base,
+@@ -345,8 +334,6 @@
+ 
+     exec->codeRangeTable[range - 1].base = (FT_Byte*)base;
+     exec->codeRangeTable[range - 1].size = length;
+-
+-    return FT_Err_Ok;
+   }
+ 
+ 
+@@ -364,13 +351,7 @@
+   /* <InOut>                                                               */
+   /*    exec  :: The target execution context.                             */
+   /*                                                                       */
+-  /* <Return>                                                              */
+-  /*    FreeType error code.  0 means success.                             */
+-  /*                                                                       */
+-  /* <Note>                                                                */
+-  /*    Does not set the Error variable.                                   */
+-  /*                                                                       */
+-  FT_LOCAL_DEF( FT_Error )
++  FT_LOCAL_DEF( void )
+   TT_Clear_CodeRange( TT_ExecContext  exec,
+                       FT_Int          range )
+   {
+@@ -378,8 +359,6 @@
+ 
+     exec->codeRangeTable[range - 1].base = NULL;
+     exec->codeRangeTable[range - 1].size = 0;
+-
+-    return FT_Err_Ok;
+   }
+ 
+ 
+@@ -403,13 +382,10 @@
+   /*                                                                       */
+   /*    memory :: A handle to the parent memory object.                    */
+   /*                                                                       */
+-  /* <Return>                                                              */
+-  /*    FreeType error code.  0 means success.                             */
+-  /*                                                                       */
+   /* <Note>                                                                */
+   /*    Only the glyph loader and debugger should call this function.      */
+   /*                                                                       */
+-  FT_LOCAL_DEF( FT_Error )
++  FT_LOCAL_DEF( void )
+   TT_Done_Context( TT_ExecContext  exec )
+   {
+     FT_Memory  memory = exec->memory;
+@@ -436,8 +412,6 @@
+     exec->face = NULL;
+ 
+     FT_FREE( exec );
+-
+-    return FT_Err_Ok;
+   }
+ 
+ 
+@@ -664,13 +638,10 @@
+   /* <InOut>                                                               */
+   /*    size :: A handle to the target size object.                        */
+   /*                                                                       */
+-  /* <Return>                                                              */
+-  /*    FreeType error code.  0 means success.                             */
+-  /*                                                                       */
+   /* <Note>                                                                */
+   /*    Only the glyph loader and debugger should call this function.      */
+   /*                                                                       */
+-  FT_LOCAL_DEF( FT_Error )
++  FT_LOCAL_DEF( void )
+   TT_Save_Context( TT_ExecContext  exec,
+                    TT_Size         size )
+   {
+@@ -688,8 +659,6 @@
+ 
+     for ( i = 0; i < TT_MAX_CODE_RANGES; i++ )
+       size->codeRangeTable[i] = exec->codeRangeTable[i];
+-
+-    return FT_Err_Ok;
+   }
+ 
+ 
+@@ -721,12 +690,7 @@
+   TT_Run_Context( TT_ExecContext  exec,
+                   FT_Bool         debug )
+   {
+-    FT_Error  error;
+-
+-
+-    if ( ( error = TT_Goto_CodeRange( exec, tt_coderange_glyph, 0 ) )
+-           != FT_Err_Ok )
+-      return error;
++    TT_Goto_CodeRange( exec, tt_coderange_glyph, 0 );
+ 
+     exec->zp0 = exec->pts;
+     exec->zp1 = exec->pts;
+@@ -1446,7 +1410,7 @@
    TT_MulFix14_arm( FT_Int32  a,
                     FT_Int    b )
    {
@@ -10589,7 +13947,7 @@ index 56e8fa7..75c67ef 100644
  
  
  #if defined( __CC_ARM ) || defined( __ARMCC__ )
-@@ -1706,9 +1703,16 @@
+@@ -1706,9 +1670,16 @@
    }
  
  
@@ -10607,7 +13965,7 @@ index 56e8fa7..75c67ef 100644
      return FT_MulFix( CUR.tt_metrics.ppem, CURRENT_Ratio() );
    }
  
-@@ -2047,7 +2051,7 @@
+@@ -2047,7 +2018,7 @@
      if ( distance >= 0 )
      {
        val = distance + compensation;
@@ -10616,7 +13974,7 @@ index 56e8fa7..75c67ef 100644
          val = 0;
      }
      else
-@@ -2087,10 +2091,8 @@
+@@ -2087,10 +2058,8 @@
  
      if ( distance >= 0 )
      {
@@ -10629,7 +13987,7 @@ index 56e8fa7..75c67ef 100644
          val = 0;
      }
      else
-@@ -2132,14 +2134,14 @@
+@@ -2132,14 +2101,14 @@
      if ( distance >= 0 )
      {
        val = FT_PIX_FLOOR( distance + compensation ) + 32;
@@ -10647,7 +14005,7 @@ index 56e8fa7..75c67ef 100644
      }
  
      return val;
-@@ -2173,15 +2175,13 @@
+@@ -2173,15 +2142,13 @@
  
      if ( distance >= 0 )
      {
@@ -10666,7 +14024,7 @@ index 56e8fa7..75c67ef 100644
        if ( val > 0 )
          val = 0;
      }
-@@ -2217,10 +2217,8 @@
+@@ -2217,10 +2184,8 @@
  
      if ( distance >= 0 )
      {
@@ -10679,7 +14037,7 @@ index 56e8fa7..75c67ef 100644
          val = 0;
      }
      else
-@@ -2261,10 +2259,8 @@
+@@ -2261,10 +2226,8 @@
  
      if ( distance >= 0 )
      {
@@ -10692,7 +14050,7 @@ index 56e8fa7..75c67ef 100644
          val = 0;
      }
      else
-@@ -2311,17 +2307,17 @@
+@@ -2311,17 +2274,17 @@
      {
        val = ( distance - CUR.phase + CUR.threshold + compensation ) &
                -CUR.period;
@@ -10714,7 +14072,7 @@ index 56e8fa7..75c67ef 100644
      }
  
      return val;
-@@ -2359,17 +2355,17 @@
+@@ -2359,17 +2322,17 @@
      {
        val = ( ( distance - CUR.phase + CUR.threshold + compensation ) /
                  CUR.period ) * CUR.period;
@@ -10736,7 +14094,7 @@ index 56e8fa7..75c67ef 100644
      }
  
      return val;
-@@ -3077,19 +3073,22 @@
+@@ -3077,19 +3040,22 @@
      CUR.GS.auto_flip = FALSE;
  
  
@@ -10764,7 +14122,7 @@ index 56e8fa7..75c67ef 100644
  
  
    /* Note: The pointSize should be irrelevant in a given font program; */
-@@ -3102,7 +3101,7 @@
+@@ -3102,7 +3068,7 @@
  #else
  
  #define DO_MPS                \
@@ -10773,7 +14131,7 @@ index 56e8fa7..75c67ef 100644
  
  #endif /* 0 */
  
-@@ -7487,9 +7486,9 @@
+@@ -7487,9 +7453,9 @@
    static void
    Ins_DELTAP( INS_ARG )
    {
@@ -10785,7 +14143,7 @@ index 56e8fa7..75c67ef 100644
      FT_Long    B;
  #ifdef TT_CONFIG_OPTION_SUBPIXEL_HINTING
      FT_UShort  B1, B2;
-@@ -7523,6 +7522,7 @@
+@@ -7523,6 +7489,7 @@
      }
  #endif
  
@@ -10793,7 +14151,7 @@ index 56e8fa7..75c67ef 100644
      nump = (FT_ULong)args[0];   /* some points theoretically may occur more
                                     than once, thus UShort isn't enough */
  
-@@ -7567,12 +7567,12 @@
+@@ -7567,12 +7534,12 @@
  
          C += CUR.GS.delta_base;
  
@@ -10808,7 +14166,7 @@ index 56e8fa7..75c67ef 100644
  
  #ifdef TT_CONFIG_OPTION_SUBPIXEL_HINTING
  
-@@ -7581,42 +7581,33 @@
+@@ -7581,42 +7548,33 @@
              /*
               *  Allow delta move if
               *
@@ -10867,7 +14225,7 @@ index 56e8fa7..75c67ef 100644
                  if ( CUR.sph_tweak_flags & SPH_TWEAK_ROUND_NONPIXEL_Y_MOVES )
                    B = FT_PIX_ROUND( B1 + B ) - B1;
  
-@@ -7627,7 +7618,7 @@
+@@ -7627,7 +7585,7 @@
                    CUR_Func_move( &CUR.zp0, A, B );
                }
  
@@ -10876,7 +14234,7 @@ index 56e8fa7..75c67ef 100644
  
                /* Reverse this move if it results in a disallowed move */
                if ( CUR.GS.freeVector.y != 0                           &&
-@@ -7667,7 +7658,7 @@
+@@ -7667,7 +7625,7 @@
    Ins_DELTAC( INS_ARG )
    {
      FT_ULong  nump, k;
@@ -10885,7 +14243,7 @@ index 56e8fa7..75c67ef 100644
      FT_Long   B;
  
  
-@@ -7691,6 +7682,7 @@
+@@ -7691,6 +7649,7 @@
      }
  #endif
  
@@ -10893,7 +14251,7 @@ index 56e8fa7..75c67ef 100644
      nump = (FT_ULong)args[0];
  
      for ( k = 1; k <= nump; k++ )
-@@ -7736,12 +7728,12 @@
+@@ -7736,12 +7695,12 @@
  
          C += CUR.GS.delta_base;
  
@@ -10908,7 +14266,7 @@ index 56e8fa7..75c67ef 100644
  
            CUR_Func_move_cvt( A, B );
          }
-@@ -8269,11 +8261,12 @@
+@@ -8269,11 +8228,12 @@
      CUR.iup_called = FALSE;
  #endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
  
@@ -10922,7 +14280,7 @@ index 56e8fa7..75c67ef 100644
        CUR.func_read_cvt  = Read_CVT_Stretched;
        CUR.func_write_cvt = Write_CVT_Stretched;
        CUR.func_move_cvt  = Move_CVT_Stretched;
-@@ -8281,6 +8274,7 @@
+@@ -8281,6 +8241,7 @@
      else
      {
        /* square pixels, use normal routines */
@@ -10930,7 +14288,7 @@ index 56e8fa7..75c67ef 100644
        CUR.func_read_cvt  = Read_CVT;
        CUR.func_write_cvt = Write_CVT;
        CUR.func_move_cvt  = Move_CVT;
-@@ -9035,10 +9029,13 @@
+@@ -9035,10 +8996,13 @@
      /* If any errors have occurred, function tables may be broken. */
      /* Force a re-execution of `prep' and `fpgm' tables if no      */
      /* bytecode debugger is run.                                   */
@@ -10947,7 +14305,7 @@ index 56e8fa7..75c67ef 100644
  
      return CUR.error;
 diff --git a/src/truetype/ttinterp.h b/src/truetype/ttinterp.h
-index 1d8825d..3cfc859 100644
+index 1d8825d..333decc 100644
 --- a/src/truetype/ttinterp.h
 +++ b/src/truetype/ttinterp.h
 @@ -4,7 +4,7 @@
@@ -10991,11 +14349,77 @@ index 1d8825d..3cfc859 100644
      TT_Get_CVT_Func    func_read_cvt;  /* read a cvt entry              */
      TT_Set_CVT_Func    func_write_cvt; /* write a cvt entry (in pixels) */
      TT_Set_CVT_Func    func_move_cvt;  /* incr a cvt entry (in pixels)  */
+@@ -295,18 +296,18 @@ FT_BEGIN_HEADER
+ 
+ 
+ #ifdef TT_USE_BYTECODE_INTERPRETER
+-  FT_LOCAL( FT_Error )
++  FT_LOCAL( void )
+   TT_Goto_CodeRange( TT_ExecContext  exec,
+                      FT_Int          range,
+                      FT_Long         IP );
+ 
+-  FT_LOCAL( FT_Error )
++  FT_LOCAL( void )
+   TT_Set_CodeRange( TT_ExecContext  exec,
+                     FT_Int          range,
+                     void*           base,
+                     FT_Long         length );
+ 
+-  FT_LOCAL( FT_Error )
++  FT_LOCAL( void )
+   TT_Clear_CodeRange( TT_ExecContext  exec,
+                       FT_Int          range );
+ 
+@@ -344,7 +345,7 @@ FT_BEGIN_HEADER
+ 
+ 
+ #ifdef TT_USE_BYTECODE_INTERPRETER
+-  FT_LOCAL( FT_Error )
++  FT_LOCAL( void )
+   TT_Done_Context( TT_ExecContext  exec );
+ 
+   FT_LOCAL( FT_Error )
+@@ -352,7 +353,7 @@ FT_BEGIN_HEADER
+                    TT_Face         face,
+                    TT_Size         size );
+ 
+-  FT_LOCAL( FT_Error )
++  FT_LOCAL( void )
+   TT_Save_Context( TT_ExecContext  exec,
+                    TT_Size         ins );
+ 
 diff --git a/src/truetype/ttobjs.c b/src/truetype/ttobjs.c
-index 4adba58..46f1332 100644
+index 4adba58..a73529d 100644
 --- a/src/truetype/ttobjs.c
 +++ b/src/truetype/ttobjs.c
-@@ -813,6 +813,8 @@
+@@ -760,7 +760,9 @@
+     if ( !exec )
+       return FT_THROW( Could_Not_Find_Context );
+ 
+-    TT_Load_Context( exec, face, size );
++    error = TT_Load_Context( exec, face, size );
++    if ( error )
++      return error;
+ 
+     exec->callTop = 0;
+     exec->top     = 0;
+@@ -801,18 +803,16 @@
+ 
+     if ( face->font_program_size > 0 )
+     {
+-      error = TT_Goto_CodeRange( exec, tt_coderange_font, 0 );
++      TT_Goto_CodeRange( exec, tt_coderange_font, 0 );
+ 
+-      if ( !error )
+-      {
+-        FT_TRACE4(( "Executing `fpgm' table.\n" ));
+-
+-        error = face->interpreter( exec );
+-      }
++      FT_TRACE4(( "Executing `fpgm' table.\n" ));
++      error = face->interpreter( exec );
+     }
      else
        error = FT_Err_Ok;
  
@@ -11003,6 +14427,29 @@ index 4adba58..46f1332 100644
 +
      if ( !error )
        TT_Save_Context( exec, size );
+ 
+@@ -854,7 +854,9 @@
+     if ( !exec )
+       return FT_THROW( Could_Not_Find_Context );
+ 
+-    TT_Load_Context( exec, face, size );
++    error = TT_Load_Context( exec, face, size );
++    if ( error )
++      return error;
+ 
+     exec->callTop = 0;
+     exec->top     = 0;
+@@ -872,9 +874,9 @@
+ 
+     if ( face->cvt_program_size > 0 )
+     {
+-      error = TT_Goto_CodeRange( exec, tt_coderange_cvt, 0 );
++      TT_Goto_CodeRange( exec, tt_coderange_cvt, 0 );
+ 
+-      if ( !error && !size->debug )
++      if ( !size->debug )
+       {
+         FT_TRACE4(( "Executing `prep' table.\n" ));
  
 @@ -884,6 +886,8 @@
      else
@@ -11163,6 +14610,36 @@ index a11dd37..859164f 100644
  
  #endif /* TT_USE_BYTECODE_INTERPRETER */
  
+diff --git a/src/truetype/ttpload.c b/src/truetype/ttpload.c
+index 9723a51..9991925 100644
+--- a/src/truetype/ttpload.c
++++ b/src/truetype/ttpload.c
+@@ -508,9 +508,9 @@
+     record_size = FT_NEXT_ULONG( p );
+ 
+     /* The maximum number of bytes in an hdmx device record is the */
+-    /* maximum number of glyphs + 2; this is 0xFFFF + 2; this is   */
+-    /* the reason why `record_size' is a long (which we read as    */
+-    /* unsigned long for convenience).  In practice, two bytes     */
++    /* maximum number of glyphs + 2; this is 0xFFFF + 2, thus      */
++    /* explaining why `record_size' is a long (which we read as    */
++    /* unsigned long for convenience).  In practice, two bytes are */
+     /* sufficient to hold the size value.                          */
+     /*                                                             */
+     /* There are at least two fonts, HANNOM-A and HANNOM-B version */
+@@ -522,8 +522,10 @@
+       record_size &= 0xFFFFU;
+ 
+     /* The limit for `num_records' is a heuristic value. */
+-
+-    if ( version != 0 || num_records > 255 || record_size > 0x10001L )
++    if ( version != 0           ||
++         num_records > 255      ||
++         record_size > 0x10001L ||
++         record_size < 4        )
+     {
+       error = FT_THROW( Invalid_File_Format );
+       goto Fail;
 diff --git a/src/truetype/ttsubpix.c b/src/truetype/ttsubpix.c
 index 28470ad..ca60451 100644
 --- a/src/truetype/ttsubpix.c
@@ -11218,10 +14695,31 @@ index 697288d..2602bdb 100644
  
      return retval;
 diff --git a/src/type1/t1load.c b/src/type1/t1load.c
-index fd06432..caa75bd 100644
+index fd06432..22b3f6b 100644
 --- a/src/type1/t1load.c
 +++ b/src/type1/t1load.c
-@@ -1604,7 +1604,7 @@
+@@ -1211,7 +1211,7 @@
+         char*  notdef = (char *)".notdef";
+ 
+ 
+-        T1_Add_Table( char_table, n, notdef, 8 );
++        (void)T1_Add_Table( char_table, n, notdef, 8 );
+       }
+ 
+       /* Now we need to read records of the form                */
+@@ -1596,6 +1596,11 @@
+       }
+ 
+       T1_Skip_PS_Token( parser );
++      if ( parser->root.cursor >= limit )
++      {
++        error = FT_THROW( Invalid_File_Format );
++        goto Fail;
++      }
+       if ( parser->root.error )
+         return;
+ 
+@@ -1604,7 +1609,7 @@
          FT_PtrDist  len;
  
  
@@ -11230,11 +14728,133 @@ index fd06432..caa75bd 100644
          {
            error = FT_THROW( Invalid_File_Format );
            goto Fail;
+diff --git a/src/type42/t42objs.c b/src/type42/t42objs.c
+index 798ebdb..915e81f 100644
+--- a/src/type42/t42objs.c
++++ b/src/type42/t42objs.c
+@@ -47,6 +47,12 @@
+     if ( FT_ALLOC( face->ttf_data, 12 ) )
+       goto Exit;
+ 
++    /* while parsing the font we always update `face->ttf_size' so that */
++    /* even in case of buggy data (which might lead to premature end of */
++    /* scanning without causing an error) the call to `FT_Open_Face' in */
++    /* `T42_Face_Init' passes the correct size                          */
++    face->ttf_size = 12;
++
+     error = t42_parser_init( parser,
+                              face->root.stream,
+                              memory,
+@@ -286,7 +292,9 @@
+       FT_Open_Args  args;
+ 
+ 
+-      args.flags       = FT_OPEN_MEMORY;
++      args.flags       = FT_OPEN_MEMORY | FT_OPEN_DRIVER;
++      args.driver      = FT_Get_Module( FT_FACE_LIBRARY( face ),
++                                        "truetype" );
+       args.memory_base = face->ttf_data;
+       args.memory_size = face->ttf_size;
+ 
 diff --git a/src/type42/t42parse.c b/src/type42/t42parse.c
-index 9b66888..a60e216 100644
+index 9b66888..fd3d669 100644
 --- a/src/type42/t42parse.c
 +++ b/src/type42/t42parse.c
-@@ -858,7 +858,7 @@
+@@ -366,7 +366,7 @@
+         char*  notdef = (char *)".notdef";
+ 
+ 
+-        T1_Add_Table( char_table, n, notdef, 8 );
++        (void)T1_Add_Table( char_table, n, notdef, 8 );
+       }
+ 
+       /* Now we need to read records of the form                */
+@@ -524,7 +524,7 @@
+     FT_Byte*    limit  = parser->root.limit;
+     FT_Error    error;
+     FT_Int      num_tables = 0;
+-    FT_ULong    count, ttf_size = 0;
++    FT_ULong    count;
+ 
+     FT_Long     n, string_size, old_string_size, real_size;
+     FT_Byte*    string_buf = NULL;
+@@ -617,7 +617,7 @@
+ 
+         if ( limit - parser->root.cursor < string_size )
+         {
+-          FT_ERROR(( "t42_parse_sfnts: too many binary data\n" ));
++          FT_ERROR(( "t42_parse_sfnts: too much binary data\n" ));
+           error = FT_THROW( Invalid_File_Format );
+           goto Fail;
+         }
+@@ -657,18 +657,18 @@
+           }
+           else
+           {
+-            num_tables = 16 * face->ttf_data[4] + face->ttf_data[5];
+-            status     = BEFORE_TABLE_DIR;
+-            ttf_size   = 12 + 16 * num_tables;
++            num_tables     = 16 * face->ttf_data[4] + face->ttf_data[5];
++            status         = BEFORE_TABLE_DIR;
++            face->ttf_size = 12 + 16 * num_tables;
+ 
+-            if ( FT_REALLOC( face->ttf_data, 12, ttf_size ) )
++            if ( FT_REALLOC( face->ttf_data, 12, face->ttf_size ) )
+               goto Fail;
+           }
+           /* fall through */
+ 
+         case BEFORE_TABLE_DIR:
+           /* the offset table is read; read the table directory */
+-          if ( count < ttf_size )
++          if ( count < face->ttf_size )
+           {
+             face->ttf_data[count++] = string_buf[n];
+             continue;
+@@ -687,24 +687,23 @@
+               len = FT_PEEK_ULONG( p );
+ 
+               /* Pad to a 4-byte boundary length */
+-              ttf_size += ( len + 3 ) & ~3;
++              face->ttf_size += ( len + 3 ) & ~3;
+             }
+ 
+-            status         = OTHER_TABLES;
+-            face->ttf_size = ttf_size;
++            status = OTHER_TABLES;
+ 
+             /* there are no more than 256 tables, so no size check here */
+             if ( FT_REALLOC( face->ttf_data, 12 + 16 * num_tables,
+-                             ttf_size + 1 ) )
++                             face->ttf_size + 1 ) )
+               goto Fail;
+           }
+           /* fall through */
+ 
+         case OTHER_TABLES:
+           /* all other tables are just copied */
+-          if ( count >= ttf_size )
++          if ( count >= face->ttf_size )
+           {
+-            FT_ERROR(( "t42_parse_sfnts: too many binary data\n" ));
++            FT_ERROR(( "t42_parse_sfnts: too much binary data\n" ));
+             error = FT_THROW( Invalid_File_Format );
+             goto Fail;
+           }
+@@ -850,6 +849,12 @@
+         break;
+ 
+       T1_Skip_PS_Token( parser );
++      if ( parser->root.cursor >= limit )
++      {
++        FT_ERROR(( "t42_parse_charstrings: out of bounds\n" ));
++        error = FT_THROW( Invalid_File_Format );
++        goto Fail;
++      }
+       if ( parser->root.error )
+         return;
+ 
+@@ -858,7 +863,7 @@
          FT_PtrDist  len;
  
  
@@ -11243,3 +14863,32 @@ index 9b66888..a60e216 100644
          {
            FT_ERROR(( "t42_parse_charstrings: out of bounds\n" ));
            error = FT_THROW( Invalid_File_Format );
+diff --git a/src/winfonts/winfnt.c b/src/winfonts/winfnt.c
+index e9c1a9b..f90b084 100644
+--- a/src/winfonts/winfnt.c
++++ b/src/winfonts/winfnt.c
+@@ -591,11 +591,14 @@
+ 
+ 
+   static FT_Error
+-  fnt_cmap_init( FNT_CMap  cmap )
++  fnt_cmap_init( FNT_CMap    cmap,
++                 FT_Pointer  pointer )
+   {
+     FNT_Face  face = (FNT_Face)FT_CMAP_FACE( cmap );
+     FNT_Font  font = face->font;
+ 
++    FT_UNUSED( pointer );
++
+ 
+     cmap->first = (FT_UInt32)  font->header.first_char;
+     cmap->count = (FT_UInt32)( font->header.last_char - cmap->first + 1 );
+@@ -971,7 +974,7 @@
+ 
+     if ( !face )
+     {
+-      error = FT_THROW( Invalid_Argument );
++      error = FT_THROW( Invalid_Face_Handle );
+       goto Exit;
+     }
+ 

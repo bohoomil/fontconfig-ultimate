@@ -1,3 +1,8 @@
+Without new ftsmooth.c
+
+---------------------------
+
+
 --- a/configure	2013-05-28 23:00:03.000000000 +0200
 +++ b/configure	2014-03-07 19:21:57.063320787 +0100
 @@ -13,6 +13,8 @@
@@ -401,8 +406,8 @@
    Exit:
      return error;
    }
---- a/src/base/ftlcdfil.c	2014-07-07 23:10:20.720076929 +0200
-+++ b/src/base/ftlcdfil.c	2014-07-07 23:35:53.756803457 +0200
+--- a/src/base/ftlcdfil.c	2014-11-25 22:31:38.852289541 +0100
++++ b/src/base/ftlcdfil.c	2014-11-25 22:32:42.963771758 +0100
 @@ -23,6 +23,9 @@
  #include FT_IMAGE_H
  #include FT_INTERNAL_OBJECTS_H
@@ -413,7 +418,7 @@
  
  #ifdef FT_CONFIG_OPTION_SUBPIXEL_RENDERING
  
-@@ -290,10 +293,53 @@
+@@ -309,10 +312,53 @@
                              { 0x00, 0x55, 0x56, 0x55, 0x00 };
      /* the values here sum up to a value larger than 256, */
      /* providing a cheap gamma correction                 */
@@ -466,10 +471,10 @@
 +    }
 +#endif
      if ( !library )
-       return FT_THROW( Invalid_Argument );
+       return FT_THROW( Invalid_Library_Handle );
  
---- a/src/base/ftobjs.c	2014-09-14 12:35:03.207593493 -0500
-+++ b/src/base/ftobjs.c	2014-09-14 15:15:51.604552925 -0500
+--- a/src/base/ftobjs.c	2014-11-25 22:31:38.852289541 +0100
++++ b/src/base/ftobjs.c	2014-11-25 22:34:45.051240386 +0100
 @@ -67,6 +67,11 @@
  
  #define GRID_FIT_METRICS
@@ -482,7 +487,7 @@
  
    FT_BASE_DEF( FT_Pointer )
    ft_service_list_lookup( FT_ServiceDesc  service_descriptors,
-@@ -538,6 +543,25 @@
+@@ -541,6 +546,25 @@
    ft_lookup_glyph_renderer( FT_GlyphSlot  slot );
  
  
@@ -508,7 +513,7 @@
  #ifdef GRID_FIT_METRICS
    static void
    ft_glyphslot_grid_fit_metrics( FT_GlyphSlot  slot,
-@@ -596,8 +620,40 @@
+@@ -599,8 +623,40 @@
      FT_Bool       autohint = FALSE;
      FT_Module     hinter;
      TT_Face       ttface = (TT_Face)face;
@@ -549,7 +554,7 @@
      if ( !face || !face->size || !face->glyph )
        return FT_THROW( Invalid_Face_Handle );
  
-@@ -685,6 +741,18 @@
+@@ -688,6 +744,18 @@
      {
        FT_AutoHinter_Interface  hinting;
  
@@ -568,7 +573,7 @@
  
        /* try to load embedded bitmaps first if available            */
        /*                                                            */
-@@ -730,6 +798,18 @@
+@@ -733,6 +801,18 @@
        if ( error )
          goto Exit;
  
@@ -587,9 +592,9 @@
        if ( slot->format == FT_GLYPH_FORMAT_OUTLINE )
        {
          /* check that the loaded outline is correct */
---- a/src/base/ftoutln.c	2014-02-08 13:29:55.000000000 +0100
-+++ b/src/base/ftoutln.c	2014-03-07 19:21:57.073320788 +0100
-@@ -908,7 +908,34 @@
+--- a/src/base/ftoutln.c	2014-11-25 22:31:38.852289541 +0100
++++ b/src/base/ftoutln.c	2014-11-25 22:35:58.862505352 +0100
+@@ -914,7 +914,34 @@
      FT_Vector   v_prev, v_first, v_next, v_cur;
      FT_Int      c, n, first;
      FT_Int      orientation;
@@ -623,10 +628,9 @@
 +#endif
  
      if ( !outline )
-       return FT_THROW( Invalid_Argument );
-
---- a/src/base/ftsynth.c	2013-09-20 07:20:13.000000000 +0200
-+++ b/src/base/ftsynth.c	2014-03-07 19:21:57.073320788 +0100
+       return FT_THROW( Invalid_Outline );
+--- a/src/base/ftsynth.c	2014-11-25 23:11:39.585032158 +0100
++++ b/src/base/ftsynth.c	2014-11-25 23:26:38.106867046 +0100
 @@ -88,7 +88,32 @@
      FT_Face     face    = slot->face;
      FT_Error    error;
@@ -660,10 +664,11 @@
  
      if ( slot->format != FT_GLYPH_FORMAT_OUTLINE &&
           slot->format != FT_GLYPH_FORMAT_BITMAP  )
-@@ -101,6 +126,13 @@
+@@ -100,8 +125,16 @@
+     ystr = xstr;
  
      if ( slot->format == FT_GLYPH_FORMAT_OUTLINE )
-     {
++    {
 +#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
 +      if ( use_various_tweaks )
 +        (void)FT_Outline_EmboldenXY( &slot->outline,
@@ -671,10 +676,13 @@
 +                                     FT_PIX_FLOOR( ystr ) );
 +      else
 +#endif
-       /* ignore error */
-       (void)FT_Outline_EmboldenXY( &slot->outline, xstr, ystr );
-     }
-@@ -141,6 +173,9 @@
+       FT_Outline_EmboldenXY( &slot->outline, xstr, ystr );
+-
++    }
+     else /* slot->format == FT_GLYPH_FORMAT_BITMAP */
+     {
+       /* round to full pixels */
+@@ -139,6 +172,9 @@
  
      slot->metrics.width        += xstr;
      slot->metrics.height       += ystr;
@@ -684,7 +692,6 @@
      slot->metrics.horiAdvance  += xstr;
      slot->metrics.vertAdvance  += ystr;
      slot->metrics.horiBearingY += ystr;
-
 --- a/src/smooth/ftsmooth.c	2013-06-05 05:12:47.000000000 -0500
 +++ b/src/smooth/ftsmooth.c	2014-09-14 11:55:39.848343363 -0500
 @@ -26,6 +26,17 @@
@@ -4484,9 +4491,9 @@
  #else /* !FT_CONFIG_OPTION_SUBPIXEL_RENDERING */
  
      /* render outline into bitmap */
---- a/src/truetype/ttinterp.c	2014-11-19 16:56:53.888227859 +0100
-+++ b/src/truetype/ttinterp.c	2014-11-19 17:24:03.158309237 +0100
-@@ -4881,6 +4881,10 @@
+--- a/src/truetype/ttinterp.c	2014-11-25 22:31:38.872290897 +0100
++++ b/src/truetype/ttinterp.c	2014-11-25 22:58:38.103377234 +0100
+@@ -4848,6 +4848,10 @@
      CUR.sph_in_func_flags = 0x0000;
  #endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
  
@@ -4497,7 +4504,7 @@
      if ( CUR.callTop <= 0 )     /* We encountered an ENDF without a call */
      {
        CUR.error = FT_THROW( ENDF_In_Exec_Stream );
-@@ -6226,6 +6230,12 @@
+@@ -6193,6 +6197,12 @@
                     ( CUR.sph_in_func_flags & SPH_FDEF_INLINE_DELTA_2 ) ) )
                goto Skip;
  
@@ -4510,7 +4517,7 @@
              if ( !( CUR.sph_tweak_flags & SPH_TWEAK_ALWAYS_SKIP_DELTAP ) &&
                    ( ( CUR.is_composite && CUR.GS.freeVector.y != 0 ) ||
                      ( CUR.zp2.tags[point] & FT_CURVE_TAG_TOUCH_Y )   ||
-@@ -6515,6 +6525,7 @@
+@@ -6482,6 +6492,7 @@
      if ( SUBPIXEL_HINTING                                  &&
           CUR.ignore_x_mode                                 &&
           CUR.GS.freeVector.x != 0                          &&
@@ -4518,7 +4525,7 @@
           !( CUR.sph_tweak_flags & SPH_TWEAK_NORMAL_ROUND ) )
        minimum_distance = 0;
  #endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
-@@ -8368,6 +8379,34 @@
+@@ -8335,6 +8346,34 @@
  
  #endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
  
