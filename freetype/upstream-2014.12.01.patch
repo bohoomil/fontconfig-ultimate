@@ -162,10 +162,95 @@ index a4e583d..17a8820 100644
  
  # Packaging
 diff --git a/ChangeLog b/ChangeLog
-index ea1eb4a..6aa3ae9 100644
+index ea1eb4a..535f07a 100644
 --- a/ChangeLog
 +++ b/ChangeLog
-@@ -1,3 +1,1555 @@
+@@ -1,3 +1,1640 @@
++2014-11-29  Werner Lemberg  <wl@gnu.org>
++
++	[docmaker] Don't output a block multiple times.
++
++	This bug was hidden by not processing all lines of `<Order>' blocks.
++
++	* src/tools/docmaker/formatter.py (Formatter::section_dump): Filter
++	out field names.
++
++2014-11-29  Werner Lemberg  <wl@gnu.org>
++
++	[docmaker] Use field values as HTML link targets where possible.
++
++	* src/tools/docmaker/tohtml.py (HtmlFormatter::make_block_url):
++	Accept second, optional argument to specify a name.
++	(HtmlFormatter::html_source_quote): Link to field ID if possible.
++	(HtmlFormatter::print_html_field_list): Emit `id' attribute.
++
++2014-11-29  Werner Lemberg  <wl@gnu.org>
++
++	[docmaker] Allow empty lines in `<Order>' blocks.
++
++	Before this patch, the suggested order of entries stopped at the
++	first empty line.
++
++	Obviously, nobody noticed that this problem caused a much reduced
++	set of links in the `Synopsis' sections; in particular, the
++	`<Order>' blocks contain a lot of entries that wouldn't be listed
++	otherwise...
++
++	* src/tools/docmaker/content.py (DocBlock::get_markup_words_all):
++	New function to iterate over all items.
++	(DocSection::process): Use it.
++
++2014-11-29  Werner Lemberg  <wl@gnu.org>
++
++	* src/tools/docmaker/sources.py (column) [Format 2]: Fix regexp.
++
++	After the single asterisk there must be no other immediately following
++	asterisk.
++
++2014-11-29  Werner Lemberg  <wl@gnu.org>
++
++	* src/tools/docmaker/tohtml.py: Improve CSS for vertical spacing.
++
++2014-11-29  Werner Lemberg  <wl@gnu.org>
++
++	[docmaker] Improve HTML code for table of contents.
++
++	* src/tools/docmaker/tohtml.py: Introduce a new table class `toc',
++	together with proper CSS.
++
++2014-11-29  Werner Lemberg  <wl@gnu.org>
++
++	[docmaker] Provide higher-level markup and simplify HTML.
++
++	* src/tools/docmaker/tohtml.py: Instead of using extraneous `<div>'
++	elements, use CSS descendants (of class `section') to format the
++	data.
++
++	Also remove reduntant <p> and <br> elements, replacing them with
++	proper CSS.
++
++	Globally reduce page width to 75%.
++
++	(block_header): Rename <div> class to `section'.
++
++2014-11-29  Werner Lemberg  <wl@gnu.org>
++
++	[docmaker] Add `top' links after blocks.
++
++	* src/tools/docmaker/tohtml.py (block_footer_middle): Implement it.
++
++2014-11-29  Werner Lemberg  <wl@gnu.org>
++
++	* src/tools/docmaker/tohtml.py: Improve CSS for fields.
++
++	Make fields align horizontally relative to full line width.
++
++2014-11-29  Werner Lemberg  <wl@gnu.org>
++
++	* src/tools/docmaker/tohtml.py: Fix index and TOC templates.
++
++	This thinko was introduced 2014-11-27.
++
 +2014-11-28  Werner Lemberg  <wl@gnu.org>
 +
 +	[docmaker] Format field lists with CSS.
@@ -4420,10 +4505,20 @@ index 5b11f0e..2b0b67e 100644
  
  
 diff --git a/include/freetype.h b/include/freetype.h
-index fb62b62..78215bb 100644
+index fb62b62..66b34f5 100644
 --- a/include/freetype.h
 +++ b/include/freetype.h
-@@ -190,15 +190,16 @@ FT_BEGIN_HEADER
+@@ -113,7 +113,8 @@ FT_BEGIN_HEADER
+   /*    The FreeType~2 base font interface.                                */
+   /*                                                                       */
+   /* <Description>                                                         */
+-  /*    This section describes the public high-level API of FreeType~2.    */
++  /*    This section describes the most important public high-level API    */
++  /*    functions of FreeType~2.                                           */
+   /*                                                                       */
+   /* <Order>                                                               */
+   /*    FT_Library                                                         */
+@@ -190,15 +191,16 @@ FT_BEGIN_HEADER
    /*    FT_LOAD_NO_SCALE                                                   */
    /*    FT_LOAD_NO_HINTING                                                 */
    /*    FT_LOAD_NO_BITMAP                                                  */
@@ -4442,7 +4537,7 @@ index fb62b62..78215bb 100644
    /*    FT_LOAD_TARGET_NORMAL                                              */
    /*    FT_LOAD_TARGET_LIGHT                                               */
    /*    FT_LOAD_TARGET_MONO                                                */
-@@ -1570,15 +1571,15 @@ FT_BEGIN_HEADER
+@@ -1570,15 +1572,15 @@ FT_BEGIN_HEADER
    /*                         change between calls of @FT_Load_Glyph and a  */
    /*                         few other functions.                          */
    /*                                                                       */
@@ -4466,7 +4561,7 @@ index fb62b62..78215bb 100644
    /*                         *positive*.                                   */
    /*                                                                       */
    /*    outline           :: The outline descriptor for the current glyph  */
-@@ -1592,7 +1593,6 @@ FT_BEGIN_HEADER
+@@ -1592,7 +1594,6 @@ FT_BEGIN_HEADER
    /*                         This field is only valid for the composite    */
    /*                         glyph format that should normally only be     */
    /*                         loaded with the @FT_LOAD_NO_RECURSE flag.     */
@@ -4474,7 +4569,7 @@ index fb62b62..78215bb 100644
    /*                                                                       */
    /*    subglyphs         :: An array of subglyph descriptors for          */
    /*                         composite glyphs.  There are `num_subglyphs'  */
-@@ -2541,11 +2541,6 @@ FT_BEGIN_HEADER
+@@ -2541,11 +2542,6 @@ FT_BEGIN_HEADER
     *     Indicates that the auto-hinter is preferred over the font's native
     *     hinter.  See also the note below.
     *
@@ -4486,7 +4581,7 @@ index fb62b62..78215bb 100644
     *   FT_LOAD_PEDANTIC ::
     *     Indicates that the font driver should perform pedantic verifications
     *     during glyph loading.  This is mostly used to detect broken glyphs
-@@ -2556,18 +2551,12 @@ FT_BEGIN_HEADER
+@@ -2556,18 +2552,12 @@ FT_BEGIN_HEADER
     *     result in partially hinted or distorted glyphs in case a glyph's
     *     bytecode is buggy.
     *
@@ -4510,7 +4605,7 @@ index fb62b62..78215bb 100644
     *
     *     This flag implies @FT_LOAD_NO_SCALE and @FT_LOAD_IGNORE_TRANSFORM.
     *
-@@ -2600,6 +2589,12 @@ FT_BEGIN_HEADER
+@@ -2600,6 +2590,12 @@ FT_BEGIN_HEADER
     *     bitmaps transparently.  Those bitmaps will be in the
     *     @FT_PIXEL_MODE_GRAY format.
     *
@@ -4523,7 +4618,7 @@ index fb62b62..78215bb 100644
     * @note:
     *   By default, hinting is enabled and the font's native hinter (see
     *   @FT_FACE_FLAG_HINTER) is preferred over the auto-hinter.  You can
-@@ -3065,9 +3060,8 @@ FT_BEGIN_HEADER
+@@ -3065,9 +3061,8 @@ FT_BEGIN_HEADER
    /*    glyph index~0 always corresponds to the `missing glyph' (called    */
    /*    `.notdef').                                                        */
    /*                                                                       */
@@ -4535,7 +4630,7 @@ index fb62b62..78215bb 100644
    /*                                                                       */
    FT_EXPORT( FT_Error )
    FT_Get_Glyph_Name( FT_Face     face,
-@@ -3515,8 +3509,8 @@ FT_BEGIN_HEADER
+@@ -3515,8 +3510,8 @@ FT_BEGIN_HEADER
    /*                                                                       */
    /*      http://www.unicode.org/reports/tr37/                             */
    /*                                                                       */
@@ -4546,7 +4641,7 @@ index fb62b62..78215bb 100644
    /*                                                                       */
    /*    Adobe and MS decided to support IVS with a new cmap subtable       */
    /*    (format~14).  It is an odd subtable because it is not a mapping of */
-@@ -3767,12 +3761,6 @@ FT_BEGIN_HEADER
+@@ -3767,12 +3762,6 @@ FT_BEGIN_HEADER
               FT_Long  c );
  
  
@@ -4559,7 +4654,7 @@ index fb62b62..78215bb 100644
    /*************************************************************************/
    /*                                                                       */
    /* <Function>                                                            */
-@@ -3806,17 +3794,6 @@ FT_BEGIN_HEADER
+@@ -3806,17 +3795,6 @@ FT_BEGIN_HEADER
    FT_MulFix( FT_Long  a,
               FT_Long  b );
  
@@ -4577,7 +4672,7 @@ index fb62b62..78215bb 100644
  
    /*************************************************************************/
    /*                                                                       */
-@@ -3829,18 +3806,12 @@ FT_BEGIN_HEADER
+@@ -3829,18 +3807,12 @@ FT_BEGIN_HEADER
    /*    used to divide a given value by a 16.16 fixed-point factor.        */
    /*                                                                       */
    /* <Input>                                                               */
@@ -5042,9 +5137,24 @@ index 241e21e..421908f 100644
    /*    memory  :: The current memory object that handles deallocation.    */
    /*                                                                       */
 diff --git a/include/ftoutln.h b/include/ftoutln.h
-index 6c6d3f9..46b0b2f 100644
+index 6c6d3f9..00945c0 100644
 --- a/include/ftoutln.h
 +++ b/include/ftoutln.h
+@@ -71,10 +71,10 @@ FT_BEGIN_HEADER
+   /*                                                                       */
+   /*    FT_Outline_Decompose                                               */
+   /*    FT_Outline_Funcs                                                   */
+-  /*    FT_Outline_MoveTo_Func                                             */
+-  /*    FT_Outline_LineTo_Func                                             */
+-  /*    FT_Outline_ConicTo_Func                                            */
+-  /*    FT_Outline_CubicTo_Func                                            */
++  /*    FT_Outline_MoveToFunc                                              */
++  /*    FT_Outline_LineToFunc                                              */
++  /*    FT_Outline_ConicToFunc                                             */
++  /*    FT_Outline_CubicToFunc                                             */
+   /*                                                                       */
+   /*************************************************************************/
+ 
 @@ -535,7 +535,7 @@ FT_BEGIN_HEADER
    *
    * @description:
@@ -14057,8 +14167,6 @@ index 425911a..9d37d64 100644
      (FT_Raster_Render_Func)  gray_raster_render,
      (FT_Raster_Done_Func)    gray_raster_done
    )
-diff --git a/src/tools/afblue.pl b/src/tools/afblue.pl
-index 58aa2a0..60fe696 100644
 --- a/src/tools/afblue.pl
 +++ b/src/tools/afblue.pl
 @@ -63,8 +63,8 @@ my $enum_element_re = qr/ ^ \s* ( [A-Za-z0-9_]+ ) \s* $ /x;
@@ -14083,7 +14191,7 @@ index 58aa2a0..60fe696 100644
    $curr_offset += $count;
    $curr_elem_size += $count;
 diff --git a/src/tools/docmaker/content.py b/src/tools/docmaker/content.py
-index 98025e6..28fc85d 100644
+index 98025e6..ed3516c 100644
 --- a/src/tools/docmaker/content.py
 +++ b/src/tools/docmaker/content.py
 @@ -1,57 +1,81 @@
@@ -14131,10 +14239,7 @@ index 98025e6..28fc85d 100644
 +# Regular expressions to detect code sequences.  `Code sequences' are simply
 +# code fragments embedded in '{' and '}', as demonstrated in the following
 +# example.
- #
--# note that indentation of the starting and ending accolades must be
--# exactly the same. the code sequence can contain accolades at greater
--# indentation
++#
 +#   {
 +#     x = y + z;
 +#     if ( zookoo == 2 )
@@ -14142,7 +14247,10 @@ index 98025e6..28fc85d 100644
 +#       foobar();
 +#     }
 +#   }
-+#
+ #
+-# note that indentation of the starting and ending accolades must be
+-# exactly the same. the code sequence can contain accolades at greater
+-# indentation
 +# Note that the indentation of the first opening brace and the last closing
 +# brace must be exactly the same.  The code sequence itself should have a
 +# larger indentation than the surrounding braces.
@@ -14348,7 +14456,15 @@ index 98025e6..28fc85d 100644
  class  DocSection:
  
      def  __init__( self, name = "Other" ):
-@@ -327,11 +376,14 @@ class  DocSection:
+@@ -320,18 +369,21 @@ class  DocSection:
+                 self.title       = title
+                 self.abstract    = block.get_markup_words( "abstract" )
+                 self.description = block.get_markup_items( "description" )
+-                self.order       = block.get_markup_words( "order" )
++                self.order       = block.get_markup_words_all( "order" )
+                 return
+ 
+     def  reorder( self ):
          self.block_names = sort_order_list( self.block_names, self.order )
  
  
@@ -14424,6 +14540,22 @@ index 98025e6..28fc85d 100644
          for m in self.markups:
              if m.tag == string.lower( tag_name ):
                  return m
+@@ -553,6 +607,15 @@ class  DocBlock:
+         except:
+             return []
+ 
++    def  get_markup_words_all( self, tag_name ):
++        try:
++            m = self.get_markup( tag_name )
++            return [word
++                      for items in m.fields[0].items
++                        for word in items.words]
++        except:
++            return []
++
+     def  get_markup_text( self, tag_name ):
+         result = self.get_markup_words( tag_name )
+         return string.join( result )
 diff --git a/src/tools/docmaker/docmaker.py b/src/tools/docmaker/docmaker.py
 index bf75c5d..4fb1abf 100644
 --- a/src/tools/docmaker/docmaker.py
@@ -14510,7 +14642,7 @@ index bf75c5d..4fb1abf 100644
 -
  # eof
 diff --git a/src/tools/docmaker/formatter.py b/src/tools/docmaker/formatter.py
-index f62ce67..7cb68b2 100644
+index f62ce67..45b3384 100644
 --- a/src/tools/docmaker/formatter.py
 +++ b/src/tools/docmaker/formatter.py
 @@ -1,19 +1,37 @@
@@ -14601,8 +14733,27 @@ index f62ce67..7cb68b2 100644
      #
      def  section_enter( self, section ):
          pass
+@@ -162,7 +182,18 @@ class  Formatter:
+         self.section_enter( section )
+ 
+         for name in section.block_names:
++            skip_entry = 0
+             block = self.identifiers[name]
++            # `block_names' can contain field names also, which we filter out
++            for markup in block.markups:
++                if markup.tag == 'values':
++                    for field in markup.fields:
++                        if field.name == name:
++                            skip_entry = 1
++
++            if skip_entry:
++              continue;
++
+             self.block_enter( block )
+ 
+             for markup in block.markups[1:]:   # always ignore first markup!
 diff --git a/src/tools/docmaker/sources.py b/src/tools/docmaker/sources.py
-index dab8349..d60fd44 100644
+index dab8349..61ecc22 100644
 --- a/src/tools/docmaker/sources.py
 +++ b/src/tools/docmaker/sources.py
 @@ -1,62 +1,70 @@
@@ -14724,6 +14875,19 @@ index dab8349..d60fd44 100644
  #
  start = r'''
    \s*     # any number of whitespace
+@@ -93,9 +98,9 @@ start = r'''
+ '''
+ 
+ column = r'''
+-  \s*        # any number of whitespace
+-  \*{1}(?!/) # followed by precisely one asterisk not followed by `/'
+-  (.*)       # then anything (group1)
++  \s*           # any number of whitespace
++  \*{1}(?![*/]) # followed by precisely one asterisk not followed by `/'
++  (.*)          # then anything (group1)
+ '''
+ 
+ end = r'''
 @@ -107,47 +112,56 @@ re_source_block_format2 = SourceBlockFormat( 2, start, column, end )
  
  
@@ -14972,7 +15136,7 @@ index dab8349..d60fd44 100644
              b.dump()
  
 diff --git a/src/tools/docmaker/tohtml.py b/src/tools/docmaker/tohtml.py
-index 7944f1c..44544cc 100644
+index 7944f1c..e570034 100644
 --- a/src/tools/docmaker/tohtml.py
 +++ b/src/tools/docmaker/tohtml.py
 @@ -1,5 +1,19 @@
@@ -15006,7 +15170,7 @@ index 7944f1c..44544cc 100644
  html_header_1 = """\
  <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
  "http://www.w3.org/TR/html4/loose.dtd">
-@@ -21,27 +35,81 @@ html_header_1 = """\
+@@ -21,62 +35,125 @@ html_header_1 = """\
  html_header_2 = """\
   API Reference</title>
  <style type="text/css">
@@ -15016,34 +15180,40 @@ index 7944f1c..44544cc 100644
 +
    body { font-family: Verdana, Geneva, Arial, Helvetica, serif;
           color: #000000;
-          background: #FFFFFF; }
+-         background: #FFFFFF; }
++         background: #FFFFFF;
++         width: 87%;
++         margin: auto; }
++
++  div.section { width: 75%;
++                margin: auto; }
++  div.section hr { margin: 4ex 0 1ex 0; }
++  div.section h4 { background-color: #EEEEFF;
++                   font-size: medium;
++                   font-style: oblique;
++                   font-weight: bold;
++                   margin: 3ex 0 1.5ex 9%;
++                   padding: 0.3ex 0 0.3ex 1%; }
++  div.section p { margin: 1.5ex 0 1.5ex 10%; }
++  div.section pre { margin: 3ex 0 3ex 9%;
++                    background-color: #D6E8FF;
++                    padding: 2ex 0 2ex 1%; }
++  div.section table.fields { width: 90%;
++                             margin: 1.5ex 0 1.5ex 10%; }
++  div.section table.toc { width: 95%;
++                          margin: 1.5ex 0 1.5ex 5%; }
++  div.timestamp { text-align: center;
++                  font-size: 69%;
++                  margin: 1.5ex 0 1.5ex 0; }
  
 -  p { text-align: justify; }
-+  div.code { width: 100%;
-+             background-color: #D6E8FF;
-+             margin: 0 0 0 -0.5em;
-+             padding: 0.3ex 0 0.3ex 0.5em; }
-+  div.indent1 { width: 87%;
-+                margin: auto; }
-+  div.indent2 { width: 75%;
-+                margin: auto; }
-+  div.timestamp { text-align: center;
-+                  font-size: 69%; }
-+
    h1 { text-align: center; }
-+  h3 { font-size: medium; }
-+  h4 { background-color: #EEEEFF;
-+       width: 100%;
-+       font-size: medium;
-+       font-style: oblique;
-+       font-weight: bold;
-+       margin: 0 0 0 -0.5em;
-+       padding: 0.3ex 0 0.3ex 0.5em; }
-+
-   li { text-align: justify; }
+-  li { text-align: justify; }
 -  td { padding: 0 0.5em 0 0.5em; }
 -  td.left { padding: 0 0.5em 0 0.5em;
 -            text-align: left; }
++  h3 { font-size: medium;
++       margin: 4ex 0 1.5ex 0; }
  
 -  a:link { color: #0000EF; }
 -  a:visited { color: #51188E; }
@@ -15058,17 +15228,16 @@ index 7944f1c..44544cc 100644
                   color: darkblue; }
  
 -  pre.colored { color: blue; }
-+  table.center { margin: auto; }
-+  table.fields { border: 0;
-+                 border-spacing: 0; }
 +  table.fields td.val { font-weight: bold;
 +                        text-align: right;
 +                        width: 30%;
-+                        vertical-align: text-top;
-+                        padding: 0 1em 0 0; }
-+  table.fields td.desc { vertical-align: text-top;
-+                         padding: 0 0 0 1em; }
-+  table.index { margin: auto;
++                        vertical-align: baseline;
++                        padding: 1ex 1em 1ex 0; }
++  table.fields td.desc { vertical-align: baseline;
++                         padding: 1ex 0 1ex 1em; }
++  table.fields td.desc p:first-child { margin: 0; }
++  table.fields td.desc p { margin: 1.5ex 0 0 0; }
++  table.index { margin: 6ex auto 6ex auto;
 +                border: 0;
 +                border-collapse: separate;
 +                border-spacing: 1em 0.3ex; }
@@ -15076,27 +15245,38 @@ index 7944f1c..44544cc 100644
 +  table.index td { padding: 0; }
 +  table.index-toc-link { width: 100%;
 +                         border: 0;
-+                         border-spacing: 0; }
++                         border-spacing: 0;
++                         margin: 1ex 0 1ex 0; }
 +  table.index-toc-link td.left { padding: 0 0.5em 0 0.5em;
 +                                 font-size: 83%;
 +                                 text-align: left; }
++  table.index-toc-link td.middle { padding: 0 0.5em 0 0.5em;
++                                   font-size: 83%;
++                                   text-align: center; }
 +  table.index-toc-link td.right { padding: 0 0.5em 0 0.5em;
 +                                  font-size: 83%;
 +                                  text-align: right; }
-+  table.synopsis { margin: auto;
++  table.synopsis { margin: 6ex auto 6ex auto;
 +                   border: 0;
 +                   border-collapse: separate;
-+                   border-spacing: 2em 1ex; }
++                   border-spacing: 2em 0.6ex; }
 +  table.synopsis tr { padding: 0; }
 +  table.synopsis td { padding: 0; }
-+
-+  td { padding: 0 0.5em 0 0.5em; }
-+  td.left { padding: 0 0.5em 0 0.5em;
-+            text-align: left; }
++  table.toc td.link { width: 30%;
++                      text-align: right;
++                      vertical-align: baseline;
++                      padding: 1ex 1em 1ex 0; }
++  table.toc td.desc { vertical-align: baseline;
++                      padding: 1ex 0 1ex 1em;
++                      text-align: left; }
++  table.toc td.desc p:first-child { margin: 0;
++                                    text-align: left; }
++  table.toc td.desc p { margin: 1.5ex 0 0 0;
++                        text-align: left; }
  
-   ul.empty { list-style-type: none; }
+-  ul.empty { list-style-type: none; }
  </style>
-@@ -49,34 +117,26 @@ html_header_2 = """\
+ </head>
  <body>
  """
  
@@ -15117,20 +15297,23 @@ index 7944f1c..44544cc 100644
 -">Index</a>]</font></td>
 -<td width="100%"></td>
 -<td><font size=-1>[<a href="\
-+">Index</a>]</td>
-+<td class="right">[<a href="\
++">Index</a>]</td><td class="right">[<a href="\
  """
  
- html_header_5 = """\
+-html_header_5 = """\
 -">TOC</a>]</font></td></tr></table>
 -<center><h1>\
--"""
--
++html_header_5t = """\
++">TOC</a>]</td></tr></table>
++<h1>\
+ """
+ 
 -html_header_5t = """\
 -">Index</a>]</font></td>
 -<td width="100%"></td></tr></table>
 -<center><h1>\
-+">TOC</a>]</td></tr></table>
++html_header_5i = """\
++">Index</a>]</td></tr></table>
 +<h1>\
  """
  
@@ -15140,7 +15323,7 @@ index 7944f1c..44544cc 100644
  """
  
  
-@@ -87,8 +147,8 @@ html_footer = """\
+@@ -87,8 +164,8 @@ html_footer = """\
  """
  
  # The header and footer used for each section.
@@ -15151,12 +15334,12 @@ index 7944f1c..44544cc 100644
  
  # The header and footer used for code segments.
  code_header = '<pre class="colored">'
-@@ -99,66 +159,61 @@ para_header = "<p>"
+@@ -99,66 +176,65 @@ para_header = "<p>"
  para_footer = "</p>"
  
  # Block header and footer.
 -block_header        = '<table align=center width="75%"><tr><td>'
-+block_header        = '<div class="indent2">'
++block_header        = '<div class="section">'
  block_footer_start  = """\
 -</td></tr></table>
 -<hr width="75%">
@@ -15168,7 +15351,8 @@ index 7944f1c..44544cc 100644
 -">Index</a>]</font></td>
 -<td width="100%"></td>
 -<td><font size=-2>[<a href="\
-+">Index</a>]</td>
++">Index</a>]</td>\
++<td class="middle">[<a href="#">Top</a>]</td>\
 +<td class="right">[<a href="\
  """
  block_footer_end    = """\
@@ -15179,35 +15363,39 @@ index 7944f1c..44544cc 100644
  # Description header/footer.
 -description_header = '<table align=center width="87%"><tr><td>'
 -description_footer = "</td></tr></table><br>"
-+description_header = '<div class="indent1">'
-+description_footer = "</div><br>"
++description_header = ""
++description_footer = ""
  
  # Marker header/inter/footer combination.
 -marker_header = '<table align=center width="87%" cellpadding=5><tr bgcolor="#EEEEFF"><td><em><b>'
 -marker_inter  = "</b></em></td></tr><tr><td>"
 -marker_footer = "</td></tr></table>"
-+marker_header = '<div class="indent1"><h4>'
++marker_header = "<h4>"
 +marker_inter  = "</h4>"
-+marker_footer = "</div>"
++marker_footer = ""
  
  # Header location header/footer.
 -header_location_header = '<table align=center width="87%"><tr><td>'
 -header_location_footer = "</td></tr></table><br>"
-+header_location_header = '<div class="indent1">'
-+header_location_footer = "</div><br>"
++header_location_header = "<p>"
++header_location_footer = "</p>"
  
  # Source code extracts header/footer.
 -source_header = '<table align=center width="87%"><tr bgcolor="#D6E8FF"><td><pre>\n'
 -source_footer = "\n</pre></table><br>"
-+source_header = '<div class="indent1"><div class="code"><pre>'
-+source_footer = "</pre></div></div>"
++source_header = "<pre>"
++source_footer = "</pre>"
  
  # Chapter header/inter/footer.
 -chapter_header = '<br><table align=center width="75%"><tr><td><h2>'
-+chapter_header = '<br><div class="indent2"><h2>'
- chapter_inter  = '</h2><ul class="empty"><li>'
+-chapter_inter  = '</h2><ul class="empty"><li>'
 -chapter_footer = '</li></ul></td></tr></table>'
-+chapter_footer = '</li></ul></div>'
++chapter_header = """\
++<div class="section">
++<h2>\
++"""
++chapter_inter  = '</h2>'
++chapter_footer = '</div>'
  
  # Index footer.
  index_footer_start = """\
@@ -15240,7 +15428,7 @@ index 7944f1c..44544cc 100644
  keyword_prefix = '<span class="keyword">'
  keyword_suffix = '</span>'
  
-@@ -166,16 +221,20 @@ section_synopsis_header = '<h2>Synopsis</h2>'
+@@ -166,66 +242,78 @@ section_synopsis_header = '<h2>Synopsis</h2>'
  section_synopsis_footer = ''
  
  
@@ -15267,7 +15455,20 @@ index 7944f1c..44544cc 100644
  class  HtmlFormatter( Formatter ):
  
      def  __init__( self, processor, project_title, file_prefix ):
-@@ -189,31 +248,32 @@ class  HtmlFormatter( Formatter ):
+         Formatter.__init__( self, processor )
+ 
+-        global html_header_1, html_header_2, html_header_3
+-        global html_header_4, html_header_5, html_footer
++        global html_header_1
++        global html_header_2
++        global html_header_3l, html_header_3r
++        global html_header_4
++        global html_header_5t, html_header_5i
++        global html_header_6
++        global html_footer
+ 
+         if file_prefix:
+             file_prefix = file_prefix + "-"
          else:
              file_prefix = ""
  
@@ -15304,19 +15505,19 @@ index 7944f1c..44544cc 100644
 +          + html_header_2
 +          + html_header_3l + file_prefix + "index.html"
 +          + html_header_4 + file_prefix + "toc.html"
-+          + html_header_5 + project_title
++          + html_header_5t + project_title
 +          + html_header_6 )
 +        self.html_index_header = (
 +          html_header_1 + project_title
 +          + html_header_2
 +          + html_header_3r + file_prefix + "toc.html"
-+          + html_header_5 + project_title
++          + html_header_5t + project_title
 +          + html_header_6 )
 +        self.html_toc_header = (
 +          html_header_1 + project_title
 +          + html_header_2
 +          + html_header_3l + file_prefix + "index.html"
-+          + html_header_5 + project_title
++          + html_header_5i + project_title
 +          + html_header_6 )
 +        self.html_footer = (
 +          '<div class="timestamp">generated on '
@@ -15325,8 +15526,15 @@ index 7944f1c..44544cc 100644
  
          self.columns = 3
  
-@@ -224,8 +284,8 @@ class  HtmlFormatter( Formatter ):
-         return self.make_section_url( block.section ) + "#" + block.name
+     def  make_section_url( self, section ):
+         return self.file_prefix + section.name + ".html"
+ 
+-    def  make_block_url( self, block ):
+-        return self.make_section_url( block.section ) + "#" + block.name
++    def  make_block_url( self, block, name = None ):
++        if name == None:
++            name = block.name
++        return self.make_section_url( block.section ) + "#" + name
  
      def  make_html_word( self, word ):
 -        """analyze a simple word to detect cross-references and styling"""
@@ -15336,7 +15544,7 @@ index 7944f1c..44544cc 100644
          m = re_crossref.match( word )
          if m:
              try:
-@@ -236,27 +296,28 @@ class  HtmlFormatter( Formatter ):
+@@ -236,27 +324,28 @@ class  HtmlFormatter( Formatter ):
                  return '<a href="' + url + '">' + name + '</a>' + rest
              except:
                  # we detected a cross-reference to an unknown item
@@ -15371,7 +15579,7 @@ index 7944f1c..44544cc 100644
          line = ""
          if words:
              line = self.make_html_word( words[0] )
-@@ -265,8 +326,8 @@ class  HtmlFormatter( Formatter ):
+@@ -265,8 +354,8 @@ class  HtmlFormatter( Formatter ):
              # handle hyperlinks
              line = re_url.sub( r'<a href="\1">\1</a>', line )
              # convert `...' quotations into real left and right single quotes
@@ -15382,7 +15590,7 @@ index 7944f1c..44544cc 100644
                             line )
              # convert tilde into non-breakable space
              line = string.replace( line, "~", "&nbsp;" )
-@@ -274,7 +335,7 @@ class  HtmlFormatter( Formatter ):
+@@ -274,7 +363,7 @@ class  HtmlFormatter( Formatter ):
          return para_header + line + para_footer
  
      def  make_html_code( self, lines ):
@@ -15391,7 +15599,7 @@ index 7944f1c..44544cc 100644
          line = code_header + '\n'
          for l in lines:
              line = line + html_quote( l ) + '\n'
-@@ -282,7 +343,7 @@ class  HtmlFormatter( Formatter ):
+@@ -282,7 +371,7 @@ class  HtmlFormatter( Formatter ):
          return line + code_footer
  
      def  make_html_items( self, items ):
@@ -15400,7 +15608,7 @@ index 7944f1c..44544cc 100644
          lines = []
          for item in items:
              if item.lines:
-@@ -297,7 +358,9 @@ class  HtmlFormatter( Formatter ):
+@@ -297,7 +386,9 @@ class  HtmlFormatter( Formatter ):
  
      def  print_html_field( self, field ):
          if field.name:
@@ -15411,7 +15619,7 @@ index 7944f1c..44544cc 100644
  
          print self.make_html_items( field.items )
  
-@@ -318,12 +381,14 @@ class  HtmlFormatter( Formatter ):
+@@ -318,12 +409,24 @@ class  HtmlFormatter( Formatter ):
                      result = result + prefix + '<b>' + name + '</b>'
                  elif re_source_keywords.match( name ):
                      # this is a C keyword
@@ -15423,16 +15631,27 @@ index 7944f1c..44544cc 100644
                      block = self.identifiers[name]
 -                    result = result + prefix + '<a href="' + \
 -                             self.make_block_url( block ) + '">' + name + '</a>'
++                    id = block.name
++
++                    # link to a field ID if possible
++                    for markup in block.markups:
++                        if markup.tag == 'values':
++                            for field in markup.fields:
++                                if field.name:
++                                    id = name
++
 +                    result = ( result + prefix
-+                               + '<a href="' + self.make_block_url( block )
++                               + '<a href="'
++                               + self.make_block_url( block, id )
 +                               + '">' + name + '</a>' )
                  else:
                      result = result + html_quote( line[:length] )
  
-@@ -336,14 +401,11 @@ class  HtmlFormatter( Formatter ):
+@@ -335,15 +438,11 @@ class  HtmlFormatter( Formatter ):
+         return result
  
      def  print_html_field_list( self, fields ):
-         print "<p></p>"
+-        print "<p></p>"
 -        print "<table cellpadding=3 border=0>"
 +        print '<table class="fields">'
          for field in fields:
@@ -15442,13 +15661,13 @@ index 7944f1c..44544cc 100644
 -            else:
 -              print "<tr valign=top><td><b>" + field.name + "</b></td><td>"
 -
-+            print ( '<tr><td class="val">'
++            print ( '<tr><td class="val" id="' + field.name + '">'
 +                    + field.name
 +                    + '</td><td class="desc">' )
              self.print_html_items( field.items )
              print "</td></tr>"
          print "</table>"
-@@ -352,10 +414,9 @@ class  HtmlFormatter( Formatter ):
+@@ -352,10 +451,9 @@ class  HtmlFormatter( Formatter ):
          table_fields = []
          for field in markup.fields:
              if field.name:
@@ -15462,7 +15681,7 @@ index 7944f1c..44544cc 100644
                  table_fields.append( field )
              else:
                  if table_fields:
-@@ -368,7 +429,7 @@ class  HtmlFormatter( Formatter ):
+@@ -368,7 +466,7 @@ class  HtmlFormatter( Formatter ):
              self.print_html_field_list( table_fields )
  
      #
@@ -15471,7 +15690,7 @@ index 7944f1c..44544cc 100644
      #
      def  index_enter( self ):
          print self.html_index_header
-@@ -380,11 +441,11 @@ class  HtmlFormatter( Formatter ):
+@@ -380,11 +478,11 @@ class  HtmlFormatter( Formatter ):
          self.index_items[name] = url
  
      def  index_exit( self ):
@@ -15485,7 +15704,7 @@ index 7944f1c..44544cc 100644
          for r in range( rows ):
              line = "<tr>"
              for c in range( self.columns ):
-@@ -392,7 +453,8 @@ class  HtmlFormatter( Formatter ):
+@@ -392,7 +490,8 @@ class  HtmlFormatter( Formatter ):
                  if i < count:
                      bname = self.block_index[r + c * rows]
                      url   = self.index_items[bname]
@@ -15495,7 +15714,7 @@ index 7944f1c..44544cc 100644
                  else:
                      line = line + '<td></td>'
              line = line + "</tr>"
-@@ -400,9 +462,9 @@ class  HtmlFormatter( Formatter ):
+@@ -400,9 +499,9 @@ class  HtmlFormatter( Formatter ):
  
          print "</table>"
  
@@ -15508,7 +15727,7 @@ index 7944f1c..44544cc 100644
  
          print self.html_footer
  
-@@ -415,20 +477,20 @@ class  HtmlFormatter( Formatter ):
+@@ -415,21 +514,20 @@ class  HtmlFormatter( Formatter ):
          Formatter.index_dump( self, index_filename )
  
      #
@@ -15524,19 +15743,20 @@ index 7944f1c..44544cc 100644
 -        print  chapter_header + string.join( chapter.title ) + chapter_inter
 -        print "<table cellpadding=5>"
 +        print chapter_header + string.join( chapter.title ) + chapter_inter
-+        print '<table cellpadding="5">'
++        print '<table class="toc">'
  
      def  toc_section_enter( self, section ):
 -        print '<tr valign=top><td class="left">'
 -        print '<a href="' + self.make_section_url( section ) + '">' + \
 -               section.title + '</a></td><td>'
-+        print '<tr valign="top"><td class="left">'
-+        print( '<a href="' + self.make_section_url( section ) + '">'
-+               + section.title + '</a></td><td>' )
- 
+-
++        print ( '<tr><td class="link">'
++                + '<a href="' + self.make_section_url( section ) + '">'
++                + section.title + '</a></td><td class="desc">' )
          print self.make_html_para( section.abstract )
  
-@@ -440,14 +502,14 @@ class  HtmlFormatter( Formatter ):
+     def  toc_section_exit( self, section ):
+@@ -440,14 +538,14 @@ class  HtmlFormatter( Formatter ):
          print chapter_footer
  
      def  toc_index( self, index_filename ):
@@ -15557,7 +15777,7 @@ index 7944f1c..44544cc 100644
  
          print self.html_footer
  
-@@ -461,7 +523,7 @@ class  HtmlFormatter( Formatter ):
+@@ -461,14 +559,12 @@ class  HtmlFormatter( Formatter ):
          Formatter.toc_dump( self, toc_filename, index_filename )
  
      #
@@ -15566,7 +15786,15 @@ index 7944f1c..44544cc 100644
      #
      def  section_enter( self, section ):
          print self.html_header
-@@ -479,7 +541,7 @@ class  HtmlFormatter( Formatter ):
+ 
+-        print section_title_header
+-        print section.title
+-        print section_title_footer
++        print section_title_header + section.title + section_title_footer
+ 
+         maxwidth = 0
+         for b in section.blocks.values():
+@@ -479,7 +575,7 @@ class  HtmlFormatter( Formatter ):
          if maxwidth <> 0:
              # print section synopsis
              print section_synopsis_header
@@ -15575,7 +15803,7 @@ index 7944f1c..44544cc 100644
  
              columns = width / maxwidth
              if columns < 1:
-@@ -492,10 +554,11 @@ class  HtmlFormatter( Formatter ):
+@@ -492,16 +588,17 @@ class  HtmlFormatter( Formatter ):
                  line = "<tr>"
                  for c in range( columns ):
                      i = r + c * rows
@@ -15589,7 +15817,14 @@ index 7944f1c..44544cc 100644
  
                      line = line + '</td>'
                  line = line + "</tr>"
-@@ -513,7 +576,7 @@ class  HtmlFormatter( Formatter ):
+                 print line
+ 
+-            print "</table><br><br>"
++            print "</table>"
+             print section_synopsis_footer
+ 
+         print description_header
+@@ -513,7 +610,7 @@ class  HtmlFormatter( Formatter ):
  
          # place html anchor if needed
          if block.name:
@@ -15598,7 +15833,7 @@ index 7944f1c..44544cc 100644
  
          # dump the block C source lines now
          if block.code:
-@@ -524,8 +587,9 @@ class  HtmlFormatter( Formatter ):
+@@ -524,13 +621,14 @@ class  HtmlFormatter( Formatter ):
                      break;
  
  #           if not header:
@@ -15609,8 +15844,16 @@ index 7944f1c..44544cc 100644
 +#                 + " '" + block.source.filename + "'.\n" )
  
              if header:
-                 print header_location_header
-@@ -552,15 +616,16 @@ class  HtmlFormatter( Formatter ):
+-                print header_location_header
+-                print 'Defined in ' + header + '.'
+-                print header_location_footer
++                print ( header_location_header
++                        + 'Defined in ' + header + '.'
++                        + header_location_footer )
+ 
+             print source_header
+             for l in block.code:
+@@ -552,15 +650,16 @@ class  HtmlFormatter( Formatter ):
              print marker_footer
  
      def  block_exit( self, block ):
