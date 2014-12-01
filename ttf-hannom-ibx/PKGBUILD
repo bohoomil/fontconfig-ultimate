@@ -1,0 +1,45 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=ttf-hannom-ibx
+pkgver=2005
+pkgrel=4
+pkgdesc='Chinese and Vietnamese TrueType fonts.'
+url='http://vietunicode.sourceforge.net/fonts/fonts_hannom.html'
+license=('custom:non-profit')
+arch=('any')
+groups=('infinality-bundle-fonts-extra')
+depends=('fontconfig')
+conflicts=('ttf-hannom')
+provides=('ttf-hannom')
+replaces=('ttf-hannom')
+install="${pkgname}".install
+source=("http://downloads.sourceforge.net/project/vietunicode/hannom/hannom%20v${pkgver}/hannomH.zip"
+        40-hannom.conf
+        90-tt-hannom.conf
+        README)
+sha1sums=('1a207b5ade4984521fa476f50c979a4674f48079'
+          'e1df9a8059276090d3d01fda429f2438f96e3380'
+          '7f96148ccbccd0379b440085f65ec6d6ae64146c'
+          '13e207063602d498a1b6949505bb3ef3d47f6f03')
+
+package() {
+  cd "${srcdir}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 README \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 ../40-hannom.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/40-hannom.conf
+  install -m644 ../90-tt-hannom.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-hannom.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/40-hannom.conf .
+  ln -s ../conf.avail/90-tt-hannom.conf .
+}
