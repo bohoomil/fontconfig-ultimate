@@ -1,0 +1,44 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=otf-bravo-ibx
+pkgver=1.0
+pkgrel=1
+depends=('fontconfig')
+pkgdesc="Bravo is a narrow accidental grotesque, which includes 3 tracings. It contains more than 600 characters in each face."
+url="https://www.behance.net/gallery/10527763/Bravo-Free-Typeface"
+arch=('any')
+groups=('infinality-bundle-fonts-extra')
+license=('custom:OFL')
+install=$pkgname.install
+source=(BravoTypeface.zip::"https://dl.dropboxusercontent.com/u/57042481/Bravo%20Typeface.zip"
+        45-bravo.conf
+        90-non-tt-bravo.conf)
+sha1sums=('0ddd24f9e2aceabcad60857958e92c8f7ef2090e'
+          '78242e7cdb89bde956f94f62b1dc39cfe13c6a7a'
+          'e669a12d658eac687052a1d1da37018624563751')
+
+package(){
+  #cd "${srcdir}"
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 "OFL_Bravo.txt" \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
+
+  install -m755 -d "${pkgdir}"/usr/share/doc/"${pkgname}"
+  install -m644 "Bravo typeface.pdf" \
+    "${pkgdir}"/usr/share/doc/"${pkgname}"/"Bravo typeface.pdf"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-bravo.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-bravo.conf
+  install -m644 90-non-tt-bravo.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-bravo.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-bravo.conf .
+  ln -s ../conf.avail/90-non-tt-bravo.conf .
+}
