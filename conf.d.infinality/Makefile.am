@@ -32,6 +32,7 @@ CONF_LINKS = \
 	35-repl-custom.conf		\
 	37-repl-webfonts.conf		\
 	40-non-latin-microsoft.conf    \
+	38-repl-webfonts-custom.conf		\
 	40-non-latin-misc.conf    \
 	45-latin-microsoft.conf   \
 	45-latin-misc.conf   \
@@ -51,7 +52,8 @@ CONF_LINKS = \
 	92-selective-rendering-misc.conf   \
 	93-final-rendering.conf   \
 	94-no-synthetic.conf    \
-	96-reject.conf
+	95-reject.conf		\
+	97-selective-rendering-custom.conf
 
 EXTRA_DIST = $(templateinf_DATA) $(DOC_SOURCES)
 CLEANFILES = $(DOC_FILES)
@@ -63,6 +65,8 @@ templateinfdir = $(TEMPLATEINFDIR)
 templateinf_DATA =				\
 	10-base-rendering.conf    \
 	10-scale-bitmap-fonts.conf	\
+	28-user.conf		\
+	29-local.conf		\
 	35-repl-custom.conf		\
 	36-repl-missing-glyphs.conf  \
 	37-repl-webfonts.conf		\
@@ -93,9 +97,8 @@ templateinf_DATA =				\
 	92-selective-rendering-misc.conf   \
 	93-final-rendering.conf   \
 	94-no-synthetic.conf    \
-	96-reject.conf	\
-	97-local.conf		\
-	98-user.conf
+	95-reject.conf	\
+	97-selective-rendering-custom.conf
 
 README: $(srcdir)/README.in
 	sed "s|\@TEMPLATEINFDIR\@|$(templateinfdir)|" $< > $@
