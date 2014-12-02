@@ -1,0 +1,51 @@
+# Maintainer: Sial <NAME at cpan dot org>
+# Contributor: bohoomil <@zoho.com>
+
+_gitname=powerline-fonts
+pkgname=otf-source-code-pro-pwl-ibx
+pkgver=1.017
+pkgrel=4
+pkgdesc='Pre-patched and adjusted version for use with the new Powerline plugin.'
+arch=('any')
+url="https://github.com/Lokaltog/${_gitname}/tree/master/SourceCodePro"
+license=('custom:OFL')
+depends=('fontconfig')
+makedepends=('git')
+optdepends=('python-powerline-git: The ultimate statusline/prompt utility'
+            'python2-powerline-git: The ultimate statusline/prompt utility')
+conflicts=('otf-source-code-pro-powerline-git')
+provides=('otf-source-code-pro-powerline-git')
+replaces=('otf-source-code-pro-powerline-git')
+groups=('infinality-bundle-fonts-extra')
+install=${pkgname}.install
+source=("git+https://github.com/Lokaltog/${_gitname}"
+        45-source-code-pro-pwl.conf
+        90-non-tt-source-code-pro-pwl.conf)
+sha1sums=('SKIP'
+          'f46b05cfdf5092adca952f6e9e8875bdbfbd1b3d'
+          '4520354197fd599e5ad605a7a4ff3a538a0dab06')
+
+pkgver() {
+  cd "${srcdir}/${_gitname}/SourceCodePro"
+  cat README.rst | grep '^:Version:' | sed -n 's/^.*: \(.*[0-9]\).*$/\1/p'
+}
+
+package() {
+  cd "${srcdir}/${_gitname}/SourceCodePro"
+
+  install -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -Dm644 LICENSE.txt \
+    "${pkgdir}/usr/share/licenses/${pkgname}/COPYING"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 ../../45-source-code-pro-pwl.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-source-code-pro-pwl.conf
+  install -m644 ../../90-non-tt-source-code-pro-pwl.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-source-code-pro-pwl.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-source-code-pro-pwl.conf .
+  ln -s ../conf.avail/90-non-tt-source-code-pro-pwl.conf .
+}
