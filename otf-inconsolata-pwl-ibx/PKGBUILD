@@ -1,0 +1,45 @@
+# Maintainer: Sial <NAME at cpan dot org>
+# Contributor: bohoomil <@zoho.com>
+
+_gitname=powerline-fonts
+pkgname=otf-inconsolata-pwl-ibx
+pkgver=20130604
+pkgrel=4
+pkgdesc="Pre-patched and adjusted version for use with the new Powerline plugin."
+arch=('any')
+url="https://github.com/Lokaltog/${_gitname}/tree/master/Inconsolata"
+license=('custom:OFL')
+depends=('fontconfig')
+makedepends=('git')
+optdepends=('python-powerline-git: The ultimate statusline/prompt utility'
+            'python2-powerline-git: The ultimate statusline/prompt utility')
+conflicts=('otf-inconsolata-powerline-git')
+provides=('otf-inconsolata-powerline-git')
+replaces=('otf-inconsolata-powerline-git')
+groups=('infinality-bundle-fonts-extra')
+install=${pkgname}.install
+source=("git+https://github.com/Lokaltog/${_gitname}"
+        45-inconsolata-pwl.conf
+        90-non-tt-inconsolata-pwl.conf)
+sha1sums=('SKIP'
+          '63e926930e4b6022dfa4f116a5b38e42e0e4d1ca'
+          '8be854eeaa5d894724d1d65de33d7c56bbe0345b')
+
+package() {
+	cd "${srcdir}/${_gitname}/Inconsolata"
+
+	local font='Inconsolata for Powerline.otf'
+	install -Dm644 "${font}" "${pkgdir}/usr/share/fonts/${pkgname}/${font}"
+	install -Dm644 LICENSE.txt "${pkgdir}/usr/share/licenses/${pkgname}/COPYING"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 ../../45-inconsolata-pwl.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-inconsolata-pwl.conf
+  install -m644 ../../90-non-tt-inconsolata-pwl.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-inconsolata-pwl.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-inconsolata-pwl.conf .
+  ln -s ../conf.avail/90-non-tt-inconsolata-pwl.conf .
+}
