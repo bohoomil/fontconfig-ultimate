@@ -27,6 +27,8 @@ DOC_FILES = $(DOC_SOURCES:.in=)
 
 CONF_LINKS = \
 	10-base-rendering.conf    \
+	28-user.conf		\
+	29-local.conf		\
 	35-repl-custom.conf		\
 	37-repl-webfonts.conf		\
 	40-non-latin-microsoft.conf    \
@@ -49,9 +51,7 @@ CONF_LINKS = \
 	92-selective-rendering-misc.conf   \
 	93-final-rendering.conf   \
 	94-no-synthetic.conf    \
-	96-reject.conf	\
-	97-local.conf		\
-	98-user.conf
+	96-reject.conf
 
 EXTRA_DIST = $(templateinf_DATA) $(DOC_SOURCES)
 CLEANFILES = $(DOC_FILES)
