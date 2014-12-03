@@ -162,10 +162,111 @@ index a4e583d..17a8820 100644
  
  # Packaging
 diff --git a/ChangeLog b/ChangeLog
-index ea1eb4a..535f07a 100644
+index ea1eb4a..79c5b89 100644
 --- a/ChangeLog
 +++ b/ChangeLog
-@@ -1,3 +1,1640 @@
+@@ -1,3 +1,1741 @@
++2014-12-03  Werner Lemberg  <wl@gnu.org>
++
++	docs/CHANGES: Updated.
++
++2014-12-03  Werner Lemberg  <wl@gnu.org>
++
++	[autofit] Better fix for conversion specifiers in debug messages.
++
++	Using `%ld' for pointer differences causes warnings on 32bit
++	platforms.  The correct type would be (the relatively new) `%td',
++	however, this is missing on some important platforms.
++
++	This patch improves the change from 2014-11-28.
++
++	* src/autofit/afhints.c (AF_INDEX_NUM): Use `int' typecast.  Our
++	pointer differences are always sufficiently small.
++	(af_glyph_hints_dump_points, af_glyph_hints_dump_segments,
++	af_glyph_hints_dump_edge): Revert to `%d' and use `AF_INDEX_NUM'.
++
++2014-12-03  Werner Lemberg  <wl@gnu.org>
++
++	FT_Sfnt_Tag: s/ft_sfnt_xxx/FT_SFNT_XXX/ for orthogonality.
++
++	All public FreeType enumeration and flag values are uppercase...
++
++	* include/tttables.h (FT_Sfnt_Tag): Implement it.  For backwards
++	compatilibity, retain the old values as macros.
++
++	* src/base/ftfstype.c (FT_Get_FSType_Flags), src/sfnt/sfdriver.c
++	(get_sfnt_table): Updated.
++
++2014-12-02  Werner Lemberg  <wl@gnu.org>
++
++	* include/*: Improve structure of documentation.
++
++	. Add and update many `<Order>' tags.
++	. Apply various documentation fixes.
++	. Remove details to deprecated (or never implemented) data.
++
++2014-12-02  Werner Lemberg  <wl@gnu.org>
++
++	[docmaker] Always handle `<Order>' section elements.
++
++	Previously, those elements were handled only for sections present in
++	a `<Sections>' chapter element.
++
++	* src/tools/docmaker/content.py (ContentProcessor::finish):
++	Implement it.
++
++2014-12-02  Werner Lemberg  <wl@gnu.org>
++
++	[docmaker] Properly handle empty rows in Synopsis.
++
++	* src/tools/docmaker/tohtml.py (HtmlFormatter::section_enter): Emit
++	`&nbsp;' for empty fields.
++
++2014-12-02  Werner Lemberg  <wl@gnu.org>
++
++	[docmaker] Thinko.
++
++	* src/tools/docmaker/content.py (DocBlock::get_markup_words_all):
++	Emit `/empty/' string for first element also.
++
++2014-12-02  Werner Lemberg  <wl@gnu.org>
++
++	[docmaker] Honour empty lines in `<Order>' section element.
++
++	This greatly improves the readability of the `Synopsis' links.
++
++	* src/tools/docmaker/content.py (DocBlock::get_markup_words_all):
++	Insert string `/empty/' between items.
++
++	* src/tools/docmaker/formatter.py (Formatter::section_dump): Make it
++	robust against nonexistent keys.
++
++	* src/tools/docmaker/tohtml.py (HtmlFormatter::section_enter): Emit
++	empty <td> elements for `/empty/'.
++
++2014-12-02  Werner Lemberg  <wl@gnu.org>
++
++	[docmaker] Ensure Python 3 compatibility.
++
++	* src/tools/docmaker/content.py (ContentProcessor::set_section,
++	ContentProcessor::finish): Replace `has_key' function with `in'
++	keyword.
++
++	* src/tools/docmaker/formatter.py (Formatter::__init__): Replace
++	sorting function with a key generator.
++	(Formatter::add_identifier): Replace `has_key' function with `in'
++	keyword.
++
++	* src/tools/docmaker/tohtml.py (HtmlFormatter::html_source_quote):
++	Replace `has_key' function with `in' keyword.
++	(HtmlFormatter::index_exit, HtmlFormatter::section_enter): Use
++	integer division.
++	s/<>/>/.
++
++	* src/tools/docmaker/utils.py: Import `itertools'.
++	(index_sort): Replaced by...
++	(index_key): ... this new key generator (doing exactly the same).
++
 +2014-11-29  Werner Lemberg  <wl@gnu.org>
 +
 +	[docmaker] Don't output a block multiple times.
@@ -288,8 +389,8 @@ index ea1eb4a..535f07a 100644
 +	Fix compiler warning to conversion specifiers in debug messages.
 +
 +	* src/autofit/afhints.c (af_glyph_hints_dump_points): Add length
-+	modifier to dump long integers.  (af_glyph_hints_dump_segments,
-+	af_glyph_hints_dump_edges): Ditto.
++	modifier to dump long integers.
++	(af_glyph_hints_dump_segments, af_glyph_hints_dump_edges): Ditto.
 +
 +2014-11-27  Werner Lemberg  <wl@gnu.org>
 +
@@ -1806,6 +1907,28 @@ index ea1eb4a..535f07a 100644
  2014-03-06  Werner Lemberg  <wl@gnu.org>
  
  	* Version 2.5.3 released.
+@@ -106,7 +1844,7 @@
+ 	option.
+ 	(libs): Updated.
+ 	(staticlibs): New variable, to be used if `--static' is given.
+-	* builds/doc/freetype-config.1: Document `--static'.
++	* docs/freetype-config.1: Document `--static'.
+ 
+ 	* builds/unix/freetype2.in, builds/unix/unix-def.in: Updated.
+ 
+diff --git a/ChangeLog.21 b/ChangeLog.21
+index d6371d1..300a094 100644
+--- a/ChangeLog.21
++++ b/ChangeLog.21
+@@ -6260,7 +6260,7 @@
+ 	Adding a new API `FT_Get_BDF_Property' to retrieve the BDF
+ 	properties of a given PCF or BDF font.
+ 
+-	* include/freetype/ftbdf.h (FT_PropertyType): New enumeration.
++	* include/freetype/ftbdf.h (BDF_PropertyType): New enumeration.
+ 	(BDF_Property, BDF_PropertyRec): New structure.
+ 	FT_Get_BDF_Property): New function.
+ 	* include/freetype/internal/bdftypes.h: Include FT_BDF_H.
 diff --git a/builds/cmake/iOS.cmake b/builds/cmake/iOS.cmake
 new file mode 100644
 index 0000000..a41a7ac
@@ -4057,10 +4180,10 @@ index d7b6a63..10027bb 100644
  
  
 diff --git a/docs/CHANGES b/docs/CHANGES
-index 803f02d..51b829c 100644
+index 803f02d..9f36946 100644
 --- a/docs/CHANGES
 +++ b/docs/CHANGES
-@@ -1,11 +1,40 @@
+@@ -1,11 +1,75 @@
  
 +CHANGES BETWEEN 2.5.3 and 2.5.4
 +
@@ -4069,10 +4192,26 @@ index 803f02d..51b829c 100644
 +    - The new auto-hinter code using HarfBuzz crashed for some invalid
 +      fonts.
 +
++    - Many fixes to better protect against malformed input.
++
 +
 +  II. IMPORTANT CHANGES
 +
 +    - Full auto-hinter support of the Devanagari script.
++
++    - Experimental auto-hinter support of the Telugu script.
++
++    - CFF stem darkening behaviour can now be controlled at build time using
++      the eight macros
++
++        CFF_CONFIG_OPTION_DARKENING_PARAMETER_{X,Y}{1,2,3,4}    .
++
++    - Some fields in the `FT_Bitmap' structure have been changed from
++      signed to unsigned type, which better reflects the actual usage.  It
++      is also an additional means to protect against malformed input.
++
++      This change doesn't break the ABI; however, it might cause compiler
++      warnings.
 +
 +
 +  III. MISCELLANEOUS
@@ -4086,7 +4225,26 @@ index 803f02d..51b829c 100644
 +    - Version 2.5.1  introduced  major  bugs in  the cjk  part of  the
 +      auto-hinter, which are now fixed.
 +
-+    - `cmake' now supports a build of FreeType as an OS X framework.
++    - The `FT_Sfnt_Tag' enumeration values have been changed to uppercase,
++      e.g. `FT_SFNT_HEAD'.  The lowercase variants are deprecated.  This is
++      for orthogonality with all other enumeration-like values in FreeType
++
++    - `cmake' now supports builds of FreeType as an OS X framework and for
++      iOS.
++
++    - Improved project files for vc2010, introducing a property file.
++
++    - The documentation generator for the API reference have been updated to
++      produce better HTML code (with proper CSS).  At the same time, the
++      documentation got a better structure.
++
++    - The FT_LOAD_BITMAP_CROP is obsolete; it is not used by any driver.
++
++    - The TrueType DELTAP[123] bytecode instructions now work in subpipxel
++      hinting mode as described in the ClearType whitepaper (i.e., for
++      touched points in the non-subpixel direction).
++
++    - Many small improvements to the internal arithmetic routines.
 +
 +
 +======================================================================
@@ -4104,7 +4262,7 @@ index 803f02d..51b829c 100644
  
      - More  bug  fixes related  to  correct  positioning of  composite
        glyphs.
-@@ -261,6 +290,9 @@ CHANGES BETWEEN 2.4.12 and 2.5
+@@ -261,6 +325,9 @@ CHANGES BETWEEN 2.4.12 and 2.5
        it accepts a new command line  option `-H' to select the hinting
        engine.
  
@@ -4505,7 +4663,7 @@ index 5b11f0e..2b0b67e 100644
  
  
 diff --git a/include/freetype.h b/include/freetype.h
-index fb62b62..66b34f5 100644
+index fb62b62..b24acde 100644
 --- a/include/freetype.h
 +++ b/include/freetype.h
 @@ -113,7 +113,8 @@ FT_BEGIN_HEADER
@@ -4518,11 +4676,67 @@ index fb62b62..66b34f5 100644
    /*                                                                       */
    /* <Order>                                                               */
    /*    FT_Library                                                         */
-@@ -190,15 +191,16 @@ FT_BEGIN_HEADER
+@@ -122,6 +123,7 @@ FT_BEGIN_HEADER
+   /*    FT_GlyphSlot                                                       */
+   /*    FT_CharMap                                                         */
+   /*    FT_Encoding                                                        */
++  /*    FT_ENC_TAG                                                         */
+   /*                                                                       */
+   /*    FT_FaceRec                                                         */
+   /*                                                                       */
+@@ -138,8 +140,22 @@ FT_BEGIN_HEADER
+   /*    FT_FACE_FLAG_MULTIPLE_MASTERS                                      */
+   /*    FT_FACE_FLAG_GLYPH_NAMES                                           */
+   /*    FT_FACE_FLAG_EXTERNAL_STREAM                                       */
+-  /*    FT_FACE_FLAG_FAST_GLYPHS                                           */
+   /*    FT_FACE_FLAG_HINTER                                                */
++  /*    FT_FACE_FLAG_TRICKY                                                */
++  /*                                                                       */
++  /*    FT_HAS_HORIZONTAL                                                  */
++  /*    FT_HAS_VERTICAL                                                    */
++  /*    FT_HAS_KERNING                                                     */
++  /*    FT_HAS_FIXED_SIZES                                                 */
++  /*    FT_HAS_GLYPH_NAMES                                                 */
++  /*    FT_HAS_MULTIPLE_MASTERS                                            */
++  /*    FT_HAS_COLOR                                                       */
++  /*                                                                       */
++  /*    FT_IS_SFNT                                                         */
++  /*    FT_IS_SCALABLE                                                     */
++  /*    FT_IS_FIXED_WIDTH                                                  */
++  /*    FT_IS_CID_KEYED                                                    */
++  /*    FT_IS_TRICKY                                                       */
+   /*                                                                       */
+   /*    FT_STYLE_FLAG_BOLD                                                 */
+   /*    FT_STYLE_FLAG_ITALIC                                               */
+@@ -158,6 +174,7 @@ FT_BEGIN_HEADER
+   /*                                                                       */
+   /*    FT_New_Face                                                        */
+   /*    FT_Done_Face                                                       */
++  /*    FT_Reference_Face                                                  */
+   /*    FT_New_Memory_Face                                                 */
+   /*    FT_Open_Face                                                       */
+   /*    FT_Open_Args                                                       */
+@@ -170,10 +187,13 @@ FT_BEGIN_HEADER
+   /*    FT_Request_Size                                                    */
+   /*    FT_Select_Size                                                     */
+   /*    FT_Size_Request_Type                                               */
++  /*    FT_Size_RequestRec                                                 */
+   /*    FT_Size_Request                                                    */
+   /*    FT_Set_Transform                                                   */
+   /*    FT_Load_Glyph                                                      */
+   /*    FT_Get_Char_Index                                                  */
++  /*    FT_Get_First_Char                                                  */
++  /*    FT_Get_Next_Char                                                   */
+   /*    FT_Get_Name_Index                                                  */
+   /*    FT_Load_Char                                                       */
+   /*                                                                       */
+@@ -190,11 +210,11 @@ FT_BEGIN_HEADER
    /*    FT_LOAD_NO_SCALE                                                   */
    /*    FT_LOAD_NO_HINTING                                                 */
    /*    FT_LOAD_NO_BITMAP                                                  */
 -  /*    FT_LOAD_CROP_BITMAP                                                */
++  /*    FT_LOAD_NO_AUTOHINT                                                */
++  /*    FT_LOAD_COLOR                                                      */
    /*                                                                       */
    /*    FT_LOAD_VERTICAL_LAYOUT                                            */
    /*    FT_LOAD_IGNORE_TRANSFORM                                           */
@@ -4530,14 +4744,92 @@ index fb62b62..66b34f5 100644
    /*    FT_LOAD_FORCE_AUTOHINT                                             */
    /*    FT_LOAD_NO_RECURSE                                                 */
    /*    FT_LOAD_PEDANTIC                                                   */
+@@ -205,6 +225,8 @@ FT_BEGIN_HEADER
+   /*    FT_LOAD_TARGET_LCD                                                 */
+   /*    FT_LOAD_TARGET_LCD_V                                               */
    /*                                                                       */
-+  /*    FT_LOAD_CROP_BITMAP                                                */
-+  /*    FT_LOAD_IGNORE_GLOBAL_ADVANCE_WIDTH                                */
++  /*    FT_LOAD_TARGET_MODE                                                */
 +  /*                                                                       */
-   /*    FT_LOAD_TARGET_NORMAL                                              */
-   /*    FT_LOAD_TARGET_LIGHT                                               */
-   /*    FT_LOAD_TARGET_MONO                                                */
-@@ -1570,15 +1572,15 @@ FT_BEGIN_HEADER
+   /*    FT_Render_Glyph                                                    */
+   /*    FT_Render_Mode                                                     */
+   /*    FT_Get_Kerning                                                     */
+@@ -218,14 +240,22 @@ FT_BEGIN_HEADER
+   /*    FT_Set_Charmap                                                     */
+   /*    FT_Get_Charmap_Index                                               */
+   /*                                                                       */
+-  /*    FT_FSTYPE_INSTALLABLE_EMBEDDING                                    */
+-  /*    FT_FSTYPE_RESTRICTED_LICENSE_EMBEDDING                             */
+-  /*    FT_FSTYPE_PREVIEW_AND_PRINT_EMBEDDING                              */
+-  /*    FT_FSTYPE_EDITABLE_EMBEDDING                                       */
+-  /*    FT_FSTYPE_NO_SUBSETTING                                            */
+-  /*    FT_FSTYPE_BITMAP_EMBEDDING_ONLY                                    */
+-  /*                                                                       */
+   /*    FT_Get_FSType_Flags                                                */
++  /*    FT_Get_SubGlyph_Info                                               */
++  /*                                                                       */
++  /*    FT_Face_Internal                                                   */
++  /*    FT_Size_Internal                                                   */
++  /*    FT_Slot_Internal                                                   */
++  /*                                                                       */
++  /*    FT_FACE_FLAG_XXX                                                   */
++  /*    FT_STYLE_FLAG_XXX                                                  */
++  /*    FT_OPEN_XXX                                                        */
++  /*    FT_LOAD_XXX                                                        */
++  /*    FT_LOAD_TARGET_XXX                                                 */
++  /*    FT_SUBGLYPH_FLAG_XXX                                               */
++  /*    FT_FSTYPE_XXX                                                      */
++  /*                                                                       */
++  /*    FT_HAS_FAST_GLYPHS                                                 */
+   /*                                                                       */
+   /*************************************************************************/
+ 
+@@ -378,6 +408,13 @@ FT_BEGIN_HEADER
+ 
+   /*************************************************************************/
+   /*                                                                       */
++  /* <Section>                                                             */
++  /*    module_management                                                  */
++  /*                                                                       */
++  /*************************************************************************/
++
++  /*************************************************************************/
++  /*                                                                       */
+   /* <Type>                                                                */
+   /*    FT_Module                                                          */
+   /*                                                                       */
+@@ -417,6 +454,13 @@ FT_BEGIN_HEADER
+ 
+   /*************************************************************************/
+   /*                                                                       */
++  /* <Section>                                                             */
++  /*    base_interface                                                     */
++  /*                                                                       */
++  /*************************************************************************/
++
++  /*************************************************************************/
++  /*                                                                       */
+   /* <Type>                                                                */
+   /*    FT_Face                                                            */
+   /*                                                                       */
+@@ -727,15 +771,8 @@ FT_BEGIN_HEADER
+   } FT_Encoding;
+ 
+ 
+-  /*************************************************************************/
+-  /*                                                                       */
+-  /* <Enum>                                                                */
+-  /*    ft_encoding_xxx                                                    */
+-  /*                                                                       */
+-  /* <Description>                                                         */
+-  /*    These constants are deprecated; use the corresponding @FT_Encoding */
+-  /*    values instead.                                                    */
+-  /*                                                                       */
++  /* these constants are deprecated; use the corresponding `FT_Encoding' */
++  /* values instead                                                      */
+ #define ft_encoding_none            FT_ENCODING_NONE
+ #define ft_encoding_unicode         FT_ENCODING_UNICODE
+ #define ft_encoding_symbol          FT_ENCODING_MS_SYMBOL
+@@ -1570,15 +1607,15 @@ FT_BEGIN_HEADER
    /*                         change between calls of @FT_Load_Glyph and a  */
    /*                         few other functions.                          */
    /*                                                                       */
@@ -4561,7 +4853,7 @@ index fb62b62..66b34f5 100644
    /*                         *positive*.                                   */
    /*                                                                       */
    /*    outline           :: The outline descriptor for the current glyph  */
-@@ -1592,7 +1594,6 @@ FT_BEGIN_HEADER
+@@ -1592,7 +1629,6 @@ FT_BEGIN_HEADER
    /*                         This field is only valid for the composite    */
    /*                         glyph format that should normally only be     */
    /*                         loaded with the @FT_LOAD_NO_RECURSE flag.     */
@@ -4569,7 +4861,72 @@ index fb62b62..66b34f5 100644
    /*                                                                       */
    /*    subglyphs         :: An array of subglyph descriptors for          */
    /*                         composite glyphs.  There are `num_subglyphs'  */
-@@ -2541,11 +2542,6 @@ FT_BEGIN_HEADER
+@@ -1783,16 +1819,6 @@ FT_BEGIN_HEADER
+   /*                                                                       */
+   /*    FT_OPEN_PARAMS   :: Use the `num_params' and `params' fields.      */
+   /*                                                                       */
+-  /*    ft_open_memory   :: Deprecated; use @FT_OPEN_MEMORY instead.       */
+-  /*                                                                       */
+-  /*    ft_open_stream   :: Deprecated; use @FT_OPEN_STREAM instead.       */
+-  /*                                                                       */
+-  /*    ft_open_pathname :: Deprecated; use @FT_OPEN_PATHNAME instead.     */
+-  /*                                                                       */
+-  /*    ft_open_driver   :: Deprecated; use @FT_OPEN_DRIVER instead.       */
+-  /*                                                                       */
+-  /*    ft_open_params   :: Deprecated; use @FT_OPEN_PARAMS instead.       */
+-  /*                                                                       */
+   /* <Note>                                                                */
+   /*    The `FT_OPEN_MEMORY', `FT_OPEN_STREAM', and `FT_OPEN_PATHNAME'     */
+   /*    flags are mutually exclusive.                                      */
+@@ -1803,11 +1829,14 @@ FT_BEGIN_HEADER
+ #define FT_OPEN_DRIVER    0x8
+ #define FT_OPEN_PARAMS    0x10
+ 
+-#define ft_open_memory    FT_OPEN_MEMORY     /* deprecated */
+-#define ft_open_stream    FT_OPEN_STREAM     /* deprecated */
+-#define ft_open_pathname  FT_OPEN_PATHNAME   /* deprecated */
+-#define ft_open_driver    FT_OPEN_DRIVER     /* deprecated */
+-#define ft_open_params    FT_OPEN_PARAMS     /* deprecated */
++
++  /* these constants are deprecated; use the corresponding `FT_OPEN_XXX' */
++  /* values instead                                                      */
++#define ft_open_memory    FT_OPEN_MEMORY
++#define ft_open_stream    FT_OPEN_STREAM
++#define ft_open_pathname  FT_OPEN_PATHNAME
++#define ft_open_driver    FT_OPEN_DRIVER
++#define ft_open_params    FT_OPEN_PARAMS
+ 
+ 
+   /*************************************************************************/
+@@ -1872,22 +1901,22 @@ FT_BEGIN_HEADER
+   /*    The stream type is determined by the contents of `flags' that      */
+   /*    are tested in the following order by @FT_Open_Face:                */
+   /*                                                                       */
+-  /*    If the `FT_OPEN_MEMORY' bit is set, assume that this is a          */
++  /*    If the @FT_OPEN_MEMORY bit is set, assume that this is a           */
+   /*    memory file of `memory_size' bytes, located at `memory_address'.   */
+   /*    The data are are not copied, and the client is responsible for     */
+   /*    releasing and destroying them _after_ the corresponding call to    */
+   /*    @FT_Done_Face.                                                     */
+   /*                                                                       */
+-  /*    Otherwise, if the `FT_OPEN_STREAM' bit is set, assume that a       */
++  /*    Otherwise, if the @FT_OPEN_STREAM bit is set, assume that a        */
+   /*    custom input stream `stream' is used.                              */
+   /*                                                                       */
+-  /*    Otherwise, if the `FT_OPEN_PATHNAME' bit is set, assume that this  */
++  /*    Otherwise, if the @FT_OPEN_PATHNAME bit is set, assume that this   */
+   /*    is a normal file and use `pathname' to open it.                    */
+   /*                                                                       */
+-  /*    If the `FT_OPEN_DRIVER' bit is set, @FT_Open_Face only tries to    */
++  /*    If the @FT_OPEN_DRIVER bit is set, @FT_Open_Face only tries to     */
+   /*    open the file with the driver whose handler is in `driver'.        */
+   /*                                                                       */
+-  /*    If the `FT_OPEN_PARAMS' bit is set, the parameters given by        */
++  /*    If the @FT_OPEN_PARAMS bit is set, the parameters given by         */
+   /*    `num_params' and `params' is used.  They are ignored otherwise.    */
+   /*                                                                       */
+   /*    Ideally, both the `pathname' and `params' fields should be tagged  */
+@@ -2541,11 +2570,6 @@ FT_BEGIN_HEADER
     *     Indicates that the auto-hinter is preferred over the font's native
     *     hinter.  See also the note below.
     *
@@ -4581,7 +4938,7 @@ index fb62b62..66b34f5 100644
     *   FT_LOAD_PEDANTIC ::
     *     Indicates that the font driver should perform pedantic verifications
     *     during glyph loading.  This is mostly used to detect broken glyphs
-@@ -2556,18 +2552,12 @@ FT_BEGIN_HEADER
+@@ -2556,18 +2580,12 @@ FT_BEGIN_HEADER
     *     result in partially hinted or distorted glyphs in case a glyph's
     *     bytecode is buggy.
     *
@@ -4605,7 +4962,7 @@ index fb62b62..66b34f5 100644
     *
     *     This flag implies @FT_LOAD_NO_SCALE and @FT_LOAD_IGNORE_TRANSFORM.
     *
-@@ -2600,6 +2590,12 @@ FT_BEGIN_HEADER
+@@ -2600,6 +2618,12 @@ FT_BEGIN_HEADER
     *     bitmaps transparently.  Those bitmaps will be in the
     *     @FT_PIXEL_MODE_GRAY format.
     *
@@ -4618,7 +4975,71 @@ index fb62b62..66b34f5 100644
     * @note:
     *   By default, hinting is enabled and the font's native hinter (see
     *   @FT_FACE_FLAG_HINTER) is preferred over the auto-hinter.  You can
-@@ -3065,9 +3061,8 @@ FT_BEGIN_HEADER
+@@ -2836,19 +2860,8 @@ FT_BEGIN_HEADER
+   } FT_Render_Mode;
+ 
+ 
+-  /*************************************************************************/
+-  /*                                                                       */
+-  /* <Enum>                                                                */
+-  /*    ft_render_mode_xxx                                                 */
+-  /*                                                                       */
+-  /* <Description>                                                         */
+-  /*    These constants are deprecated.  Use the corresponding             */
+-  /*    @FT_Render_Mode values instead.                                    */
+-  /*                                                                       */
+-  /* <Values>                                                              */
+-  /*    ft_render_mode_normal :: see @FT_RENDER_MODE_NORMAL                */
+-  /*    ft_render_mode_mono   :: see @FT_RENDER_MODE_MONO                  */
+-  /*                                                                       */
++  /* these constants are deprecated; use the corresponding */
++  /* `FT_Render_Mode' values instead                       */
+ #define ft_render_mode_normal  FT_RENDER_MODE_NORMAL
+ #define ft_render_mode_mono    FT_RENDER_MODE_MONO
+ 
+@@ -2912,39 +2925,10 @@ FT_BEGIN_HEADER
+   } FT_Kerning_Mode;
+ 
+ 
+-  /*************************************************************************/
+-  /*                                                                       */
+-  /* <Const>                                                               */
+-  /*    ft_kerning_default                                                 */
+-  /*                                                                       */
+-  /* <Description>                                                         */
+-  /*    This constant is deprecated.  Please use @FT_KERNING_DEFAULT       */
+-  /*    instead.                                                           */
+-  /*                                                                       */
++  /* these constants are deprecated; use the corresponding */
++  /* `FT_Kerning_Mode' values instead                      */
+ #define ft_kerning_default   FT_KERNING_DEFAULT
+-
+-
+-  /*************************************************************************/
+-  /*                                                                       */
+-  /* <Const>                                                               */
+-  /*    ft_kerning_unfitted                                                */
+-  /*                                                                       */
+-  /* <Description>                                                         */
+-  /*    This constant is deprecated.  Please use @FT_KERNING_UNFITTED      */
+-  /*    instead.                                                           */
+-  /*                                                                       */
+ #define ft_kerning_unfitted  FT_KERNING_UNFITTED
+-
+-
+-  /*************************************************************************/
+-  /*                                                                       */
+-  /* <Const>                                                               */
+-  /*    ft_kerning_unscaled                                                */
+-  /*                                                                       */
+-  /* <Description>                                                         */
+-  /*    This constant is deprecated.  Please use @FT_KERNING_UNSCALED      */
+-  /*    instead.                                                           */
+-  /*                                                                       */
+ #define ft_kerning_unscaled  FT_KERNING_UNSCALED
+ 
+ 
+@@ -3065,9 +3049,8 @@ FT_BEGIN_HEADER
    /*    glyph index~0 always corresponds to the `missing glyph' (called    */
    /*    `.notdef').                                                        */
    /*                                                                       */
@@ -4630,7 +5051,7 @@ index fb62b62..66b34f5 100644
    /*                                                                       */
    FT_EXPORT( FT_Error )
    FT_Get_Glyph_Name( FT_Face     face,
-@@ -3515,8 +3510,8 @@ FT_BEGIN_HEADER
+@@ -3515,8 +3498,8 @@ FT_BEGIN_HEADER
    /*                                                                       */
    /*      http://www.unicode.org/reports/tr37/                             */
    /*                                                                       */
@@ -4641,7 +5062,7 @@ index fb62b62..66b34f5 100644
    /*                                                                       */
    /*    Adobe and MS decided to support IVS with a new cmap subtable       */
    /*    (format~14).  It is an odd subtable because it is not a mapping of */
-@@ -3767,12 +3762,6 @@ FT_BEGIN_HEADER
+@@ -3767,12 +3750,6 @@ FT_BEGIN_HEADER
               FT_Long  c );
  
  
@@ -4654,7 +5075,7 @@ index fb62b62..66b34f5 100644
    /*************************************************************************/
    /*                                                                       */
    /* <Function>                                                            */
-@@ -3806,17 +3795,6 @@ FT_BEGIN_HEADER
+@@ -3806,17 +3783,6 @@ FT_BEGIN_HEADER
    FT_MulFix( FT_Long  a,
               FT_Long  b );
  
@@ -4672,7 +5093,7 @@ index fb62b62..66b34f5 100644
  
    /*************************************************************************/
    /*                                                                       */
-@@ -3829,18 +3807,12 @@ FT_BEGIN_HEADER
+@@ -3829,18 +3795,12 @@ FT_BEGIN_HEADER
    /*    used to divide a given value by a 16.16 fixed-point factor.        */
    /*                                                                       */
    /* <Input>                                                               */
@@ -4693,6 +5114,137 @@ index fb62b62..66b34f5 100644
    FT_EXPORT( FT_Long )
    FT_DivFix( FT_Long  a,
               FT_Long  b );
+@@ -3940,6 +3900,18 @@ FT_BEGIN_HEADER
+   /*    even a new release of FreeType with only documentation changes     */
+   /*    increases the version number.                                      */
+   /*                                                                       */
++  /* <Order>                                                               */
++  /*    FT_Library_Version                                                 */
++  /*                                                                       */
++  /*    FREETYPE_MAJOR                                                     */
++  /*    FREETYPE_MINOR                                                     */
++  /*    FREETYPE_PATCH                                                     */
++  /*                                                                       */
++  /*    FT_Face_CheckTrueTypePatents                                       */
++  /*    FT_Face_SetUnpatentedHinting                                       */
++  /*                                                                       */
++  /*    FREETYPE_XXX                                                       */
++  /*                                                                       */
+   /*************************************************************************/
+ 
+ 
+diff --git a/include/ftadvanc.h b/include/ftadvanc.h
+index 8f7e2fc..955f93f 100644
+--- a/include/ftadvanc.h
++++ b/include/ftadvanc.h
+@@ -4,7 +4,7 @@
+ /*                                                                         */
+ /*    Quick computation of advance widths (specification only).            */
+ /*                                                                         */
+-/*  Copyright 2008, 2013 by                                                */
++/*  Copyright 2008, 2013, 2014 by                                          */
+ /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+ /*                                                                         */
+ /*  This file is part of the FreeType project, and may only be used,       */
+@@ -48,6 +48,11 @@ FT_BEGIN_HEADER
+    * @description:
+    *   This section contains functions to quickly extract advance values
+    *   without handling glyph outlines, if possible.
++   *
++   * @order:
++   *   FT_Get_Advance
++   *   FT_Get_Advances
++   *
+    */
+ 
+ 
+@@ -171,7 +176,7 @@ FT_BEGIN_HEADER
+                    FT_Int32   load_flags,
+                    FT_Fixed  *padvances );
+ 
+-/* */
++  /* */
+ 
+ 
+ FT_END_HEADER
+diff --git a/include/ftautoh.h b/include/ftautoh.h
+index 936791e..59191ab 100644
+--- a/include/ftautoh.h
++++ b/include/ftautoh.h
+@@ -245,12 +245,12 @@ FT_BEGIN_HEADER
+    *   The data exchange structure for the @glyph-to-script-map property.
+    *
+    */
+-   typedef struct  FT_Prop_GlyphToScriptMap_
+-   {
+-     FT_Face   face;
+-     FT_Byte*  map;
++  typedef struct  FT_Prop_GlyphToScriptMap_
++  {
++    FT_Face   face;
++    FT_Byte*  map;
+ 
+-   } FT_Prop_GlyphToScriptMap;
++  } FT_Prop_GlyphToScriptMap;
+ 
+ 
+   /**************************************************************************
+@@ -384,15 +384,15 @@ FT_BEGIN_HEADER
+    *   The data exchange structure for the @increase-x-height property.
+    *
+    */
+-   typedef struct  FT_Prop_IncreaseXHeight_
+-   {
+-     FT_Face  face;
+-     FT_UInt  limit;
++  typedef struct  FT_Prop_IncreaseXHeight_
++  {
++    FT_Face  face;
++    FT_UInt  limit;
+ 
+-   } FT_Prop_IncreaseXHeight;
++  } FT_Prop_IncreaseXHeight;
+ 
++  /* */
+ 
+- /* */
+ 
+ FT_END_HEADER
+ 
+diff --git a/include/ftbbox.h b/include/ftbbox.h
+index 8938841..d6800e2 100644
+--- a/include/ftbbox.h
++++ b/include/ftbbox.h
+@@ -85,7 +85,6 @@ FT_BEGIN_HEADER
+   FT_Outline_Get_BBox( FT_Outline*  outline,
+                        FT_BBox     *abbox );
+ 
+-
+   /* */
+ 
+ 
+diff --git a/include/ftbdf.h b/include/ftbdf.h
+index 8b3c411..6d262e4 100644
+--- a/include/ftbdf.h
++++ b/include/ftbdf.h
+@@ -53,7 +53,7 @@ FT_BEGIN_HEADER
+   /**********************************************************************
+    *
+    * @enum:
+-   *    FT_PropertyType
++   *    BDF_PropertyType
+    *
+    * @description:
+    *    A list of BDF property types.
+@@ -200,7 +200,7 @@ FT_BEGIN_HEADER
+                        const char*       prop_name,
+                        BDF_PropertyRec  *aproperty );
+ 
+- /* */
++  /* */
+ 
+ FT_END_HEADER
+ 
 diff --git a/include/ftbitmap.h b/include/ftbitmap.h
 index 7dbf5ba..eae7169 100644
 --- a/include/ftbitmap.h
@@ -4727,8 +5279,21 @@ index 7dbf5ba..eae7169 100644
    FT_EXPORT( FT_Error )
    FT_Bitmap_Embolden( FT_Library  library,
                        FT_Bitmap*  bitmap,
+diff --git a/include/ftbzip2.h b/include/ftbzip2.h
+index 1bf81b1..4dce161 100644
+--- a/include/ftbzip2.h
++++ b/include/ftbzip2.h
+@@ -91,7 +91,7 @@ FT_BEGIN_HEADER
+   FT_Stream_OpenBzip2( FT_Stream  stream,
+                        FT_Stream  source );
+ 
+- /* */
++  /* */
+ 
+ 
+ FT_END_HEADER
 diff --git a/include/ftcache.h b/include/ftcache.h
-index a5d7100..b915e39 100644
+index a5d7100..a30e925 100644
 --- a/include/ftcache.h
 +++ b/include/ftcache.h
 @@ -4,7 +4,7 @@
@@ -4740,7 +5305,7 @@ index a5d7100..b915e39 100644
  /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
  /*                                                                         */
  /*  This file is part of the FreeType project, and may only be used,       */
-@@ -209,7 +209,7 @@ FT_BEGIN_HEADER
+@@ -209,10 +209,10 @@ FT_BEGIN_HEADER
    typedef FT_Error
    (*FTC_Face_Requester)( FTC_FaceID  face_id,
                           FT_Library  library,
@@ -4748,9 +5313,23 @@ index a5d7100..b915e39 100644
 +                         FT_Pointer  req_data,
                           FT_Face*    aface );
  
-  /* */
+- /* */
++  /* */
+ 
+ 
+   /*************************************************************************/
+@@ -1046,8 +1046,8 @@ FT_BEGIN_HEADER
+                               FTC_SBit      *sbit,
+                               FTC_Node      *anode );
+ 
++  /* */
+ 
+- /* */
+ 
+ FT_END_HEADER
+ 
 diff --git a/include/ftcffdrv.h b/include/ftcffdrv.h
-index e4d039d..49c1e6e 100644
+index e4d039d..f7031bc 100644
 --- a/include/ftcffdrv.h
 +++ b/include/ftcffdrv.h
 @@ -4,7 +4,7 @@
@@ -4762,7 +5341,20 @@ index e4d039d..49c1e6e 100644
  /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
  /*                                                                         */
  /*  This file is part of the FreeType project, and may only be used,       */
-@@ -212,9 +212,11 @@ FT_BEGIN_HEADER
+@@ -108,6 +108,12 @@ FT_BEGIN_HEADER
+    *   in one of four ways, top edge up or down, bottom edge up or down.
+    *   Unless there are conflicting hstems, the smallest movement is taken
+    *   to minimize distortion.
++   *
++   * @order:
++   *   hinting-engine
++   *   no-stem-darkening
++   *   darkening-parameters
++   *
+    */
+ 
+ 
+@@ -212,9 +218,11 @@ FT_BEGIN_HEADER
     *     stem width >= 2.333px: darkening amount = 0px
     *   }
     *
@@ -4777,6 +5369,30 @@ index e4d039d..49c1e6e 100644
     *
     *   {
     *     FT_Library  library;
+@@ -242,8 +250,8 @@ FT_BEGIN_HEADER
+    *
+    */
+ 
++  /* */
+ 
+- /* */
+ 
+ FT_END_HEADER
+ 
+diff --git a/include/ftcid.h b/include/ftcid.h
+index 203a30c..17550d8 100644
+--- a/include/ftcid.h
++++ b/include/ftcid.h
+@@ -156,7 +156,8 @@ FT_BEGIN_HEADER
+                                FT_UInt   glyph_index,
+                                FT_UInt  *cid );
+ 
+- /* */
++  /* */
++
+ 
+ FT_END_HEADER
+ 
 diff --git a/include/fterrdef.h b/include/fterrdef.h
 index 76c7b9e..99b2fad 100644
 --- a/include/fterrdef.h
@@ -5091,11 +5707,244 @@ index 76c7b9e..99b2fad 100644
                  "Font glyphs corrupted or missing fields" )
  
  
+diff --git a/include/ftgasp.h b/include/ftgasp.h
+index 453d4fa..3f3d765 100644
+--- a/include/ftgasp.h
++++ b/include/ftgasp.h
+@@ -120,7 +120,8 @@
+   FT_Get_Gasp( FT_Face  face,
+                FT_UInt  ppem );
+ 
+-/* */
++  /* */
++
+ 
+ #endif /* _FT_GASP_H_ */
+ 
+diff --git a/include/ftglyph.h b/include/ftglyph.h
+index 2d30ed9..15fa6a9 100644
+--- a/include/ftglyph.h
++++ b/include/ftglyph.h
+@@ -4,7 +4,7 @@
+ /*                                                                         */
+ /*    FreeType convenience functions to handle glyphs (specification).     */
+ /*                                                                         */
+-/*  Copyright 1996-2003, 2006, 2008, 2009, 2011, 2013 by                   */
++/*  Copyright 1996-2003, 2006, 2008, 2009, 2011, 2013, 2014 by             */
+ /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+ /*                                                                         */
+ /*  This file is part of the FreeType project, and may only be used,       */
+@@ -325,22 +325,8 @@ FT_BEGIN_HEADER
+   } FT_Glyph_BBox_Mode;
+ 
+ 
+-  /*************************************************************************/
+-  /*                                                                       */
+-  /* <Enum>                                                                */
+-  /*    ft_glyph_bbox_xxx                                                  */
+-  /*                                                                       */
+-  /* <Description>                                                         */
+-  /*    These constants are deprecated.  Use the corresponding             */
+-  /*    @FT_Glyph_BBox_Mode values instead.                                */
+-  /*                                                                       */
+-  /* <Values>                                                              */
+-  /*   ft_glyph_bbox_unscaled  :: See @FT_GLYPH_BBOX_UNSCALED.             */
+-  /*   ft_glyph_bbox_subpixels :: See @FT_GLYPH_BBOX_SUBPIXELS.            */
+-  /*   ft_glyph_bbox_gridfit   :: See @FT_GLYPH_BBOX_GRIDFIT.              */
+-  /*   ft_glyph_bbox_truncate  :: See @FT_GLYPH_BBOX_TRUNCATE.             */
+-  /*   ft_glyph_bbox_pixels    :: See @FT_GLYPH_BBOX_PIXELS.               */
+-  /*                                                                       */
++  /* these constants are deprecated; use the corresponding */
++  /* `FT_Glyph_BBox_Mode' values instead                   */
+ #define ft_glyph_bbox_unscaled   FT_GLYPH_BBOX_UNSCALED
+ #define ft_glyph_bbox_subpixels  FT_GLYPH_BBOX_SUBPIXELS
+ #define ft_glyph_bbox_gridfit    FT_GLYPH_BBOX_GRIDFIT
+@@ -603,7 +589,6 @@ FT_BEGIN_HEADER
+   FT_EXPORT( FT_Error )
+   FT_Matrix_Invert( FT_Matrix*  matrix );
+ 
+-
+   /* */
+ 
+ 
+diff --git a/include/ftgxval.h b/include/ftgxval.h
+index 6d38e32..88c3d93 100644
+--- a/include/ftgxval.h
++++ b/include/ftgxval.h
+@@ -57,9 +57,19 @@ FT_BEGIN_HEADER
+   /*    some TrueTypeGX tables (feat, mort, morx, bsln, just, kern, opbd,  */
+   /*    trak, prop, lcar).                                                 */
+   /*                                                                       */
++  /* <Order>                                                               */
++  /*    FT_TrueTypeGX_Validate                                             */
++  /*    FT_TrueTypeGX_Free                                                 */
++  /*                                                                       */
++  /*    FT_ClassicKern_Validate                                            */
++  /*    FT_ClassicKern_Free                                                */
++  /*                                                                       */
++  /*    FT_VALIDATE_GX_LENGTH                                              */
++  /*    FT_VALIDATE_GXXXX                                                  */
++  /*    FT_VALIDATE_CKERNXXX                                               */
++  /*                                                                       */
+   /*************************************************************************/
+ 
+-
+   /*************************************************************************/
+   /*                                                                       */
+   /*                                                                       */
+@@ -171,8 +181,6 @@ FT_BEGIN_HEADER
+                           FT_VALIDATE_lcar )
+ 
+ 
+-  /* */
+-
+  /**********************************************************************
+   *
+   * @function:
+@@ -221,8 +229,6 @@ FT_BEGIN_HEADER
+                           FT_UInt   table_length );
+ 
+ 
+-  /* */
+-
+  /**********************************************************************
+   *
+   * @function:
+@@ -248,8 +254,6 @@ FT_BEGIN_HEADER
+                       FT_Bytes  table );
+ 
+ 
+-  /* */
+-
+  /**********************************************************************
+   *
+   * @enum:
+@@ -277,8 +281,6 @@ FT_BEGIN_HEADER
+ #define FT_VALIDATE_CKERN  ( FT_VALIDATE_MS | FT_VALIDATE_APPLE )
+ 
+ 
+-  /* */
+-
+  /**********************************************************************
+   *
+   * @function:
+@@ -320,8 +322,6 @@ FT_BEGIN_HEADER
+                            FT_Bytes  *ckern_table );
+ 
+ 
+-  /* */
+-
+  /**********************************************************************
+   *
+   * @function:
+@@ -346,8 +346,7 @@ FT_BEGIN_HEADER
+   FT_ClassicKern_Free( FT_Face   face,
+                        FT_Bytes  table );
+ 
+-
+- /* */
++  /* */
+ 
+ 
+ FT_END_HEADER
+diff --git a/include/ftgzip.h b/include/ftgzip.h
+index 78e7269..eb346c6 100644
+--- a/include/ftgzip.h
++++ b/include/ftgzip.h
+@@ -137,8 +137,7 @@ FT_BEGIN_HEADER
+                       const FT_Byte*  input,
+                       FT_ULong        input_len );
+ 
+-
+- /* */
++  /* */
+ 
+ 
+ FT_END_HEADER
 diff --git a/include/ftimage.h b/include/ftimage.h
-index ea71a78..b66f036 100644
+index ea71a78..2f7ca2a 100644
 --- a/include/ftimage.h
 +++ b/include/ftimage.h
-@@ -318,13 +318,13 @@ FT_BEGIN_HEADER
+@@ -5,7 +5,7 @@
+ /*    FreeType glyph image formats and default raster interface            */
+ /*    (specification).                                                     */
+ /*                                                                         */
+-/*  Copyright 1996-2010, 2013 by                                           */
++/*  Copyright 1996-2010, 2013, 2014 by                                     */
+ /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+ /*                                                                         */
+ /*  This file is part of the FreeType project, and may only be used,       */
+@@ -193,67 +193,14 @@ FT_BEGIN_HEADER
+   } FT_Pixel_Mode;
+ 
+ 
+-  /*************************************************************************/
+-  /*                                                                       */
+-  /* <Enum>                                                                */
+-  /*    ft_pixel_mode_xxx                                                  */
+-  /*                                                                       */
+-  /* <Description>                                                         */
+-  /*    A list of deprecated constants.  Use the corresponding             */
+-  /*    @FT_Pixel_Mode values instead.                                     */
+-  /*                                                                       */
+-  /* <Values>                                                              */
+-  /*    ft_pixel_mode_none  :: See @FT_PIXEL_MODE_NONE.                    */
+-  /*    ft_pixel_mode_mono  :: See @FT_PIXEL_MODE_MONO.                    */
+-  /*    ft_pixel_mode_grays :: See @FT_PIXEL_MODE_GRAY.                    */
+-  /*    ft_pixel_mode_pal2  :: See @FT_PIXEL_MODE_GRAY2.                   */
+-  /*    ft_pixel_mode_pal4  :: See @FT_PIXEL_MODE_GRAY4.                   */
+-  /*                                                                       */
++  /* these constants are deprecated; use the corresponding `FT_Pixel_Mode' */
++  /* values instead.                                                       */
+ #define ft_pixel_mode_none   FT_PIXEL_MODE_NONE
+ #define ft_pixel_mode_mono   FT_PIXEL_MODE_MONO
+ #define ft_pixel_mode_grays  FT_PIXEL_MODE_GRAY
+ #define ft_pixel_mode_pal2   FT_PIXEL_MODE_GRAY2
+ #define ft_pixel_mode_pal4   FT_PIXEL_MODE_GRAY4
+ 
+- /* */
+-
+-#if 0
+-
+-  /*************************************************************************/
+-  /*                                                                       */
+-  /* <Enum>                                                                */
+-  /*    FT_Palette_Mode                                                    */
+-  /*                                                                       */
+-  /* <Description>                                                         */
+-  /*    THIS TYPE IS DEPRECATED.  DO NOT USE IT!                           */
+-  /*                                                                       */
+-  /*    An enumeration type to describe the format of a bitmap palette,    */
+-  /*    used with ft_pixel_mode_pal4 and ft_pixel_mode_pal8.               */
+-  /*                                                                       */
+-  /* <Values>                                                              */
+-  /*    ft_palette_mode_rgb  :: The palette is an array of 3-byte RGB      */
+-  /*                            records.                                   */
+-  /*                                                                       */
+-  /*    ft_palette_mode_rgba :: The palette is an array of 4-byte RGBA     */
+-  /*                            records.                                   */
+-  /*                                                                       */
+-  /* <Note>                                                                */
+-  /*    As ft_pixel_mode_pal2, pal4 and pal8 are currently unused by       */
+-  /*    FreeType, these types are not handled by the library itself.       */
+-  /*                                                                       */
+-  typedef enum  FT_Palette_Mode_
+-  {
+-    ft_palette_mode_rgb = 0,
+-    ft_palette_mode_rgba,
+-
+-    ft_palette_mode_max   /* do not remove */
+-
+-  } FT_Palette_Mode;
+-
+-  /* */
+-
+-#endif
+-
+ 
+   /*************************************************************************/
+   /*                                                                       */
+@@ -318,13 +265,13 @@ FT_BEGIN_HEADER
    /*                                                                       */
    typedef struct  FT_Bitmap_
    {
@@ -5114,8 +5963,294 @@ index ea71a78..b66f036 100644
      void*           palette;
  
    } FT_Bitmap;
+@@ -381,7 +328,7 @@ FT_BEGIN_HEADER
+   /*                                                                       */
+   /*    flags      :: A set of bit flags used to characterize the outline  */
+   /*                  and give hints to the scan-converter and hinter on   */
+-  /*                  how to convert/grid-fit it.  See @FT_OUTLINE_FLAGS.  */
++  /*                  how to convert/grid-fit it.  See @FT_OUTLINE_XXX.    */
+   /*                                                                       */
+   /* <Note>                                                                */
+   /*    The B/W rasterizer only checks bit~2 in the `tags' array for the   */
+@@ -402,6 +349,8 @@ FT_BEGIN_HEADER
+ 
+   } FT_Outline;
+ 
++  /* */
++
+   /* Following limits must be consistent with */
+   /* FT_Outline.{n_contours,n_points}         */
+ #define FT_OUTLINE_CONTOURS_MAX  SHRT_MAX
+@@ -411,7 +360,7 @@ FT_BEGIN_HEADER
+   /*************************************************************************/
+   /*                                                                       */
+   /* <Enum>                                                                */
+-  /*    FT_OUTLINE_FLAGS                                                   */
++  /*    FT_OUTLINE_XXX                                                     */
+   /*                                                                       */
+   /* <Description>                                                         */
+   /*    A list of bit-field constants use for the flags in an outline's    */
+@@ -492,24 +441,8 @@ FT_BEGIN_HEADER
+ #define FT_OUTLINE_SINGLE_PASS      0x200
+ 
+ 
+- /*************************************************************************
+-  *
+-  * @enum:
+-  *   ft_outline_flags
+-  *
+-  * @description:
+-  *   These constants are deprecated.  Please use the corresponding
+-  *   @FT_OUTLINE_FLAGS values.
+-  *
+-  * @values:
+-  *   ft_outline_none            :: See @FT_OUTLINE_NONE.
+-  *   ft_outline_owner           :: See @FT_OUTLINE_OWNER.
+-  *   ft_outline_even_odd_fill   :: See @FT_OUTLINE_EVEN_ODD_FILL.
+-  *   ft_outline_reverse_fill    :: See @FT_OUTLINE_REVERSE_FILL.
+-  *   ft_outline_ignore_dropouts :: See @FT_OUTLINE_IGNORE_DROPOUTS.
+-  *   ft_outline_high_precision  :: See @FT_OUTLINE_HIGH_PRECISION.
+-  *   ft_outline_single_pass     :: See @FT_OUTLINE_SINGLE_PASS.
+-  */
++  /* these constants are deprecated; use the corresponding */
++  /* `FT_OUTLINE_XXX' values instead                       */
+ #define ft_outline_none             FT_OUTLINE_NONE
+ #define ft_outline_owner            FT_OUTLINE_OWNER
+ #define ft_outline_even_odd_fill    FT_OUTLINE_EVEN_ODD_FILL
+@@ -796,22 +729,8 @@ FT_BEGIN_HEADER
+   } FT_Glyph_Format;
+ 
+ 
+-  /*************************************************************************/
+-  /*                                                                       */
+-  /* <Enum>                                                                */
+-  /*    ft_glyph_format_xxx                                                */
+-  /*                                                                       */
+-  /* <Description>                                                         */
+-  /*    A list of deprecated constants.  Use the corresponding             */
+-  /*    @FT_Glyph_Format values instead.                                   */
+-  /*                                                                       */
+-  /* <Values>                                                              */
+-  /*    ft_glyph_format_none      :: See @FT_GLYPH_FORMAT_NONE.            */
+-  /*    ft_glyph_format_composite :: See @FT_GLYPH_FORMAT_COMPOSITE.       */
+-  /*    ft_glyph_format_bitmap    :: See @FT_GLYPH_FORMAT_BITMAP.          */
+-  /*    ft_glyph_format_outline   :: See @FT_GLYPH_FORMAT_OUTLINE.         */
+-  /*    ft_glyph_format_plotter   :: See @FT_GLYPH_FORMAT_PLOTTER.         */
+-  /*                                                                       */
++  /* these constants are deprecated; use the corresponding */
++  /* `FT_Glyph_Format' values instead.                     */
+ #define ft_glyph_format_none       FT_GLYPH_FORMAT_NONE
+ #define ft_glyph_format_composite  FT_GLYPH_FORMAT_COMPOSITE
+ #define ft_glyph_format_bitmap     FT_GLYPH_FORMAT_BITMAP
+@@ -856,6 +775,21 @@ FT_BEGIN_HEADER
+   /* <Description>                                                         */
+   /*    This section contains technical definitions.                       */
+   /*                                                                       */
++  /* <Order>                                                               */
++  /*    FT_Raster                                                          */
++  /*    FT_Span                                                            */
++  /*    FT_SpanFunc                                                        */
++  /*                                                                       */
++  /*    FT_Raster_Params                                                   */
++  /*    FT_RASTER_FLAG_XXX                                                 */
++  /*                                                                       */
++  /*    FT_Raster_NewFunc                                                  */
++  /*    FT_Raster_DoneFunc                                                 */
++  /*    FT_Raster_ResetFunc                                                */
++  /*    FT_Raster_SetModeFunc                                              */
++  /*    FT_Raster_RenderFunc                                               */
++  /*    FT_Raster_Funcs                                                    */
++  /*                                                                       */
+   /*************************************************************************/
+ 
+ 
+@@ -865,8 +799,8 @@ FT_BEGIN_HEADER
+   /*    FT_Raster                                                          */
+   /*                                                                       */
+   /* <Description>                                                         */
+-  /*    A handle (pointer) to a raster object.  Each object can be used    */
+-  /*    independently to convert an outline into a bitmap or pixmap.       */
++  /*    An opaque handle (pointer) to a raster object.  Each object can be */
++  /*    used independently to convert an outline into a bitmap or pixmap.  */
+   /*                                                                       */
+   typedef struct FT_RasterRec_*  FT_Raster;
+ 
+@@ -877,8 +811,8 @@ FT_BEGIN_HEADER
+   /*    FT_Span                                                            */
+   /*                                                                       */
+   /* <Description>                                                         */
+-  /*    A structure used to model a single span of gray (or black) pixels  */
+-  /*    when rendering a monochrome or anti-aliased bitmap.                */
++  /*    A structure used to model a single span of gray pixels when        */
++  /*    rendering an anti-aliased bitmap.                                  */
+   /*                                                                       */
+   /* <Fields>                                                              */
+   /*    x        :: The span's horizontal start position.                  */
+@@ -886,8 +820,7 @@ FT_BEGIN_HEADER
+   /*    len      :: The span's length in pixels.                           */
+   /*                                                                       */
+   /*    coverage :: The span color/coverage, ranging from 0 (background)   */
+-  /*                to 255 (foreground).  Only used for anti-aliased       */
+-  /*                rendering.                                             */
++  /*                to 255 (foreground).                                   */
+   /*                                                                       */
+   /* <Note>                                                                */
+   /*    This structure is used by the span drawing callback type named     */
+@@ -957,22 +890,7 @@ FT_BEGIN_HEADER
+   /*    FT_Raster_BitTest_Func                                             */
+   /*                                                                       */
+   /* <Description>                                                         */
+-  /*    THIS TYPE IS DEPRECATED.  DO NOT USE IT.                           */
+-  /*                                                                       */
+-  /*    A function used as a call-back by the monochrome scan-converter    */
+-  /*    to test whether a given target pixel is already set to the drawing */
+-  /*    `color'.  These tests are crucial to implement drop-out control    */
+-  /*    per-se the TrueType spec.                                          */
+-  /*                                                                       */
+-  /* <Input>                                                               */
+-  /*    y     :: The pixel's y~coordinate.                                 */
+-  /*                                                                       */
+-  /*    x     :: The pixel's x~coordinate.                                 */
+-  /*                                                                       */
+-  /*    user  :: User-supplied data that is passed to the callback.        */
+-  /*                                                                       */
+-  /* <Return>                                                              */
+-  /*   1~if the pixel is `set', 0~otherwise.                               */
++  /*    Deprecated, unimplemented.                                         */
+   /*                                                                       */
+   typedef int
+   (*FT_Raster_BitTest_Func)( int    y,
+@@ -986,21 +904,7 @@ FT_BEGIN_HEADER
+   /*    FT_Raster_BitSet_Func                                              */
+   /*                                                                       */
+   /* <Description>                                                         */
+-  /*    THIS TYPE IS DEPRECATED.  DO NOT USE IT.                           */
+-  /*                                                                       */
+-  /*    A function used as a call-back by the monochrome scan-converter    */
+-  /*    to set an individual target pixel.  This is crucial to implement   */
+-  /*    drop-out control according to the TrueType specification.          */
+-  /*                                                                       */
+-  /* <Input>                                                               */
+-  /*    y     :: The pixel's y~coordinate.                                 */
+-  /*                                                                       */
+-  /*    x     :: The pixel's x~coordinate.                                 */
+-  /*                                                                       */
+-  /*    user  :: User-supplied data that is passed to the callback.        */
+-  /*                                                                       */
+-  /* <Return>                                                              */
+-  /*    1~if the pixel is `set', 0~otherwise.                              */
++  /*    Deprecated, unimplemented.                                         */
+   /*                                                                       */
+   typedef void
+   (*FT_Raster_BitSet_Func)( int    y,
+@@ -1034,8 +938,8 @@ FT_BEGIN_HEADER
+   /*                              pixmap's buffer _must_ be zeroed before  */
+   /*                              rendering.                               */
+   /*                                                                       */
+-  /*                              Note that for now, direct rendering is   */
+-  /*                              only possible with anti-aliased glyphs.  */
++  /*                              Direct rendering is only possible with   */
++  /*                              anti-aliased glyphs.                     */
+   /*                                                                       */
+   /*    FT_RASTER_FLAG_CLIP    :: This flag is only used in direct         */
+   /*                              rendering mode.  If set, the output will */
+@@ -1053,7 +957,8 @@ FT_BEGIN_HEADER
+ #define FT_RASTER_FLAG_DIRECT   0x2
+ #define FT_RASTER_FLAG_CLIP     0x4
+ 
+-  /* deprecated */
++  /* these constants are deprecated; use the corresponding */
++  /* `FT_RASTER_FLAG_XXX' values instead                   */
+ #define ft_raster_flag_default  FT_RASTER_FLAG_DEFAULT
+ #define ft_raster_flag_aa       FT_RASTER_FLAG_AA
+ #define ft_raster_flag_direct   FT_RASTER_FLAG_DIRECT
+@@ -1079,11 +984,11 @@ FT_BEGIN_HEADER
+   /*                                                                       */
+   /*    gray_spans  :: The gray span drawing callback.                     */
+   /*                                                                       */
+-  /*    black_spans :: The black span drawing callback.  UNIMPLEMENTED!    */
++  /*    black_spans :: Unused.                                             */
+   /*                                                                       */
+-  /*    bit_test    :: The bit test callback.  UNIMPLEMENTED!              */
++  /*    bit_test    :: Unused.                                             */
+   /*                                                                       */
+-  /*    bit_set     :: The bit set callback.  UNIMPLEMENTED!               */
++  /*    bit_set     :: Unused.                                             */
+   /*                                                                       */
+   /*    user        :: User-supplied data that is passed to each drawing   */
+   /*                   callback.                                           */
+@@ -1100,15 +1005,9 @@ FT_BEGIN_HEADER
+   /*                                                                       */
+   /*    If the @FT_RASTER_FLAG_DIRECT bit flag is set in `flags', the      */
+   /*    raster will call the `gray_spans' callback to draw gray pixel      */
+-  /*    spans, in the case of an aa glyph bitmap, it will call             */
+-  /*    `black_spans', and `bit_test' and `bit_set' in the case of a       */
+-  /*    monochrome bitmap.  This allows direct composition over a          */
+-  /*    pre-existing bitmap through user-provided callbacks to perform the */
+-  /*    span drawing/composition.                                          */
+-  /*                                                                       */
+-  /*    Note that the `bit_test' and `bit_set' callbacks are required when */
+-  /*    rendering a monochrome bitmap, as they are crucial to implement    */
+-  /*    correct drop-out control as defined in the TrueType specification. */
++  /*    spans.  This allows direct composition over a pre-existing bitmap  */
++  /*    through user-provided callbacks to perform the span drawing and    */
++  /*    composition.    Not supported by the monochrome rasterizer.        */
+   /*                                                                       */
+   typedef struct  FT_Raster_Params_
+   {
+@@ -1116,9 +1015,9 @@ FT_BEGIN_HEADER
+     const void*             source;
+     int                     flags;
+     FT_SpanFunc             gray_spans;
+-    FT_SpanFunc             black_spans;  /* doesn't work! */
+-    FT_Raster_BitTest_Func  bit_test;     /* doesn't work! */
+-    FT_Raster_BitSet_Func   bit_set;      /* doesn't work! */
++    FT_SpanFunc             black_spans;  /* unused */
++    FT_Raster_BitTest_Func  bit_test;     /* unused */
++    FT_Raster_BitSet_Func   bit_set;      /* unused */
+     void*                   user;
+     FT_BBox                 clip_box;
+ 
+@@ -1305,7 +1204,6 @@ FT_BEGIN_HEADER
+ 
+   } FT_Raster_Funcs;
+ 
+-
+   /* */
+ 
+ 
+diff --git a/include/ftincrem.h b/include/ftincrem.h
+index aaf689f..4c0246c 100644
+--- a/include/ftincrem.h
++++ b/include/ftincrem.h
+@@ -4,7 +4,7 @@
+ /*                                                                         */
+ /*    FreeType incremental loading (specification).                        */
+ /*                                                                         */
+-/*  Copyright 2002, 2003, 2006, 2007, 2008, 2010 by                        */
++/*  Copyright 2002, 2003, 2006-2008, 2010, 2014 by                         */
+ /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+ /*                                                                         */
+ /*  This file is part of the FreeType project, and may only be used,       */
+@@ -45,7 +45,7 @@ FT_BEGIN_HEADER
+    * @description:
+    *   This section contains various functions used to perform so-called
+    *   `incremental' glyph loading.  This is a mode where all glyphs loaded
+-   *   from a given @FT_Face are provided by the client application,
++   *   from a given @FT_Face are provided by the client application.
+    *
+    *   Apart from that, all other tables are loaded normally from the font
+    *   file.  This mode is useful when FreeType is used within another
+@@ -345,6 +345,7 @@ FT_BEGIN_HEADER
+ 
+   /* */
+ 
++
+ FT_END_HEADER
+ 
+ #endif /* __FTINCREM_H__ */
 diff --git a/include/ftlist.h b/include/ftlist.h
-index 241e21e..421908f 100644
+index 241e21e..9950a27 100644
 --- a/include/ftlist.h
 +++ b/include/ftlist.h
 @@ -4,7 +4,7 @@
@@ -5136,12 +6271,175 @@ index 241e21e..421908f 100644
    /*                                                                       */
    /*    memory  :: The current memory object that handles deallocation.    */
    /*                                                                       */
+@@ -265,7 +265,6 @@ FT_BEGIN_HEADER
+                     FT_Memory           memory,
+                     void*               user );
+ 
+-
+   /* */
+ 
+ 
+diff --git a/include/ftlzw.h b/include/ftlzw.h
+index 00d4016..857c0c5 100644
+--- a/include/ftlzw.h
++++ b/include/ftlzw.h
+@@ -88,7 +88,7 @@ FT_BEGIN_HEADER
+   FT_Stream_OpenLZW( FT_Stream  stream,
+                      FT_Stream  source );
+ 
+- /* */
++  /* */
+ 
+ 
+ FT_END_HEADER
+diff --git a/include/ftmm.h b/include/ftmm.h
+index 837975a..2dcfd67 100644
+--- a/include/ftmm.h
++++ b/include/ftmm.h
+@@ -218,9 +218,6 @@ FT_BEGIN_HEADER
+   } FT_MM_Var;
+ 
+ 
+-  /* */
+-
+-
+   /*************************************************************************/
+   /*                                                                       */
+   /* <Function>                                                            */
+@@ -365,7 +362,6 @@ FT_BEGIN_HEADER
+                                 FT_UInt    num_coords,
+                                 FT_Fixed*  coords );
+ 
+-
+   /* */
+ 
+ 
+diff --git a/include/ftmodapi.h b/include/ftmodapi.h
+index 22878f8..980f15d 100644
+--- a/include/ftmodapi.h
++++ b/include/ftmodapi.h
+@@ -75,6 +75,33 @@ FT_BEGIN_HEADER
+   /*                                                                       */
+   /*    Note that the FreeType Cache sub-system is not a FreeType module.  */
+   /*                                                                       */
++  /* <Order>                                                               */
++  /*    FT_Module                                                          */
++  /*    FT_Module_Constructor                                              */
++  /*    FT_Module_Destructor                                               */
++  /*    FT_Module_Requester                                                */
++  /*    FT_Module_Class                                                    */
++  /*                                                                       */
++  /*    FT_Add_Module                                                      */
++  /*    FT_Get_Module                                                      */
++  /*    FT_Remove_Module                                                   */
++  /*    FT_Add_Default_Modules                                             */
++  /*                                                                       */
++  /*    FT_Property_Set                                                    */
++  /*    FT_Property_Get                                                    */
++  /*                                                                       */
++  /*    FT_New_Library                                                     */
++  /*    FT_Done_Library                                                    */
++  /*    FT_Reference_Library                                               */
++  /*                                                                       */
++  /*    FT_Renderer                                                        */
++  /*    FT_Renderer_Class                                                  */
++  /*                                                                       */
++  /*    FT_Get_Renderer                                                    */
++  /*    FT_Set_Renderer                                                    */
++  /*                                                                       */
++  /*    FT_Set_Debug_Hook                                                  */
++  /*                                                                       */
+   /*************************************************************************/
+ 
+ 
+@@ -491,7 +518,7 @@ FT_BEGIN_HEADER
+   FT_EXPORT( FT_Error )
+   FT_Done_Library( FT_Library  library );
+ 
+-/* */
++  /* */
+ 
+   typedef void
+   (*FT_DebugHook_Func)( void*  arg );
+@@ -629,7 +656,6 @@ FT_BEGIN_HEADER
+   FT_EXPORT( FT_TrueTypeEngineType )
+   FT_Get_TrueType_Engine_Type( FT_Library  library );
+ 
+-
+   /* */
+ 
+ 
+diff --git a/include/ftotval.h b/include/ftotval.h
+index bb52dc4..75ba03e 100644
+--- a/include/ftotval.h
++++ b/include/ftotval.h
+@@ -4,7 +4,7 @@
+ /*                                                                         */
+ /*    FreeType API for validating OpenType tables (specification).         */
+ /*                                                                         */
+-/*  Copyright 2004-2007, 2013 by                                           */
++/*  Copyright 2004-2007, 2013, 2014 by                                     */
+ /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+ /*                                                                         */
+ /*  This file is part of the FreeType project, and may only be used,       */
+@@ -58,6 +58,12 @@ FT_BEGIN_HEADER
+   /*    This section contains the declaration of functions to validate     */
+   /*    some OpenType tables (BASE, GDEF, GPOS, GSUB, JSTF, MATH).         */
+   /*                                                                       */
++  /* <Order>                                                               */
++  /*    FT_OpenType_Validate                                               */
++  /*    FT_OpenType_Free                                                   */
++  /*                                                                       */
++  /*    FT_VALIDATE_OTXXX                                                  */
++  /*                                                                       */
+   /*************************************************************************/
+ 
+ 
+@@ -107,8 +113,6 @@ FT_BEGIN_HEADER
+                         FT_VALIDATE_JSTF | \
+                         FT_VALIDATE_MATH
+ 
+-  /* */
+-
+  /**********************************************************************
+   *
+   * @function:
+@@ -165,8 +169,6 @@ FT_BEGIN_HEADER
+                         FT_Bytes  *GSUB_table,
+                         FT_Bytes  *JSTF_table );
+ 
+-  /* */
+-
+  /**********************************************************************
+   *
+   * @function:
+@@ -191,8 +193,7 @@ FT_BEGIN_HEADER
+   FT_OpenType_Free( FT_Face   face,
+                     FT_Bytes  table );
+ 
+-
+- /* */
++  /* */
+ 
+ 
+ FT_END_HEADER
 diff --git a/include/ftoutln.h b/include/ftoutln.h
-index 6c6d3f9..00945c0 100644
+index 6c6d3f9..d3b8fbd 100644
 --- a/include/ftoutln.h
 +++ b/include/ftoutln.h
-@@ -71,10 +71,10 @@ FT_BEGIN_HEADER
+@@ -52,7 +52,6 @@ FT_BEGIN_HEADER
    /*                                                                       */
+   /* <Order>                                                               */
+   /*    FT_Outline                                                         */
+-  /*    FT_OUTLINE_FLAGS                                                   */
+   /*    FT_Outline_New                                                     */
+   /*    FT_Outline_Done                                                    */
+   /*    FT_Outline_Copy                                                    */
+@@ -68,13 +67,17 @@ FT_BEGIN_HEADER
+   /*                                                                       */
+   /*    FT_Outline_Get_Bitmap                                              */
+   /*    FT_Outline_Render                                                  */
+-  /*                                                                       */
    /*    FT_Outline_Decompose                                               */
    /*    FT_Outline_Funcs                                                   */
 -  /*    FT_Outline_MoveTo_Func                                             */
@@ -5152,10 +6450,15 @@ index 6c6d3f9..00945c0 100644
 +  /*    FT_Outline_LineToFunc                                              */
 +  /*    FT_Outline_ConicToFunc                                             */
 +  /*    FT_Outline_CubicToFunc                                             */
++  /*                                                                       */
++  /*    FT_Orientation                                                     */
++  /*    FT_Outline_Get_Orientation                                         */
++  /*                                                                       */
++  /*    FT_OUTLINE_XXX                                                     */
    /*                                                                       */
    /*************************************************************************/
  
-@@ -535,7 +535,7 @@ FT_BEGIN_HEADER
+@@ -535,7 +538,7 @@ FT_BEGIN_HEADER
    *
    * @description:
    *   This function analyzes a glyph outline and tries to compute its
@@ -5164,8 +6467,41 @@ index 6c6d3f9..00945c0 100644
    *   the total area covered by the outline. The positive integral
    *   corresponds to the clockwise orientation and @FT_ORIENTATION_POSTSCRIPT
    *   is returned. The negative integral corresponds to the counter-clockwise
+@@ -555,7 +558,6 @@ FT_BEGIN_HEADER
+   FT_EXPORT( FT_Orientation )
+   FT_Outline_Get_Orientation( FT_Outline*  outline );
+ 
+-
+   /* */
+ 
+ 
+diff --git a/include/ftpfr.h b/include/ftpfr.h
+index 0b7b7d4..7d50353 100644
+--- a/include/ftpfr.h
++++ b/include/ftpfr.h
+@@ -161,7 +161,7 @@ FT_BEGIN_HEADER
+                       FT_UInt   gindex,
+                       FT_Pos   *aadvance );
+ 
+- /* */
++  /* */
+ 
+ 
+ FT_END_HEADER
+diff --git a/include/ftrender.h b/include/ftrender.h
+index dd0229b..e8d3636 100644
+--- a/include/ftrender.h
++++ b/include/ftrender.h
+@@ -226,7 +226,6 @@ FT_BEGIN_HEADER
+                    FT_UInt        num_params,
+                    FT_Parameter*  parameters );
+ 
+-
+   /* */
+ 
+ 
 diff --git a/include/ftstroke.h b/include/ftstroke.h
-index a498e4a..ad2a900 100644
+index a498e4a..bd31170 100644
 --- a/include/ftstroke.h
 +++ b/include/ftstroke.h
 @@ -4,7 +4,7 @@
@@ -5177,7 +6513,55 @@ index a498e4a..ad2a900 100644
  /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
  /*                                                                         */
  /*  This file is part of the FreeType project, and may only be used,       */
-@@ -276,6 +276,8 @@ FT_BEGIN_HEADER
+@@ -46,6 +46,38 @@ FT_BEGIN_HEADER
+   *    This can be useful to generate `bordered' glyph, i.e., glyphs
+   *    displayed with a coloured (and anti-aliased) border around their
+   *    shape.
++  *
++  * @order:
++  *    FT_Stroker
++  *
++  *    FT_Stroker_LineJoin
++  *    FT_Stroker_LineCap
++  *    FT_StrokerBorder
++  *
++  *    FT_Outline_GetInsideBorder
++  *    FT_Outline_GetOutsideBorder
++  *
++  *    FT_Glyph_Stroke
++  *    FT_Glyph_StrokeBorder
++  *
++  *    FT_Stroker_New
++  *    FT_Stroker_Set
++  *    FT_Stroker_Rewind
++  *    FT_Stroker_ParseOutline
++  *    FT_Stroker_Done
++  *
++  *    FT_Stroker_BeginSubPath
++  *    FT_Stroker_EndSubPath
++  *
++  *    FT_Stroker_LineTo
++  *    FT_Stroker_ConicTo
++  *    FT_Stroker_CubicTo
++  *
++  *    FT_Stroker_GetBorderCounts
++  *    FT_Stroker_ExportBorder
++  *    FT_Stroker_GetCounts
++  *    FT_Stroker_Export
++  *
+   */
+ 
+ 
+@@ -55,7 +87,7 @@ FT_BEGIN_HEADER
+   *   FT_Stroker
+   *
+   * @description:
+-  *   Opaque handler to a path stroker object.
++  *   Opaque handle to a path stroker object.
+   */
+   typedef struct FT_StrokerRec_*  FT_Stroker;
+ 
+@@ -276,6 +308,8 @@ FT_BEGIN_HEADER
     * @note:
     *   The radius is expressed in the same units as the outline
     *   coordinates.
@@ -5186,7 +6570,7 @@ index a498e4a..ad2a900 100644
     */
    FT_EXPORT( void )
    FT_Stroker_Set( FT_Stroker           stroker,
-@@ -570,10 +572,10 @@ FT_BEGIN_HEADER
+@@ -570,10 +604,10 @@ FT_BEGIN_HEADER
     *   receive all new data.
     *
     *   When an outline, or a sub-path, is `closed', the stroker generates
@@ -5199,6 +6583,39 @@ index a498e4a..ad2a900 100644
     *   points, while the `right' border becomes empty.
     *
     *   Use the function @FT_Stroker_Export instead if you want to
+@@ -736,7 +770,7 @@ FT_BEGIN_HEADER
+                          FT_Bool      inside,
+                          FT_Bool      destroy );
+ 
+- /* */
++  /* */
+ 
+ FT_END_HEADER
+ 
+diff --git a/include/ftsynth.h b/include/ftsynth.h
+index 839ab5e..d0ea730 100644
+--- a/include/ftsynth.h
++++ b/include/ftsynth.h
+@@ -73,6 +73,7 @@ FT_BEGIN_HEADER
+ 
+   /* */
+ 
++
+ FT_END_HEADER
+ 
+ #endif /* __FTSYNTH_H__ */
+diff --git a/include/ftsystem.h b/include/ftsystem.h
+index e07460c..2c95cbb 100644
+--- a/include/ftsystem.h
++++ b/include/ftsystem.h
+@@ -335,7 +335,6 @@ FT_BEGIN_HEADER
+ 
+   } FT_StreamRec;
+ 
+-
+   /* */
+ 
+ 
 diff --git a/include/fttrigon.h b/include/fttrigon.h
 index 65143cb..9c7b543 100644
 --- a/include/fttrigon.h
@@ -5221,6 +6638,93 @@ index 65143cb..9c7b543 100644
     *
     */
    FT_EXPORT( void )
+diff --git a/include/ftttdrv.h b/include/ftttdrv.h
+index 70ad3d5..3588413 100644
+--- a/include/ftttdrv.h
++++ b/include/ftttdrv.h
+@@ -158,9 +158,9 @@ FT_BEGIN_HEADER
+ #define TT_INTERPRETER_VERSION_35  35
+ #define TT_INTERPRETER_VERSION_38  38
+ 
+-
+  /* */
+ 
++
+ FT_END_HEADER
+ 
+ 
+diff --git a/include/fttypes.h b/include/fttypes.h
+index bd944a4..2c01e87 100644
+--- a/include/fttypes.h
++++ b/include/fttypes.h
+@@ -4,7 +4,7 @@
+ /*                                                                         */
+ /*    FreeType simple types definitions (specification only).              */
+ /*                                                                         */
+-/*  Copyright 1996-2002, 2004, 2006-2009, 2012, 2013 by                    */
++/*  Copyright 1996-2002, 2004, 2006-2009, 2012-2014 by                     */
+ /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+ /*                                                                         */
+ /*  This file is part of the FreeType project, and may only be used,       */
+@@ -57,6 +57,8 @@ FT_BEGIN_HEADER
+   /*    FT_UInt16                                                          */
+   /*    FT_Int32                                                           */
+   /*    FT_UInt32                                                          */
++  /*    FT_Int64                                                           */
++  /*    FT_UInt64                                                          */
+   /*    FT_Short                                                           */
+   /*    FT_UShort                                                          */
+   /*    FT_Long                                                            */
+@@ -78,7 +80,9 @@ FT_BEGIN_HEADER
+   /*    FT_F2Dot14                                                         */
+   /*    FT_UnitVector                                                      */
+   /*    FT_F26Dot6                                                         */
++  /*    FT_Data                                                            */
+   /*                                                                       */
++  /*    FT_MAKE_TAG                                                        */
+   /*                                                                       */
+   /*    FT_Generic                                                         */
+   /*    FT_Generic_Finalizer                                               */
+@@ -567,9 +571,9 @@ FT_BEGIN_HEADER
+ 
+   } FT_ListRec;
+ 
+-
+   /* */
+ 
++
+ #define FT_IS_EMPTY( list )  ( (list).head == 0 )
+ #define FT_BOOL( x )  ( (FT_Bool)( x ) )
+ 
+diff --git a/include/ftwinfnt.h b/include/ftwinfnt.h
+index 0b67351..5026158 100644
+--- a/include/ftwinfnt.h
++++ b/include/ftwinfnt.h
+@@ -259,9 +259,9 @@ FT_BEGIN_HEADER
+   FT_Get_WinFNT_Header( FT_Face               face,
+                         FT_WinFNT_HeaderRec  *aheader );
+ 
+-
+   /* */
+ 
++
+ FT_END_HEADER
+ 
+ #endif /* __FTWINFNT_H__ */
+diff --git a/include/ftxf86.h b/include/ftxf86.h
+index 493cccd..89d1993 100644
+--- a/include/ftxf86.h
++++ b/include/ftxf86.h
+@@ -76,7 +76,8 @@ FT_BEGIN_HEADER
+   FT_EXPORT( const char* )
+   FT_Get_X11_Font_Format( FT_Face  face );
+ 
+- /* */
++  /* */
++
+ 
+ FT_END_HEADER
+ 
 diff --git a/include/internal/ftcalc.h b/include/internal/ftcalc.h
 index 03bd68e..14ec37b 100644
 --- a/include/internal/ftcalc.h
@@ -5696,6 +7200,313 @@ index 6b5e41f..d558e86 100644
    (*TT_Get_Metrics_Func)( TT_Face     face,
                            FT_Bool     vertical,
                            FT_UInt     gindex,
+diff --git a/include/t1tables.h b/include/t1tables.h
+index a14255e..61aefdd 100644
+--- a/include/t1tables.h
++++ b/include/t1tables.h
+@@ -5,7 +5,7 @@
+ /*    Basic Type 1/Type 2 tables definitions and interface (specification  */
+ /*    only).                                                               */
+ /*                                                                         */
+-/*  Copyright 1996-2004, 2006, 2008, 2009, 2011 by                         */
++/*  Copyright 1996-2004, 2006, 2008, 2009, 2011, 2014 by                   */
+ /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+ /*                                                                         */
+ /*  This file is part of the FreeType project, and may only be used,       */
+@@ -49,6 +49,26 @@ FT_BEGIN_HEADER
+   /*    This section contains the definition of Type 1-specific tables,    */
+   /*    including structures related to other PostScript font formats.     */
+   /*                                                                       */
++  /* <Order>                                                               */
++  /*    PS_FontInfoRec                                                     */
++  /*    PS_FontInfo                                                        */
++  /*    PS_PrivateRec                                                      */
++  /*    PS_Private                                                         */
++  /*                                                                       */
++  /*    CID_FaceDictRec                                                    */
++  /*    CID_FaceDict                                                       */
++  /*    CID_FaceInfoRec                                                    */
++  /*    CID_FaceInfo                                                       */
++  /*                                                                       */
++  /*    FT_Has_PS_Glyph_Names                                              */
++  /*    FT_Get_PS_Font_Info                                                */
++  /*    FT_Get_PS_Font_Private                                             */
++  /*    FT_Get_PS_Font_Value                                               */
++  /*                                                                       */
++  /*    T1_Blend_Flags                                                     */
++  /*    T1_EncodingType                                                    */
++  /*    PS_Dict_Keys                                                       */
++  /*                                                                       */
+   /*************************************************************************/
+ 
+ 
+@@ -190,14 +210,30 @@ FT_BEGIN_HEADER
+   /*    given blend dictionary (font info or private).  Used to support    */
+   /*    Multiple Masters fonts.                                            */
+   /*                                                                       */
++  /* <Values>                                                              */
++  /*    T1_BLEND_UNDERLINE_POSITION ::                                     */
++  /*    T1_BLEND_UNDERLINE_THICKNESS ::                                    */
++  /*    T1_BLEND_ITALIC_ANGLE ::                                           */
++  /*    T1_BLEND_BLUE_VALUES ::                                            */
++  /*    T1_BLEND_OTHER_BLUES ::                                            */
++  /*    T1_BLEND_STANDARD_WIDTH ::                                         */
++  /*    T1_BLEND_STANDARD_HEIGHT ::                                        */
++  /*    T1_BLEND_STEM_SNAP_WIDTHS ::                                       */
++  /*    T1_BLEND_STEM_SNAP_HEIGHTS ::                                      */
++  /*    T1_BLEND_BLUE_SCALE ::                                             */
++  /*    T1_BLEND_BLUE_SHIFT ::                                             */
++  /*    T1_BLEND_FAMILY_BLUES ::                                           */
++  /*    T1_BLEND_FAMILY_OTHER_BLUES ::                                     */
++  /*    T1_BLEND_FORCE_BOLD ::                                             */
++  /*                                                                       */
+   typedef enum  T1_Blend_Flags_
+   {
+-    /*# required fields in a FontInfo blend dictionary */
++    /* required fields in a FontInfo blend dictionary */
+     T1_BLEND_UNDERLINE_POSITION = 0,
+     T1_BLEND_UNDERLINE_THICKNESS,
+     T1_BLEND_ITALIC_ANGLE,
+ 
+-    /*# required fields in a Private blend dictionary */
++    /* required fields in a Private blend dictionary */
+     T1_BLEND_BLUE_VALUES,
+     T1_BLEND_OTHER_BLUES,
+     T1_BLEND_STANDARD_WIDTH,
+@@ -210,15 +246,13 @@ FT_BEGIN_HEADER
+     T1_BLEND_FAMILY_OTHER_BLUES,
+     T1_BLEND_FORCE_BOLD,
+ 
+-    /*# never remove */
+-    T1_BLEND_MAX
++    T1_BLEND_MAX    /* do not remove */
+ 
+   } T1_Blend_Flags;
+ 
+-  /* */
+ 
+-
+-  /*# backwards compatible definitions */
++  /* these constants are deprecated; use the corresponding */
++  /* `T1_Blend_Flags' values instead                       */
+ #define t1_blend_underline_position   T1_BLEND_UNDERLINE_POSITION
+ #define t1_blend_underline_thickness  T1_BLEND_UNDERLINE_THICKNESS
+ #define t1_blend_italic_angle         T1_BLEND_ITALIC_ANGLE
+@@ -235,6 +269,8 @@ FT_BEGIN_HEADER
+ #define t1_blend_force_bold           T1_BLEND_FORCE_BOLD
+ #define t1_blend_max                  T1_BLEND_MAX
+ 
++  /* */
++
+ 
+   /* maximum number of Multiple Masters designs, as defined in the spec */
+ #define T1_MAX_MM_DESIGNS     16
+@@ -333,10 +369,17 @@ FT_BEGIN_HEADER
+   /*                                                                       */
+   typedef struct CID_FaceDictRec_*  CID_FaceDict;
+ 
+-  /* */
+-
+ 
+-  /* backwards-compatible definition */
++  /*************************************************************************/
++  /*                                                                       */
++  /* <Struct>                                                              */
++  /*    CID_FontDict                                                       */
++  /*                                                                       */
++  /* <Description>                                                         */
++  /*    This type is equivalent to @CID_FaceDictRec.  It is deprecated but */
++  /*    kept to maintain source compatibility between various versions of  */
++  /*    FreeType.                                                          */
++  /*                                                                       */
+   typedef CID_FaceDictRec  CID_FontDict;
+ 
+ 
+@@ -503,6 +546,13 @@ FT_BEGIN_HEADER
+   /*    An enumeration describing the `Encoding' entry in a Type 1         */
+   /*    dictionary.                                                        */
+   /*                                                                       */
++  /* <Values>                                                              */
++  /*    T1_ENCODING_TYPE_NONE ::                                           */
++  /*    T1_ENCODING_TYPE_ARRAY ::                                          */
++  /*    T1_ENCODING_TYPE_STANDARD ::                                       */
++  /*    T1_ENCODING_TYPE_ISOLATIN1 ::                                      */
++  /*    T1_ENCODING_TYPE_EXPERT ::                                         */
++  /*                                                                       */
+   typedef enum  T1_EncodingType_
+   {
+     T1_ENCODING_TYPE_NONE = 0,
+@@ -523,6 +573,54 @@ FT_BEGIN_HEADER
+   /*    An enumeration used in calls to @FT_Get_PS_Font_Value to identify  */
+   /*    the Type~1 dictionary entry to retrieve.                           */
+   /*                                                                       */
++  /* <Values>                                                              */
++  /*    PS_DICT_FONT_TYPE ::                                               */
++  /*    PS_DICT_FONT_MATRIX ::                                             */
++  /*    PS_DICT_FONT_BBOX ::                                               */
++  /*    PS_DICT_PAINT_TYPE ::                                              */
++  /*    PS_DICT_FONT_NAME ::                                               */
++  /*    PS_DICT_UNIQUE_ID ::                                               */
++  /*    PS_DICT_NUM_CHAR_STRINGS ::                                        */
++  /*    PS_DICT_CHAR_STRING_KEY ::                                         */
++  /*    PS_DICT_CHAR_STRING ::                                             */
++  /*    PS_DICT_ENCODING_TYPE ::                                           */
++  /*    PS_DICT_ENCODING_ENTRY ::                                          */
++  /*    PS_DICT_NUM_SUBRS ::                                               */
++  /*    PS_DICT_SUBR ::                                                    */
++  /*    PS_DICT_STD_HW ::                                                  */
++  /*    PS_DICT_STD_VW ::                                                  */
++  /*    PS_DICT_NUM_BLUE_VALUES ::                                         */
++  /*    PS_DICT_BLUE_VALUE ::                                              */
++  /*    PS_DICT_BLUE_FUZZ ::                                               */
++  /*    PS_DICT_NUM_OTHER_BLUES ::                                         */
++  /*    PS_DICT_OTHER_BLUE ::                                              */
++  /*    PS_DICT_NUM_FAMILY_BLUES ::                                        */
++  /*    PS_DICT_FAMILY_BLUE ::                                             */
++  /*    PS_DICT_NUM_FAMILY_OTHER_BLUES ::                                  */
++  /*    PS_DICT_FAMILY_OTHER_BLUE ::                                       */
++  /*    PS_DICT_BLUE_SCALE ::                                              */
++  /*    PS_DICT_BLUE_SHIFT ::                                              */
++  /*    PS_DICT_NUM_STEM_SNAP_H ::                                         */
++  /*    PS_DICT_STEM_SNAP_H ::                                             */
++  /*    PS_DICT_NUM_STEM_SNAP_V ::                                         */
++  /*    PS_DICT_STEM_SNAP_V ::                                             */
++  /*    PS_DICT_FORCE_BOLD ::                                              */
++  /*    PS_DICT_RND_STEM_UP ::                                             */
++  /*    PS_DICT_MIN_FEATURE ::                                             */
++  /*    PS_DICT_LEN_IV ::                                                  */
++  /*    PS_DICT_PASSWORD ::                                                */
++  /*    PS_DICT_LANGUAGE_GROUP ::                                          */
++  /*    PS_DICT_VERSION ::                                                 */
++  /*    PS_DICT_NOTICE ::                                                  */
++  /*    PS_DICT_FULL_NAME ::                                               */
++  /*    PS_DICT_FAMILY_NAME ::                                             */
++  /*    PS_DICT_WEIGHT ::                                                  */
++  /*    PS_DICT_IS_FIXED_PITCH ::                                          */
++  /*    PS_DICT_UNDERLINE_POSITION ::                                      */
++  /*    PS_DICT_UNDERLINE_THICKNESS ::                                     */
++  /*    PS_DICT_FS_TYPE ::                                                 */
++  /*    PS_DICT_ITALIC_ANGLE ::                                            */
++  /*                                                                       */
+   typedef enum  PS_Dict_Keys_
+   {
+     /* conventionally in the font dictionary */
+diff --git a/include/tttables.h b/include/tttables.h
+index bb49dc0..e1d8b05 100644
+--- a/include/tttables.h
++++ b/include/tttables.h
+@@ -5,7 +5,7 @@
+ /*    Basic SFNT/TrueType tables definitions and interface                 */
+ /*    (specification only).                                                */
+ /*                                                                         */
+-/*  Copyright 1996-2005, 2008-2013 by                                      */
++/*  Copyright 1996-2005, 2008-2014 by                                      */
+ /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+ /*                                                                         */
+ /*  This file is part of the FreeType project, and may only be used,       */
+@@ -48,6 +48,25 @@ FT_BEGIN_HEADER
+   /*    This section contains the definition of TrueType-specific tables   */
+   /*    as well as some routines used to access and process them.          */
+   /*                                                                       */
++  /* <Order>                                                               */
++  /*    TT_Header                                                          */
++  /*    TT_HoriHeader                                                      */
++  /*    TT_VertHeader                                                      */
++  /*    TT_OS2                                                             */
++  /*    TT_Postscript                                                      */
++  /*    TT_PCLT                                                            */
++  /*    TT_MaxProfile                                                      */
++  /*                                                                       */
++  /*    FT_Sfnt_Tag                                                        */
++  /*    FT_Get_Sfnt_Table                                                  */
++  /*    FT_Load_Sfnt_Table                                                 */
++  /*    FT_Sfnt_Table_Info                                                 */
++  /*                                                                       */
++  /*    FT_Get_CMap_Language_ID                                            */
++  /*    FT_Get_CMap_Format                                                 */
++  /*                                                                       */
++  /*    FT_PARAM_TAG_UNPATENTED_HINTING                                    */
++  /*                                                                       */
+   /*************************************************************************/
+ 
+ 
+@@ -559,21 +578,44 @@ FT_BEGIN_HEADER
+   /*    An enumeration used to specify the index of an SFNT table.         */
+   /*    Used in the @FT_Get_Sfnt_Table API function.                       */
+   /*                                                                       */
++  /* <Values>                                                              */
++  /*    FT_SFNT_HEAD :: To access the font's @TT_Header structure.         */
++  /*                                                                       */
++  /*    FT_SFNT_MAXP :: To access the font's @TT_MaxProfile structure.     */
++  /*                                                                       */
++  /*    FT_SFNT_OS2  :: To access the font's @TT_OS2 structure.            */
++  /*                                                                       */
++  /*    FT_SFNT_HHEA :: To access the font's @TT_HoriHeader structure.     */
++  /*                                                                       */
++  /*    FT_SFNT_VHEA :: To access the font's @TT_VertHeader struture.      */
++  /*                                                                       */
++  /*    FT_SFNT_POST :: To access the font's @TT_Postscript structure.     */
++  /*                                                                       */
++  /*    FT_SFNT_PCLT :: To access the font's @TT_PCLT structure.           */
++  /*                                                                       */
+   typedef enum  FT_Sfnt_Tag_
+   {
+-    ft_sfnt_head = 0,    /* TT_Header     */
+-    ft_sfnt_maxp = 1,    /* TT_MaxProfile */
+-    ft_sfnt_os2  = 2,    /* TT_OS2        */
+-    ft_sfnt_hhea = 3,    /* TT_HoriHeader */
+-    ft_sfnt_vhea = 4,    /* TT_VertHeader */
+-    ft_sfnt_post = 5,    /* TT_Postscript */
+-    ft_sfnt_pclt = 6,    /* TT_PCLT       */
++    FT_SFNT_HEAD,
++    FT_SFNT_MAXP,
++    FT_SFNT_OS2,
++    FT_SFNT_HHEA,
++    FT_SFNT_VHEA,
++    FT_SFNT_POST,
++    FT_SFNT_PCLT,
+ 
+-    sfnt_max   /* internal end mark */
++    FT_SFNT_MAX
+ 
+   } FT_Sfnt_Tag;
+ 
+-  /* */
++  /* these constants are deprecated; use the corresponding `FT_Sfnt_Tag' */
++  /* values instead                                                      */
++#define ft_sfnt_head  FT_SFNT_HEAD
++#define ft_sfnt_maxp  FT_SFNT_MAXP
++#define ft_sfnt_os2   FT_SFNT_OS2
++#define ft_sfnt_hhea  FT_SFNT_HHEA
++#define ft_sfnt_vhea  FT_SFNT_VHEA
++#define ft_sfnt_post  FT_SFNT_POST
++#define ft_sfnt_pclt  FT_SFNT_PCLT
+ 
+ 
+   /*************************************************************************/
+@@ -611,7 +653,7 @@ FT_BEGIN_HEADER
+   /*                                                                       */
+   /*                                                                       */
+   /*      vert_header =                                                    */
+-  /*        (TT_VertHeader*)FT_Get_Sfnt_Table( face, ft_sfnt_vhea );       */
++  /*        (TT_VertHeader*)FT_Get_Sfnt_Table( face, FT_SFNT_VHEA );       */
+   /*    }                                                                  */
+   /*                                                                       */
+   FT_EXPORT( void* )
+diff --git a/include/ttunpat.h b/include/ttunpat.h
+index a016275..bf53ddd 100644
+--- a/include/ttunpat.h
++++ b/include/ttunpat.h
+@@ -48,7 +48,8 @@ FT_BEGIN_HEADER
+   */
+ #define FT_PARAM_TAG_UNPATENTED_HINTING  FT_MAKE_TAG( 'u', 'n', 'p', 'a' )
+ 
+- /* */
++  /* */
++
+ 
+ FT_END_HEADER
+ 
 diff --git a/src/autofit/afangles.c b/src/autofit/afangles.c
 index b44a5ba..f8b095b 100644
 --- a/src/autofit/afangles.c
@@ -6751,7 +8562,7 @@ index d2da40e..38d8d69 100644
    /* `increase-x-height' property */
  #define AF_PROP_INCREASE_X_HEIGHT_MIN  6
 diff --git a/src/autofit/afhints.c b/src/autofit/afhints.c
-index 270a06b..89b640c 100644
+index 270a06b..f3cc50f 100644
 --- a/src/autofit/afhints.c
 +++ b/src/autofit/afhints.c
 @@ -74,7 +74,8 @@
@@ -6775,18 +8586,26 @@ index 270a06b..89b640c 100644
    Exit:
      *anedge = edge;
      return error;
-@@ -203,8 +200,8 @@
-               " |  xfit |  yfit |  flags ]\n" ));
+@@ -183,7 +180,7 @@
+   }
+ 
+ 
+-#define AF_INDEX_NUM( ptr, base )  ( (ptr) ? ( (ptr) - (base) ) : -1 )
++#define AF_INDEX_NUM( ptr, base )  (int)( (ptr) ? ( (ptr) - (base) ) : -1 )
+ 
+ 
+ #ifdef __cplusplus
+@@ -204,20 +201,15 @@
  
      for ( point = points; point < limit; point++ )
--      AF_DUMP(( "  [ %5d | %5d | %5d | %6.2f | %6.2f"
+       AF_DUMP(( "  [ %5d | %5d | %5d | %6.2f | %6.2f"
 -                " | %5.2f | %5.2f | %c%c%c%c%c%c ]\n",
-+      AF_DUMP(( "  [ %5ld | %5d | %5d | %6.2f | %6.2f"
+-                point - points,
 +                " | %5.2f | %5.2f | %c ]\n",
-                 point - points,
++                AF_INDEX_NUM( point, points ),
                  point->fx,
                  point->fy,
-@@ -212,12 +209,7 @@
+                 point->ox / 64.0,
                  point->oy / 64.0,
                  point->x / 64.0,
                  point->y / 64.0,
@@ -6800,28 +8619,24 @@ index 270a06b..89b640c 100644
      AF_DUMP(( "\n" ));
    }
  #ifdef __cplusplus
-@@ -286,8 +278,8 @@
-         AF_DUMP(( "  (none)\n" ));
- 
-       for ( seg = segments; seg < limit; seg++ )
--        AF_DUMP(( "  [ %5d | %5.2g | %5s | %4d"
--                  " | %4d | %4d | %5d | %4d"
-+        AF_DUMP(( "  [ %5ld | %5.2g | %5s | %4ld"
-+                  " | %4ld | %4ld | %5ld | %4ld"
+@@ -289,7 +281,7 @@
+         AF_DUMP(( "  [ %5d | %5.2g | %5s | %4d"
+                   " | %4d | %4d | %5d | %4d"
                    " | %6d | %5d | %11s ]\n",
-                   seg - segments,
+-                  seg - segments,
++                  AF_INDEX_NUM( seg, segments ),
                    dimension == AF_DIMENSION_HORZ
-@@ -418,8 +410,8 @@
-         AF_DUMP(( "  (none)\n" ));
- 
+                                ? (int)seg->first->ox / 64.0
+                                : (int)seg->first->oy / 64.0,
+@@ -420,7 +412,7 @@
        for ( edge = edges; edge < limit; edge++ )
--        AF_DUMP(( "  [ %5d | %5.2g | %5s | %4d"
--                  " | %5d |   %c  | %5.2f | %5.2f | %11s ]\n",
-+        AF_DUMP(( "  [ %5ld | %5.2g | %5s | %4ld"
-+                  " | %5ld |   %c  | %5.2f | %5.2f | %11s ]\n",
-                   edge - edges,
+         AF_DUMP(( "  [ %5d | %5.2g | %5s | %4d"
+                   " | %5d |   %c  | %5.2f | %5.2f | %11s ]\n",
+-                  edge - edges,
++                  AF_INDEX_NUM( edge, edges ),
                    (int)edge->opos / 64.0,
                    af_dir_str( (AF_Direction)edge->dir ),
+                   AF_INDEX_NUM( edge->link, edges ),
 @@ -651,6 +643,9 @@
  
          for ( point = points; point < point_limit; point++, vec++, tag++ )
@@ -9767,6 +11582,28 @@ index 6e65583..f3ef8c5 100644
    }
  
  
+diff --git a/src/base/ftfstype.c b/src/base/ftfstype.c
+index d0ef7b7..6b49ef8 100644
+--- a/src/base/ftfstype.c
++++ b/src/base/ftfstype.c
+@@ -4,7 +4,7 @@
+ /*                                                                         */
+ /*    FreeType utility file to access FSType data (body).                  */
+ /*                                                                         */
+-/*  Copyright 2008, 2009 by                                                */
++/*  Copyright 2008, 2009, 2014 by                                          */
+ /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+ /*                                                                         */
+ /*  This file is part of the FreeType project, and may only be used,       */
+@@ -51,7 +51,7 @@
+ 
+     /* look at FSType before fsType for Type42 */
+ 
+-    if ( ( os2 = (TT_OS2*)FT_Get_Sfnt_Table( face, ft_sfnt_os2 ) ) != NULL &&
++    if ( ( os2 = (TT_OS2*)FT_Get_Sfnt_Table( face, FT_SFNT_OS2 ) ) != NULL &&
+          os2->version != 0xFFFFU                                           )
+       return os2->fsType;
+ 
 diff --git a/src/base/ftglyph.c b/src/base/ftglyph.c
 index c62b3db..ac178c4 100644
 --- a/src/base/ftglyph.c
@@ -12647,7 +14484,7 @@ index f6e03c6..52248b2 100644
      /* can't build Unicode map for CID-keyed font */
      /* because we don't know glyph names.         */
 diff --git a/src/cff/cffgload.c b/src/cff/cffgload.c
-index c8e9f91..577375d 100644
+index c8e9f91..758a3d3 100644
 --- a/src/cff/cffgload.c
 +++ b/src/cff/cffgload.c
 @@ -4,7 +4,7 @@
@@ -12659,6 +14496,15 @@ index c8e9f91..577375d 100644
  /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
  /*                                                                         */
  /*  This file is part of the FreeType project, and may only be used,       */
+@@ -703,7 +703,7 @@
+     /* callback function.                                     */
+     if ( face->root.internal->incremental_interface )
+     {
+-      FT_Data data;
++      FT_Data  data;
+ 
+ 
+       data.pointer = *pointer;
 @@ -1989,9 +1989,6 @@
            }
            else
@@ -13529,6 +15375,58 @@ index 878de1f..9bfcc2a 100644
        size = map->rows * map->pitch;
  
        error = ft_glyphslot_alloc_bitmap( slot, size );
+diff --git a/src/sfnt/sfdriver.c b/src/sfnt/sfdriver.c
+index e4fcda5..bd8dd2e 100644
+--- a/src/sfnt/sfdriver.c
++++ b/src/sfnt/sfdriver.c
+@@ -75,36 +75,36 @@
+ 
+     switch ( tag )
+     {
+-    case ft_sfnt_head:
++    case FT_SFNT_HEAD:
+       table = &face->header;
+       break;
+ 
+-    case ft_sfnt_hhea:
++    case FT_SFNT_HHEA:
+       table = &face->horizontal;
+       break;
+ 
+-    case ft_sfnt_vhea:
+-      table = face->vertical_info ? &face->vertical : 0;
++    case FT_SFNT_VHEA:
++      table = face->vertical_info ? &face->vertical : NULL;
+       break;
+ 
+-    case ft_sfnt_os2:
+-      table = face->os2.version == 0xFFFFU ? 0 : &face->os2;
++    case FT_SFNT_OS2:
++      table = face->os2.version == 0xFFFFU ? NULL : &face->os2;
+       break;
+ 
+-    case ft_sfnt_post:
++    case FT_SFNT_POST:
+       table = &face->postscript;
+       break;
+ 
+-    case ft_sfnt_maxp:
++    case FT_SFNT_MAXP:
+       table = &face->max_profile;
+       break;
+ 
+-    case ft_sfnt_pclt:
+-      table = face->pclt.Version ? &face->pclt : 0;
++    case FT_SFNT_PCLT:
++      table = face->pclt.Version ? &face->pclt : NULL;
+       break;
+ 
+     default:
+-      table = 0;
++      table = NULL;
+     }
+ 
+     return table;
 diff --git a/src/sfnt/sfobjs.c b/src/sfnt/sfobjs.c
 index a31c77c..70b988d 100644
 --- a/src/sfnt/sfobjs.c
@@ -14191,7 +16089,7 @@ index 425911a..9d37d64 100644
    $curr_offset += $count;
    $curr_elem_size += $count;
 diff --git a/src/tools/docmaker/content.py b/src/tools/docmaker/content.py
-index 98025e6..ed3516c 100644
+index 98025e6..adea6f1 100644
 --- a/src/tools/docmaker/content.py
 +++ b/src/tools/docmaker/content.py
 @@ -1,57 +1,81 @@
@@ -14481,15 +16379,17 @@ index 98025e6..ed3516c 100644
          self.reset()
  
          self.sections = {}    # dictionary of documentation sections
-@@ -342,7 +394,7 @@ class  ContentProcessor:
+@@ -342,8 +394,8 @@ class  ContentProcessor:
          self.headers  = {}    # dictionary of header macros
  
      def  set_section( self, section_name ):
 -        """set current section during parsing"""
+-        if not self.sections.has_key( section_name ):
 +        """Set current section during parsing."""
-         if not self.sections.has_key( section_name ):
++        if not section_name in self.sections:
              section = DocSection( section_name )
              self.sections[section_name] = section
+             self.section                = section
 @@ -354,15 +406,14 @@ class  ContentProcessor:
          chapter = DocChapter( block )
          self.chapters.append( chapter )
@@ -14519,7 +16419,24 @@ index 98025e6..ed3516c 100644
          markup       = None
          markup_lines = []
          first        = 1
-@@ -463,7 +514,10 @@ class  ContentProcessor:
+@@ -437,7 +488,7 @@ class  ContentProcessor:
+         # listed there
+         for chap in self.chapters:
+             for sec in chap.order:
+-                if self.sections.has_key( sec ):
++                if sec in self.sections:
+                     section = self.sections[sec]
+                     section.chapter = chap
+                     section.reorder()
+@@ -452,6 +503,7 @@ class  ContentProcessor:
+         others = []
+         for sec in self.sections.values():
+             if not sec.chapter:
++                sec.reorder()
+                 others.append( sec )
+ 
+         # create a new special chapter for all remaining sections
+@@ -463,7 +515,10 @@ class  ContentProcessor:
              self.chapters.append( chap )
  
  
@@ -14531,7 +16448,7 @@ index 98025e6..ed3516c 100644
  class  DocBlock:
  
      def  __init__( self, source, follow, processor ):
-@@ -540,7 +594,7 @@ class  DocBlock:
+@@ -540,7 +595,7 @@ class  DocBlock:
          return self.source.location()
  
      def  get_markup( self, tag_name ):
@@ -14540,16 +16457,22 @@ index 98025e6..ed3516c 100644
          for m in self.markups:
              if m.tag == string.lower( tag_name ):
                  return m
-@@ -553,6 +607,15 @@ class  DocBlock:
+@@ -553,6 +608,21 @@ class  DocBlock:
          except:
              return []
  
 +    def  get_markup_words_all( self, tag_name ):
 +        try:
 +            m = self.get_markup( tag_name )
-+            return [word
-+                      for items in m.fields[0].items
-+                        for word in items.words]
++            words = []
++            for item in m.fields[0].items:
++                # We honour empty lines in an `<Order>' section element by
++                # adding the sentinel `/empty/'.  The formatter should then
++                # convert it to an appropriate representation in the
++                # `section_enter' function.
++                words += item.words
++                words.append( "/empty/" )
++            return words
 +        except:
 +            return []
 +
@@ -14642,7 +16565,7 @@ index bf75c5d..4fb1abf 100644
 -
  # eof
 diff --git a/src/tools/docmaker/formatter.py b/src/tools/docmaker/formatter.py
-index f62ce67..45b3384 100644
+index f62ce67..b1c88be 100644
 --- a/src/tools/docmaker/formatter.py
 +++ b/src/tools/docmaker/formatter.py
 @@ -1,19 +1,37 @@
@@ -14692,9 +16615,16 @@ index f62ce67..45b3384 100644
  class  Formatter:
  
      def  __init__( self, processor ):
-@@ -41,15 +59,17 @@ class  Formatter:
+@@ -36,20 +54,22 @@ class  Formatter:
+                             self.add_identifier( field.name, block )
+ 
+         self.block_index = self.identifiers.keys()
+-        self.block_index.sort( index_sort )
++        self.block_index.sort( key = index_key )
+ 
      def  add_identifier( self, name, block ):
-         if self.identifiers.has_key( name ):
+-        if self.identifiers.has_key( name ):
++        if name in self.identifiers:
              # duplicate name!
 -            sys.stderr.write(                                           \
 -               "WARNING: duplicate definition for '" + name + "' in " + \
@@ -14733,18 +16663,23 @@ index f62ce67..45b3384 100644
      #
      def  section_enter( self, section ):
          pass
-@@ -162,7 +182,18 @@ class  Formatter:
+@@ -162,7 +182,22 @@ class  Formatter:
          self.section_enter( section )
  
          for name in section.block_names:
+-            block = self.identifiers[name]
 +            skip_entry = 0
-             block = self.identifiers[name]
-+            # `block_names' can contain field names also, which we filter out
-+            for markup in block.markups:
-+                if markup.tag == 'values':
-+                    for field in markup.fields:
-+                        if field.name == name:
-+                            skip_entry = 1
++            try:
++                block = self.identifiers[name]
++                # `block_names' can contain field names also,
++                # which we filter out
++                for markup in block.markups:
++                    if markup.tag == 'values':
++                        for field in markup.fields:
++                            if field.name == name:
++                                skip_entry = 1
++            except:
++                skip_entry = 1   # this happens e.g. for `/empty/' entries
 +
 +            if skip_entry:
 +              continue;
@@ -15136,7 +17071,7 @@ index dab8349..61ecc22 100644
              b.dump()
  
 diff --git a/src/tools/docmaker/tohtml.py b/src/tools/docmaker/tohtml.py
-index 7944f1c..e570034 100644
+index 7944f1c..9b2f291 100644
 --- a/src/tools/docmaker/tohtml.py
 +++ b/src/tools/docmaker/tohtml.py
 @@ -1,5 +1,19 @@
@@ -15624,9 +17559,10 @@ index 7944f1c..e570034 100644
                  elif re_source_keywords.match( name ):
                      # this is a C keyword
 -                    result = result + prefix + keyword_prefix + name + keyword_suffix
+-                elif self.identifiers.has_key( name ):
 +                    result = ( result + prefix
 +                               + keyword_prefix + name + keyword_suffix )
-                 elif self.identifiers.has_key( name ):
++                elif name in self.identifiers:
                      # this is a known identifier
                      block = self.identifiers[name]
 -                    result = result + prefix + '<a href="' + \
@@ -15697,7 +17633,8 @@ index 7944f1c..e570034 100644
 -        # block_index already contains the sorted list of index names
 +        # `block_index' already contains the sorted list of index names
          count = len( self.block_index )
-         rows  = ( count + self.columns - 1 ) / self.columns
+-        rows  = ( count + self.columns - 1 ) / self.columns
++        rows  = ( count + self.columns - 1 ) // self.columns
  
 -        print "<table align=center border=0 cellpadding=0 cellspacing=0>"
 +        print '<table class="index">'
@@ -15794,16 +17731,30 @@ index 7944f1c..e570034 100644
  
          maxwidth = 0
          for b in section.blocks.values():
-@@ -479,7 +575,7 @@ class  HtmlFormatter( Formatter ):
-         if maxwidth <> 0:
+@@ -476,32 +572,43 @@ class  HtmlFormatter( Formatter ):
+                 maxwidth = len( b.name )
+ 
+         width = 70  # XXX magic number
+-        if maxwidth <> 0:
++        if maxwidth > 0:
              # print section synopsis
              print section_synopsis_header
 -            print "<table align=center cellspacing=5 cellpadding=0 border=0>"
 +            print '<table class="synopsis">'
  
-             columns = width / maxwidth
+-            columns = width / maxwidth
++            columns = width // maxwidth
              if columns < 1:
-@@ -492,16 +588,17 @@ class  HtmlFormatter( Formatter ):
+                 columns = 1
+ 
+             count = len( section.block_names )
+-            rows  = ( count + columns - 1 ) / columns
++            # don't handle last entry if it is empty
++            if section.block_names[-1] == "/empty/":
++                count -= 1
++            rows  = ( count + columns - 1 ) // columns
+ 
+             for r in range( rows ):
                  line = "<tr>"
                  for c in range( columns ):
                      i = r + c * rows
@@ -15812,8 +17763,15 @@ index 7944f1c..e570034 100644
                      if i < count:
                          name = section.block_names[i]
 -                        line = line + '<a href="#' + name + '">' + name + '</a>'
-+                        line = ( line + '<a href="#' + name + '">'
-+                                 + name + '</a>' )
++                        if name == "/empty/":
++                            # it can happen that a complete row is empty, and
++                            # without a proper `filler' the browser might
++                            # collapse the row to a much smaller height (or
++                            # even omit it completely)
++                            line = line + "&nbsp;"
++                        else:
++                            line = ( line + '<a href="#' + name + '">'
++                                     + name + '</a>' )
  
                      line = line + '</td>'
                  line = line + "</tr>"
@@ -15824,7 +17782,7 @@ index 7944f1c..e570034 100644
              print section_synopsis_footer
  
          print description_header
-@@ -513,7 +610,7 @@ class  HtmlFormatter( Formatter ):
+@@ -513,7 +620,7 @@ class  HtmlFormatter( Formatter ):
  
          # place html anchor if needed
          if block.name:
@@ -15833,7 +17791,7 @@ index 7944f1c..e570034 100644
  
          # dump the block C source lines now
          if block.code:
-@@ -524,13 +621,14 @@ class  HtmlFormatter( Formatter ):
+@@ -524,13 +631,14 @@ class  HtmlFormatter( Formatter ):
                      break;
  
  #           if not header:
@@ -15853,7 +17811,7 @@ index 7944f1c..e570034 100644
  
              print source_header
              for l in block.code:
-@@ -552,15 +650,16 @@ class  HtmlFormatter( Formatter ):
+@@ -552,15 +660,16 @@ class  HtmlFormatter( Formatter ):
              print marker_footer
  
      def  block_exit( self, block ):
@@ -15875,16 +17833,36 @@ index 7944f1c..e570034 100644
  
  # eof
 diff --git a/src/tools/docmaker/utils.py b/src/tools/docmaker/utils.py
-index 1d96658..c75dd2d 100644
+index 1d96658..b35823a 100644
 --- a/src/tools/docmaker/utils.py
 +++ b/src/tools/docmaker/utils.py
-@@ -1,15 +1,28 @@
+@@ -1,48 +1,42 @@
 -#  Utils (c) 2002, 2004, 2007, 2008  David Turner <david@freetype.org>
  #
+-
+-import string, sys, os, glob
+-
+-# current output directory
 +#  utils.py
-+#
+ #
+-output_dir = None
+-
+-
+-# This function is used to sort the index.  It is a simple lexicographical
+-# sort, except that it places capital letters before lowercase ones.
 +#    Auxiliary functions for the `docmaker' tool (library file).
-+#
+ #
+-def  index_sort( s1, s2 ):
+-    if not s1:
+-        return -1
+-
+-    if not s2:
+-        return 1
+-
+-    l1 = len( s1 )
+-    l2 = len( s2 )
+-    m1 = string.lower( s1 )
+-    m2 = string.lower( s2 )
 +#  Copyright 2002, 2004, 2007, 2008, 2014 by
 +#  David Turner.
 +#
@@ -15893,25 +17871,41 @@ index 1d96658..c75dd2d 100644
 +#  license, LICENSE.TXT.  By continuing to use, modify, or distribute
 +#  this file you indicate that you have read the license and
 +#  understand and accept it fully.
-+
  
- import string, sys, os, glob
+-    for i in range( l1 ):
+-        if i >= l2 or m1[i] > m2[i]:
+-            return 1
  
-+
- # current output directory
- #
- output_dir = None
+-        if m1[i] < m2[i]:
+-            return -1
++import string, sys, os, glob, itertools
  
+-        if s1[i] < s2[i]:
+-            return -1
  
--# This function is used to sort the index.  It is a simple lexicographical
--# sort, except that it places capital letters before lowercase ones.
-+# A function to sort the index.  It is a simple lexicographical sort, except
-+# that it places capital letters before lowercase ones.
- #
- def  index_sort( s1, s2 ):
-     if not s1:
-@@ -42,7 +55,7 @@ def  index_sort( s1, s2 ):
-     return 0
+-        if s1[i] > s2[i]:
+-            return 1
++# current output directory
++#
++output_dir = None
+ 
+-    if l2 > l1:
+-        return -1
+ 
+-    return 0
++# A function that generates a sorting key.  We want lexicographical order
++# (primary key) except that capital letters are sorted before lowercase
++# ones (secondary key).
++#
++# The primary key is implemented by lowercasing the input.  The secondary
++# key is simply the original data appended, character by character.  For
++# example, the sort key for `FT_x' is `fFtT__xx', while the sort key for
++# `ft_X' is `fftt__xX'.  Since ASCII codes of uppercase letters are
++# numerically smaller than the codes of lowercase letters, `fFtT__xx' gets
++# sorted before `fftt__xX'.
++#
++def  index_key( s ):
++    return string.join( itertools.chain( *zip( s.lower(), s ) ) )
  
  
 -# Sort input_list, placing the elements of order_list in front.
@@ -15919,7 +17913,7 @@ index 1d96658..c75dd2d 100644
  #
  def  sort_order_list( input_list, order_list ):
      new_list = order_list[:]
-@@ -52,9 +65,9 @@ def  sort_order_list( input_list, order_list ):
+@@ -52,9 +46,9 @@ def  sort_order_list( input_list, order_list ):
      return new_list
  
  
@@ -15932,7 +17926,7 @@ index 1d96658..c75dd2d 100644
  #
  def  open_output( filename ):
      global output_dir
-@@ -69,7 +82,7 @@ def  open_output( filename ):
+@@ -69,7 +63,7 @@ def  open_output( filename ):
      return ( new_file, old_stdout )
  
  
@@ -15941,7 +17935,7 @@ index 1d96658..c75dd2d 100644
  #
  def  close_output( output ):
      output[0].close()
-@@ -83,15 +96,16 @@ def  check_output():
+@@ -83,15 +77,16 @@ def  check_output():
      if output_dir:
          if output_dir != "":
              if not os.path.isdir( output_dir ):
@@ -15961,7 +17955,7 @@ index 1d96658..c75dd2d 100644
      result = 1
      try:
          file = open( pathname, "r" )
-@@ -104,12 +118,12 @@ def  file_exists( pathname ):
+@@ -104,12 +99,12 @@ def  file_exists( pathname ):
  
  
  def  make_file_list( args = None ):
