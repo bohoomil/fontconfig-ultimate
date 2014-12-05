@@ -687,8 +687,8 @@
      slot->metrics.horiAdvance  += xstr;
      slot->metrics.vertAdvance  += ystr;
      slot->metrics.horiBearingY += ystr;
---- a/src/smooth/ftsmooth.c	2013-06-05 05:12:47.000000000 -0500
-+++ b/src/smooth/ftsmooth.c	2014-09-14 11:55:39.848343363 -0500
+--- a/src/smooth/ftsmooth.c	2014-12-04 23:07:46.585780090 +0100
++++ b/src/smooth/ftsmooth.c	2014-12-04 23:08:41.802156790 +0100
 @@ -26,6 +26,17 @@
  
  #include "ftsmerrs.h"
@@ -4304,9 +4304,9 @@
      cbox.yMax = FT_PIX_CEIL( cbox.yMax );
 +#endif
  
-     if ( cbox.xMin < 0 && cbox.xMax > FT_INT_MAX + cbox.xMin )
-     {
-@@ -227,6 +3796,9 @@
+     width  = (FT_ULong)( cbox.xMax - cbox.xMin ) >> 6;
+     height = (FT_ULong)( cbox.yMax - cbox.yMin ) >> 6;
+@@ -208,6 +3777,9 @@
          y_top   += extra >> 1;
        }
      }
@@ -4316,7 +4316,7 @@
  
  #endif
  
-@@ -251,8 +3823,15 @@
+@@ -228,8 +3800,15 @@
      bitmap->pitch      = pitch;
  
      /* translate outline to render it into the bitmap */
@@ -4332,7 +4332,7 @@
  
      if ( FT_ALLOC( bitmap->buffer, (FT_ULong)pitch * height ) )
        goto Exit;
-@@ -306,9 +3885,153 @@
+@@ -283,9 +3862,153 @@
      if ( error )
        goto Exit;
  
