@@ -10,14 +10,14 @@ arch=('any')
 license=('OFL-1.1')
 groups=('infinality-bundle-fonts-extra')
 source=(montserrat.zip::"http://www.fontsquirrel.com/fonts/download/montserrat"
+        http://bohoomil.com/src/Montserrat-Hairline_fixed.otf
         45-montserrat.conf
-        90-non-tt-montserrat.conf
-        Montserrat-Hairline_fixed.otf)
+        90-non-tt-montserrat.conf)
 install=${pkgname}.install
-sha1sums=('41015224796857f87f33f17c77117f75c8f6a713'
+sha1sums=('a118c5a413d2134fd52b29c6ec7980fae3fa4fd2'
+          '500cabc30a634370515b3af18fe43203945e9ed2'
           '305c20dd89f9dafb62a19cc3a9d8c661342ec374'
-          '186ebde7a24155c3275f9553850999a9ee1871ae'
-          '500cabc30a634370515b3af18fe43203945e9ed2')
+          '186ebde7a24155c3275f9553850999a9ee1871ae')
 
 package() {
   cd "${srcdir}"
