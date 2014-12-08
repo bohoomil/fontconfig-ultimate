@@ -12,7 +12,7 @@ conflicts=('ttf-sansation')
 replaces=('ttf-sansation')
 license=('Custom:Freeware')
 install=$pkgname.install
-source=(sansation.zip
+source=(http://bohoomil.com/src/sansation.zip
         45-sansation.conf
         90-tt-sansation.conf)
 sha1sums=('3bfebc294ec791c0d3921f1ef17bab9c4898a17c'
