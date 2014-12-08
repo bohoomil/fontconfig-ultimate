@@ -12,7 +12,7 @@ license=('OFL-1.1')
 conflicts=('ttf-charis')
 groups=('infinality-bundle-fonts-extra')
 install=$pkgname.install
-source=("${_src_name}-${pkgver}.zip"
+source=(http://bohoomil.com/src/"${_src_name}-${pkgver}.zip"
         45-charis-sil.conf
         90-tt-charis-sil.conf)
 sha1sums=('d0fbd177612ff843645af8b9755118251b89598b'
