@@ -3,11 +3,11 @@
 
 pkgname=fontconfig-infinality-ultimate
 _basename=fontconfig
-pkgdesc="A library for configuring and customizing font access (includes generic fontconfig package and ultimate settings by bohoomil)."
+pkgdesc="A library for configuring and customizing font access, optimized for freetype2-infinality-ultimate."
 url=('http://www.fontconfig.org/release/')
 license=('custom' 'MIT')
 pkgver=2.11.1
-pkgrel=23
+pkgrel=24
 _master_name=fontconfig-ultimate-master
 arch=('i686' 'x86_64')
 changelog=CHANGELOG
@@ -23,18 +23,21 @@ backup=('etc/fonts/fonts.conf'
         'etc/fonts/conf.avail.infinality/combi/65-non-latin-combi.conf'
         'etc/fonts/conf.avail.infinality/combi/66-aliases-wine-combi.conf'
         'etc/fonts/conf.avail.infinality/35-repl-custom.conf'
-        'etc/fonts/conf.avail.infinality/36-repl-missing-glyphs.conf'
-        'etc/fonts/conf.avail.infinality/37-repl-webfonts.conf')
+        'etc/fonts/conf.avail.infinality/38-repl-webfonts-custom.conf'
+        'etc/fonts/conf.avail.infinality/97-selective-rendering-custom.conf')
 install=fontconfig-ultimate.install
 source=(http://www.fontconfig.org/release/${_basename}-${pkgver}.tar.bz2
-        master.zip::https://github.com/bohoomil/fontconfig-ultimate/archive/master.tar.gz)
+        fontconfig-upstream-2014-11-06.patch
+        master.tar.gz::https://github.com/bohoomil/fontconfig-ultimate/archive/master.tar.gz)
 sha1sums=('08565feea5a4e6375f9d8a7435dac04e52620ff2'
-          '6ec8c6f6a0c67aeb3d68a3ece65c411e5779ac80')
+          '3e3e76465aeb67ff0c43b5559e2bf406601f2d9b'
+          'c1bfb2894f34cedb91c7d06430dc59ae55d35540')
 
 # a nice page to test font matching:
 # http://zipcon.net/~swhite/docs/computers/browsers/fonttest.html
 
 prepare() {
+
   patches=(00-fonts.conf.in.patch
            01-configure.patch
            02-configure.ac.patch
@@ -51,14 +54,17 @@ prepare() {
   # prepare src
   cd "${srcdir}/${_basename}-${pkgver}"
 
+  # upstream commits
+  patch -Np1 -i ../fontconfig-upstream-2014-11-06.patch
+
   # infinality & post release fixes
-  for patch in "${patches[@]}"; do
-    patch -Np1 -i ${patch}
-  done
+  #for patch in "${patches[@]}"; do
+    #patch -Np1 -i ${patch}
+  #done
 
   # fix for [bug 7752]
   # http://lists.freedesktop.org/archives/fontconfig-bugs/2014-April/000835.html
-  patch -Np1 -i fc-cache.c.patch
+  #patch -Np1 -i fc-cache.c.patch
 
   aclocal
   libtoolize -f

@@ -6,6 +6,36 @@ CHANGELOG
 ---------
 
 
+2014-12-06
+~~~~~~~~~~
+
+### fontconfig-infinality-ultimate, rev. 2.11.1-24
+
+* Fixing bug #58 (reverting commmit d839ee0).
+* Introducing additional user customization files, `38-repl-webfonts-custom.conf`
+  and `97-selective-rendering-custom.conf`. Both override systemwide settings,
+  giving the user control over all `fontconfig` parameters.
+* Rendering of Open Sans family << 9px was improved.
+* Rendering of Noto Sans family 19px >> 20px was improved.
+
+### infinality-bundle-fonts
+
+The following packages were added to the repository:
+
+  * `otf-bravo-ibx`
+  * `otf-inconsolata-pwl-ibx`
+  * `otf-source-code-pro-pwl-ibx`
+  * `ttf-arphic-ukai-ibx`
+  * `ttf-hannom-ibx`
+  * `ttf-wqy-zenhei-ibx`
+
+The following packages were updated:
+
+  * `ttf-noto-sans-ib`
+  * `ttf-noto-serif-ib`
+  * `ttf-opensans-ib`
+
+
 2014-10-29
 ~~~~~~~~~~
 
@@ -22,11 +52,13 @@ CHANGELOG
 ### infinality-bundle-fonts
 
 * Updated packages (tweaked rendering of fonts << 12.5px):
+
     * `ttf-dejavu-ib`
     * `ttf-liberation-ib`
     * `ttf-meslo-fonts-ibx`
 
 * Montserrat family (`otf-montserrat-ibx`) was added to the repository.
+
 
 2014-10-29
 ~~~~~~~~~~
