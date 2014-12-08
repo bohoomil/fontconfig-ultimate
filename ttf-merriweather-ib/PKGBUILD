@@ -14,7 +14,7 @@ license=('OFL-1.1')
 install=$pkgname.install
 #http://www.fontspace.com/
 #http://www.google.com/fonts/
-source=(merriweather_ib.tar.xz
+source=(http://bohoomil.com/src/merriweather_ib.tar.xz
         45-merriweather.conf
         90-tt-merriweather.conf)
 sha1sums=('f6a05c1fbbbdba5ddb781b3f5a39c0d51e838389'
