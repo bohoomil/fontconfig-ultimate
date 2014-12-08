@@ -10,7 +10,7 @@ arch=('any')
 groups=('infinality-bundle-fonts-extra')
 license=('OFL-1.1')
 install=$pkgname.install
-source=(Archivo_Narrow.zip
+source=(http://bohoomil.com/src/archivo_narrow.zip
         45-archivo-narrow.conf
         90-tt-archivo-narrow.conf)
 sha1sums=('8fb3677004c317e0e4e15a3c05cf7713dcfef9c3'
