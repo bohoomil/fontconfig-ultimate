@@ -12,8 +12,8 @@ conflicts=('t1-opensans-ib' 'ttf-opensans')
 provides=('ttf-opensans')
 groups=('infinality-bundle-fonts')
 install=$pkgname.install
-source=(Open_Sans.zip
-        Open_Sans_Condensed.zip
+source=(http://bohoomil.com/src/open_sans.zip
+        http://bohoomil.com/src/open_sans_condensed.zip
         45-opensans.conf
         90-tt-opensans.conf)
 sha1sums=('1fc651d6dd131baf795dd4b0dcc259980bcb9c58'
