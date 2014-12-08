@@ -1,0 +1,89 @@
+# Contributor: Jan de Groot <jgc@archlinux.org>
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=bh-ib
+pkgname=('t1-bh-ib' 'ttf-bh-ib')
+pkgver=1.0.3
+pkgrel=1
+pkgdesc="Luxi Sans, Serif and Mono families by Bigelow & Holmes."
+arch=(any)
+depends=('fontconfig')
+groups=('infinality-bundle-fonts')
+license=('custom')
+url="http://xorg.freedesktop.org/"
+# http://www.fontsquirrel.com
+source=(${url}/releases/individual/font/font-bh-type1-1.0.3.tar.bz2
+        45-luxi.conf
+        90-non-tt-luxi.conf)
+sha1sums=('69ff038d38015cd305a4cd4d1a921fe3bd08bbde'
+          '8fdf9fc799fe19a9ef492a6ad442cb5770f8431a'
+          'd269bad6719f1d790dd4955a0805b5778661be8a')
+
+build() {
+  cd "${srcdir}"
+  for dir in *; do
+    if [ -d "${dir}" ]; then
+      pushd "${dir}"
+      ./configure --prefix=/usr \
+        --with-fontdir=/usr/share/fonts/${pkgname}
+      make
+      popd
+    fi
+  done
+}
+
+package_t1-bh-ib() {
+  pkgdesc="Luxi Sans, Serif and Mono families by Bigelow & Holmes. Type 1 version."
+  conflicts=('font-bh-ttf' 'luximono' 'ttf-bh-ib')
+  install=$pkgname.install
+
+  cd "${srcdir}"
+
+  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
+  for dir in *; do
+    if [ -d "${dir}" ]; then
+      pushd "${dir}"
+      make DESTDIR="${pkgdir}" install
+      install -m644 COPYING "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE.${dir%-*}"
+      popd
+    fi
+  done
+  rm -f "${pkgdir}"/usr/share/fonts/${pkgname}/fonts.*
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-luxi.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-luxi.conf
+  install -m644 90-non-tt-luxi.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-luxi.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-luxi.conf .
+  ln -s ../conf.avail/90-non-tt-luxi.conf .
+}
+
+package_ttf-bh-ib() {
+  pkgdesc="Luxi Sans, Serif and Mono families by Bigelow & Holmes. TrueType version."
+  conflicts=('font-bh-ttf' 'luximono' 't1-bh-ib')
+  install=$pkgname.install
+
+  cd "${srcdir}"
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 "Bigelow & Holmes - Luxi License.txt" \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-luxi.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-luxi.conf
+  install -m644 90-tt-luxi.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-luxi.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-luxi.conf .
+  ln -s ../conf.avail/90-tt-luxi.conf .
+}
