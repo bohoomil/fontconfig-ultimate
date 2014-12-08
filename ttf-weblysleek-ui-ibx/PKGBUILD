@@ -10,7 +10,7 @@ arch=('any')
 groups=('infinality-bundle-fonts-extra')
 license=('GPL' 'PD' 'OFL-1.1')
 install=$pkgname.install
-source=(weblysleek-ui.zip
+source=(http://bohoomil.com/src/weblysleek-ui.zip
         45-weblysleek-ui.conf
         90-tt-weblysleek-ui.conf)
 sha1sums=('01732074b4067d3dd2931039efca15b82af90860'
