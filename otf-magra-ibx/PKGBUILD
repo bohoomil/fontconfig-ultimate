@@ -10,7 +10,7 @@ arch=('any')
 license=('OFL-1.1')
 groups=('infinality-bundle-fonts-extra')
 # http://www.ffonts.net
-source=(Magra.zip
+source=(http://bohoomil.com/src/magra.zip
         45-magra.conf
         90-non-tt-magra.conf)
 install=${pkgname}.install
