@@ -13,8 +13,8 @@ license=('OFL-1.1')
 install=$pkgname.install
 # http://www.huertatipografica.com/free_download/23
 # http://fedoraproject.org/wiki/Alegreya_font
-source=(alegreya-sans-ht-full-pack-otf.zip
-        Alegreya.zip
+source=(http://bohoomil.com/src/alegreya-sans-ht-full-pack-otf.zip
+        http://bohoomil.com/src/alegreya_otf.zip
         45-alegreya.conf
         45-alegreya-sans.conf
         90-non-tt-alegreya.conf
