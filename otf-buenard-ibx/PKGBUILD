@@ -10,7 +10,7 @@ arch=('any')
 license=('OFL-1.1')
 groups=('infinality-bundle-fonts-extra')
 # http://www.ffonts.net
-source=(Buenard.zip
+source=(http://bohoomil.com/src/buenard.zip
         45-buenard.conf
         90-non-tt-buenard.conf)
 install=${pkgname}.install
