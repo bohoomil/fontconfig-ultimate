@@ -2,7 +2,7 @@
 
 pkgname=ttf-opensans-ib
 pkgver=1.2
-pkgrel=12
+pkgrel=15
 depends=('fontconfig')
 pkgdesc="Open Sans is a humanist sans serif typeface designed by Steve Matteson, Type Director of Ascender Corp."
 url="http://opensans.com/"
@@ -12,20 +12,20 @@ conflicts=('t1-opensans-ib' 'ttf-opensans')
 provides=('ttf-opensans')
 groups=('infinality-bundle-fonts')
 install=$pkgname.install
-source=(open-sans.zip
-        open-sans-condensed.zip
+source=(Open_Sans.zip
+        Open_Sans_Condensed.zip
         45-opensans.conf
         90-tt-opensans.conf)
-sha1sums=('b708b3e056d5d612c47c2d163aa274cd2fd23c33'
-          '281be1d16cbf8890079c5cee3a1ac6e5046dae79'
+sha1sums=('1fc651d6dd131baf795dd4b0dcc259980bcb9c58'
+          'db8b311e0f139ca3ce5e1108a2d8b430af39e759'
           'e2cccbc4c5d9552430fe158351de374e2aa3b889'
-          'b088e98fa41719aec5ab66958360beda77601c6f')
+          '60da5bd1e4500e7252a2d50ccf07f5c8a847a606')
 
 package(){
   cd "${srcdir}"
 
   install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 'Apache License.txt' \
+  install -m644 'LICENSE.txt' \
     "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
