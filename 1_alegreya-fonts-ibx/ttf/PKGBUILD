@@ -13,9 +13,9 @@ license=('OFL-1.1')
 install=$pkgname.install
 # http://www.huertatipografica.com/free_download/24
 # http://www.google.com/fonts
-source=(alegreya-sans-ht-full-pack-ttf.zip
-        Alegreya.zip
-        Alegreya_SC.zip
+source=(http://bohoomil.com/src/alegreya-sans-ht-full-pack-ttf.zip
+        http://bohoomil.com/src/alegreya_ttf.zip
+        http://bohoomil.com/src/alegreya_sc.zip
         45-alegreya.conf
         45-alegreya-sans.conf
         90-tt-alegreya.conf
