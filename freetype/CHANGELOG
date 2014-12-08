@@ -6,6 +6,15 @@ CHANGELOG
 ---------
 
 
+2014-12-07
+~~~~~~~~~~
+
+### freetype2-infinality-ultimate, rev. 2.5.4-1 (inc. multilib)
+
+* Version upgrade release, 2.5.4.
+* Merged with the recent upstream code base (fixing memory leaks on buggy fonts).
+
+
 2014-12-06
 ~~~~~~~~~~
 
