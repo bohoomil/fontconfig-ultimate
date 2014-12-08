@@ -13,19 +13,11 @@ license=('custom')
 url="http://xorg.freedesktop.org/"
 # http://www.fontsquirrel.com
 source=(${url}/releases/individual/font/font-bh-type1-1.0.3.tar.bz2
-        Luxi-Mono.zip
-        Luxi-Sans.zip
-        Luxi-Serif.zip
         45-luxi.conf
-        90-non-tt-luxi.conf
-        90-tt-luxi.conf)
+        90-non-tt-luxi.conf)
 sha1sums=('69ff038d38015cd305a4cd4d1a921fe3bd08bbde'
-          '2f3fa007705aa7077ecfc3c4448f2aea2c5132b9'
-          'dd7975055a7857813c2a6c19aeb10c78c9fcb47b'
-          '742a370f48435b75833da6d060c36d2996b02dee'
           '8fdf9fc799fe19a9ef492a6ad442cb5770f8431a'
-          'd269bad6719f1d790dd4955a0805b5778661be8a'
-          '402afa5b61f99cce7254e62bb9de5f5ad3878dc9')
+          'd269bad6719f1d790dd4955a0805b5778661be8a')
 
 build() {
   cd "${srcdir}"
