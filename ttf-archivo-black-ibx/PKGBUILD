@@ -10,7 +10,7 @@ arch=('any')
 groups=('infinality-bundle-fonts-extra')
 license=('OFL-1.1')
 install=$pkgname.install
-source=(Archivo_Black.zip
+source=(http://bohoomil.com/src/archivo_black.zip
         45-archivo-black.conf
         90-tt-archivo-black.conf)
 sha1sums=('648bfa7726b25202c93de60f9011fdb2c34f8335'
