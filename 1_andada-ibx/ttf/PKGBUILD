@@ -9,11 +9,11 @@ url="http://www.huertatipografica.com/"
 arch=('any')
 conflicts=('otf-andada-ibx')
 groups=('infinality-bundle-fonts-extra')
-license=('OFL-1.1')
+license=('custom:OFL')
 # http://www.fontsc.com (ttf)
 install=$pkgname.install
-source=(andada.zip
-        andada_sc.zip
+source=(http://bohoomil.com/src/andada_ttf.zip
+        http://bohoomil.com/src/andada_sc.zip
         45-andada.conf
         90-tt-andada.conf)
 sha1sums=('4b66b558ae04dcffe49175613cb3a538eeab97e9'
