@@ -10,7 +10,7 @@ arch=('any')
 license=('OFL-1.1')
 groups=('infinality-bundle-fonts-extra')
 # http://www.ffonts.net
-source=(Enriqueta.zip
+source=(http://bohoomil.com/src/enriqueta.zip
         45-enriqueta.conf
         90-non-tt-enriqueta.conf)
 install=${pkgname}.install
