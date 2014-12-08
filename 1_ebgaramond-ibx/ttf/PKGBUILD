@@ -11,10 +11,10 @@ conflicts=('ttf-ebgaramond' 'otf-ebgaramond' 'otf-eb-garamond' 't1-ebgaramond-ib
 groups=('infinality-bundle-fonts-extra')
 license=('OFL-1.1')
 install=$pkgname.install
-source=(ebgaramond_ttf.tar.gz
+source=(http://bohoomil.com/src/ebgaramond_ttf.tar.xz
         '45-ebgaramond.conf'
         '90-tt-ebgaramond.conf')
-sha1sums=('9bb0db8cd0d779e35f9bdc259297361034657a0c'
+sha1sums=('48b5ff76ac2ca04a11f1921fa32af3bc9103d691'
           'ba581cc9f03cb3a60030b25e26e2578af5f7e7b7'
           '5e8d7c416cfc50f4258918c72b5f787b7ab51bd7')
 
