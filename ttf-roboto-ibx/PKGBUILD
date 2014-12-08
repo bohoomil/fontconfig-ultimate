@@ -12,8 +12,8 @@ groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-roboto' 'ttf-roboto-fontconfig' 'ttf-roboto-slab')
 install=$pkgname.install
 #http://www.google.com/fonts
-source=(roboto-2014-fixed.zip
-        Roboto_Slab.zip
+source=(http://bohoomil.com/src/roboto-2014-fixed.zip
+        http://bohoomil.com/src/roboto-slab.zip
         45-roboto.conf
         90-tt-roboto.conf)
 sha1sums=('c17d3f83ca6472bafa9addfd815e2655d3cd18e5'
