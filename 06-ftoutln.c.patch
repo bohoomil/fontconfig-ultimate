@@ -1,6 +1,6 @@
---- a/src/base/ftoutln.c	2014-02-08 13:29:55.000000000 +0100
-+++ b/src/base/ftoutln.c	2014-03-07 19:21:57.073320788 +0100
-@@ -908,7 +908,34 @@
+--- a/src/base/ftoutln.c	2014-12-01 22:40:34.438380192 +0100
++++ b/src/base/ftoutln.c	2014-12-01 22:43:55.562934868 +0100
+@@ -917,7 +917,34 @@
      FT_Vector   v_prev, v_first, v_next, v_cur;
      FT_Int      c, n, first;
      FT_Int      orientation;
@@ -34,5 +34,4 @@
 +#endif
  
      if ( !outline )
-       return FT_THROW( Invalid_Argument );
-
+       return FT_THROW( Invalid_Outline );

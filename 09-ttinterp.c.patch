@@ -1,6 +1,6 @@
---- a/src/truetype/ttinterp.c	2014-09-14 23:02:01.616685627 +0200
-+++ b/src/truetype/ttinterp.c	2014-09-14 23:02:59.846685964 +0200
-@@ -4886,6 +4886,10 @@
+--- a/src/truetype/ttinterp.c	2014-12-01 22:40:34.468385156 +0100
++++ b/src/truetype/ttinterp.c	2014-12-01 22:46:52.925480354 +0100
+@@ -4853,6 +4853,10 @@
      CUR.sph_in_func_flags = 0x0000;
  #endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
  
@@ -11,7 +11,7 @@
      if ( CUR.callTop <= 0 )     /* We encountered an ENDF without a call */
      {
        CUR.error = FT_THROW( ENDF_In_Exec_Stream );
-@@ -6231,6 +6235,12 @@
+@@ -6198,6 +6202,12 @@
                     ( CUR.sph_in_func_flags & SPH_FDEF_INLINE_DELTA_2 ) ) )
                goto Skip;
  
@@ -24,7 +24,7 @@
              if ( !( CUR.sph_tweak_flags & SPH_TWEAK_ALWAYS_SKIP_DELTAP ) &&
                    ( ( CUR.is_composite && CUR.GS.freeVector.y != 0 ) ||
                      ( CUR.zp2.tags[point] & FT_CURVE_TAG_TOUCH_Y )   ||
-@@ -6520,6 +6530,7 @@
+@@ -6487,6 +6497,7 @@
      if ( SUBPIXEL_HINTING                                  &&
           CUR.ignore_x_mode                                 &&
           CUR.GS.freeVector.x != 0                          &&
@@ -32,7 +32,7 @@
           !( CUR.sph_tweak_flags & SPH_TWEAK_NORMAL_ROUND ) )
        minimum_distance = 0;
  #endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
-@@ -8382,6 +8393,34 @@
+@@ -8343,6 +8354,34 @@
  
  #endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
  

@@ -1,5 +1,5 @@
---- a/src/base/ftlcdfil.c	2014-07-07 23:10:20.720076929 +0200
-+++ b/src/base/ftlcdfil.c	2014-07-07 23:35:53.756803457 +0200
+--- a/src/base/ftlcdfil.c	2014-11-25 22:31:38.852289541 +0100
++++ b/src/base/ftlcdfil.c	2014-11-25 22:32:42.963771758 +0100
 @@ -23,6 +23,9 @@
  #include FT_IMAGE_H
  #include FT_INTERNAL_OBJECTS_H
@@ -10,7 +10,7 @@
  
  #ifdef FT_CONFIG_OPTION_SUBPIXEL_RENDERING
  
-@@ -290,10 +293,53 @@
+@@ -309,10 +312,53 @@
                              { 0x00, 0x55, 0x56, 0x55, 0x00 };
      /* the values here sum up to a value larger than 256, */
      /* providing a cheap gamma correction                 */
@@ -63,5 +63,5 @@
 +    }
 +#endif
      if ( !library )
-       return FT_THROW( Invalid_Argument );
+       return FT_THROW( Invalid_Library_Handle );
  

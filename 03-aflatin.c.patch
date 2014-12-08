@@ -1,5 +1,5 @@
---- a/src/autofit/aflatin.c	2014-09-14 11:35:20.946193837 -0500
-+++ b/src/autofit/aflatin.c	2014-09-14 11:58:37.726708173 -0500
+--- a/src/autofit/aflatin.c	2014-11-19 16:53:15.576938625 +0100
++++ b/src/autofit/aflatin.c	2014-11-19 16:53:42.147096030 +0100
 @@ -24,6 +24,7 @@
  #include "afpic.h"
  #include "aflatin.h"
@@ -103,7 +103,7 @@
  
  #endif
  
-@@ -1916,7 +1962,10 @@
+@@ -1913,7 +1959,10 @@
                dist = edge->fpos - blue->shoot.org;
                if ( dist < 0 )
                  dist = -dist;
@@ -115,7 +115,7 @@
                dist = FT_MulFix( dist, scale );
                if ( dist < best_dist )
                {
-@@ -2082,8 +2131,31 @@
+@@ -2079,8 +2128,31 @@
      FT_Pos           dist     = width;
      FT_Int           sign     = 0;
      FT_Int           vertical = ( dim == AF_DIMENSION_VERT );
@@ -147,7 +147,7 @@
      if ( !AF_LATIN_HINTS_DO_STEM_ADJUST( hints ) ||
           axis->extra_light                       )
        return width;
-@@ -2093,9 +2165,73 @@
+@@ -2090,9 +2162,73 @@
        dist = -width;
        sign = 1;
      }
@@ -222,7 +222,7 @@
      {
        /* smooth hinting process: very lightly quantize the stem width */
  
-@@ -2155,6 +2291,9 @@
+@@ -2152,6 +2288,9 @@
        }
      }
      else
@@ -232,7 +232,7 @@
      {
        /* strong hinting process: snap the stem width to integer pixels */
  
-@@ -2162,7 +2301,10 @@
+@@ -2159,7 +2298,10 @@
  
  
        dist = af_latin_snap_width( axis->widths, axis->width_count, dist );
@@ -244,7 +244,7 @@
        if ( vertical )
        {
          /* in the case of vertical hinting, always round */
-@@ -2225,6 +2367,32 @@
+@@ -2222,6 +2364,32 @@
      }
  
    Done_Width:
@@ -277,7 +277,7 @@
      if ( sign )
        dist = -dist;
  
-@@ -2247,6 +2415,8 @@
+@@ -2244,6 +2412,8 @@
                               (AF_Edge_Flags)base_edge->flags,
                               (AF_Edge_Flags)stem_edge->flags );
  
@@ -286,7 +286,7 @@
  
      stem_edge->pos = base_edge->pos + fitted_width;
  
-@@ -2810,8 +2980,32 @@
+@@ -2807,8 +2977,32 @@
      int       dim;
  
      AF_LatinAxis  axis;
@@ -320,7 +320,7 @@
      error = af_glyph_hints_reload( hints, outline );
      if ( error )
        goto Exit;
-@@ -2877,7 +3071,11 @@
+@@ -2874,7 +3068,11 @@
      }
  
      af_glyph_hints_save( hints, outline );
