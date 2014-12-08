@@ -9,25 +9,23 @@ conflicts=('ttf-andada-ibx')
 url="http://www.huertatipografica.com/"
 arch=('any')
 groups=('infinality-bundle-fonts-extra')
-license=('OFL-1.1')
+license=('custom:OFL')
 install=$pkgname.install
 # http://www.fontsquirrel.com (otf)
 # http://www.fontsc.com (ttf)
-source=(andada_otf.zip
+source=(http://bohoomil.com/src/andada_otf.zip
         45-andada.conf
         90-non-tt-andada.conf)
 sha1sums=('97e80bfd3df758ead7d4906fca4cc02d48cbc219'
-          '4b66b558ae04dcffe49175613cb3a538eeab97e9'
-          '236d2ecd67eea9bad0284dc799517882eb17c8e9'
           'cb3f7a353211156a65e22c2c4d6113fb3179a300'
-          '684d4b6c2fc234285935ee8b6a8a7dfa18d5be94'
-          '4cad6f8517b17de69be6d082eb62d44e049bf981')
+          '684d4b6c2fc234285935ee8b6a8a7dfa18d5be94')
 
 package(){
   cd "${srcdir}"
 
   install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 "SIL Open Font License.txt" \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
