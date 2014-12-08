@@ -13,7 +13,7 @@ license=('Custom')
 noextract=('HimalayaFonts.rar')
 install=$pkgname.install
 #http://www.tibetebook.com/nyer_mkho/demig/HimalayaFonts.rar
-source=(HimalayaFonts.rar
+source=(http://bohoomil.com/src/HimalayaFonts.rar
         40-himalaya-fonts.conf
         90-tt-himalaya-fonts.conf)
 sha1sums=('74f5fa41df50340cd43d73ea92916b7fab5a284d'
