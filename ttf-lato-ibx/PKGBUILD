@@ -13,7 +13,7 @@ conflicts=('ttf-lato' 't1-lato-ibx' 'otf-lato-ib')
 replaces=('t1-lato-ibx' 'otf-lato-ib')
 install=$pkgname.install
 source=("http://www.latofonts.com/download/Lato2OFL.zip"
-        lato-thin-${pkgver}-fixed.tar.xz
+        "http://bohoomil.com/src/lato-thin-${pkgver}-fixed.tar.xz"
         45-lato.conf
         90-tt-lato.conf)
 sha1sums=('875d4afb6f0f5748a5b82d6e74c3e8306e552609'
