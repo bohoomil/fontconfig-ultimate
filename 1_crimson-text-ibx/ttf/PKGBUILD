@@ -10,7 +10,7 @@ url="http://aldusleaf.org/"
 arch=('any')
 conflicts=('otf-crimson-text' 'otf-crimson-text-ibx')
 groups=('infinality-bundle-fonts-extra')
-license=('Custom')
+license=('custom:OFL')
 install=$pkgname.install
 source=(git+https://github.com/skosch/Crimson.git
         45-crimson-text.conf
