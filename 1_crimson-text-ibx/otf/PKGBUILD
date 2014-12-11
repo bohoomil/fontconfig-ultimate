@@ -11,7 +11,7 @@ conflicts=('otf-crimson-text' 'ttf-crimson-text-ibx')
 replaces=('otf-crimson-text')
 arch=('any')
 groups=('infinality-bundle-fonts-extra')
-license=('Custom')
+license=('custom:OFL')
 install=$pkgname.install
 source=(git+https://github.com/skosch/Crimson.git
         45-crimson-text.conf
