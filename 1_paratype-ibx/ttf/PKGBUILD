@@ -1,15 +1,15 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=ttf-paratype-ibx
-pkgver=2014.06.10
-pkgrel=2
+pkgver=2014.09.11
+pkgrel=1
 depends=('fontconfig')
 pkgdesc="Paratype font family. TrueType version."
 groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-paratype' 'ttf-ptsans' 'ttf-pt-mono' 'ttf-pt-sans' 'ttf-pt-serif' 't1-paratype-ibx')
 url="http://www.paratype.com/public/"
 arch=('any')
-license=('Custom')
+license=('custom')
 install=$pkgname.install
 source=("http://mirrors.ctan.org/fonts/paratype.zip"
         45-paratype.conf
@@ -23,9 +23,7 @@ package(){
 
   install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
   install -m644 doc/"PT_Free_Font_License_eng_1.3.txt" \
-    "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 doc/"PT_Free_Font_License_eng_1.3.txt" \
-    "${pkgdir}"/usr/share/licenses/"${pkgname}"
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 truetype/*.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
