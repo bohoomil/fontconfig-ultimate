@@ -10,7 +10,7 @@ conflicts=('ttf-impallari-libre-baskerville' 'ttf-librebaskerville' 't1-libre-ba
 replaces=('t1-libre-baskerville-ibx')
 groups=('infinality-bundle-fonts-extra')
 arch=('any')
-license=('OFL-1.1')
+license=('custom:OFL')
 install=${pkgname}.install
 source=("http://www.impallari.com/media/uploads/prosources/update-86-source.zip"
         45-libre-baskerville.conf
