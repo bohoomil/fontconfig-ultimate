@@ -9,7 +9,7 @@ url="http://www.georgduffner.at/ebgaramond/"
 arch=('any')
 conflicts=('ttf-ebgaramond' 'otf-ebgaramond' 'otf-eb-garamond' 't1-ebgaramond-ibx' 'ttf-ebgaramond-ibx')
 groups=('infinality-bundle-fonts-extra')
-license=('OFL-1.1')
+license=('custom:OFL')
 install=$pkgname.install
 #"https://bitbucket.org/georgd/eb-garamond/downloads/EBGaramond-0.016.zip"
 source=("http://mirrors.ctan.org/fonts/ebgaramond.zip"
