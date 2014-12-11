@@ -19,9 +19,6 @@ sha1sums=('6a4f2878c1dbd5a995351e555c02a66cc8decb74'
           'dfa5cb778431cd331b1539326eb7072acbc1dc55')
 
 package(){
-
-  cd "${srcdir}"
-
   install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
   install -m644 COPYING "${pkgdir}"/usr/share/licenses/"${pkgname}"
 
