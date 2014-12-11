@@ -1,5 +1,5 @@
 post_install() {
-  fc-cache -f /usr/share/fonts/otf-source-han-sans-twhk-ibx >/dev/null
+  fc-cache -f /usr/share/fonts/otf-source-han-sans-otc-ibx >/dev/null
   echo "Done."
 }
 

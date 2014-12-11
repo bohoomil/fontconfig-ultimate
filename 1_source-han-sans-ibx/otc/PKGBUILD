@@ -1,0 +1,43 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=otf-source-han-sans-otc-ibx
+pkgver=1.001
+pkgrel=1
+depends=('fontconfig')
+pkgdesc="A set of Pan-CJK fonts designed to complement Source Sans Pro. OpenType/CFF Collection (OTC) fonts."
+url="http://www.adobe.com/"
+arch=('any')
+license=('Apache')
+groups=('infinality-bundle-fonts-extra' 'source-han-sans-cjk')
+conflicts=('adobe-source-han-sans-otc-fonts' 'source-han-sans')
+replaces=('adobe-source-han-sans-otc-fonts' 'source-han-sans')
+install=$pkgname.install
+source=("https://github.com/adobe-fonts/source-han-sans/archive/${pkgver}R.tar.gz"
+        40-source-han-sans-otc.conf
+        90-non-tt-source-han-sans-otc.conf)
+sha1sums=('26a72040896f4bdcc4a6ecaa64cd67a764d88aef'
+          'c524c5400356cd85772947d8089b0cf9f9c460ac'
+          '045d310e56d7498c72b1c5fee36dd11035078a14')
+
+package(){
+  cd "source-han-sans-${pkgver}R"
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 LICENSE.txt \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 OTC/*.ttc "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  cd "${srcdir}"
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 40-source-han-sans-otc.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/40-source-han-sans-otc.conf
+  install -m644 90-non-tt-source-han-sans-otc.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-source-han-sans-otc.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/40-source-han-sans-otc.conf .
+  ln -s ../conf.avail/90-non-tt-source-han-sans-otc.conf .
+}
