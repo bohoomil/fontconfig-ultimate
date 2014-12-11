@@ -4,7 +4,7 @@
 pkgname=otf-vollkorn-ibx
 pkgdesc="Vollkorn typeface by Friedrich Althausen. OpenType version."
 url=('http://vollkorn-typeface.com/')
-license=('custom:SIL Open Font License')
+license=('custom:OFL')
 pkgver=3.005
 pkgrel=2
 depends=('fontconfig')
