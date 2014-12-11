@@ -9,7 +9,7 @@ pkgdesc="Alegreya and Alegreya Sans are modern font families designed by Juan Pa
 url="http://www.huertatipografica.com/"
 arch=('any')
 groups=('infinality-bundle-fonts-extra')
-license=('OFL-1.1')
+license=('custom:OFL')
 install=$pkgname.install
 # http://www.huertatipografica.com/free_download/23
 # http://fedoraproject.org/wiki/Alegreya_font
