@@ -8,7 +8,7 @@ depends=('fontconfig')
 pkgdesc="Yanone Kaffeesatz was first published in 2004. Its Bold is reminiscent of 1920s coffee house typography, while the rather thin fonts bridge the gap to present times."
 url="http://www.yanone.de/"
 arch=('any')
-license=('OFL-1.1')
+license=('custom:OFL')
 groups=('infinality-bundle-fonts-extra')
 source=("http://www.yanone.de/typedesign/kaffeesatz/YanoneKaffeesatz.zip"
         "http://www.yanone.de/typedesign/kaffeesatz/YanoneKaffeesatzTTF.zip"
