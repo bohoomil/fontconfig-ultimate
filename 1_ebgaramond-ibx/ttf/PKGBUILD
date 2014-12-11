@@ -9,7 +9,7 @@ url="http://www.georgduffner.at/ebgaramond/"
 arch=('any')
 conflicts=('ttf-ebgaramond' 'otf-ebgaramond' 'otf-eb-garamond' 't1-ebgaramond-ibx' 'otf-ebgaramond-ibx')
 groups=('infinality-bundle-fonts-extra')
-license=('OFL-1.1')
+license=('custom:OFL')
 install=$pkgname.install
 source=(http://bohoomil.com/src/ebgaramond_ttf.tar.xz
         '45-ebgaramond.conf'
