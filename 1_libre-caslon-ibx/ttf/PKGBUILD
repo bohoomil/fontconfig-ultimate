@@ -2,12 +2,12 @@
 
 pkgname=ttf-libre-caslon-ibx
 pkgver=1.0
-pkgrel=5
-pkgdesc="The Libre Caslon fonts designed by Pablo Impallari. Type 1 version."
+pkgrel=6
+pkgdesc="The Libre Caslon fonts designed by Pablo Impallari. TrueType version."
 url="http://www.impallari.com/"
 depends=('fontconfig')
 arch=('any')
-license=('OFL-1.1')
+license=('custom:OFL')
 conflicts=('ttf-impallari-libre-caslon-text' 'otf-libre-caslon-ibx' 't1-libre-caslon-ibx')
 groups=('infinality-bundle-fonts-extra')
 install=${pkgname}.install
