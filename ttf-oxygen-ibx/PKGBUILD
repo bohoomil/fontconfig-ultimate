@@ -1,38 +1,51 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=ttf-oxygen-ibx
-pkgver=0.4.0
-_plasmaver=5.0.0
+epoch=1
+pkgver=5.1.1
 pkgrel=1
-depends=('fontconfig')
 pkgdesc="The Oxygen typeface family is created as part of the KDE Project."
 url="http://kde.org/"
 arch=('any')
 groups=('infinality-bundle-fonts-extra')
+depends=('fontconfig')
+makedepends=('extra-cmake-modules' 'qt5-base' 'fontforge')
 conflicts=('ttf-oxygen' 'ttf-oxygen-git')
 provides=('ttf-oxygen')
 license=('custom:OFL' 'custom:GPL+FE' 'GPL')
 install=$pkgname.install
-source=(http://download.kde.org/stable/plasma/${_plasmaver}/oxygen-fonts-${pkgver}.tar.xz
+source=("http://download.kde.org/stable/plasma/${pkgver}/oxygen-fonts-${pkgver}.tar.xz"
         45-oxygen.conf
-        90-tt-oxygen.conf)
-sha1sums=('c4bd89151876484e06ef6c49543b5bb746a0a659'
+        90-tt-oxygen.conf
+        CMakeLists.txt.patch)
+sha1sums=('57a739a0f22bf12e3623fde6b7a6d3829d1c5f0a'
           'cc78ee55ef16f085e7d73dd8eb9df191793791c1'
-          '0e884da0573482a1c9ce7b20d43a28231d9689c3')
+          '0e884da0573482a1c9ce7b20d43a28231d9689c3'
+          'cae6644056c9eb815f317a1d3e370cd9b76586c1')
+
+prepare() {
+  mkdir build
+
+  patch -Np1 -i CMakeLists.txt.patch
+}
+
+build() {
+  cd build
+  cmake ../oxygen-fonts-${pkgver} \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DLIB_INSTALL_DIR=lib
+  make
+}
 
 package(){
-  cd "${srcdir}"/oxygen-fonts-"${pkgver}"
+  cd build
 
-  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 "COPYING-OFL" \
-    "${pkgdir}"/usr/share/licenses/"${pkgname}"/"COPYING-OFL"
-  install -m644 "COPYING-GPL+FE.txt" \
-    "${pkgdir}"/usr/share/licenses/"${pkgname}"/"COPYING-GPL+FE.txt"
+  make DESTDIR="${pkgdir}" install
 
-  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
-  install -m644 oxygen-fonts/Bold-700/*.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
-  install -m644 oxygen-fonts/Regular-400/*.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
-  install -m644 oxygen-fonts/mono-400/*.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -d "${pkgdir}"/usr/share/licenses/${pkgname}
+  install -m644 "${srcdir}"/oxygen-fonts-${pkgver}/COPYING-{GPL+FE.txt,OFL} \
+    "${pkgdir}"/usr/share/licenses/${pkgname}
 
   install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
   install -m755 -d "${pkgdir}"/etc/fonts/conf.d
