@@ -1,27 +1,35 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=ttf-symbola-ib
-pkgver=7.17
+pkgver=7.19
 pkgrel=1
 depends=('fontconfig')
 pkgdesc="Symbola is a free symbol-type font."
 url="http://users.teilar.gr/~g1951d/"
 arch=('any')
+conflicts=('ttf-symbola')
+provides=('ttf-symbola')
+replaces=('ttf-symbola')
 groups=('infinality-bundle-fonts')
-license=('Custom')
+license=('custom')
 install=$pkgname.install
 source=(http://users.teilar.gr/~g1951d/Symbola.zip
+        COPYING
         45-symbola.conf
         90-tt-symbola.conf)
-sha1sums=('b386a78a777d7da1e305b7663556dfdf51d8b75e'
+sha1sums=('9fdf849a2116b8c3425e4db98943279ee13b7ac5'
+          '3964a993a97d51f019d2dd592eda7bc87817260f'
           'bece6c5f6f1c869264d2d7d8aaf53b27970b09f7'
           '55667eafb4db4bc51c42a2c81ffb667337bb6135')
 
 package(){
-  cd "${srcdir}"
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 COPYING \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
-  install -m644 Symbola_hint.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 Symbola_hint.ttf \
+    "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
   install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
   install -m755 -d "${pkgdir}"/etc/fonts/conf.d
