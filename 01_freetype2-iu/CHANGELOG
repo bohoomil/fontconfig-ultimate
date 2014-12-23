@@ -6,6 +6,15 @@ CHANGELOG
 ---------
 
 
+2014-12-23
+~~~~~~~~~~
+
+### freetype2-infinality-ultimate, rev. 2.5.4-2 (inc. multilib)
+
+* Merged with the recent upstream code base.
+* `infinality-settings`: slightly increased fringe filter strength.
+
+
 2014-12-07
 ~~~~~~~~~~
 

@@ -4,8 +4,8 @@
 
 pkgname=freetype2-infinality-ultimate
 pkgver=2.5.4
-pkgrel=1
-_patchrel=2014.12.07
+pkgrel=2
+_patchrel=2014.12.17
 pkgdesc="TrueType font rendering library with Infinality patches and custom settings."
 arch=('i686' 'x86_64')
 changelog=CHANGELOG
@@ -24,10 +24,10 @@ source=(http://downloads.sourceforge.net/sourceforge/freetype/freetype-${pkgver}
         "03-upstream-${_patchrel}.patch"
         "04-infinality-2.5.4-${_patchrel}.patch")
 sha1sums=('f30b929e2edc5d7ca64c1ccc65f0c2068e84c5e2'
-          '8f602756c60310d0cbbd29c76b858547599be0a0'
+          'e6fc24261a645682a55764b6dccaaf57ff1580c8'
           'abf7a8f726ad6359533651a8942636880febf9f6'
-          '06f28588d3ea03445bc86aa55f5ec97954997a5e'
-          '96fbaf7d5489e0aa69de78adb32634650c38f3db'
+          'fbd3b9ea3b94900b9818a8e9eb6cd6c0c4132188'
+          '1234a1b47bc39fb1afe7518925cee41a1f26b5ae'
           '0f57a47247f212e9ed957c816c20a564d29a2606')
 
 prepare() {
