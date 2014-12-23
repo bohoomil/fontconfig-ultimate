@@ -8,7 +8,8 @@
 
 pkgname=ttf-liberation-ib
 pkgver=2.00.1
-pkgrel=10
+_narrowver=1.07.4
+pkgrel=11
 pkgdesc='Red Hats Liberation fonts for infinality-bundle-fonts (inc. Liberation Sans Narrow).'
 arch=('any')
 license=('custom:OFL')
@@ -20,7 +21,7 @@ replaces=('ttf-liberation')
 provides=('ttf-font' 'ttf-liberation')
 install=$pkgname.install
 source=("https://fedorahosted.org/releases/l/i/liberation-fonts/liberation-fonts-ttf-$pkgver.tar.gz"
-        "https://fedorahosted.org/releases/l/i/liberation-fonts/liberation-fonts-ttf-1.07.3.tar.gz"
+        "https://fedorahosted.org/releases/l/i/liberation-fonts/liberation-fonts-ttf-$_narrowver.tar.gz"
         30-liberation-mono.conf
         30-liberation-sans.conf
         30-liberation-sans-narrow.conf
@@ -28,7 +29,7 @@ source=("https://fedorahosted.org/releases/l/i/liberation-fonts/liberation-fonts
         45-liberation.conf
         90-tt-liberation.conf)
 sha1sums=('84b40d7f8bb0cd085dd70b3abed197133d761557'
-          '24be509eaf38cef0b13fa32c1213be4f0d91c26a'
+          'c36bccbf6a0e562fa5a7b4b832af7185fa7f8a4b'
           '032b28f94d2a5d19a4339f691815f324e4f81d2d'
           'c867c50c152b5853b8c518ad4b5fb6be39f43509'
           '6a4c8a790024acb920ca70748f6654db29f1ff07'
@@ -45,7 +46,7 @@ package() {
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  cd "${srcdir}"/liberation-fonts-ttf-1.07.3
+  cd "${srcdir}"/liberation-fonts-ttf-"${_narrowver}"
   install -m644 *Narrow-*.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
   install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
