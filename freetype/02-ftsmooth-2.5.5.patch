@@ -1,3 +1,35 @@
+Temporarily reverting upstream commits (Infinality patch `08` needs a bit of tweaking):
+
+1. From 465ab99585cb748f9de0087d369677cc9e196785 Mon Sep 17 00:00:00 2001
+   From: Alexei Podtelezhnikov <apodtele@gmail.com>
+   Date: Wed, 29 Oct 2014 23:45:23 -0400
+   Subject: [PATCH] [smooth] Improve code readability.
+
+2. From e1efe0a2fc877c198d72cb0c877db3a17e956f63 Mon Sep 17 00:00:00 2001
+   From: Alexei Podtelezhnikov <apodtele@gmail.com>
+   Date: Fri, 31 Oct 2014 00:07:14 -0400
+   Subject: [PATCH] [smooth] Reduce outline translations during rendering.
+
+3. From 525d4876bea4a56adc0b3c9aab2082f84f050e32 Mon Sep 17 00:00:00 2001
+   From: Alexei Podtelezhnikov <apodtele@gmail.com>
+   Date: Fri, 31 Oct 2014 22:12:37 -0400
+   Subject: [PATCH] [smooth] Improve code readability.
+
+4. From 2676e07aa45761d00ff0cb0101bf0aeb0d95ad05 Mon Sep 17 00:00:00 2001
+   From: suzuki toshiya <mpsuzuki@hiroshima-u.ac.jp>
+   Date: Fri, 28 Nov 2014 00:58:25 +0900
+   Subject: [PATCH] * src/smooth/ftsmooth.c (ft_smooth_render_generic): Remove
+   unrequired negative value check for `width' and `height'.
+
+Applying a bug fix:
+
+From c7fd93565c2f9f967aa24fe8dee028c2600c459d Mon Sep 17 00:00:00 2001
+From: Alexei Podtelezhnikov <apodtele@gmail.com>
+Date: Thu, 30 Oct 2014 22:43:01 -0400
+Subject: [PATCH] [smooth] Fix Savannah bug #35604 (cont'd).
+
+---
+
 --- a/src/smooth/ftsmooth.c	2014-11-27 19:17:01.009987078 +0100
 +++ b/src/smooth/ftsmooth.c	2013-06-05 12:12:47.000000000 +0200
 @@ -103,24 +103,25 @@
