@@ -2,8 +2,8 @@
 
 pkgname=ttf-noto-family-ib
 pkgname=('ttf-noto-sans-ib' 'ttf-noto-serif-ib')
-pkgver=2014.11
-pkgrel=2
+pkgver=2014.12
+pkgrel=1
 pkgdesc="Noto Sans family."
 url="http://www.google.com/get/noto/"
 arch=('any')
@@ -17,11 +17,11 @@ source=(http://www.google.com/get/noto/pkgs/Noto-hinted.zip
         90-tt-noto-sans.conf
         90-tt-noto-serif.conf)
 sha1sums=('a21ede33ff841c193eee1896f0fc6bd4c0fbb8bb'
-          '926c11b9f0b3b6271079aedcacfeae9900a933f6'
-          '4abf4162d461ae9f14970fd9480ef6edcae5a4bc'
+          '5c3c4b13db2ae3ac9f45f14d5129782fc33845e1'
+          'abdd4d6de77d486192451bdd3bd222bc4622e4b8'
           'e20c836813721d8bf53e07f6fced4a4639a3c238'
           'fd6fabab03f187fdd8eeabd655d75451347c28da'
-          '80d8f55360e42b80811d7353bff2875dfd1b37ba'
+          '2adb35c703547f433c7e06b3d7c0e4c8d63bdb08'
           '017ca1ca6f041035c2dbaa2c7b8d36725e881534')
 
 package_ttf-noto-sans-ib() {
