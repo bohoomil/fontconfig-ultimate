@@ -3,7 +3,7 @@
 pkgname=otf-berenis-pro-ibx
 _src_name=Berenis-Pro
 pkgver=20120228
-pkgrel=2
+pkgrel=3
 pkgdesc="Berenis ADF is a serif family designed as a substitute for Bodoni or Didot."
 arch=('any')
 url="http://arkandis.tuxfamily.org"

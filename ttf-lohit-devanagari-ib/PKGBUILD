@@ -3,7 +3,7 @@
 pkgname=ttf-lohit-devanagari-ib
 _src_pkg=lohit-devanagari-ttf
 pkgver=2.94.0
-pkgrel=4
+pkgrel=5
 depends=('fontconfig')
 pkgdesc="Lohit Devanagari font."
 url="https://fedorahosted.org/lohit/"

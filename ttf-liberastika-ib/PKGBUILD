@@ -2,7 +2,7 @@
 
 pkgname=ttf-liberastika-ib
 pkgver=1.1.4
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="Liberastika is a Liberation Sans derivative typeface with re-designed and enhanced Cyrillic section."
 url="http://code.google.com/p/liberastika/"

@@ -1,5 +1,5 @@
 post_install() {
-  fc-cache -f /usr/share/fonts/otf-exo2-ibx > /dev/null
+  fc-cache -s /usr/share/fonts/otf-exo2-ibx > /dev/null
   echo "Done."
 }
 

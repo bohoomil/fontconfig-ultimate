@@ -2,7 +2,7 @@
 
 pkgname=otf-magra-ibx
 pkgver=1.001
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Magra is a beautiful sans-serif typeface with a humanist feel, perfect for tables and charts."
 url="http://www.fontfuror.com"

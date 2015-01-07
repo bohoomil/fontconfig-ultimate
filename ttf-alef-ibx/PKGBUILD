@@ -2,7 +2,7 @@
 
 pkgname=ttf-alef-ibx
 pkgver=1.001
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="Alef is an open source multiscript web-font."
 url="http://alef.hagilda.com/"

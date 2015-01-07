@@ -2,7 +2,7 @@
 
 pkgname=otf-bravo-ibx
 pkgver=1.0
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="Bravo is a narrow accidental grotesque, which includes 3 tracings. It contains more than 600 characters in each face."
 url="https://www.behance.net/gallery/10527763/Bravo-Free-Typeface"

@@ -2,7 +2,7 @@
 
 pkgname=ttf-consola-mono-ibx
 pkgver=2.001
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="Consola Mono is a legible, programming font by Wojciech Kalinowski."
 url="http://openfontlibrary.org"

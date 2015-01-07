@@ -40,13 +40,13 @@ _EOF
   popd > /dev/null
 
   echo -e "Updating font cache... "
-  /usr/bin/fc-cache -f
+  /usr/bin/fc-cache -s
   echo -e "Done."
 }
 
 post_upgrade() {
   echo -e "Updating font cache... "
-  /usr/bin/fc-cache -f
+  /usr/bin/fc-cache -s
   echo "Done."
 }
 

@@ -2,7 +2,7 @@
 
 pkgname=otf-linden-hill-ibx
 pkgver=1.2
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="Linden Hill is a digital version of Frederic Goudy’s Deepdene created by Barry Schwartz."
 url="http://crudfactory.com/"

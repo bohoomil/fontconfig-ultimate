@@ -2,7 +2,7 @@
 
 pkgname=otf-cooper-hewitt-ibx
 pkgver=1.0
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="Cooper Hewitt is a contemporary sans serif with characters composed of modified-geometric curves and arches."
 url="http://www.cooperhewitt.org/"

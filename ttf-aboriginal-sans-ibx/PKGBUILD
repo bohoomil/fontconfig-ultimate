@@ -2,7 +2,7 @@
 
 pkgname=ttf-aboriginal-sans-ibx
 pkgver=9.602
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="Aboriginal Sans typeface by Christopher Harvey for Syllabics, Cherokee, and Latin script."
 url="http://www.languagegeek.com/"

@@ -2,7 +2,7 @@
 
 pkgname=ttf-himalaya-fonts-ibx
 pkgver=1.0
-pkgrel=7
+pkgrel=8
 depends=('fontconfig')
 makedepends=('unrar')
 pkgdesc="Himalaya fonts."

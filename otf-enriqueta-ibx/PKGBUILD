@@ -2,7 +2,7 @@
 
 pkgname=otf-enriqueta-ibx
 pkgver=1.001
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Enriqueta is a serif typeface with distinctive glyphs, mainly intended for screen."
 url="http://www.fontfuror.com"

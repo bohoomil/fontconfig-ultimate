@@ -2,7 +2,7 @@
 
 pkgname=otf-montserrat-ibx
 pkgver=1.0
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="Montserrat, by Julieta Ulanovsky, aims to rescue the beauty of urban typography from the first half of the 20th century."
 url="http://www.fontsquirrel.com/"

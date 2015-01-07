@@ -2,7 +2,7 @@
 
 pkgname=ttf-hannom-ibx
 pkgver=2005
-pkgrel=4
+pkgrel=5
 pkgdesc='Chinese and Vietnamese TrueType fonts.'
 url='http://vietunicode.sourceforge.net/fonts/fonts_hannom.html'
 license=('custom:non-profit')

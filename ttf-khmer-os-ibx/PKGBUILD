@@ -4,7 +4,7 @@
 
 pkgname=ttf-khmer-os-ibx
 pkgver=5.0
-pkgrel=3
+pkgrel=4
 pkgdesc="TTFont collection for Khmer (Cambodia)."
 arch=('any')
 license=('LGPL')

@@ -1,5 +1,5 @@
 post_install() {
-  fc-cache -f /usr/share/fonts/ttf-caviar-dreams-ibx > /dev/null
+  fc-cache -s /usr/share/fonts/ttf-caviar-dreams-ibx > /dev/null
   echo "Done."
 }
 

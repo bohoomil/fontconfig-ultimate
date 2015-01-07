@@ -2,7 +2,7 @@
 
 pkgname=ttf-cantoraone-ib
 pkgver=1.001
-pkgrel=5
+pkgrel=6
 depends=('fontconfig')
 pkgdesc="Cantora is a friendly semi formal, semi condensed, semi sans serif. It has reminiscences of hand lettering, mixing straight and bowed stems, and natural curves."
 url="http://www.impallari.com"

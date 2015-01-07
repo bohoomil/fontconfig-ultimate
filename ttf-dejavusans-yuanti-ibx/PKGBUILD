@@ -4,7 +4,7 @@
 pkgbase=ttf-dejavu-yuanti-ibx
 pkgname=('ttf-dejavusans-yuanti-basic-ibx' 'ttf-dejavusans-yuanti-condensed-ibx' 'ttf-dejavusans-yuanti-mono-ibx')
 pkgver=2.32
-pkgrel=4
+pkgrel=5
 pkgdesc="Chinese Yuan Ti family based on DejaVu Sans fonts."
 arch=(any)
 depends=('fontconfig')

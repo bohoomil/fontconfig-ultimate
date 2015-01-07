@@ -3,7 +3,7 @@
 pkgname=ttf-charis-sil-ibx
 _src_name=CharisSIL
 pkgver=4.114
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Charis SIL is a serif typeface providing a comprehensive inventory of glyphs for almost any Roman- or Cyrilic-based writing system."
 url="http://www.sil.org/"

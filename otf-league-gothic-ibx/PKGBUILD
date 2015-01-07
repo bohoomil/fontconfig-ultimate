@@ -2,7 +2,7 @@
 
 pkgname=otf-league-gothic-ibx
 pkgver=1.560
-pkgrel=2
+pkgrel=3
 _src_rel=64c3ede
 depends=('fontconfig')
 pkgdesc="League Gothic is a revival of an old classic, and one of our favorite typefaces, Alternate Gothic #1."

@@ -2,7 +2,7 @@
 
 pkgname=ttf-gelasio-ib
 pkgver=1.00
-pkgrel=3
+pkgrel=4
 _hgrev=325e7174147acd060cb6dfe982cf57594a180d53
 depends=('fontconfig')
 pkgdesc="Gelasio serif family by Eben Sorkin."

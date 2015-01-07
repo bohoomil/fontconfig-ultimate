@@ -2,7 +2,7 @@
 
 pkgname=ttf-vera-humana-95-ibx
 pkgver=15.02.97
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="Vera Humana 95 is an elegant sans-serif humanist typeface family."
 url="http://www.fatont.com/"
