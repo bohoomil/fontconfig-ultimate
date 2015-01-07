@@ -3,7 +3,7 @@
 pkgname=ttf-lohit-odia-ib
 _src_pkg=lohit-odia-ttf
 pkgver=2.5.5
-pkgrel=4
+pkgrel=5
 depends=('fontconfig')
 pkgdesc="Lohit Oriya font."
 url="https://fedorahosted.org/lohit/"

@@ -2,7 +2,7 @@
 
 pkgname=otf-unb-pro-ibx
 pkgver=1.0
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="UnB Pro is based on Liberation Sans family and was developed especially for the new visual identity system of UnB."
 url="http://www.fontfuror.com"

@@ -2,7 +2,7 @@
 
 pkgname=ttf-lato-ibx
 pkgver=2.010
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="Lato is a sanserif type­face family designed in the Summer 2010 by Warsaw-based designer Łukasz Dziedzic."
 url="http://www.latofonts.com/"

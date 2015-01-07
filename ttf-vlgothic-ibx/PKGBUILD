@@ -2,7 +2,7 @@
 
 pkgname=ttf-vlgothic-ibx
 pkgver=2.108
-pkgrel=6
+pkgrel=7
 depends=('fontconfig')
 pkgdesc="Japanese VL Gothic font family."
 url="http://vlgothic.dicey.org/"

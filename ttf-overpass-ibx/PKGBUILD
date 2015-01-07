@@ -3,7 +3,7 @@
 pkgname=ttf-overpass-fonts-ibx
 _src_name=overpass-fonts
 pkgver=1.01
-pkgrel=2
+pkgrel=3
 _upstream_rev=6.fc20
 depends=('fontconfig')
 makedepends=('rpmextract')

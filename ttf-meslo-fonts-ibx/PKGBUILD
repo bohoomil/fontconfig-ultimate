@@ -3,7 +3,7 @@
 pkgname=ttf-meslo-fonts-ibx
 _basename=Meslo
 pkgver=1.2.1
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Customized version of Apple's Menlo font."
 url="https://github.com/andreberg/Meslo-Font"

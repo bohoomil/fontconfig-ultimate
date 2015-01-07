@@ -2,7 +2,7 @@
 
 pkgname=ttf-roboto-ibx
 pkgver=2.0
-pkgrel=4
+pkgrel=5
 pkgdesc="Modern sans-serif font family designed by Christian Robertson and introduced with Android Ice Cream Sandwich operating system. Basic, condensed and slab variants included."
 arch=('any')
 license=('Apache')

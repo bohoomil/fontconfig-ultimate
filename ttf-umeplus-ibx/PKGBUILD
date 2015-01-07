@@ -3,7 +3,7 @@
 pkgname=ttf-umeplus-ibx
 _src_name=umeplus-fonts
 pkgver=20140427
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="UmePlus fonts are modified Ume and M+ fonts for Japanese."
 url="http://www.geocities.jp/ep3797/modified_fonts_01.html"

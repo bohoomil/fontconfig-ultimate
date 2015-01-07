@@ -3,7 +3,7 @@
 
 pkgname=ttf-koruri-ibx
 pkgver=20140904
-pkgrel=1
+pkgrel=2
 pkgdesc="Japanese TrueType font obtained by mixing M+ and Open Sans (fixed base family name)."
 arch=('any')
 url="http://sourceforge.jp/projects/koruri"

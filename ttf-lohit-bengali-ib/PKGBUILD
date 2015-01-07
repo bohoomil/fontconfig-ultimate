@@ -3,7 +3,7 @@
 pkgname=ttf-lohit-bengali-ib
 _src_pkg=lohit-bengali-ttf
 pkgver=2.5.3
-pkgrel=4
+pkgrel=5
 depends=('fontconfig')
 pkgdesc="Lohit Bengali font."
 url="https://fedorahosted.org/lohit/"

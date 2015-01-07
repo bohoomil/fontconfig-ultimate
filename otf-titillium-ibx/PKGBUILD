@@ -2,7 +2,7 @@
 
 pkgname=otf-titillium-ibx
 pkgver=2.0
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="Titillium is an elegant sans-serif typeface created at Accademia di Belle Arti di Urbino."
 url="http://www.campivisivi.net/titillium/"

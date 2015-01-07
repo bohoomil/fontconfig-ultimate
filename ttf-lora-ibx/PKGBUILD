@@ -2,7 +2,7 @@
 
 pkgname=ttf-lora-ibx
 pkgver=1.014
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="Lora is a well-balanced contemporary serif with roots in calligraphy. It is a text typeface with moderate contrast well suited for body text."
 url="http://www.cyreal.org/"

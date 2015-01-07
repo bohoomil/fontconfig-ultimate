@@ -2,7 +2,7 @@
 
 pkgname=otf-oswald-ib
 pkgver=3.0
-pkgrel=6
+pkgrel=7
 depends=('fontconfig')
 pkgdesc="Oswald is a reworking of the classic Gothic and Grotesque type styles."
 url="http://oswaldfont.com"

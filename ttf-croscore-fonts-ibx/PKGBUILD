@@ -2,7 +2,7 @@
 
 pkgname=ttf-croscore-fonts-ibx
 pkgver=1.23
-pkgrel=8
+pkgrel=9
 depends=('fontconfig')
 pkgdesc="Google Chrome OS core fonts."
 url="http://code.google.com/p/chromium-os/issues/detail?id=5287"

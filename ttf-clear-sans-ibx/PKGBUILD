@@ -3,7 +3,7 @@
 pkgname=ttf-clear-sans-ibx
 _archname=clearsans
 pkgver=1.00
-pkgrel=6
+pkgrel=7
 depends=('fontconfig')
 pkgdesc="Clear Sans is a versatile OpenType font for screen, print, and Web."
 url="https://01.org/clear-sans"

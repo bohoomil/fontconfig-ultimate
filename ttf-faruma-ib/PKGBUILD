@@ -2,7 +2,7 @@
 
 pkgname=ttf-faruma-ib
 pkgver=2.0
-pkgrel=1
+pkgrel=2
 pkgdesc="A font for Maldivian (Dhivehi) language, Thaana script."
 arch=('any')
 url="http://www.wazu.jp/"

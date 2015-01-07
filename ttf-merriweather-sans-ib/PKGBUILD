@@ -2,7 +2,7 @@
 
 pkgname=ttf-merriweather-sans-ib
 pkgver=1.003
-pkgrel=7
+pkgrel=8
 depends=('fontconfig')
 pkgdesc="Merriweather Sans-Serif font family by Eben Sorkin."
 url="http://sorkintype.com"

@@ -4,7 +4,7 @@
 pkgname=ttf-tlwg-ibx
 _src_pkg=ttf-tlwg
 pkgver=0.5.1
-pkgrel=2
+pkgrel=3
 pkgdesc='Collection of scalable Thai fonts.'
 url='http://linux.thai.net/projects/fonts-tlwg'
 arch=('any')

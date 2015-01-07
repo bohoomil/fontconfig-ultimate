@@ -4,7 +4,7 @@
 pkgname=ttf-mplus-ibx
 pkgver=TESTFLIGHT_058
 _pkgver=${pkgver/_/-}
-pkgrel=1
+pkgrel=2
 pkgdesc="M+ family of Japanese, sans-serif and monospaced outline fonts."
 arch=('any')
 url="http://mplus-fonts.sourceforge.jp/"

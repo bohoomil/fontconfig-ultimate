@@ -2,7 +2,7 @@
 
 pkgname=ttf-noticia-text-ibx
 pkgver=1.003
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="Noticia Text is a contemporary humanist slab serif typeface designed to be used for running text on digital newspapers (both on websites and mobile apps)."
 url="http://jmsole.cl/"

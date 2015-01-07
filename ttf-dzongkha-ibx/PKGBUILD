@@ -2,7 +2,7 @@
 
 pkgname=ttf-dzongkha-ibx
 pkgver=1.0
-pkgrel=5
+pkgrel=6
 depends=('fontconfig')
 makedep=('unzip')
 pkgdesc="Dzongkha fonts."

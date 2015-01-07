@@ -2,7 +2,7 @@
 
 pkgname=ttf-tharlon-ibx
 pkgver=1.002
-pkgrel=4
+pkgrel=5
 depends=('fontconfig')
 pkgdesc="TharLon is an authentic Myanmar typeface which covers several languages."
 url="https://kippt.com/aung/myanmar-fonts/clips/8988942"

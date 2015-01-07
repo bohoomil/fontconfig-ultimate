@@ -2,7 +2,7 @@
 
 pkgname=ttf-amble-ibx
 pkgver=1.0
-pkgrel=5
+pkgrel=6
 depends=('fontconfig')
 pkgdesc="A free, screen-optimized sans-serif font from Punchcut."
 url="http://punchcut.com/"

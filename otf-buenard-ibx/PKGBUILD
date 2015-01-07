@@ -2,7 +2,7 @@
 
 pkgname=otf-buenard-ibx
 pkgver=1.001
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Buenard is a contemporary serif typeface, originally created for artistic and literary texts."
 url="http://www.fontfuror.com"

@@ -6,7 +6,7 @@
 pkgname=ttf-wqy-zenhei-ibx
 _basename=wqy-zenhei
 pkgver=0.9.45
-pkgrel=5
+pkgrel=6
 pkgdesc="A Hei Ti Style (sans-serif) Chinese Outline Font."
 arch=('any')
 license=('GPL2' 'custom:"font embedding exception"')

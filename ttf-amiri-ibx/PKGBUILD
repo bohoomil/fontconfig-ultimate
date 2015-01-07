@@ -2,7 +2,7 @@
 
 pkgname=ttf-amiri-ibx
 pkgver=0.107
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="Amiri is a high quality classical Arabic typeface in Naskh style for typesetting books and other running text."
 url="http://www.amirifont.org/"

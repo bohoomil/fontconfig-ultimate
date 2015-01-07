@@ -2,7 +2,7 @@
 
 pkgname=ttf-carlito-ib
 pkgver=20130920
-pkgrel=6
+pkgrel=7
 _tarname=crosextrafonts-carlito
 depends=('fontconfig')
 pkgdesc="Carlito is a sans-serif font metrically compatible with Calibri."

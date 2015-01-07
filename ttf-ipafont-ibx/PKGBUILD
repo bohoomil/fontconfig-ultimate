@@ -4,7 +4,7 @@
 pkgname=ttf-ipamjfont-ibx
 pkgver=002.02
 _pkgver=${pkgver/./}
-pkgrel=4
+pkgrel=5
 pkgdesc="Japanese outline Mincho fonts including the unified characters of the Basic Resident Registers Network and the Family Register of Japan (based on IPAex Mincho fonts)"
 arch=('any')
 url="http://ossipedia.ipa.go.jp/ipamjfont/"

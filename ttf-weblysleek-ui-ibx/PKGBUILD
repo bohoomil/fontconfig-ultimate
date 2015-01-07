@@ -2,7 +2,7 @@
 
 pkgname=ttf-weblysleek-ui-ibx
 pkgver=0.10
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="WeblySleek UI was created by Mat Douglas for UI Webdesign layouts."
 url="http://www.dafont.com/mat-douglas.d4101"

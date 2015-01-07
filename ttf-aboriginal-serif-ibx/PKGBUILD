@@ -2,7 +2,7 @@
 
 pkgname=ttf-aboriginal-serif-ibx
 pkgver=9.606
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Aboriginal Serif typeface by Christopher Harvey for Syllabics, Cherokee, and Latin script."
 url="http://www.languagegeek.com/"

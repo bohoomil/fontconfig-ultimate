@@ -2,7 +2,7 @@
 
 pkgname=ttf-nanum-fonts-ibx
 pkgver=3.020
-pkgrel=6
+pkgrel=7
 depends=('fontconfig')
 pkgdesc="The Nanum fonts are unicode fonts designed especially for the Korean-language script."
 url="http://hangeul.naver.com/"

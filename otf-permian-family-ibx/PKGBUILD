@@ -2,7 +2,7 @@
 
 pkgname=otf-permian-family-ibx
 pkgver=1.0
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="Developed for the city of Perm, Permian family provides extensive number of Latin and Cyrillic glyphs, icons and small caps."
 url="http://pcrd.ru/"

@@ -2,7 +2,7 @@
 
 pkgname=ibfonts-meta-extended-lt
 pkgver=1
-pkgrel=17
+pkgrel=18
 arch=('any')
 url="https://github.com/bohoomil/fontconfig-ultimate"
 license=('GPL')
