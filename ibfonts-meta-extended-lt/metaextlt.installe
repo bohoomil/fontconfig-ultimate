@@ -1,0 +1,17 @@
+
+post_install() {
+  cat << EOF
+  Additional, optional replacements:
+
+  Arial Black => Archivo Black
+  Baskerville Old Face => Libre Baskerville
+  SegoeUI => WeblySleek UI
+
+EOF
+}
+
+post_upgrade() {
+  post_install
+}
+
+# vim:set ts=2 sw=2 et:
