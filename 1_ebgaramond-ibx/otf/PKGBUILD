@@ -2,7 +2,7 @@
 
 pkgname=otf-ebgaramond-ibx
 pkgver=0.16
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="EB Garamond is a revival by Georg Duffner of the 16th century fonts designed by Claude Garamond. OpenType version."
 url="http://www.georgduffner.at/ebgaramond/"
@@ -15,7 +15,7 @@ install=$pkgname.install
 source=("http://mirrors.ctan.org/fonts/ebgaramond.zip"
         '45-ebgaramond.conf'
         '90-non-tt-ebgaramond.conf')
-sha1sums=('fbf811e461e445aeee50f1dfcbb5554f5bff4c6c'
+sha1sums=('57fbcecbf356a633f4c5a98c67c40d0d4a16a5ad'
           'ba581cc9f03cb3a60030b25e26e2578af5f7e7b7'
           '7a8d6b16f14ff260f27517490bbc05bf9bbab0bb')
 
