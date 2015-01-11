@@ -2,7 +2,7 @@
 
 pkgname=t1-paratype-ibx
 pkgver=2014.09.11
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="Paratype font family. Type 1 version (CTAN)."
 groups=('infinality-bundle-fonts-extra')
