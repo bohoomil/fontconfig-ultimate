@@ -1,47 +1,45 @@
-# Maintainer: ponsfoot <cabezon dot hashimoto at gmail dot com>
-# Contributor: bohoomil <@zoho.com>
+# Contributor: ponsfoot <cabezon dot hashimoto at gmail dot com>
+# Maintainer: bohoomil <@zoho.com>
 
-pkgname=ttf-ipamjfont-ibx
-pkgver=002.02
+pkgname=ttf-ipafont-ibx
+pkgver=003.03
 _pkgver=${pkgver/./}
-pkgrel=4
-pkgdesc="Japanese outline Mincho fonts including the unified characters of the Basic Resident Registers Network and the Family Register of Japan (based on IPAex Mincho fonts)"
+pkgrel=5
+pkgdesc="Japanese outline (P)Mincho and (P)Gothic fonts."
 arch=('any')
 url="http://ossipedia.ipa.go.jp/ipamjfont/"
 license=('custom')
 depends=('fontconfig')
 groups=('infinality-bundle-fonts-extra')
-conflicts=('otf-ipamjfont')
-replaces=('otf-ipamjfont')
+conflicts=('otf-ipafont' 'otf-ipaexfont')
+replaces=('otf-ipafont' 'otf-ipaexfont')
+provides=('otf-ipafont')
 install=${pkgname}.install
-source=(http://download.forest.impress.co.jp/pub/library/i/ipamjfont/10750/ipamjm${_pkgver}.zip
-        40-ipamjfont.conf
-        90-tt-ipamjfont.conf)
-sha1sums=('997a61cc3a8b96568bfd0a1099598b2c3fc1dc90'
-          '57e4bb8164d546f066c715cc0aa886059af0c901'
-          'b65df8dcbd12c100110f7800f07354959ef61580')
+source=("http://download.forest.impress.co.jp/pub/library/i/ipafont/10483/IPAfont${_pkgver}.zip"
+        40-ipafont.conf
+        90-tt-ipafont.conf)
+sha1sums=('9d7558a84b2dac7bcd1aa650f59b4af9cb4d0ea9'
+          '1383cf2f5568da98dd508800d25f1cea9e23097e'
+          '5020dbfe2444e6147b029618530c8d1241cee817')
 
 package() {
-  cd "${srcdir}"/"ipamjm${_pkgver}"
-
-  install -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -d "${pkgdir}"/usr/share/doc/"${pkgname}"
-  install -m644 "IPA_Font_License_Agreement_v1.0.txt" \
-    "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 "Readme_ipamjm${pkgver}.txt" \
-    "${pkgdir}"/usr/share/doc/"${pkgname}"
+  cd "${srcdir}"/"IPAfont${_pkgver}"
 
   install -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
+  install -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 IPA_Font_License_Agreement_v1.0.txt \
+    Readme_IPAfont"${_pkgver}".txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
   install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
   install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 ../40-ipamjfont.conf \
-    "${pkgdir}"/etc/fonts/conf.avail/40-ipamjfont.conf
-  install -m644 ../90-tt-ipamjfont.conf \
-    "${pkgdir}"/etc/fonts/conf.avail/90-tt-ipamjfont.conf
+  install -m644 ../40-ipafont.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/40-ipafont.conf
+  install -m644 ../90-tt-ipafont.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-ipafont.conf
 
   cd "${pkgdir}"/etc/fonts/conf.d
-  ln -s ../conf.avail/40-ipamjfont.conf .
-  ln -s ../conf.avail/90-tt-ipamjfont.conf .
+  ln -s ../conf.avail/40-ipafont.conf .
+  ln -s ../conf.avail/90-tt-ipafont.conf .
 }
