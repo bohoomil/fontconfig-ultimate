@@ -2,12 +2,12 @@
 
 pkgname=otf-aileron-ibx
 pkgver=0.101
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="Aileron is a high quality sans serif font designed by Sora Sagano."
 url="http://dotcolon.net/"
 arch=('any')
-license=('Custom:Public Domain')
+license=('custom:Public Domain')
 groups=('infinality-bundle-fonts-extra')
 source=("http://dotcolon.net/DL/font/aileron.zip"
         COPYING
