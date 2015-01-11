@@ -1,0 +1,38 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=ttf-antonio-ibx
+pkgver=1.0
+pkgrel=2
+depends=('fontconfig')
+pkgdesc="Antonio is a reworking of a traditional advertising sans serif typeface."
+url="http://www.newtypography.co.uk/"
+arch=('any')
+groups=('infinality-bundle-fonts-extra')
+license=('custom:OFL')
+install=$pkgname.install
+source=(antonio.zip::http://www.fontsquirrel.com/fonts/download/antonio
+        45-antonio.conf
+        90-tt-antonio.conf)
+sha1sums=('77d50e333fb28775d00c731ffabed7e764de7718'
+          '804f411dd873c95d0a2352f410c33535bbdf1f2b'
+          'a0980d5264f546fc965c37068b6ad23765fe5c48')
+
+package(){
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 "SIL Open Font License.txt" \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-antonio.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-antonio.conf
+  install -m644 90-tt-antonio.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-antonio.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-antonio.conf .
+  ln -s ../conf.avail/90-tt-antonio.conf .
+}
