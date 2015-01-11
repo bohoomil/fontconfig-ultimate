@@ -3,7 +3,7 @@
 pkgname=ttf-yanone-kaffeesatz-ibx
 pkgname=('otf-yanone-kaffeesatz-ibx' 'ttf-yanone-kaffeesatz-ibx')
 pkgver=1.002
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="Yanone Kaffeesatz was first published in 2004. Its Bold is reminiscent of 1920s coffee house typography, while the rather thin fonts bridge the gap to present times."
 url="http://www.yanone.de/"
