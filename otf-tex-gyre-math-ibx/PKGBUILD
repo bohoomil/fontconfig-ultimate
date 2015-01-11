@@ -2,7 +2,7 @@
 
 pkgname=otf-tex-gyre-math-ibx
 pkgver=2.005
-pkgrel=2
+pkgrel=3
 pkgdesc="The TeX Gyre (TG) Math Fonts."
 depends=('fontconfig' 'otf-tex-gyre-ib')
 groups=('infinality-bundle-fonts-extra')
