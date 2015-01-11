@@ -2,7 +2,7 @@
 
 pkgname=ttf-heuristica-ib
 pkgver=1.0.2
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Heuristica is an extended version of Adobe Utopia font. TrueType version."
 url="http://code.google.com/p/evristika/"
@@ -14,8 +14,7 @@ groups=('infinality-bundle-fonts')
 source=("https://downloads.sourceforge.net/project/heuristica/heuristica-ttf-${pkgver}.tar.xz"
         45-heuristica.conf
         90-tt-heuristica.conf)
-sha1sums=('cbfcf2f2e51735403ed2bca1c4eed83ff01a539f'
-          '7b233f1f66816e0f023f57d7385cf1d40c04f2ec'
+sha1sums=('7b233f1f66816e0f023f57d7385cf1d40c04f2ec'
           '902385dcf1c3fc3f66bfeabba4589ecdb90593a7'
           '8eb1f7933a5b2bfaacc17115835afe2396681ab7')
 
