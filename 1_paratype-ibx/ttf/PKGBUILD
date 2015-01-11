@@ -2,7 +2,7 @@
 
 pkgname=ttf-paratype-ibx
 pkgver=2014.09.11
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="Paratype font family. TrueType version."
 groups=('infinality-bundle-fonts-extra')
