@@ -3,8 +3,8 @@
 
 pkgname=ttf-tlwg-ibx
 _src_pkg=ttf-tlwg
-pkgver=0.5.1
-pkgrel=2
+pkgver=0.6.1
+pkgrel=1
 pkgdesc='Collection of scalable Thai fonts.'
 url='http://linux.thai.net/projects/fonts-tlwg'
 arch=('any')
@@ -13,9 +13,9 @@ depends=('fontconfig')
 conflicts=('ttf-tlwg')
 replaces=('ttf-tlwg')
 install=$pkgname.install
-source=("ftp://linux.thai.net/pub/thailinux/software/thai-ttf/${_src_pkg}-${pkgver}.tar.xz"
+source=("http://linux.thai.net/pub/thailinux/software/thai-ttf/${_src_pkg}-${pkgver}.tar.xz"
         'LICENSE')
-sha1sums=('0848d2c7fa18c1f01daa2aef9c964471952b159b'
+sha1sums=('975bb4fb87ef52598519a6aba21bcf694d3901ff'
           '174356eab02649dd2e76b1a9040e2c020d9647be')
 
 package() {
