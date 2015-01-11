@@ -2,14 +2,14 @@
 
 pkgname=otf-oswald-ib
 pkgver=3.0
-pkgrel=6
+pkgrel=7
 depends=('fontconfig')
 pkgdesc="Oswald is a reworking of the classic Gothic and Grotesque type styles."
 url="http://oswaldfont.com"
 arch=('any')
 groups=('infinality-bundle-fonts')
 conflicts=('ttf-google-webfonts-git')
-license=('OFL-1.1')
+license=('custom:OFL')
 install=$pkgname.install
 source=(git+https://github.com/vernnobile/OswaldFont.git
         45-oswald.conf
