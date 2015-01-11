@@ -3,16 +3,18 @@
 pkgname=ttf-noto-family-ib
 pkgname=('ttf-noto-sans-multilang-ib' 'ttf-noto-serif-multilang-ib')
 pkgver=2014.12
-pkgrel=1
+pkgrel=2
 pkgdesc="Noto Sans family."
 url="http://www.google.com/get/noto/"
 arch=('any')
 groups=('infinality-bundle-fonts')
 license=('Apache')
 source=(http://www.google.com/get/noto/pkgs/Noto-hinted.zip
-        http://bohoomil.com/src/noto-sans-multi-fixed.tar.xz)
+        http://bohoomil.com/src/noto-sans-multi-fixed.tar.xz{,.sig})
+validgpgkeys=('A9244FB5E93F11F0E975337FAE6866C7962DDE58')
 sha1sums=('a21ede33ff841c193eee1896f0fc6bd4c0fbb8bb'
-          '60a128658a8dd6ee8620444772751a09c1b4e916')
+          '60a128658a8dd6ee8620444772751a09c1b4e916'
+          'SKIP')
 
 package_ttf-noto-sans-multilang-ib() {
   pkgdesc="Noto Sans family: non-Latin extension."
