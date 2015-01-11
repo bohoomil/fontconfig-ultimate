@@ -2,19 +2,21 @@
 
 pkgname=otf-buenard-ibx
 pkgver=1.001
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Buenard is a contemporary serif typeface, originally created for artistic and literary texts."
 url="http://www.fontfuror.com"
 arch=('any')
-license=('OFL-1.1')
+license=('custom:OFL')
 groups=('infinality-bundle-fonts-extra')
 # http://www.ffonts.net
-source=(http://bohoomil.com/src/buenard.zip
+source=(http://bohoomil.com/src/buenard.zip{,.sig}
         45-buenard.conf
         90-non-tt-buenard.conf)
 install=${pkgname}.install
+validgpgkeys=('A9244FB5E93F11F0E975337FAE6866C7962DDE58')
 sha1sums=('1d43587ceabb2c82a1b66031f5c3258449ac7960'
+          'SKIP'
           '5ec95d2744b3805040cdb9b8d673b1a7abf6a8ac'
           '7f8ed7fdaf00cf7a95ff174ac1b62ef128b42c13')
 
