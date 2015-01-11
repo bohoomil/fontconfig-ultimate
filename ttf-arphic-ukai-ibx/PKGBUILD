@@ -6,7 +6,7 @@
 
 pkgname=ttf-arphic-ukai-ibx
 pkgver=0.2.20080216.1
-pkgrel=5
+pkgrel=7
 pkgdesc='CJK Unicode font Kaiti style.'
 url='http://www.freedesktop.org/wiki/Software/CJKUnifonts'
 license=('custom:Arphic_Public_License')
@@ -16,12 +16,12 @@ groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-arphic-ukai')
 provides=('ttf-arphic-ukai')
 replaces=('ttf-arphic-ukai')
-install=$pkgname.install
+install=${pkgname}.install
 source=("http://archive.ubuntu.com/ubuntu/pool/main/t/ttf-arphic-ukai/ttf-arphic-ukai_${pkgver}.orig.tar.gz"
         40-arphic-ukai.conf
         90-tt-arphic-ukai.conf)
 sha1sums=('70f9489e7e15241c13d7eb6496a38736b49024e6'
-          'eb6f8091eb5d02d2becdd778e5b03457117e0a31'
+          '582c13fba5c7abf2e78ceb521edbccf25f81b2f8'
           'd99784c9669553741dec45809f4cce3ccc2e7607')
 
 package() {
