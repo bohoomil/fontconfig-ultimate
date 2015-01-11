@@ -2,18 +2,18 @@
 
 pkgname=ttf-lora-ibx
 pkgver=1.014
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="Lora is a well-balanced contemporary serif with roots in calligraphy. It is a text typeface with moderate contrast well suited for body text."
 url="http://www.cyreal.org/"
 arch=('any')
-license=('OFL-1.1')
+license=('custom:OFL')
 groups=('infinality-bundle-fonts-extra')
-source=("http://www.google.com/webfonts/download?kit=iwrHM7FQEcKgsUvDuXxrPg"
+source=("lora.zip"::"http://www.google.com/webfonts/download?kit=iwrHM7FQEcKgsUvDuXxrPg"
         45-lora.conf
         90-tt-lora.conf)
 install=${pkgname}.install
-sha1sums=('2eaa531d77b7b259187e880283121b2b50c19299'
+sha1sums=('0e63abe41764ae89b295e39ea71ce838f4e42b6b'
           'c0fb0a61c994c2f57730a80f68a28014622e3e5f'
           '5f69ae5efd78480d70ffdeb3642ebc4bb0360ba8')
 
