@@ -2,18 +2,20 @@
 
 pkgname=ttf-weblysleek-ui-ibx
 pkgver=0.10
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="WeblySleek UI was created by Mat Douglas for UI Webdesign layouts."
 url="http://www.dafont.com/mat-douglas.d4101"
 arch=('any')
 groups=('infinality-bundle-fonts-extra')
-license=('GPL' 'PD' 'OFL-1.1')
+license=('GPL' 'PD' 'custom:OFL')
 install=$pkgname.install
-source=(http://bohoomil.com/src/weblysleek-ui.zip
+source=(http://bohoomil.com/src/weblysleek-ui.zip{,.sig}
         45-weblysleek-ui.conf
         90-tt-weblysleek-ui.conf)
+validgpgkeys=('A9244FB5E93F11F0E975337FAE6866C7962DDE58')
 sha1sums=('01732074b4067d3dd2931039efca15b82af90860'
+          'SKIP'
           '9bf5bbb49427f68df5098f3dd49f56cbe0f3741b'
           'd0557efe853efb10a22090e7dd8d8c21bd2a288c')
 
