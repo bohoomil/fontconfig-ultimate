@@ -2,12 +2,12 @@
 
 pkgname=otf-inconsolatazi4-ibx
 pkgver=1.04
-pkgrel=8
+pkgrel=10
 depends=('fontconfig')
 pkgdesc="Monospace font for pretty code listings and for the terminal."
 url="http://www.levien.com/type/myfonts/inconsolata.html"
 arch=('any')
-license=('OFL-1.1')
+license=('custom:OFL')
 groups=('infinality-bundle-fonts-extra')
 replaces=('t1-inconsolata-zi4-ibx' 'otf-inconsolatazi4-ib')
 conflicts=('ttf-inconsolata' 'otf-inconsolata' 'otf-inconsolatazi4-ib')
@@ -17,7 +17,7 @@ source=("http://mirrors.ctan.org/fonts/inconsolata.zip"
         90-non-tt-inconsolatazi4.conf)
 sha1sums=('6544075761a7b7fa2f71eaf286ef9cf39cbabd52'
           '4d8d33210e76fb159bbef70946c3a25354b62a16'
-          '9479c519abb5919e745b72a773d8bf4098e4b748')
+          'cd37f07d0ba632648dca1c6766da493fe079c662')
 
 package(){
   cd "${srcdir}"/inconsolata
