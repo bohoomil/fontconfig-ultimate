@@ -3,14 +3,14 @@
 pkgname=ttf-lohit-assamese-ib
 _src_pkg=lohit-assamese-ttf
 pkgver=2.5.3
-pkgrel=4
+pkgrel=5
 depends=('fontconfig')
 pkgdesc="Lohit Assamese font."
 url="https://fedorahosted.org/lohit/"
 arch=('any')
 conflicts=('lohit-fonts')
 groups=('infinality-bundle-fonts')
-license=('OFL-1.1')
+license=('custom:OFL')
 install=$pkgname.install
 source=("https://fedorahosted.org/releases/l/o/lohit/${_src_pkg}-${pkgver}.tar.gz"
         40-lohit-assamese.conf
