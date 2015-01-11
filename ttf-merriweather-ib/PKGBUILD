@@ -2,7 +2,7 @@
 
 pkgname=ttf-merriweather-ib
 pkgver=1.003
-pkgrel=7
+pkgrel=8
 depends=('fontconfig')
 pkgdesc="Merriweather Serif font family by Eben Sorkin."
 url="http://sorkintype.com"
@@ -10,14 +10,16 @@ conflicts=('ttf-google-webfonts-git' 'ttf-merriweather')
 replaces=('ttf-merriweather')
 groups=('infinality-bundle-fonts')
 arch=('any')
-license=('OFL-1.1')
+license=('custom:OFL')
 install=$pkgname.install
 #http://www.fontspace.com/
 #http://www.google.com/fonts/
-source=(http://bohoomil.com/src/merriweather_ib.tar.xz
+source=(http://bohoomil.com/src/merriweather_ib.tar.xz{,.sig}
         45-merriweather.conf
         90-tt-merriweather.conf)
+validgpgkeys=('A9244FB5E93F11F0E975337FAE6866C7962DDE58')
 sha1sums=('f6a05c1fbbbdba5ddb781b3f5a39c0d51e838389'
+          'SKIP'
           '336f79b1fa27cabbd05223e034afac03dee59876'
           '66dc12c0667f8b99cc85ab7817a9ec1850859545')
 
