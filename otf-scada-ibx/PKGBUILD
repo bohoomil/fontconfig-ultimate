@@ -2,13 +2,13 @@
 
 pkgname=otf-scada-ibx
 pkgver=3.005
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="Scada is a sans serif font designed by Jovanny Lemonad."
 url="http://www.scada.lv/en/company/scada-font"
 arch=('any')
 groups=('infinality-bundle-fonts-extra')
-license=('OFL-1.1')
+license=('custom:OFL')
 install=$pkgname.install
 source=(https://googlefontdirectory.googlecode.com/hg/ofl/scada/src/Scada-{Bold,BoldItalic,Italic,Regular}.otf
         45-scada.conf
