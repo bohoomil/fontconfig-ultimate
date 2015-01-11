@@ -1,5 +1,6 @@
 post_install() {
-  fc-cache -f /usr/share/fonts/otf-andada-ibx > /dev/null
+  echo "Updating font cache..."
+  fc-cache -s
   echo "Done."
 }
 
@@ -8,11 +9,6 @@ post_upgrade() {
 }
 
 post_remove() {
-  fc-cache -sf > /dev/null
-  echo "Done."
+  post_install $1
 }
-
-op=$1
-shift
-$op $*
 

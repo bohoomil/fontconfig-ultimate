@@ -2,7 +2,7 @@
 
 pkgname=otf-andada-ibx
 pkgver=1.003
-pkgrel=4
+pkgrel=5
 depends=('fontconfig')
 pkgdesc="Andada is a text font with an organic-slab serif, hybrid style, a solid design of medium stroke contrast. OpenType version."
 conflicts=('ttf-andada-ibx')
@@ -13,10 +13,12 @@ license=('custom:OFL')
 install=$pkgname.install
 # http://www.fontsquirrel.com (otf)
 # http://www.fontsc.com (ttf)
-source=(http://bohoomil.com/src/andada_otf.zip
+source=(http://bohoomil.com/src/andada_otf.zip{,.sig}
         45-andada.conf
         90-non-tt-andada.conf)
+validgpgkeys=('A9244FB5E93F11F0E975337FAE6866C7962DDE58')
 sha1sums=('97e80bfd3df758ead7d4906fca4cc02d48cbc219'
+          'SKIP'
           'cb3f7a353211156a65e22c2c4d6113fb3179a300'
           '684d4b6c2fc234285935ee8b6a8a7dfa18d5be94')
 
