@@ -2,14 +2,14 @@
 
 pkgname=ttf-dzongkha-ibx
 pkgver=1.0
-pkgrel=5
+pkgrel=6
 depends=('fontconfig')
 makedep=('unzip')
 pkgdesc="Dzongkha fonts."
 url="http://www.dit.gov.bt/"
 arch=('any')
 groups=('infinality-bundle-fonts-extra')
-license=('Custom')
+license=('custom')
 install=$pkgname.install
 source=("http://www.dit.gov.bt/sites/default/files/dzongkhafonts.zip"
         40-dzongkha.conf
