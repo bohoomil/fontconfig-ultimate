@@ -2,7 +2,7 @@
 
 pkgname=ttf-libre-caslon-ibx
 pkgver=1.0
-pkgrel=6
+pkgrel=7
 pkgdesc="The Libre Caslon fonts designed by Pablo Impallari. TrueType version."
 url="http://www.impallari.com/"
 depends=('fontconfig')
