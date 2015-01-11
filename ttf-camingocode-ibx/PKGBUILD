@@ -2,7 +2,7 @@
 
 pkgname=ttf-camingocode-ibx
 pkgver=1.0
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="CamingoCode by Jan Fromm is designed for source-code editors."
 url="http://www.janfromm.de"
