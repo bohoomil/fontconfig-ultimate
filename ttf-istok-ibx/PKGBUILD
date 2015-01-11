@@ -2,7 +2,7 @@
 
 pkgname=ttf-istok-ibx
 pkgver=1.0.1
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="Istok is a sans-serif typeface designed by Andrey Panov."
 url="https://code.google.com/p/istok/"
