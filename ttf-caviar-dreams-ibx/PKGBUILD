@@ -2,17 +2,17 @@
 
 pkgname=ttf-caviar-dreams-ibx
 pkgver=5.00
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Caviar Dreams is a geometric sans-serif family designed by Lauren Thompson."
 url="http://www.nymfont.com/"
 arch=('any')
 groups=('infinality-bundle-fonts-extra')
-license=('Custom')
+license=('custom')
 conflicts=('ttf-caviar_dreams')
 replaces=('ttf-caviar_dreams')
 install=$pkgname.install
-source=(http://img.dafont.com/dl/?f=caviar_dreams
+source=("caviar_dreams.zip"::http://img.dafont.com/dl/?f=caviar_dreams
         Nymphont-License.txt
         45-caviar-dreams.conf
         90-tt-caviar-dreams.conf)
