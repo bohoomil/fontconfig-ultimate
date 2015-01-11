@@ -2,7 +2,7 @@
 
 pkgname=ttf-caladea-ib
 pkgver=20130214
-pkgrel=5
+pkgrel=6
 _tarname=crosextrafonts
 depends=('fontconfig')
 pkgdesc="Caladeo is a serif font metrically compatible with Cambria."
