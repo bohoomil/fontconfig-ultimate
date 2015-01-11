@@ -3,14 +3,14 @@
 pkgname=ttf-lohit-gujarati-ib
 _src_pkg=lohit-gujarati-ttf
 pkgver=2.92.2
-pkgrel=4
+pkgrel=5
 depends=('fontconfig')
 pkgdesc="Lohit Gujarati font."
 url="https://fedorahosted.org/lohit/"
 arch=('any')
 conflicts=('lohit-fonts')
 groups=('infinality-bundle-fonts')
-license=('OFL-1.1')
+license=('custom:OFL')
 install=$pkgname.install
 source=("https://fedorahosted.org/releases/l/o/lohit/${_src_pkg}-${pkgver}.tar.gz"
         40-lohit-gujarati.conf
