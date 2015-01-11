@@ -2,7 +2,7 @@
 
 pkgname=ttf-roboto-ibx
 pkgver=2.0
-pkgrel=4
+pkgrel=5
 pkgdesc="Modern sans-serif font family designed by Christian Robertson and introduced with Android Ice Cream Sandwich operating system. Basic, condensed and slab variants included."
 arch=('any')
 license=('Apache')
@@ -12,12 +12,15 @@ groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-roboto' 'ttf-roboto-fontconfig' 'ttf-roboto-slab')
 install=$pkgname.install
 #http://www.google.com/fonts
-source=(http://bohoomil.com/src/roboto-2014-fixed.zip
-        http://bohoomil.com/src/roboto-slab.zip
+source=(http://bohoomil.com/src/roboto-2014-fixed.zip{,.sig}
+        http://bohoomil.com/src/roboto-slab.zip{,.sig}
         45-roboto.conf
         90-tt-roboto.conf)
+validgpgkeys=('A9244FB5E93F11F0E975337FAE6866C7962DDE58')
 sha1sums=('c17d3f83ca6472bafa9addfd815e2655d3cd18e5'
+          'SKIP'
           '4fde6251ce8a1593bfd6a891412edd4c31779e00'
+          'SKIP'
           '8ff0fd3af47b4234cdb40746a29aa613fc8dc502'
           '05cffa42f1ac56bf5595afe2ab67e656555273fb')
 
