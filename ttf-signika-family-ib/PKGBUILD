@@ -2,7 +2,7 @@
 
 pkgname=ttf-signika-family-ib
 pkgver=1.0001
-pkgrel=6
+pkgrel=7
 depends=('fontconfig')
 pkgdesc="Signika is a sans-serif with a gentle character, developed for wayfinding, signage, and other media where clarity of information is required. TrueType version."
 groups=('infinality-bundle-fonts-extra')
@@ -10,12 +10,14 @@ conflicts=('ttf-google-webfonts-git' 'otf-signika-family-ib')
 replaces=('otf-signika-family-ib' 'ttf-signika-family-ibx')
 url="http://fontfabric.com/signika-font/"
 arch=('any')
-license=('OFL-1.1')
+license=('custom:OFL')
 #http://www.google.com/fonts
-source=(http://bohoomil.com/src/signika.zip
+source=(http://bohoomil.com/src/signika.zip{,.sig}
         45-signika.conf
         90-tt-signika.conf)
+validgpgkeys=('A9244FB5E93F11F0E975337FAE6866C7962DDE58')
 sha1sums=('0769c357ae884d47efd40f9fc9631de582f1ae76'
+          'SKIP'
           '16aff1bcdddfaa1c64ecc56c3d370953dffe8e46'
           '107bcfd30759580b9dd213c329dc735f26f87fc3')
 
