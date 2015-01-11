@@ -2,7 +2,7 @@
 
 pkgname=otf-league-gothic-ibx
 pkgver=1.560
-pkgrel=2
+pkgrel=3
 _src_rel=64c3ede
 depends=('fontconfig')
 pkgdesc="League Gothic is a revival of an old classic, and one of our favorite typefaces, Alternate Gothic #1."
@@ -11,7 +11,7 @@ arch=('any')
 groups=('infinality-bundle-fonts-extra')
 conflicts=('otf-league-gothic')
 replaces=('otf-league-gothic')
-license=('OFL-1.1')
+license=('custom:OFL')
 install=$pkgname.install
 source=(https://www.theleagueofmoveabletype.com/league-gothic/download
         45-league-gothic.conf
