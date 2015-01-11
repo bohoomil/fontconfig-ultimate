@@ -2,14 +2,14 @@
 
 pkgname=ttf-vera-humana-95-ibx
 pkgver=15.02.97
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="Vera Humana 95 is an elegant sans-serif humanist typeface family."
 url="http://www.fatont.com/"
 arch=('any')
-license=('Custom')
+license=('custom')
 groups=('infinality-bundle-fonts-extra')
-source=("http://img.dafont.com/dl/?f=vera_humana_95"
+source=(vera_humana.zip::"http://img.dafont.com/dl/?f=vera_humana_95"
         45-vera-humana-95.conf
         90-tt-vera-humana-95.conf)
 install=${pkgname}.install
