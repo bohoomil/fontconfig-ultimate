@@ -3,7 +3,7 @@
 pkgname=ttf-crimson-text-ibx
 _gitname=Crimson
 pkgver=0.8
-pkgrel=6
+pkgrel=7
 depends=('fontconfig')
 pkgdesc="Crimson Text is an open source serif font family in the tradition of beautiful oldstyle typefaces. TrueType version."
 url="http://aldusleaf.org/"
