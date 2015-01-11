@@ -4,7 +4,7 @@
 pkgname=otf-linux-libertine-ibx
 pkgname=('otf-linux-libertine-ibx' 'ttf-linux-libertine-ibx')
 pkgver=5.3.0
-pkgrel=7
+pkgrel=8
 pkgdesc="Linux Libertine and Linux Biolinum fonts."
 depends=('fontconfig')
 arch=(any)
@@ -17,7 +17,7 @@ source=("http://mirrors.ctan.org/fonts/libertine.zip"
         45-linux-libertine.conf
         90-non-tt-linux-libertine.conf
         90-tt-linux-libertine.conf)
-sha1sums=('e1e3d9e0eff1258d34fc4a5ee4e2dcef8720fb28'
+sha1sums=('a94e9102904af48de5b0a828ecfa7aed0f40a22c'
           '3e83241395446dcf00c7831b8b587fd55e7a7eda'
           '7e65f87878e50a2f88724b2a3481e3198d8ca32f'
           '128c87f7502b6e55799aab276af3aec6bfe7ed8b'
