@@ -2,7 +2,7 @@
 
 pkgname=ttf-source-serif-pro-ibx
 pkgver=1.014
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Source Serif Pro is a serif typeface in the transitional style, designed to complement Source Sans. TrueType version."
 url="http://www.adobe.com/"
