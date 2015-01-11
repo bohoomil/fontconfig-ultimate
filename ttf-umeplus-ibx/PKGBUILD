@@ -3,14 +3,14 @@
 pkgname=ttf-umeplus-ibx
 _src_name=umeplus-fonts
 pkgver=20140427
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="UmePlus fonts are modified Ume and M+ fonts for Japanese."
 url="http://www.geocities.jp/ep3797/modified_fonts_01.html"
 arch=('any')
 groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-umeplus')
-license=('Custom:Freeware')
+license=('custom:Freeware')
 install=$pkgname.install
 source=(http://downloads.sourceforge.net/project/mdk-ut/30-source/source/${_src_name}-${pkgver}.tar.lzma
         40-umeplus.conf
