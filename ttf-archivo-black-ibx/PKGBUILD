@@ -2,18 +2,20 @@
 
 pkgname=ttf-archivo-black-ibx
 pkgver=1.002
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Archivo from Omnibus-Type is a grotesque sans-serif typeface family derived from Chivo. Black style."
 url="http://omnibus-type.com/"
 arch=('any')
 groups=('infinality-bundle-fonts-extra')
-license=('OFL-1.1')
+license=('custom:OFL')
 install=$pkgname.install
-source=(http://bohoomil.com/src/archivo_black.zip
+source=(http://bohoomil.com/src/archivo_black.zip{,.sig}
         45-archivo-black.conf
         90-tt-archivo-black.conf)
+validgpgkeys=('A9244FB5E93F11F0E975337FAE6866C7962DDE58')
 sha1sums=('648bfa7726b25202c93de60f9011fdb2c34f8335'
+          'SKIP'
           '97b66ebd5dab6df2ef0e1310525c386592ea0337'
           'c9adbc42270036be6350b87785bc5779be8f3a57')
 
