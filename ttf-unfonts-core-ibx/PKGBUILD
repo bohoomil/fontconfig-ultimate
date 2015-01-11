@@ -4,7 +4,7 @@ pkgname=ttf-unfonts-core-ibx
 _basename=un-fonts-core
 pkgver=1.0.2
 _pkgrev=080608
-pkgrel=5
+pkgrel=6
 depends=('fontconfig')
 pkgdesc="Un Core family of Korean TrueType fonts."
 url="http://kldp.net/projects/unfonts/"
@@ -12,7 +12,7 @@ arch=('any')
 groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-unfonts-core' 'ttf-unfontscore')
 replaces=('ttf-unfonts-core' 'ttf-unfontscore')
-license=('Custom')
+license=('custom')
 install=$pkgname.install
 source=(http://kldp.net/frs/download.php/4695/$_basename-$pkgver-$_pkgrev.tar.gz
         40-unfonts-core.conf
