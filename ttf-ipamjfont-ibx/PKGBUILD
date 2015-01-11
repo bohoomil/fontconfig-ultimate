@@ -2,9 +2,9 @@
 # Contributor: bohoomil <@zoho.com>
 
 pkgname=ttf-ipamjfont-ibx
-pkgver=002.02
+pkgver=003.01
 _pkgver=${pkgver/./}
-pkgrel=4
+pkgrel=1
 pkgdesc="Japanese outline Mincho fonts including the unified characters of the Basic Resident Registers Network and the Family Register of Japan (based on IPAex Mincho fonts)"
 arch=('any')
 url="http://ossipedia.ipa.go.jp/ipamjfont/"
@@ -17,7 +17,7 @@ install=${pkgname}.install
 source=(http://download.forest.impress.co.jp/pub/library/i/ipamjfont/10750/ipamjm${_pkgver}.zip
         40-ipamjfont.conf
         90-tt-ipamjfont.conf)
-sha1sums=('997a61cc3a8b96568bfd0a1099598b2c3fc1dc90'
+sha1sums=('62098c7963dff6ceb45965bfdb791f4324142448'
           '57e4bb8164d546f066c715cc0aa886059af0c901'
           'b65df8dcbd12c100110f7800f07354959ef61580')
 
