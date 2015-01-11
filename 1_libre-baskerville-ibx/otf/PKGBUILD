@@ -2,7 +2,7 @@
 
 pkgname=otf-libre-baskerville-ibx
 pkgver=1.0
-pkgrel=5
+pkgrel=6
 pkgdesc="Libre Baskerville font designed by Pablo Impallari. OpenType version."
 url="http://www.impallari.com/"
 depends=('fontconfig')
