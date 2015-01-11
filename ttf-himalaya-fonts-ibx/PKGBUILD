@@ -2,21 +2,23 @@
 
 pkgname=ttf-himalaya-fonts-ibx
 pkgver=1.0
-pkgrel=7
+pkgrel=8
 depends=('fontconfig')
 makedepends=('unrar')
 pkgdesc="Himalaya fonts."
 url="http://www.tibetebook.com/"
 arch=('any')
 groups=('infinality-bundle-fonts-extra')
-license=('Custom')
+license=('custom')
 noextract=('HimalayaFonts.rar')
 install=$pkgname.install
 #http://www.tibetebook.com/nyer_mkho/demig/HimalayaFonts.rar
-source=(http://bohoomil.com/src/HimalayaFonts.rar
+source=(http://bohoomil.com/src/HimalayaFonts.rar{,.sig}
         40-himalaya-fonts.conf
         90-tt-himalaya-fonts.conf)
+validgpgkeys=('A9244FB5E93F11F0E975337FAE6866C7962DDE58')
 sha1sums=('74f5fa41df50340cd43d73ea92916b7fab5a284d'
+          'SKIP'
           '2e5aaffdea626bcfc1086034f3da9d4d8a4ab7fd'
           '51a5942be1bb2d01a93ab432bd6af0d0d0ef12d1')
 
