@@ -2,7 +2,7 @@
 
 pkgname=ttf-vlgothic-ibx
 pkgver=2.108
-pkgrel=6
+pkgrel=7
 depends=('fontconfig')
 pkgdesc="Japanese VL Gothic font family."
 url="http://vlgothic.dicey.org/"
@@ -10,7 +10,7 @@ arch=('any')
 groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-vlgothic')
 replaces=('ttf-vlgothic')
-license=('Custom')
+license=('custom')
 install=$pkgname.install
 source=(http://dl.sourceforge.jp/vlgothic/58961/VLGothic-20130607.tar.xz
         40-vlgothic.conf
