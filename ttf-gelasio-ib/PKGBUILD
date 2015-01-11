@@ -2,14 +2,14 @@
 
 pkgname=ttf-gelasio-ib
 pkgver=1.00
-pkgrel=3
+pkgrel=6
 _hgrev=325e7174147acd060cb6dfe982cf57594a180d53
 depends=('fontconfig')
 pkgdesc="Gelasio serif family by Eben Sorkin."
 url="http://code.google.com/p/googlefontdirectory/"
 arch=('any')
 groups=('infinality-bundle-fonts')
-license=('OFL-1.1')
+license=('custom:OFL')
 install=$pkgname.install
 source=(https://googlefontdirectory.googlecode.com/hg-history/${_hgrev}/ofl/gelasio/Gelasio-{Bold,BoldItalic,Italic,Regular}.ttf
         https://googlefontdirectory.googlecode.com/hg-history/${_hgrev}/ofl/gelasio/OFL.txt
@@ -20,9 +20,9 @@ sha1sums=('ac1662f8f95e59e2dc1536dd01cd500be2bb7e46'
           '2e1e3b6cf233cc337da991f4ab94af088eae9f0e'
           'bffe2fb3c360a4f4ac310bcfa591379c8a682a3d'
           '17081ba3c5b026074014699996fbd15d4c28aefc'
-          '62f9cce0b7e68a956086a037278e93acaf84c703'
+          'cd12c82ff7fd6f03768be4cc9b6f924e7add6c65'
           '67fc5c8d7ebcd96a5a368c2cc220e9568776d05d'
-          'a47f4ceec5140538a0b0f652e0b799bb89d25753')
+          'fd1b0628eccf0d613de6928ec47f0183c49e7199')
 
 package(){
   cd "${srcdir}"
