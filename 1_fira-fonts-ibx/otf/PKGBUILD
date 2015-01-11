@@ -2,7 +2,7 @@
 
 pkgbase=otf-fira-fonts
 pkgver=3.111
-pkgrel=1
+pkgrel=2
 pkgname=('otf-fira-sans-ibx' 'otf-fira-mono-ibx')
 depends=('fontconfig')
 pkgdesc="Mozilla font family designed for the Firefox OS."
