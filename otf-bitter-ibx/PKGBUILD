@@ -2,7 +2,7 @@
 
 pkgname=otf-bitter-ibx
 pkgver=1.3
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="Bitter is a contemporary slab serif family intended for screen."
 url="http://www.huertatipografica.com/"
@@ -12,10 +12,10 @@ conflicts=('otf-bitter')
 replaces=('otf-bitter')
 license=('MIT')
 install=$pkgname.install
-source=(http://www.huertatipografica.com/free_download/36
+source=(bitter.zip::http://www.huertatipografica.com/free_download/48
         45-bitter.conf
         90-non-tt-bitter.conf)
-sha1sums=('aaa55b0de89b258c770aaa0b4aefd978a1dd01fe'
+sha1sums=('44e3a4455a8925ddc96feacee6ca4226fe76d99c'
           'f91291a6571d02008bcf1312b9799b6cd6cceed0'
           '8f0a3b4f688096ad852a651192f8469ca17ce25a')
 
