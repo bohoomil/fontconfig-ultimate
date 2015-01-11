@@ -2,12 +2,12 @@
 
 pkgname=otf-unb-pro-ibx
 pkgver=1.0
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="UnB Pro is based on Liberation Sans family and was developed especially for the new visual identity system of UnB."
 url="http://www.fontfuror.com"
 arch=('any')
-license=('OFL-1.1')
+license=('custom:OFL')
 groups=('infinality-bundle-fonts-extra')
 # http://www.ffonts.net
 source=("http://www.marca.unb.br/arquivosdigitais/files/fontes/UnB_Pro_v1.0.zip"
