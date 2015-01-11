@@ -3,14 +3,14 @@
 pkgname=ttf-lohit-marathi-ib
 _src_pkg=lohit-marathi-ttf
 pkgver=2.93.0
-pkgrel=4
+pkgrel=5
 depends=('fontconfig')
 pkgdesc="Lohit Marathi font."
 url="https://fedorahosted.org/lohit/"
 arch=('any')
 conflicts=('lohit-fonts')
 groups=('infinality-bundle-fonts')
-license=('OFL-1.1')
+license=('custom:OFL')
 install=$pkgname.install
 source=("https://fedorahosted.org/releases/l/o/lohit/${_src_pkg}-${pkgver}.tar.gz"
         40-lohit-marathi.conf
