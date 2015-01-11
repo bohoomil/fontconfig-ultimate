@@ -2,7 +2,7 @@
 
 pkgname=otf-source-han-sans-jp-ibx
 pkgver=1.001
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="A set of Pan-CJK fonts designed to complement Source Sans Pro. Japanese subset, OpenType/CFF (OTF) fonts."
 url="http://www.adobe.com/"
