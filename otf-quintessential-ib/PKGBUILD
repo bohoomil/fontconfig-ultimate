@@ -2,20 +2,20 @@
 
 pkgname=otf-quintessential-ib
 pkgver=1.000
-pkgrel=4
+pkgrel=5
 depends=('fontconfig')
 pkgdesc="The Quintessential typeface is a calligraphic lettering style based on the Italic Hand."
 url="http://www.impallari.com"
 arch=('any')
 groups=('infinality-bundle-fonts')
-license=('OFL-1.1')
+license=('custom:OFL')
 install=$pkgname.install
 source=(http://googlefontdirectory.googlecode.com/hg/ofl/quintessential/src/Quintessential-Regular.otf
         http://googlefontdirectory.googlecode.com/hg/ofl/quintessential/OFL.txt
         45-quintessential.conf
         90-non-tt-quintessential.conf)
 sha1sums=('29458cc6c41c336c25c248c79f2232ebaffa4462'
-          '62f9cce0b7e68a956086a037278e93acaf84c703'
+          'cd12c82ff7fd6f03768be4cc9b6f924e7add6c65'
           'b46dcddbfb4ab8883e7b8f5749ed477f1823f202'
           'b777fbb3004b5109ba500aed3238cbc0df4bf6d4')
 
