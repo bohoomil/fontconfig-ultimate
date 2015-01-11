@@ -2,12 +2,12 @@
 
 pkgname=ttf-arev-sans-ibx
 pkgver=0.21a
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="The Arev set of fonts adds Greek, Cyrillic, Latin-A, Latin-B, Latin-Extended, IPA, Combining Diacritical Marks, Dingbats, and Symbol characters to Bitstream's Vera fonts."
 url="http://tavmjong.free.fr/"
 arch=('any')
-license=('Custom')
+license=('custom')
 groups=('infinality-bundle-fonts-extra')
 source=("http://tavmjong.free.fr/FONTS/TTF/Arev.ttf"
         "http://tavmjong.free.fr/FONTS/TTF/ArevIt.ttf"
