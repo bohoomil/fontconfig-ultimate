@@ -1,0 +1,43 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=otf-blogger-sans-ibx
+pkgver=1.2
+pkgrel=1
+depends=('fontconfig')
+pkgdesc="Blogger Sans was designed by Sergiy Tkachenko as the FirstSiteGuide’s custom typeface, created primarily for the use in headlines of the website."
+url="http://firstsiteguide.com/"
+arch=('any')
+license=('CCPL')
+groups=('infinality-bundle-fonts-extra')
+#"blogger-sans.zip"::"http://www.fontsquirrel.com/fonts/download/blogger-sans"
+source=(http://bohoomil.com/src/blogger-sans-fixed.zip{,.sig}
+        45-blogger-sans.conf
+        90-non-tt-blogger-sans.conf)
+install=${pkgname}.install
+validgpgkeys=('A9244FB5E93F11F0E975337FAE6866C7962DDE58')
+sha1sums=('92afc5fb59050fb5d969114cb158ecbae46b296c'
+          'SKIP'
+          'b9c30dd445e9ab86243610c4cfe9c569265f35e3'
+          'bcc1bcb51927f3103c43e3112e5d76a426e6b005')
+
+package() {
+  cd "${srcdir}"
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 'LICENSE.txt' \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-blogger-sans.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-blogger-sans.conf
+  install -m644 90-non-tt-blogger-sans.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-blogger-sans.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-blogger-sans.conf .
+  ln -s ../conf.avail/90-non-tt-blogger-sans.conf .
+}
