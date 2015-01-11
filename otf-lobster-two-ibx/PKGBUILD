@@ -1,0 +1,41 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=otf-lobster-two-ibx
+pkgver=1.006
+pkgrel=2
+depends=('fontconfig')
+pkgdesc="Lobster Two is a family version of the original Lobster. OpenType version."
+url="http://www.impallari.com/"
+arch=('any')
+conflicts=('ttf-impallari-lobstertwo')
+groups=('infinality-bundle-fonts-extra')
+license=('custom:OFL')
+install=$pkgname.install
+source=(lobster-two.zip::http://www.fontsquirrel.com/fonts/download/lobster-two/
+        45-lobster-two.conf
+        90-non-tt-lobster-two.conf)
+sha1sums=('b1005301a47a613086fb6b1faabee01e0238ebf5'
+          '42002431ee88385e23e157b818f5392e80538667'
+          'f1061889e6f0eb132cd2b106547d31e522de4143')
+
+package(){
+  cd "${srcdir}"
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 "SIL Open Font License.txt" \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-lobster-two.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-lobster-two.conf
+  install -m644 90-non-tt-lobster-two.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-lobster-two.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-lobster-two.conf .
+  ln -s ../conf.avail/90-non-tt-lobster-two.conf .
+}
