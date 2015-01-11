@@ -2,12 +2,12 @@
 
 pkgname=ttf-gentium-tug-ibx
 pkgver=1.0
-pkgrel=5
+pkgrel=6
 depends=('fontconfig')
 pkgdesc="Gentium is a serif typeface family designed by Victor Gaultney."
 url="http://www.ctan.org/tex-archive/fonts/gentium-tug"
 arch=('any')
-license=('OFL-1.1')
+license=('custom:OFL')
 groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-gentium-basic' 'ttf-gentium-plus' 'ttf-gentium')
 replaces=('ttf-gentium')
