@@ -2,12 +2,12 @@
 
 pkgname=otf-permian-family-ibx
 pkgver=1.0
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="Developed for the city of Perm, Permian family provides extensive number of Latin and Cyrillic glyphs, icons and small caps."
 url="http://pcrd.ru/"
 arch=('any')
-license=('Custom')
+license=('custom')
 groups=('infinality-bundle-fonts-extra')
 source=("http://pcrd.ru/files/permian.zip"
         "http://pcrd.ru/files/Permian_Free_Font_License_eng.txt"
