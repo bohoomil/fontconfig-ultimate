@@ -3,7 +3,7 @@
 pkgname=sinkin-sans-ibx
 pkgname=('otf-sinkin-sans-ibx' 'ttf-sinkin-sans-ibx')
 pkgver=1.1
-pkgrel=3
+pkgrel=5
 depends=('fontconfig')
 pkgdesc="Sinkin Sans is a simple, pleasant, luxuriously proportioned and easy to read sans-serif."
 url="http://www.k-type.com/"
@@ -17,7 +17,7 @@ source=(http://www.k-type.com/freefonts/SINKIN_SANS_FAMILY.zip
 sha1sums=('e95495df31674a2bcb7622dd7a7050f0e8a94aed'
           '974fa6222711f8788db6a8511239fb6ce2cb6caf'
           'fc8ccb8b451b1d0fa9e8bb28abaf68c63270aac4'
-          'eadcb74136b13a2c68f53a93fed2801747d5e339')
+          '11e853e02e468b4a54a9dff32d3a57e095c44b68')
 
 package_otf-sinkin-sans-ibx(){
   pkgdesc="Sinkin Sans is a simple, pleasant, luxuriously proportioned and easy to read sans-serif. OTF version."
@@ -31,8 +31,7 @@ package_otf-sinkin-sans-ibx(){
     "${pkgdir}"/usr/share/licenses/"${pkgname}"
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
-  install -m644 SinkinSans-{200XLight,200XLightItalic,300Light,300LightItalic,400Italic,400Regular,500Medium,500MediumItalic,600SemiBold,600SemiBoldItali,700Bold,700BoldItalic,800Black,800BlackItalic,900XBlack,900XBlackItalic}.otf \
-    "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
   install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
   install -m755 -d "${pkgdir}"/etc/fonts/conf.d
@@ -58,8 +57,7 @@ package_ttf-sinkin-sans-ibx(){
     "${pkgdir}"/usr/share/licenses/"${pkgname}"
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
-  install -m644 SinkinSans-{200XLight,200XLightItalic,300Light,300LightItalic,400Italic,400Regular,500Medium,500MediumItalic,600SemiBold,600SemiBoldItali,700Bold,700BoldItalic,800Black,800BlackItalic,900XBlack,900XBlackItalic}.ttf \
-    "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
   install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
   install -m755 -d "${pkgdir}"/etc/fonts/conf.d
