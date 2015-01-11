@@ -2,7 +2,7 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=ttf-mplus-ibx
-pkgver=TESTFLIGHT_058
+pkgver=TESTFLIGHT_059
 _pkgver=${pkgver/_/-}
 pkgrel=1
 pkgdesc="M+ family of Japanese, sans-serif and monospaced outline fonts."
@@ -14,10 +14,10 @@ groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-mplus')
 install=${pkgname}.install
 _mirror="jaist" # keihanna, jaist, iij, osdn
-source=(http://${_mirror}.dl.sourceforge.jp/mplus-fonts/6650/mplus-${_pkgver}.tar.xz
+source=(http://${_mirror}.dl.sourceforge.jp/mplus-fonts/62344/mplus-${_pkgver}.tar.xz
         40-mplus.conf
         90-non-tt-mplus.conf)
-md5sums=('6b61cbf898e3690b192b490c9fa6204d'
+md5sums=('2e154630ce38cc48ea3e290c5f68c2d7'
          '4d6570bdd11b9038dacd650f4ccf60e9'
          'f09f57c5231acdceeb2dd9ac67e53a69')
 
