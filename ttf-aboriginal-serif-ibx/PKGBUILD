@@ -2,7 +2,7 @@
 
 pkgname=ttf-aboriginal-serif-ibx
 pkgver=9.606
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Aboriginal Serif typeface by Christopher Harvey for Syllabics, Cherokee, and Latin script."
 url="http://www.languagegeek.com/"
@@ -10,7 +10,7 @@ arch=('any')
 groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-aboriginal-serif')
 replaces=('ttf-aboriginal-serif')
-license=('PD')
+license=('custom:PD')
 install=$pkgname.install
 source=(http://www.languagegeek.com/font/AboriginalSerif.zip
         45-aboriginal-serif.conf
