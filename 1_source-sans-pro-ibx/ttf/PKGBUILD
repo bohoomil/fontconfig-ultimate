@@ -2,7 +2,7 @@
 
 pkgname=ttf-source-sans-pro-ibx
 pkgver=2.010ro+1.065it
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="A set of OpenType fonts designed for user interfaces. TrueType version."
 url="http://www.adobe.com/"
