@@ -2,12 +2,12 @@
 
 pkgname=otf-aleo-ibx
 pkgver=1.1
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Alessio Laiso's Aleo Free Font is a contemporary typeface designed as the slab serif companion to the Lato font by Łukasz Dziedzic."
 url="http://fontfabric.com"
 arch=('any')
-license=('OFL-1.1')
+license=('custom:OFL')
 groups=('infinality-bundle-fonts-extra')
 source=("http://fontfabric.com/downfont/aleo.zip"
         45-aleo.conf
