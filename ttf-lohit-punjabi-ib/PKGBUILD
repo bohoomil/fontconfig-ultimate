@@ -3,14 +3,14 @@
 pkgname=ttf-lohit-punjabi-ib
 _src_pkg=lohit-punjabi-ttf
 pkgver=2.5.3
-pkgrel=5
+pkgrel=6
 depends=('fontconfig')
 pkgdesc="Lohit Punjabi font."
 url="https://fedorahosted.org/lohit/"
 arch=('any')
 conflicts=('lohit-fonts')
 groups=('infinality-bundle-fonts')
-license=('OFL-1.1')
+license=('custom:OFL')
 install=$pkgname.install
 source=("https://fedorahosted.org/releases/l/o/lohit/${_src_pkg}-${pkgver}.tar.gz"
         40-lohit-punjabi.conf
