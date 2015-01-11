@@ -2,12 +2,12 @@
 
 pkgname=ttf-pfennig-ibx
 pkgver=20120410
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="Pfennig is a humanist sans-serif font with support for Latin, Cyrillic, Greek and Hebrew character sets."
 url="http://openfontlibrary.org/"
 arch=('any')
-license=('OFL-1.1')
+license=('custom:OFL')
 groups=('infinality-bundle-fonts-extra')
 source=("http://openfontlibrary.org/assets/downloads/pfennig/8b5fa73ca4cf4cfa42d21b9f73f6060b/pfennig.zip"
         45-pfennig.conf
