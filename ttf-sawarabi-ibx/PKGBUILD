@@ -2,14 +2,14 @@
 
 pkgname=ttf-sawarabi-ibx
 pkgver=0.0045
-pkgrel=5
+pkgrel=6
 depends=('fontconfig')
 pkgdesc="Sawarabi font family for Japanese script."
 url="http://sawarabi-fonts.sourceforge.jp/en/"
 arch=('any')
 groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-sawarabi-gothic' 'ttf-sawarabi-mincho')
-license=('Custom')
+license=('custom')
 install=$pkgname.install
 source=(http://dl.sourceforge.jp/sawarabi-fonts/59501/sawarabi-gothic-20130915.tar.gz
         http://dl.sourceforge.jp/sawarabi-fonts/59500/sawarabi-mincho-20130915.tar.gz
