@@ -2,7 +2,7 @@
 
 pkgname=otf-cooper-hewitt-ibx
 pkgver=1.0
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="Cooper Hewitt is a contemporary sans serif with characters composed of modified-geometric curves and arches."
 url="http://www.cooperhewitt.org/"
@@ -11,10 +11,12 @@ groups=('infinality-bundle-fonts-extra')
 license=('MIT')
 install=$pkgname.install
 # http://uh8yh30l48rpize52xh0q1o6i.wpengine.netdna-cdn.com/wp-content/uploads/fonts/CooperHewitt-OTF-public.zip (need fixing weight class)
-source=(http://bohoomil.com/src/cooper-hewitt-otf-fixed.tar.xz
+source=(http://bohoomil.com/src/cooper-hewitt-otf-fixed.tar.xz{,.sig}
         45-cooper-hewitt.conf
         90-non-tt-cooper-hewitt.conf)
+validgpgkeys=('A9244FB5E93F11F0E975337FAE6866C7962DDE58')
 sha1sums=('43d53e0650a088cb1895a450718177d4d796d124'
+          'SKIP'
           '8a9fc2d8074f4e3156bd0b25a26da2f9d70fa8a2'
           '9b31d968517c3a7a2206a1a7496619953fd53147')
 
