@@ -3,7 +3,7 @@
 pkgname=ttf-lohit-odia-ib
 _src_pkg=lohit-odia-ttf
 pkgver=2.5.5
-pkgrel=4
+pkgrel=5
 depends=('fontconfig')
 pkgdesc="Lohit Oriya font."
 url="https://fedorahosted.org/lohit/"
@@ -12,7 +12,7 @@ conflicts=('lohit-fonts' 'ttf-lohit-oriya-ib')
 replaces=('ttf-lohit-oriya-ib')
 provides=('ttf-lohit-oriya-ib')
 groups=('infinality-bundle-fonts')
-license=('OFL-1.1')
+license=('custom:OFL')
 install=$pkgname.install
 source=("https://fedorahosted.org/releases/l/o/lohit/${_src_pkg}-${pkgver}.tar.gz"
         40-lohit-odia.conf
