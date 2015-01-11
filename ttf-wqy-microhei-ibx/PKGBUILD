@@ -5,7 +5,7 @@
 pkgname=ttf-wqy-microhei-ibx
 _src_pkg=wqy-microhei
 pkgver=0.2.0_beta
-pkgrel=9
+pkgrel=10
 pkgdesc="A Sans-Serif style high quality CJK outline font."
 arch=('any')
 license=('GPL3' 'APACHE' 'custom:"font embedding exception"')
@@ -20,7 +20,7 @@ source=("http://downloads.sourceforge.net/project/wqy/${_src_pkg}/${pkgver//_/-}
         90-non-tt-wqy-microhei.conf)
 sha1sums=('28023041b22b6368bcfae076de68109b81e77976'
           '0468e9436df9e367901f373882ba92e6d842f714'
-          '89549d2364edb12116fae566898213bff569e5cb')
+          '0c93e9b15f4ea8ff75faf2ad28aa1f516dda5914')
 
 build() {
   cd "${srcdir}/${_src_pkg}"
