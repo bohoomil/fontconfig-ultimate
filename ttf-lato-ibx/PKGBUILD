@@ -2,22 +2,24 @@
 
 pkgname=ttf-lato-ibx
 pkgver=2.010
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="Lato is a sanserif type­face family designed in the Summer 2010 by Warsaw-based designer Łukasz Dziedzic."
 url="http://www.latofonts.com/"
 arch=('any')
 groups=('infinality-bundle-fonts-extra')
-license=('OFL-1.1')
+license=('custom:OFL')
 conflicts=('ttf-lato' 't1-lato-ibx' 'otf-lato-ib')
 replaces=('t1-lato-ibx' 'otf-lato-ib')
 install=$pkgname.install
 source=("http://www.latofonts.com/download/Lato2OFL.zip"
-        "http://bohoomil.com/src/lato-thin-${pkgver}-fixed.tar.xz"
+        http://bohoomil.com/src/lato-thin-${pkgver}-fixed.tar.xz{,.sig}
         45-lato.conf
         90-tt-lato.conf)
+validgpgkeys=('A9244FB5E93F11F0E975337FAE6866C7962DDE58')
 sha1sums=('875d4afb6f0f5748a5b82d6e74c3e8306e552609'
           'c3a88dfa01cace9440ec692905f6c1c956ce78d7'
+          'SKIP'
           '86f9ff2da81ba10f64e6747fdd8d27231da28d2b'
           'a84058cb3051d858221a7a0eefeea18db24306c5')
 
