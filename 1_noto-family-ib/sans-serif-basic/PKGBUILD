@@ -3,7 +3,7 @@
 pkgname=ttf-noto-family-ib
 pkgname=('ttf-noto-sans-ib' 'ttf-noto-serif-ib')
 pkgver=2014.12
-pkgrel=2
+pkgrel=4
 pkgdesc="Noto Sans family."
 url="http://www.google.com/get/noto/"
 arch=('any')
