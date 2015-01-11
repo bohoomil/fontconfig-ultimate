@@ -2,7 +2,7 @@
 
 pkgname=ttf-merriweather-sans-ib
 pkgver=1.003
-pkgrel=7
+pkgrel=8
 depends=('fontconfig')
 pkgdesc="Merriweather Sans-Serif font family by Eben Sorkin."
 url="http://sorkintype.com"
@@ -10,13 +10,15 @@ arch=('any')
 groups=('infinality-bundle-fonts')
 conflicts=('ttf-google-webfonts-git' 'ttf-merriweather-sans')
 replaces=('ttf-merriweather-sans')
-license=('OFL-1.1')
+license=('custom:OFL')
 install=$pkgname.install
 #http://www.google.com/fonts/
-source=(http://bohoomil.com/src/merriweather_sans_ib.tar.xz
+source=(http://bohoomil.com/src/merriweather_sans_ib.tar.xz{,.sig}
         45-merriweather-sans.conf
         90-tt-merriweather-sans.conf)
+validgpgkeys=('A9244FB5E93F11F0E975337FAE6866C7962DDE58')
 sha1sums=('c57e5ee392e166caedb51bba98e33c773bf5df10'
+          'SKIP'
           'cf1094eea5008854b8368a39fb5545f218498ced'
           '27b49bd914983321ab5bc4a807d4ec189de2643d')
 
