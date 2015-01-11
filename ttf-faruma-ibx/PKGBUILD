@@ -1,12 +1,12 @@
 # Contributor: bohoomil <@zoho.com>
 
-pkgname=ttf-faruma-ib
+pkgname=ttf-faruma-ibx
 pkgver=2.0
-pkgrel=1
+pkgrel=2
 pkgdesc="A font for Maldivian (Dhivehi) language, Thaana script."
 arch=('any')
 url="http://www.wazu.jp/"
-license=('Custom')
+license=('custom')
 depends=('fontconfig')
 groups=('infinality-bundle-fonts')
 install=${pkgname}.install
