@@ -3,19 +3,21 @@
 pkgname=ttf-charis-sil-ibx
 _src_name=CharisSIL
 pkgver=4.114
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Charis SIL is a serif typeface providing a comprehensive inventory of glyphs for almost any Roman- or Cyrilic-based writing system."
 url="http://www.sil.org/"
 arch=('any')
-license=('OFL-1.1')
+license=('custom:OFL')
 conflicts=('ttf-charis')
 groups=('infinality-bundle-fonts-extra')
 install=$pkgname.install
-source=(http://bohoomil.com/src/"${_src_name}-${pkgver}.zip"
+source=(http://bohoomil.com/src/${_src_name}-${pkgver}.zip{,.sig}
         45-charis-sil.conf
         90-tt-charis-sil.conf)
+validgpgkeys=('A9244FB5E93F11F0E975337FAE6866C7962DDE58')
 sha1sums=('d0fbd177612ff843645af8b9755118251b89598b'
+          'SKIP'
           '415235a6b837bb94f0aeec3ec21b040782020076'
           'dc3ba28b19a6cd9bc4010dab21d71ea99c0a60c7')
 
