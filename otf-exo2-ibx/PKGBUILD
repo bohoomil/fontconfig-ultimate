@@ -2,7 +2,7 @@
 
 pkgname=otf-exo2-ibx
 pkgver=2.0
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="Exo is a geometric sans serif font with a technological feel."
 url="http://ndiscovered.com"
@@ -10,14 +10,14 @@ arch=('any')
 groups=('infinality-bundle-fonts-extra')
 conflicts=('otf-exo')
 replaces=('otf-exo')
-license=('OFL-1.1')
+license=('custom:OFL')
 install=$pkgname.install
 source=(http://www.ndiscovered.com/downloads/exo2/EXO_2_OTF.zip
         45-exo2.conf
         90-non-tt-exo2.conf)
 sha1sums=('1b27bdb6db0062a679193724bdde89a39e0bf025'
           '6e2b7cc9db2e6e17e8d55587002a13f052ff067e'
-          'bea80b16d4ecb2db0ae230d5b2c724bc9adb3980')
+          'c1cd5b7e39ad42aeb61990b872a4ea7fd046ac41')
 
 package(){
   cd "${srcdir}"/
