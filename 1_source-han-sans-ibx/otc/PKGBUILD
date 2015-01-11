@@ -2,7 +2,7 @@
 
 pkgname=otf-source-han-sans-otc-ibx
 pkgver=1.001
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="A set of Pan-CJK fonts designed to complement Source Sans Pro. OpenType/CFF Collection (OTC) fonts."
 url="http://www.adobe.com/"
