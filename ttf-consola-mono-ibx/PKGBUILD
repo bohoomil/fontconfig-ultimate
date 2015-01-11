@@ -2,7 +2,7 @@
 
 pkgname=ttf-consola-mono-ibx
 pkgver=2.001
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="Consola Mono is a legible, programming font by Wojciech Kalinowski."
 url="http://openfontlibrary.org"
@@ -10,7 +10,7 @@ arch=('any')
 groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-consolamono')
 replaces=('ttf-consolamono')
-license=('OFL-1.1')
+license=('custom:OFL')
 install=$pkgname.install
 source=("http://openfontlibrary.org/assets/downloads/consolamono/61cc2afcc4eca96efe7c6ebf178d39df/consolamono.zip"
         45-consola-mono.conf
