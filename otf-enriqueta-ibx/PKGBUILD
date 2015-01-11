@@ -2,19 +2,21 @@
 
 pkgname=otf-enriqueta-ibx
 pkgver=1.001
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Enriqueta is a serif typeface with distinctive glyphs, mainly intended for screen."
 url="http://www.fontfuror.com"
 arch=('any')
-license=('OFL-1.1')
+license=('custom:OFL')
 groups=('infinality-bundle-fonts-extra')
 # http://www.ffonts.net
-source=(http://bohoomil.com/src/enriqueta.zip
+source=(http://bohoomil.com/src/enriqueta.zip{,.sig}
         45-enriqueta.conf
         90-non-tt-enriqueta.conf)
 install=${pkgname}.install
+validgpgkeys=('A9244FB5E93F11F0E975337FAE6866C7962DDE58')
 sha1sums=('8e2ad4cc29121ea15b979d1999d4dd4e3aa90875'
+          'SKIP'
           '01da730b80efe9472db4697c250d57253011c526'
           'f7de9ce11b529fc1ce96ede7e453a66dad484a55')
 
