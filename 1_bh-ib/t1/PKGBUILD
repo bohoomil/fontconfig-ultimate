@@ -4,7 +4,7 @@
 pkgname=t1-bh-ib
 _basename=font-bh-type1
 pkgver=1.0.3
-pkgrel=1
+pkgrel=2
 pkgdesc="Luxi Sans, Serif and Mono families by Bigelow & Holmes. Type 1 version."
 url="http://xorg.freedesktop.org/"
 arch=(any)
