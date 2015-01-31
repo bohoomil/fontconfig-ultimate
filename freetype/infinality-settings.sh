@@ -1,5 +1,5 @@
 ###          freetype2-infinality-ultimate settings          ###
-###           rev. 0.4.8.2, for freetype2 v.2.5.x            ###
+###           rev. 0.4.8.3, for freetype2 v.2.5.x            ###
 ###                                                          ###
 ###                Copyright (c) 2014 bohoomil               ###
 ### The MIT License (MIT) http://opensource.org/licenses/MIT ###
@@ -25,7 +25,7 @@ echo "$XFT_SETTINGS" | xrdb -merge > /dev/null 2>&1
 ### 4 <> darker & smoother
 ### 5 <> darkest & heaviest ("MacIsh")
 
-USE_STYLE="3"
+USE_STYLE="2"
 
 if [ "$USE_STYLE" = "1" ]; then
   export INFINALITY_FT_FILTER_PARAMS="04 22 38 22 04"
@@ -39,8 +39,12 @@ elif [ "$USE_STYLE" = "5" ]; then
   export INFINALITY_FT_FILTER_PARAMS="12 28 42 28 12"
 fi
 
-export INFINALITY_FT_FRINGE_FILTER_STRENGTH="60"
+export INFINALITY_FT_FRINGE_FILTER_STRENGTH="50"
 export INFINALITY_FT_USE_VARIOUS_TWEAKS="true"
 export INFINALITY_FT_CHROMEOS_STYLE_SHARPENING_STRENGTH="20"
+export INFINALITY_FT_GAMMA_CORRECTION="30 85"
+export INFINALITY_FT_STEM_ALIGNMENT_STRENGTH="15"
+export INFINALITY_FT_STEM_FITTING_STRENGTH="15"
+
 
 # vim:ft=sh:

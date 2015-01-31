@@ -6,6 +6,15 @@ CHANGELOG
 ---------
 
 
+2014-12-31
+~~~~~~~~~~
+
+### freetype2-infinality-ultimate, rev. 2.5.5-2 (incl. multilib)
+
+* The code base was merged with the upstream changes up to 2015.01.23.
+* The Infinality patchset was revised and updated accordingly.
+* `infinality-settings` was update to rev. 0.4.8.3.
+
 2014-12-30
 ~~~~~~~~~~
 

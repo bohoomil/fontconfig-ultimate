@@ -11,7 +11,7 @@
  # respect GNUMAKE environment variable for backwards compatibility
 --- a/devel/ftoption.h	2013-12-21 21:39:04.000000000 +0100
 +++ b/devel/ftoption.h	2014-03-07 19:21:57.066654119 +0100
-@@ -609,6 +609,17 @@ FT_BEGIN_HEADER
+@@ -605,6 +605,17 @@ FT_BEGIN_HEADER
  
    /*************************************************************************/
    /*                                                                       */
@@ -41,7 +41,7 @@
  
  
    /*************************************************************************/
-@@ -604,11 +604,22 @@ FT_BEGIN_HEADER
+@@ -600,11 +600,22 @@ FT_BEGIN_HEADER
    /*   This option requires TT_CONFIG_OPTION_BYTECODE_INTERPRETER to be    */
    /*   defined.                                                            */
    /*                                                                       */
@@ -589,7 +589,7 @@
          /* check that the loaded outline is correct */
 --- a/src/base/ftoutln.c	2014-12-01 22:40:34.438380192 +0100
 +++ b/src/base/ftoutln.c	2014-12-01 22:43:55.562934868 +0100
-@@ -917,7 +917,34 @@
+@@ -910,7 +910,34 @@
      FT_Vector   v_prev, v_first, v_next, v_cur;
      FT_Int      c, n, first;
      FT_Int      orientation;
@@ -4486,75 +4486,6 @@
  #else /* !FT_CONFIG_OPTION_SUBPIXEL_RENDERING */
  
      /* render outline into bitmap */
---- a/src/truetype/ttinterp.c	2014-12-01 22:40:34.468385156 +0100
-+++ b/src/truetype/ttinterp.c	2014-12-01 22:46:52.925480354 +0100
-@@ -4853,6 +4853,10 @@
-     CUR.sph_in_func_flags = 0x0000;
- #endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
- 
-+#ifdef TT_CONFIG_OPTION_SUBPIXEL_HINTING
-+    CUR.sph_in_func_flags = 0x0000;
-+#endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
-+
-     if ( CUR.callTop <= 0 )     /* We encountered an ENDF without a call */
-     {
-       CUR.error = FT_THROW( ENDF_In_Exec_Stream );
-@@ -6198,6 +6202,12 @@
-                    ( CUR.sph_in_func_flags & SPH_FDEF_INLINE_DELTA_2 ) ) )
-               goto Skip;
- 
-+            /* skip post-iup deltas */
-+            if ( CUR.iup_called                                          &&
-+                 ( ( CUR.sph_in_func_flags & SPH_FDEF_INLINE_DELTA_1 ) ||
-+                   ( CUR.sph_in_func_flags & SPH_FDEF_INLINE_DELTA_2 ) ) )
-+              goto Skip;
-+
-             if ( !( CUR.sph_tweak_flags & SPH_TWEAK_ALWAYS_SKIP_DELTAP ) &&
-                   ( ( CUR.is_composite && CUR.GS.freeVector.y != 0 ) ||
-                     ( CUR.zp2.tags[point] & FT_CURVE_TAG_TOUCH_Y )   ||
-@@ -6487,6 +6497,7 @@
-     if ( SUBPIXEL_HINTING                                  &&
-          CUR.ignore_x_mode                                 &&
-          CUR.GS.freeVector.x != 0                          &&
-+         CUR.GS.freeVector.y == 0                          &&
-          !( CUR.sph_tweak_flags & SPH_TWEAK_NORMAL_ROUND ) )
-       minimum_distance = 0;
- #endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
-@@ -8343,6 +8354,34 @@
- 
- #endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
- 
-+#ifdef TT_CONFIG_OPTION_SUBPIXEL_HINTING
-+      for ( i = 0; i < opcode_patterns; i++ )
-+      {
-+        if ( opcode_pointer[i] < opcode_size[i]                 &&
-+             CUR.opcode == opcode_pattern[i][opcode_pointer[i]] )
-+        {
-+          opcode_pointer[i] += 1;
-+
-+          if ( opcode_pointer[i] == opcode_size[i] )
-+          {
-+            FT_TRACE7(( "sph: opcode ptrn: %d, %s %s\n",
-+                        i,
-+                        CUR.face->root.family_name,
-+                        CUR.face->root.style_name ));
-+
-+            switch ( i )
-+            {
-+            case 0:
-+              break;
-+            }
-+            opcode_pointer[i] = 0;
-+          }
-+        }
-+        else
-+          opcode_pointer[i] = 0;
-+      }
-+#endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
-+
- #ifdef TT_CONFIG_OPTION_INTERPRETER_SWITCH
- 
-       {
 --- a/src/autofit/aflatin.h	2014-09-14 11:18:00.268465365 -0500
 +++ b/src/autofit/aflatin.h	2014-09-14 11:23:45.223942422 -0500
 @@ -62,6 +62,9 @@
