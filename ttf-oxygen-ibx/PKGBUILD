@@ -3,25 +3,31 @@
 pkgname=ttf-oxygen-ibx
 epoch=1
 pkgver=5.1.1
-pkgrel=3
+pkgrel=4
 pkgdesc="The Oxygen typeface family is created as part of the KDE Project."
 url="http://kde.org/"
 arch=('any')
 groups=('infinality-bundle-fonts-extra')
 depends=('fontconfig')
-makedepends=('extra-cmake-modules' 'qt5-base' 'fontforge')
+makedepends=('extra-cmake-modules' 'qt5-base')
 conflicts=('ttf-oxygen' 'ttf-oxygen-git')
 provides=('ttf-oxygen')
 license=('custom:OFL' 'custom:GPL+FE' 'GPL')
 install=$pkgname.install
 source=("http://download.kde.org/stable/plasma/${pkgver}/oxygen-fonts-${pkgver}.tar.xz"
+        http://bohoomil.com/src/Oxygen.zip{,.sig}
+        http://bohoomil.com/src/Oxygen_Mono.zip{,.sig}
         45-oxygen.conf
         90-tt-oxygen.conf
         CMakeLists.txt.patch)
 sha1sums=('57a739a0f22bf12e3623fde6b7a6d3829d1c5f0a'
+          '12e43391c3feee3f7c361bfff1c0cbb0c91b6859'
+          'SKIP'
+          '381cce855e5ead414f4bc7480a6fa94f7d3ecbdf'
+          'SKIP'
           'cc78ee55ef16f085e7d73dd8eb9df191793791c1'
           '0e884da0573482a1c9ce7b20d43a28231d9689c3'
-          'cae6644056c9eb815f317a1d3e370cd9b76586c1')
+          '99de604c09eae0b4f790139b60602b2fd7fd99fa')
 
 prepare() {
   mkdir build
@@ -47,6 +53,9 @@ package(){
   install -d "${pkgdir}"/usr/share/licenses/${pkgname}
   install -m644 "${srcdir}"/oxygen-fonts-${pkgver}/COPYING-{GPL+FE.txt,OFL} \
     "${pkgdir}"/usr/share/licenses/${pkgname}
+
+  install -d "${pkgdir}"/usr/share/fonts/${pkgname}
+  install -m644 "${srcdir}"/*.ttf "${pkgdir}"/usr/share/fonts/${pkgname}
 
   install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
   install -m755 -d "${pkgdir}"/etc/fonts/conf.d
