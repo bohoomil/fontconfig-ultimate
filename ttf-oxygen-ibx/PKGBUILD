@@ -27,7 +27,7 @@ sha1sums=('57a739a0f22bf12e3623fde6b7a6d3829d1c5f0a'
           'SKIP'
           'cc78ee55ef16f085e7d73dd8eb9df191793791c1'
           '0e884da0573482a1c9ce7b20d43a28231d9689c3'
-          '99de604c09eae0b4f790139b60602b2fd7fd99fa')
+          '6dc59d79217ce1696d321905658914989189fb1b')
 
 prepare() {
   mkdir build
