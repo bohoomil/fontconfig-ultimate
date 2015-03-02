@@ -11,7 +11,7 @@
  # respect GNUMAKE environment variable for backwards compatibility
 --- a/devel/ftoption.h	2013-12-21 21:39:04.000000000 +0100
 +++ b/devel/ftoption.h	2014-03-07 19:21:57.066654119 +0100
-@@ -605,6 +605,17 @@ FT_BEGIN_HEADER
+@@ -607,6 +607,17 @@ FT_BEGIN_HEADER
  
    /*************************************************************************/
    /*                                                                       */
@@ -41,7 +41,7 @@
  
  
    /*************************************************************************/
-@@ -600,11 +600,22 @@ FT_BEGIN_HEADER
+@@ -602,11 +602,22 @@ FT_BEGIN_HEADER
    /*   This option requires TT_CONFIG_OPTION_BYTECODE_INTERPRETER to be    */
    /*   defined.                                                            */
    /*                                                                       */
@@ -345,16 +345,16 @@
      if ( sign )
        dist = -dist;
  
-@@ -2244,6 +2412,8 @@
-                              (AF_Edge_Flags)base_edge->flags,
-                              (AF_Edge_Flags)stem_edge->flags );
+@@ -2243,6 +2411,8 @@
+                                                         base_edge->flags,
+                                                         stem_edge->flags );
  
 +/* if fitted_width causes stem_edge->pos to land basically on top of an existing
 + * stem_edge->pos, then add or remove 64.  Need to figure out a way to do this */
  
      stem_edge->pos = base_edge->pos + fitted_width;
  
-@@ -2807,8 +2977,32 @@
+@@ -2803,8 +2973,32 @@
      int       dim;
  
      AF_LatinAxis  axis;
@@ -388,7 +388,7 @@
      error = af_glyph_hints_reload( hints, outline );
      if ( error )
        goto Exit;
-@@ -2874,7 +3068,11 @@
+@@ -2870,7 +3064,11 @@
      }
  
      af_glyph_hints_save( hints, outline );
@@ -4330,7 +4330,7 @@
 +    }
 +#endif
  
-     if ( FT_ALLOC( bitmap->buffer, (FT_ULong)pitch * height ) )
+     if ( FT_ALLOC( bitmap->buffer, (FT_ULong)( pitch * height ) ) )
        goto Exit;
 @@ -283,9 +3862,153 @@
      if ( error )
@@ -4488,7 +4488,7 @@
      /* render outline into bitmap */
 --- a/src/autofit/aflatin.h	2014-09-14 11:18:00.268465365 -0500
 +++ b/src/autofit/aflatin.h	2014-09-14 11:23:45.223942422 -0500
-@@ -62,6 +62,9 @@
+@@ -62,6 +62,9 @@ FT_BEGIN_HEADER
  
  #define AF_LATIN_MAX_WIDTHS  16
  
@@ -4496,5 +4496,5 @@
 +    extern FT_Pos infinality_cur_width;
 +#endif
  
-   enum
-   {
+ #define AF_LATIN_BLUE_ACTIVE      ( 1U << 0 ) /* zone height is <= 3/4px   */
+ #define AF_LATIN_BLUE_TOP         ( 1U << 1 ) /* we have a top blue zone   */
