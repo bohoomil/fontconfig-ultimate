@@ -3,7 +3,7 @@ post_install() {
   cat << EOF
   If you have been using freetype2-infinality from the AUR,
   the runtime file that came with it has been saved as
-  /etc/profile.d/infinality-settings.sh.pacsave and the new
+  /etc/X11/xinit/xinitrc.d/infinality-settings.pacsave and the new
   one was installed in its place. You can manually delete
   infinality-settings.sh.pacsave as it is not needed anymore.
 
