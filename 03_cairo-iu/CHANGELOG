@@ -5,6 +5,22 @@ cairo-infinality-ultimate
 CHANGELOG
 ---------
 
+
+2015-03-11
+~~~~~~~~~~
+
+### cairo-infinality-ultimate, rev. 1.14.2-1 (incl. multilib)
+
+* Version upgrade.
+
+
+2014-10-29
+~~~~~~~~~~
+
+### cairo-infinality-ultimate, rev. 1.14.0-2 (incl. multilib)
+
+* Applied git_fixes.diff patch.
+
 2014-10-15
 ~~~~~~~~~~
 
