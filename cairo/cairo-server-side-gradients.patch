@@ -1,9 +1,9 @@
 # Description: don't use server side gradients most drivers don't handle it
 Index: cairo-1.12.2/src/cairo-xlib-display.c
 ===================================================================
---- cairo-1.12.2.orig/src/cairo-xlib-display.c	2012-04-25 21:53:19.000000000 +1200
-+++ cairo-1.12.2/src/cairo-xlib-display.c	2012-05-17 16:06:18.543220800 +1200
-@@ -266,11 +266,7 @@
+--- a/src/cairo-xlib-display.c	2015-03-10 23:21:07.000000000 +0100
++++ b/src/cairo-xlib-display.c	2015-03-11 21:59:05.751030406 +0100
+@@ -263,11 +263,7 @@ _cairo_xlib_device_create (Display *dpy)
      /* Prior to Render 0.10, there is no protocol support for gradients and
       * we call function stubs instead, which would silently consume the drawing.
       */

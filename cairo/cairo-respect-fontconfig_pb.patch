@@ -1,6 +1,6 @@
---- a/src/cairo-ft-font.c	2008-09-29 21:43:13.000000000 +0100
-+++ b/src/cairo-ft-font.c	2008-09-29 21:52:19.000000000 +0100
-@@ -1705,7 +1705,9 @@
+--- a/src/cairo-ft-font.c	2015-03-10 23:21:07.000000000 +0100
++++ b/src/cairo-ft-font.c	2015-03-11 21:59:05.747697134 +0100
+@@ -1841,7 +1841,9 @@ _cairo_ft_options_merge (cairo_ft_option
  	options->base.subpixel_order = other->base.subpixel_order;
      }
  
