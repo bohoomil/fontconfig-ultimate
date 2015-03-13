@@ -1,8 +1,8 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=ttf-source-serif-pro-ibx
-pkgver=1.014
-pkgrel=3
+pkgver=1.017
+pkgrel=1
 depends=('fontconfig')
 pkgdesc="Source Serif Pro is a serif typeface in the transitional style, designed to complement Source Sans. TrueType version."
 url="http://www.adobe.com/"
@@ -14,7 +14,7 @@ install=$pkgname.install
 source=("https://github.com/adobe-fonts/source-serif-pro/archive/${pkgver}R.tar.gz"
         45-source-serif-pro.conf
         90-tt-source-serif-pro.conf)
-sha1sums=('b9e3ddb81532c3567408b349e1a0926aad674cfb'
+sha1sums=('b52bfa1fe0f8f573cc16315ea347be160e79980e'
           'ec79743b49b83d380ca86918c7c44d474fd5101d'
           '19dfa23495d142c728f8947b5eefd169f495e82e')
 
