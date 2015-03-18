@@ -1,5 +1,5 @@
 --- a/conf.d/Makefile.am	2014-01-20 09:14:19.000000000 +0100
-+++ b/conf.d/Makefile.am	2014-03-24 22:42:04.326965609 +0100
++++ b/conf.d/Makefile.am	2015-03-18 22:01:22.228445576 +0100
 @@ -21,26 +21,9 @@
  #  TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  #  PERFORMANCE OF THIS SOFTWARE.
@@ -54,7 +54,7 @@
 -
  -include $(top_srcdir)/git.mk
 --- a/conf.d/Makefile.in	2014-03-24 07:04:15.000000000 +0100
-+++ b/conf.d/Makefile.in	2014-03-24 22:42:04.326965609 +0100
++++ b/conf.d/Makefile.in	2015-03-18 22:06:52.180613814 +0100
 @@ -102,7 +102,7 @@ POST_UNINSTALL = :
  build_triplet = @build@
  host_triplet = @host@

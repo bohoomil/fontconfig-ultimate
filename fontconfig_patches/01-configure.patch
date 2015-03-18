@@ -1,5 +1,5 @@
---- a/configure	2015-03-18 00:28:19.783935404 +0100
-+++ b/configure	2015-03-18 00:31:22.395067701 +0100
+--- a/configure	2014-03-24 07:04:16.000000000 +0100
++++ b/configure	2015-03-18 21:26:18.805031769 +0100
 @@ -655,6 +655,7 @@ XMLDIR
  CONFIGDIR
  BASECONFIGDIR
@@ -8,7 +8,7 @@
  FC_FONTDATE
  FC_CACHEDIR
  fc_cachedir
-@@ -842,6 +843,7 @@ with_default_fonts
+@@ -833,6 +834,7 @@ with_default_fonts
  with_add_fonts
  with_cache_dir
  with_templatedir
@@ -16,7 +16,7 @@
  with_baseconfigdir
  with_configdir
  with_xmldir
-@@ -1528,6 +1530,10 @@ Optional Packages:
+@@ -1518,6 +1520,10 @@ Optional Packages:
                            [default=LOCALSTATEDIR/cache/fontconfig]
    --with-templatedir=DIR  Use DIR to store the configuration template files
                            [default=DATADIR/fontconfig/conf.avail]
@@ -27,7 +27,7 @@
    --with-baseconfigdir=DIR
                            Use DIR to store the base configuration files
                            [default=SYSCONFDIR/fonts]
-@@ -15182,6 +15188,12 @@ else
+@@ -14856,6 +14862,12 @@ else
    templatedir=yes
  fi
  
@@ -40,7 +40,7 @@
  
  # Check whether --with-baseconfigdir was given.
  if test "${with_baseconfigdir+set}" = set; then :
-@@ -15214,6 +15226,13 @@ no|yes)
+@@ -14888,6 +14900,13 @@ no|yes)
  *)
  	;;
  esac
@@ -54,7 +54,7 @@
  case "$baseconfigdir" in
  no|yes)
  	baseconfigdir='${sysconfdir}'/fonts
-@@ -15237,6 +15256,7 @@ no|yes)
+@@ -14911,6 +14930,7 @@ no|yes)
  esac
  
  TEMPLATEDIR=${templatedir}
@@ -62,20 +62,12 @@
  BASECONFIGDIR=${baseconfigdir}
  CONFIGDIR=${configdir}
  XMLDIR=${xmldir}
-@@ -16300,7 +16320,7 @@ _ACEOF
+@@ -15939,7 +15959,7 @@ _ACEOF
  
  
  
--ac_config_files="$ac_config_files Makefile fontconfig/Makefile fc-lang/Makefile fc-glyphname/Makefile fc-blanks/Makefile fc-case/Makefile src/Makefile conf.d/Makefile fc-cache/Makefile fc-cat/Makefile fc-list/Makefile fc-match/Makefile fc-pattern/Makefile fc-query/Makefile fc-scan/Makefile fc-validate/Makefile doc/Makefile doc/version.sgml test/Makefile fontconfig.spec fontconfig.pc fontconfig-zip"
-+ac_config_files="$ac_config_files Makefile fontconfig/Makefile fc-lang/Makefile fc-glyphname/Makefile fc-blanks/Makefile fc-case/Makefile src/Makefile conf.d/Makefile conf.d.infinality/Makefile fc-cache/Makefile fc-cat/Makefile fc-list/Makefile fc-match/Makefile fc-pattern/Makefile fc-query/Makefile fc-scan/Makefile fc-validate/Makefile doc/Makefile doc/version.sgml test/Makefile fontconfig.spec fontconfig.pc fontconfig-zip"
+-ac_config_files="$ac_config_files Makefile fontconfig/Makefile fc-lang/Makefile fc-glyphname/Makefile fc-case/Makefile src/Makefile conf.d/Makefile fc-cache/Makefile fc-cat/Makefile fc-list/Makefile fc-match/Makefile fc-pattern/Makefile fc-query/Makefile fc-scan/Makefile fc-validate/Makefile doc/Makefile doc/version.sgml test/Makefile fontconfig.spec fontconfig.pc fontconfig-zip"
++ac_config_files="$ac_config_files Makefile fontconfig/Makefile fc-lang/Makefile fc-glyphname/Makefile fc-case/Makefile src/Makefile conf.d/Makefile conf.d.infinality/Makefile fc-cache/Makefile fc-cat/Makefile fc-list/Makefile fc-match/Makefile fc-pattern/Makefile fc-query/Makefile fc-scan/Makefile fc-validate/Makefile doc/Makefile doc/version.sgml test/Makefile fontconfig.spec fontconfig.pc fontconfig-zip"
  
  cat >confcache <<\_ACEOF
  # This file is a shell script that caches the results of configure
-@@ -17365,6 +17385,7 @@ do
-     "fc-case/Makefile") CONFIG_FILES="$CONFIG_FILES fc-case/Makefile" ;;
-     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
-     "conf.d/Makefile") CONFIG_FILES="$CONFIG_FILES conf.d/Makefile" ;;
-+    "conf.d.infinality/Makefile") CONFIG_FILES="$CONFIG_FILES conf.d.infinality/Makefile" ;;
-     "fc-cache/Makefile") CONFIG_FILES="$CONFIG_FILES fc-cache/Makefile" ;;
-     "fc-cat/Makefile") CONFIG_FILES="$CONFIG_FILES fc-cat/Makefile" ;;
-     "fc-list/Makefile") CONFIG_FILES="$CONFIG_FILES fc-list/Makefile" ;;
