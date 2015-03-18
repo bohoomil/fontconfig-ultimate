@@ -23,10 +23,10 @@ has led to the following conventions in usage:
  90 through 99		font synthesis
 
 If you are using fontconfig-infinality-ultimate from the infinality-bundle
-collection, configuration files are located in ../conf.avail.infinality and
-they are symlinked here instead. Besides, there are four more subdirectories
-located in the main template direcotory: three of them provide necessary
-configuration files (depending on which font collection you are using)
+collection, templates are located in ../conf.avail.infinality and they
+are symlinked here instead. Besides, there are three more subdirectories
+located in the main template directory, each containing collection-specific
+fontconfig configuration files:
 
  ../conf.avail.infinality/combi - for a custom, user-compiled collection
  ../conf.avail.infinality/free  - for the free font collection, available in the
@@ -36,10 +36,9 @@ configuration files (depending on which font collection you are using)
                                   with Microsoft Windows and Office software
                                   (not freely available)
 
-The fourth one, ../conf.avail.infinality/ftypes, provides optional base
-rendering instructions for fonts that are not installed by default and are
-available in multiple formats (TrueType, OpenType and Type 1). See
-../conf.avail.infinality/README for instruction on how to use them.
+Symbolic links in conf.d to all five *.conf files from one of either combi,
+free or ms need to be created in order for default aliases and font
+substitution rules to work properly.
 
 The stock fontconfig template directory and configuration files are still
 available for compatibility reasons and should not be removed.
