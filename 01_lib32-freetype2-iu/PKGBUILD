@@ -54,6 +54,11 @@ build() {
   make
 }
 
+check() {
+  cd "freetype-${pkgver}"
+  make -k check
+}
+
 package() {
   cd "freetype-${pkgver}"
   make DESTDIR="${pkgdir}" install
