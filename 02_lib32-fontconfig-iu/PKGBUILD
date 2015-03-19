@@ -1,32 +1,45 @@
 # Maintainer: Jan de Groot <jgc@archlinux.org>
 # Maintainer: bohoomil <@zoho.com>
 
-_pkgbasename=fontconfig
-pkgname=lib32-$_pkgbasename-infinality-ultimate
+_basename=fontconfig
+pkgname=lib32-$_basename-infinality-ultimate
 pkgver=2.11.1
-pkgrel=3
+pkgrel=5
+_master_name=fontconfig-ultimate-master
 pkgdesc="A library for configuring and customizing font access (32-bit, infinality-bundle)"
 arch=(x86_64)
 url="http://www.fontconfig.org/release/"
 license=('custom' 'MIT')
 groups=('infinality-bundle-multilib')
-depends=('lib32-expat' 'lib32-freetype2-infinality-ultimate' $_pkgbasename-infinality-ultimate)
-makedepends=('gcc-multilib' 'lib32-expat')
+depends=('lib32-expat' 'lib32-freetype2-infinality-ultimate' $_basename-infinality-ultimate)
+makedepends=('gcc-multilib' 'lib32-expat' 'gperf' 'python2-lxml')
 options=('!libtool')
 provides=('lib32-fontconfig')
 conflicts=('lib32-fontconfig')
 install="lib32-fontconfig.install"
-source=(http://www.fontconfig.org/release/${_pkgbasename}-${pkgver}.tar.bz2
-        'fc-cache.c.patch')
-md5sums=('824d000eb737af6e16c826dd3b2d6c90'
-         '51b760fb0658af0f9b85b819a3e94c9a')
+source=(http://www.fontconfig.org/release/${_basename}-${pkgver}.tar.bz2
+        master.tar.gz::https://github.com/bohoomil/fontconfig-ultimate/archive/master.tar.gz)
+sha1sums=('08565feea5a4e6375f9d8a7435dac04e52620ff2'
+          'c467c14548e38722b8633b84d50211073008f8c0')
 
 prepare() {
-  cd "${_pkgbasename}-${pkgver}"
 
-  # fix for [bug 7752]
-  # http://lists.freedesktop.org/archives/fontconfig-bugs/2014-April/000835.html
-  patch -Np1 -i "${srcdir}"/fc-cache.c.patch
+  # copy fontconfig-ib patches & stuff
+  cd "${srcdir}/${_master_name}"
+
+  cp -r fontconfig_patches/00-upstream_2.11.93.patch "${srcdir}/${_basename}-${pkgver}"
+  cp -r fontconfig_patches/06-missing_mans.patch "${srcdir}/${_basename}-${pkgver}"
+
+  # prepare src
+  cd "${srcdir}/${_basename}-${pkgver}"
+
+  # upstream fixes
+  patch -Np1 -i 00-upstream_2.11.93.patch
+  patch -Np1 -i 06-missing_mans.patch
+
+  aclocal
+  libtoolize -f
+  automake -afi
 }
 
 build() {
@@ -34,11 +47,7 @@ build() {
   export CXX="g++ -m32"
   export PKG_CONFIG_PATH="/usr/lib32/pkgconfig"
 
-  cd "${_pkgbasename}-${pkgver}"
-
-  # make sure there's no rpath trouble and sane .so versioning - FC and Gentoo do this as well
-  libtoolize -f
-  autoreconf -fi
+  cd "${_basename}-${pkgver}"
 
   ./configure --prefix=/usr \
     --sysconfdir=/etc \
@@ -46,6 +55,7 @@ build() {
     --with-xmldir=/etc/fonts \
     --localstatedir=/var \
     --disable-static \
+    --disable-docs \
     --with-default-fonts=/usr/share/fonts \
     --with-add-fonts=/usr/share/fonts \
     --libdir=/usr/lib32
@@ -54,12 +64,12 @@ build() {
 }
 
 check() {
-  cd "${_pkgbasename}-${pkgver}"
+  cd "${_basename}-${pkgver}"
   make -k check
 }
 
 package() {
-  cd "${_pkgbasename}-${pkgver}"
+  cd "${_basename}-${pkgver}"
 
   make DESTDIR="${pkgdir}" install
 
@@ -67,5 +77,5 @@ package() {
   find "${pkgdir}/usr/bin" -not -type d -not -name fc-cache -delete
   mv "${pkgdir}"/usr/bin/fc-cache{,-32}
   mkdir -p "${pkgdir}/usr/share/licenses"
-  ln -s ${_pkgbasename} "${pkgdir}/usr/share/licenses/${pkgname}"
+  ln -s ${_basename} "${pkgdir}/usr/share/licenses/${pkgname}"
 }
