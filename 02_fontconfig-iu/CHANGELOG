@@ -6,6 +6,25 @@ CHANGELOG
 ---------
 
 
+2015-03-19
+~~~~~~~~~~
+
+### fontconfig-infinality-ultimate, rev. 2.11.1-26
+
+* Removed obsolete configuration entry from `fonts.conf`.
+* Minor fixes to optional configuration files.
+* Major patchset revision and code cleanup.
+
+2015-03-18
+~~~~~~~~~~
+
+### fontconfig-infinality-ultimate, rev. 2.11.1-25
+
+* The code base was merged with the recent upstream updates (up to rev. 2.11.93).
+* `/etc/conf.d/README` was updated.
+* Nimbus and URW family names were updated to match the current upstream release.
+* `free` and `combi` templates were revised and updated.
+
 2014-12-06
 ~~~~~~~~~~
 
