@@ -1,0 +1,6 @@
+If you are going to substitute proprietary fonts with Nimbus and URW families,
+you need to create symbolic links in /etc/fonts/conf.d:
+
+# cd /usr/share/doc/t1-urw-fonts-cyr-ib
+# for conf in `ls *.conf`; do ln -s `pwd`/"$conf" /etc/fonts/conf.d/; done
+

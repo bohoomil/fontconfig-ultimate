@@ -1,0 +1,66 @@
+# Contributor: Firmicus <francois.archlinux.org>
+# Contributor: dorphell <dorphell@archlinux.org>
+# Contributor: Gaetan Bisson <bisson@archlinux.org>
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=t1-urw-fonts-cyr-ib
+pkgname_org=urw-fonts
+pkgver=2.4
+_fedoraver=2.4
+_fedorarel=17.fc20
+pkgrel=2
+pkgdesc='Standard Ghostscript Type1 fonts from URW for infinality-bundle-fonts.'
+url='http://sourceforge.net/projects/gs-fonts/'
+arch=('any')
+license=('GPL2')
+makedepends=('rpmextract')
+depends=('fontconfig')
+conflicts=('gsfonts' 't1-urw-fonts-ib')
+provides=('gsfonts' 't1-urw-fonts-ib')
+groups=('infinality-bundle-fonts')
+install=$pkgname.install
+source=("http://kojipkgs.fedoraproject.org/packages/${pkgname_org}/${_fedoraver}/${_fedorarel}/src/${pkgname_org}-${_fedoraver}-${_fedorarel}.src.rpm"
+        29-metric-aliases-cyr.conf
+        36-repl-global-cyr.conf
+        45-urw-fonts-cyr.conf
+        59-latin-cyr.conf
+        90-non-tt-urw-fonts-cyr.conf
+        README)
+sha1sums=('0066723d9cd086cfdaecc57f7b216545a50924dd'
+          '55d922471acee0cc3e2476c71a71deec5616cd5a'
+          'e30b667954cb8e4a07810a1fcfd3c861b0289c8a'
+          '5f96002a53d4eddbd23c9b0991cc3c332b29e8c3'
+          'b863decf687afd51bdc14150b1c2919611e878b1'
+          '9ec26822d826d9ca6efa11b4e7810d5c8a280101'
+          '930d28bd60716bc3a823dcf638dbe197582db717')
+
+build() {
+  cd "${srcdir}"
+  rpmextract.sh "${pkgname_org}-${_fedoraver}-${_fedorarel}.src.rpm"
+  bsdtar xf *.tar.bz2
+}
+
+package() {
+  cd "${srcdir}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/${pkgname}
+  install -m644 *.{pfb,pfm,afm} "${pkgdir}"/usr/share/fonts/${pkgname}
+
+  install -m755 -d "${pkgdir}"/usr/share/doc/${pkgname}
+  install -m644 29-metric-aliases-cyr.conf "${pkgdir}"/usr/share/doc/${pkgname}
+  install -m644 36-repl-global-cyr.conf "${pkgdir}"/usr/share/doc/${pkgname}
+  install -m644 59-latin-cyr.conf "${pkgdir}"/usr/share/doc/${pkgname}
+  install -m644 README "${pkgdir}"/usr/share/doc/${pkgname}
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-urw-fonts-cyr.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-urw-fonts-cyr.conf
+  install -m644 90-non-tt-urw-fonts-cyr.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-urw-fonts-cyr.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-urw-fonts-cyr.conf .
+  ln -s ../conf.avail/90-non-tt-urw-fonts-cyr.conf .
+
+}
