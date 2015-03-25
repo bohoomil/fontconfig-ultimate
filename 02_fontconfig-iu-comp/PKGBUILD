@@ -1,0 +1,114 @@
+# Maintainer: Jan de Groot <jgc@archlinux.org>
+# Maintainer: bohoomil <bohoomil@zoho.com>
+
+pkgname=fontconfig-iu-comp
+_basename=fontconfig
+pkgdesc="A library for configuring and customizing font access, optimized for freetype2-infinality-ultimate (compatibility package)"
+url=('http://www.fontconfig.org/release/')
+license=('custom' 'MIT')
+pkgver=2.11.1
+pkgrel=1
+_master_name=fontconfig-ultimate-comp
+arch=('i686' 'x86_64')
+groups=('infinality-bundle')
+depends=('expat' 'freetype2-infinality-ultimate')
+makedepends=('gperf' 'python2-lxml')
+options=('!libtool')
+provides=('fontconfig=$pkgver' 'fontconfig-infinality' 'fontconfig-infinality-ultimate')
+conflicts=('fontconfig' 'fontconfig-infinality' 'fontconfig-infinality-git' 'fontconfig-infinality-ultimate-git' 'fontconfig-infinality-ultimate')
+backup=('etc/fonts/fonts.conf'
+        'etc/fonts/conf.avail.infinality/combi/30-metric-aliases-combi.conf'
+        'etc/fonts/conf.avail.infinality/combi/37-repl-global-combi.conf'
+        'etc/fonts/conf.avail.infinality/combi/60-latin-combi.conf'
+        'etc/fonts/conf.avail.infinality/combi/65-non-latin-combi.conf'
+        'etc/fonts/conf.avail.infinality/combi/66-aliases-wine-combi.conf'
+        'etc/fonts/conf.avail.infinality/35-repl-custom.conf'
+        'etc/fonts/conf.avail.infinality/38-repl-webfonts-custom.conf'
+        'etc/fonts/conf.avail.infinality/97-selective-rendering-custom.conf')
+install=fontconfig-ultimate.install
+
+source=(http://www.fontconfig.org/release/${_basename}-${pkgver}.tar.bz2
+        fontconfig-ultimate-comp.tar.gz)
+sha1sums=('08565feea5a4e6375f9d8a7435dac04e52620ff2'
+          '9df365bb534237e9893c6b783d2d05366811c2d5')
+
+# a nice page to test font matching:
+# http://zipcon.net/~swhite/docs/computers/browsers/fonttest.html
+
+prepare() {
+
+  patches=(01-configure.patch
+           02-configure.ac.patch
+           03-Makefile.in.patch
+           04-Makefile.conf.d.patch
+           05-Makefile.am.in.patch
+           fc-cache.c.patch)
+
+  # copy fontconfig-ib patches & stuff
+  cd "${_master_name}"
+
+  cp -r conf.d.infinality "${srcdir}/${_basename}-${pkgver}"/conf.d.infinality
+  cp -r fontconfig_patches/*.patch "${srcdir}/${_basename}-${pkgver}"
+
+  # prepare src
+  cd "${srcdir}/${_basename}-${pkgver}"
+
+  # infinality & post release fixes
+  for patch in "${patches[@]}"; do
+    patch -Np1 -i ${patch}
+  done
+
+  aclocal
+  libtoolize -f
+  automake -afi
+}
+
+build() {
+  cd "${_basename}-${pkgver}"
+
+  ./configure --prefix=/usr \
+    --sysconfdir=/etc \
+    --with-templatedir=/etc/fonts/conf.avail \
+    --with-templateinfdir=/etc/fonts/conf.avail.infinality \
+    --with-xmldir=/etc/fonts \
+    --localstatedir=/var \
+    --disable-static \
+    --with-default-fonts=/usr/share/fonts \
+    --with-add-fonts=/usr/share/fonts
+  make
+}
+
+#check() {
+  #cd "${_basename}-${pkgver}"
+  #make -k check
+#}
+
+package() {
+  cd "${_basename}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+
+  #Install license
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${_basename}"
+  install -m644 COPYING "${pkgdir}"/usr/share/licenses/"${_basename}"
+
+  #install infinality stuff
+  cd "${srcdir}/${_master_name}"
+
+  # copy presets
+  cp -r fontconfig_patches/{combi,free,ms} \
+    "${pkgdir}"/etc/fonts/conf.avail.infinality
+
+  # install fc-presets
+  install -m755 fontconfig_patches/"fc-presets" "${pkgdir}"/usr/bin/"fc-presets"
+
+  # copy documentation
+  install -m755 -d "${pkgdir}"/usr/share/doc/"${pkgname}"
+  cp -r doc "${pkgdir}"/usr/share/
+
+  # install infinality-settings
+  install -m755 -d "${pkgdir}"/usr/share/doc/"${pkgname}"/freetype
+  install -m755 freetype/infinality-settings.sh \
+    "${pkgdir}"/usr/share/doc/"${pkgname}"/freetype/infinality-settings.sh
+
+  find "${pkgdir}" -type d -name .git -exec rm -r '{}' +
+}
