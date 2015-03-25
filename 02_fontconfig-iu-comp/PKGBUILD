@@ -12,7 +12,6 @@ _master_name=fontconfig-ultimate-comp
 arch=('i686' 'x86_64')
 groups=('infinality-bundle')
 depends=('expat' 'freetype2-infinality-ultimate')
-makedepends=('gperf' 'python2-lxml')
 options=('!libtool')
 provides=('fontconfig=$pkgver' 'fontconfig-infinality' 'fontconfig-infinality-ultimate')
 conflicts=('fontconfig' 'fontconfig-infinality' 'fontconfig-infinality-git' 'fontconfig-infinality-ultimate-git' 'fontconfig-infinality-ultimate')
@@ -28,9 +27,11 @@ backup=('etc/fonts/fonts.conf'
 install=fontconfig-ultimate.install
 
 source=(http://www.fontconfig.org/release/${_basename}-${pkgver}.tar.bz2
-        fontconfig-ultimate-comp.tar.gz)
+        fontconfig-ultimate-comp.tar.gz{,.sig})
+validgpgkeys=('A9244FB5E93F11F0E975337FAE6866C7962DDE58')
 sha1sums=('08565feea5a4e6375f9d8a7435dac04e52620ff2'
-          '9df365bb534237e9893c6b783d2d05366811c2d5')
+          '9df365bb534237e9893c6b783d2d05366811c2d5'
+          'SKIP')
 
 # a nice page to test font matching:
 # http://zipcon.net/~swhite/docs/computers/browsers/fonttest.html
