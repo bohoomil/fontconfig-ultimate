@@ -30307,3 +30307,4393 @@ index 8d8fdf7..5b7da39 100644
  $! David Turner, Robert Wilhelm, and Werner Lemberg.
  $!
  $! This file is part of the FreeType project, and may only be used, modified,
+From dd7498d28394ce77e8df97918a865b70201b5c55 Mon Sep 17 00:00:00 2001
+From: Alexei Podtelezhnikov <apodtele@gmail.com>
+Date: Thu, 5 Mar 2015 22:51:36 -0500
+Subject: [PATCH] * src/base/ftstroke.c: Simplify.
+
+---
+ ChangeLog           |  4 ++++
+ src/base/ftstroke.c | 14 ++++----------
+ 2 files changed, 8 insertions(+), 10 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 96a4bfd..f620bed 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,7 @@
++2015-03-05  Alexei Podtelezhnikov <apodtele@gmail.com>
++
++	* src/base/ftstroke.c: Simplify.
++
+ 2015-03-04  Werner Lemberg  <wl@gnu.org>
+ 
+ 	[truetype] Some fixes and code refactoring in `ttgxvar.c'.
+diff --git a/src/base/ftstroke.c b/src/base/ftstroke.c
+index d7f9283..434d0d8 100644
+--- a/src/base/ftstroke.c
++++ b/src/base/ftstroke.c
+@@ -1220,11 +1220,8 @@
+       goto Exit;
+ 
+     /* when we turn to the right, the inside side is 0 */
+-    inside_side = 0;
+-
+     /* otherwise, the inside side is 1 */
+-    if ( turn < 0 )
+-      inside_side = 1;
++    inside_side = ( turn < 0 );
+ 
+     /* process the inside side */
+     error = ft_stroker_inside( stroker, inside_side, line_length );
+@@ -1232,7 +1229,7 @@
+       goto Exit;
+ 
+     /* process the outside side */
+-    error = ft_stroker_outside( stroker, 1 - inside_side, line_length );
++    error = ft_stroker_outside( stroker, !inside_side, line_length );
+ 
+   Exit:
+     return error;
+@@ -1941,11 +1938,8 @@
+       if ( turn != 0 )
+       {
+         /* when we turn to the right, the inside side is 0 */
+-        inside_side = 0;
+-
+         /* otherwise, the inside side is 1 */
+-        if ( turn < 0 )
+-          inside_side = 1;
++        inside_side = ( turn < 0 );
+ 
+         error = ft_stroker_inside( stroker,
+                                    inside_side,
+@@ -1955,7 +1949,7 @@
+ 
+         /* process the outside side */
+         error = ft_stroker_outside( stroker,
+-                                    1 - inside_side,
++                                    !inside_side,
+                                     stroker->subpath_line_length );
+         if ( error )
+           goto Exit;
+-- 
+2.3.4
+
+From 493cc037c760e5a81e31dc70711ba05ee5a6b8fa Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Fri, 6 Mar 2015 05:38:31 +0100
+Subject: [PATCH] * src/sfnt/ttload.c (tt_face_load_font_dir): Fix compiler
+ warning.
+
+Found by Alexei.
+---
+ ChangeLog         | 6 ++++++
+ src/sfnt/ttload.c | 2 ++
+ 2 files changed, 8 insertions(+)
+
+diff --git a/ChangeLog b/ChangeLog
+index f620bed..d242616 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,9 @@
++2015-03-06  Werner Lemberg  <wl@gnu.org>
++
++	* src/sfnt/ttload.c (tt_face_load_font_dir): Fix compiler warning.
++
++	Found by Alexei.
++
+ 2015-03-05  Alexei Podtelezhnikov <apodtele@gmail.com>
+ 
+ 	* src/base/ftstroke.c: Simplify.
+diff --git a/src/sfnt/ttload.c b/src/sfnt/ttload.c
+index 5fed0b2..ad2975d 100644
+--- a/src/sfnt/ttload.c
++++ b/src/sfnt/ttload.c
+@@ -417,7 +417,9 @@
+         if ( entry->Tag == TTAG_hmtx ||
+              entry->Tag == TTAG_vmtx )
+         {
++#ifdef FT_DEBUG_LEVEL_TRACE
+           FT_ULong  old_length = entry->Length;
++#endif
+ 
+ 
+           /* make metrics table length a multiple of 4 */
+-- 
+2.3.4
+
+From 6fce8427e4325e1db08bbc1e4e8a1e5c595cebe3 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Fri, 6 Mar 2015 23:53:28 +0100
+Subject: [PATCH] Minor documentation improvement.
+
+Based on a suggestion from Lawrence D'Oliveiro <ldo@geek-central.gen.nz>.
+---
+ include/ftmodapi.h | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/include/ftmodapi.h b/include/ftmodapi.h
+index 95aef3a..2ef3f46 100644
+--- a/include/ftmodapi.h
++++ b/include/ftmodapi.h
+@@ -469,7 +469,9 @@ FT_BEGIN_HEADER
+   /* <Description>                                                         */
+   /*    This function is used to create a new FreeType library instance    */
+   /*    from a given memory object.  It is thus possible to use libraries  */
+-  /*    with distinct memory allocators within the same program.           */
++  /*    with distinct memory allocators within the same program.  Note,    */
++  /*    however, that the used @FT_Memory structure is expected to remain  */
++  /*    valid for the life of the @FT_Library object.                      */
+   /*                                                                       */
+   /*    Normally, you would call this function (followed by a call to      */
+   /*    @FT_Add_Default_Modules or a series of calls to @FT_Add_Module)    */
+-- 
+2.3.4
+
+From 0aa36160d6ca5b4f7280127ea861a637759a1ff6 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Sun, 8 Mar 2015 22:50:37 +0100
+Subject: [PATCH] Formatting, whitespace, addition of some comments.
+
+---
+ include/internal/ftdebug.h |   2 +-
+ src/truetype/ttgxvar.c     | 162 +++++++++++++++++++++++++--------------------
+ 2 files changed, 91 insertions(+), 73 deletions(-)
+
+diff --git a/include/internal/ftdebug.h b/include/internal/ftdebug.h
+index edd3b49..216c730 100644
+--- a/include/internal/ftdebug.h
++++ b/include/internal/ftdebug.h
+@@ -140,7 +140,7 @@ FT_BEGIN_HEADER
+   /*    This function may be useful if you want to control FreeType 2's    */
+   /*    debug level in your application.                                   */
+   /*                                                                       */
+-  FT_BASE( const char * )
++  FT_BASE( const char* )
+   FT_Trace_Get_Name( FT_Int  idx );
+ 
+ 
+diff --git a/src/truetype/ttgxvar.c b/src/truetype/ttgxvar.c
+index e44951d..2652e75 100644
+--- a/src/truetype/ttgxvar.c
++++ b/src/truetype/ttgxvar.c
+@@ -288,7 +288,7 @@
+   static void
+   ft_var_load_avar( TT_Face  face )
+   {
+-    FT_Stream       stream = FT_FACE_STREAM(face);
++    FT_Stream       stream = FT_FACE_STREAM( face );
+     FT_Memory       memory = stream->memory;
+     GX_Blend        blend  = face->blend;
+     GX_AVarSegment  segment;
+@@ -302,7 +302,10 @@
+ 
+ 
+     blend->avar_checked = TRUE;
+-    if ( (error = face->goto_table( face, TTAG_avar, stream, &table_len )) != 0 )
++    if ( ( error = face->goto_table( face,
++                                     TTAG_avar,
++                                     stream,
++                                     &table_len ) ) != 0 )
+       return;
+ 
+     if ( FT_FRAME_ENTER( table_len ) )
+@@ -319,7 +322,7 @@
+       goto Exit;
+ 
+     segment = &blend->avar_segment[0];
+-    for ( i = 0; i < axisCount; ++i, ++segment )
++    for ( i = 0; i < axisCount; i++, segment++ )
+     {
+       segment->pairCount = FT_GET_USHORT();
+       if ( FT_NEW_ARRAY( segment->correspondence, segment->pairCount ) )
+@@ -327,7 +330,7 @@
+         /* Failure.  Free everything we have done so far.  We must do */
+         /* it right now since loading the `avar' table is optional.   */
+ 
+-        for ( j = i - 1; j >= 0; --j )
++        for ( j = i - 1; j >= 0; j-- )
+           FT_FREE( blend->avar_segment[j].correspondence );
+ 
+         FT_FREE( blend->avar_segment );
+@@ -335,7 +338,7 @@
+         goto Exit;
+       }
+ 
+-      for ( j = 0; j < segment->pairCount; ++j )
++      for ( j = 0; j < segment->pairCount; j++ )
+       {
+         /* convert to Fixed */
+         segment->correspondence[j].fromCoord = FT_GET_SHORT() << 2;
+@@ -367,8 +370,8 @@
+   /*    ft_var_load_gvar                                                   */
+   /*                                                                       */
+   /* <Description>                                                         */
+-  /*    Parses the `gvar' table if present.  If `fvar' is there, `gvar'    */
+-  /*    had better be there too.                                           */
++  /*    Parse the `gvar' table if present.  If `fvar' is there, `gvar' had */
++  /*    better be there too.                                               */
+   /*                                                                       */
+   /* <InOut>                                                               */
+   /*    face :: The font face.                                             */
+@@ -379,7 +382,7 @@
+   static FT_Error
+   ft_var_load_gvar( TT_Face  face )
+   {
+-    FT_Stream     stream = FT_FACE_STREAM(face);
++    FT_Stream     stream = FT_FACE_STREAM( face );
+     FT_Memory     memory = stream->memory;
+     GX_Blend      blend  = face->blend;
+     FT_Error      error;
+@@ -406,7 +409,10 @@
+       FT_FRAME_END
+     };
+ 
+-    if ( (error = face->goto_table( face, TTAG_gvar, stream, &table_len )) != 0 )
++    if ( ( error = face->goto_table( face,
++                                     TTAG_gvar,
++                                     stream,
++                                     &table_len ) ) != 0 )
+       goto Exit;
+ 
+     gvar_start = FT_STREAM_POS( );
+@@ -433,7 +439,7 @@
+       if ( FT_FRAME_ENTER( ( blend->gv_glyphcnt + 1 ) * 4L ) )
+         goto Exit;
+ 
+-      for ( i = 0; i <= blend->gv_glyphcnt; ++i )
++      for ( i = 0; i <= blend->gv_glyphcnt; i++ )
+         blend->glyphoffsets[i] = offsetToData + FT_GET_ULONG();
+ 
+       FT_FRAME_EXIT();
+@@ -444,9 +450,9 @@
+       if ( FT_FRAME_ENTER( ( blend->gv_glyphcnt + 1 ) * 2L ) )
+         goto Exit;
+ 
+-      for ( i = 0; i <= blend->gv_glyphcnt; ++i )
++      for ( i = 0; i <= blend->gv_glyphcnt; i++ )
+         blend->glyphoffsets[i] = offsetToData + FT_GET_USHORT() * 2;
+-                                              /* XXX: Undocumented: `*2'! */
++                                               /* XXX: Undocumented: `*2'! */
+ 
+       FT_FRAME_EXIT();
+     }
+@@ -457,12 +463,12 @@
+                          gvar_head.axisCount * blend->tuplecount ) )
+         goto Exit;
+ 
+-      if ( FT_STREAM_SEEK( gvar_start + gvar_head.offsetToCoord )       ||
+-           FT_FRAME_ENTER( blend->tuplecount * gvar_head.axisCount * 2L )                   )
++      if ( FT_STREAM_SEEK( gvar_start + gvar_head.offsetToCoord )         ||
++           FT_FRAME_ENTER( blend->tuplecount * gvar_head.axisCount * 2L ) )
+         goto Exit;
+ 
+-      for ( i = 0; i < blend->tuplecount; ++i )
+-        for ( j = 0 ; j < (FT_UInt)gvar_head.axisCount; ++j )
++      for ( i = 0; i < blend->tuplecount; i++ )
++        for ( j = 0 ; j < (FT_UInt)gvar_head.axisCount; j++ )
+           blend->tuplecoords[i * gvar_head.axisCount + j] =
+             FT_GET_SHORT() << 2;                /* convert to FT_Fixed */
+ 
+@@ -512,7 +518,7 @@
+     FT_Fixed  apply = 0x10000L;
+ 
+ 
+-    for ( i = 0; i < blend->num_axis; ++i )
++    for ( i = 0; i < blend->num_axis; i++ )
+     {
+       if ( tuple_coords[i] == 0 )
+         /* It's not clear why (for intermediate tuples) we don't need     */
+@@ -662,15 +668,18 @@
+     };
+ 
+ 
++    /* read the font data and set up the internal representation */
++    /* if not already done                                       */
++
+     if ( face->blend == NULL )
+     {
+       /* both `fvar' and `gvar' must be present */
+-      if ( (error = face->goto_table( face, TTAG_gvar,
+-                                      stream, &table_len )) != 0 )
++      if ( ( error = face->goto_table( face, TTAG_gvar,
++                                       stream, &table_len ) ) != 0 )
+         goto Exit;
+ 
+-      if ( (error = face->goto_table( face, TTAG_fvar,
+-                                      stream, &table_len )) != 0 )
++      if ( ( error = face->goto_table( face, TTAG_fvar,
++                                       stream, &table_len ) ) != 0 )
+         goto Exit;
+ 
+       fvar_start = FT_STREAM_POS( );
+@@ -713,6 +722,9 @@
+         goto Exit;
+       face->blend->mmvar = mmvar;
+ 
++      /* set up pointers and offsets into the `mmvar' array; */
++      /* the data gets filled in later on                    */
++
+       mmvar->num_axis =
+         fvar_head.axisCount;
+       mmvar->num_designs =
+@@ -722,30 +734,32 @@
+       mmvar->num_namedstyles =
+         fvar_head.instanceCount;
+       mmvar->axis =
+-        (FT_Var_Axis*)&(mmvar[1]);
++        (FT_Var_Axis*)&( mmvar[1] );
+       mmvar->namedstyle =
+-        (FT_Var_Named_Style*)&(mmvar->axis[fvar_head.axisCount]);
++        (FT_Var_Named_Style*)&( mmvar->axis[fvar_head.axisCount] );
+ 
+       next_coords =
+-        (FT_Fixed*)&(mmvar->namedstyle[fvar_head.instanceCount]);
+-      for ( i = 0; i < fvar_head.instanceCount; ++i )
++        (FT_Fixed*)&( mmvar->namedstyle[fvar_head.instanceCount] );
++      for ( i = 0; i < fvar_head.instanceCount; i++ )
+       {
+         mmvar->namedstyle[i].coords  = next_coords;
+         next_coords                 += fvar_head.axisCount;
+       }
+ 
+       next_name = (FT_String*)next_coords;
+-      for ( i = 0; i < fvar_head.axisCount; ++i )
++      for ( i = 0; i < fvar_head.axisCount; i++ )
+       {
+         mmvar->axis[i].name  = next_name;
+         next_name           += 5;
+       }
+ 
++      /* now fill in the data */
++
+       if ( FT_STREAM_SEEK( fvar_start + fvar_head.offsetToData ) )
+         goto Exit;
+ 
+       a = mmvar->axis;
+-      for ( i = 0; i < fvar_head.axisCount; ++i )
++      for ( i = 0; i < fvar_head.axisCount; i++ )
+       {
+         GX_FVar_Axis  axis_rec;
+ 
+@@ -762,13 +776,13 @@
+         a->name[1] = (FT_String)( ( a->tag >> 16 ) & 0xFF );
+         a->name[2] = (FT_String)( ( a->tag >>  8 ) & 0xFF );
+         a->name[3] = (FT_String)( ( a->tag       ) & 0xFF );
+-        a->name[4] = 0;
++        a->name[4] = '\0';
+ 
+-        ++a;
++        a++;
+       }
+ 
+       ns = mmvar->namedstyle;
+-      for ( i = 0; i < fvar_head.instanceCount; ++i, ++ns )
++      for ( i = 0; i < fvar_head.instanceCount; i++, ns++ )
+       {
+         if ( FT_FRAME_ENTER( 4L + 4L * fvar_head.axisCount ) )
+           goto Exit;
+@@ -776,13 +790,15 @@
+         ns->strid       =    FT_GET_USHORT();
+         (void) /* flags = */ FT_GET_USHORT();
+ 
+-        for ( j = 0; j < fvar_head.axisCount; ++j )
++        for ( j = 0; j < fvar_head.axisCount; j++ )
+           ns->coords[j] = FT_GET_LONG();
+ 
+         FT_FRAME_EXIT();
+       }
+     }
+ 
++    /* fill the output array if requested */
++
+     if ( master != NULL )
+     {
+       FT_UInt  n;
+@@ -793,36 +809,36 @@
+       FT_MEM_COPY( mmvar, face->blend->mmvar, face->blend->mmvar_len );
+ 
+       mmvar->axis =
+-        (FT_Var_Axis*)&(mmvar[1]);
++        (FT_Var_Axis*)&( mmvar[1] );
+       mmvar->namedstyle =
+-        (FT_Var_Named_Style*)&(mmvar->axis[mmvar->num_axis]);
++        (FT_Var_Named_Style*)&( mmvar->axis[mmvar->num_axis] );
+       next_coords =
+-        (FT_Fixed*)&(mmvar->namedstyle[mmvar->num_namedstyles]);
++        (FT_Fixed*)&( mmvar->namedstyle[mmvar->num_namedstyles] );
+ 
+-      for ( n = 0; n < mmvar->num_namedstyles; ++n )
++      for ( n = 0; n < mmvar->num_namedstyles; n++ )
+       {
+         mmvar->namedstyle[n].coords  = next_coords;
+         next_coords                 += mmvar->num_axis;
+       }
+ 
+-      a = mmvar->axis;
++      a         = mmvar->axis;
+       next_name = (FT_String*)next_coords;
+-      for ( n = 0; n < mmvar->num_axis; ++n )
++      for ( n = 0; n < mmvar->num_axis; n++ )
+       {
+         a->name = next_name;
+ 
+         /* standard PostScript names for some standard apple tags */
+         if ( a->tag == TTAG_wght )
+-          a->name = (char *)"Weight";
++          a->name = (char*)"Weight";
+         else if ( a->tag == TTAG_wdth )
+-          a->name = (char *)"Width";
++          a->name = (char*)"Width";
+         else if ( a->tag == TTAG_opsz )
+-          a->name = (char *)"OpticalSize";
++          a->name = (char*)"OpticalSize";
+         else if ( a->tag == TTAG_slnt )
+-          a->name = (char *)"Slant";
++          a->name = (char*)"Slant";
+ 
+         next_name += 5;
+-        ++a;
++        a++;
+       }
+ 
+       *master = mmvar;
+@@ -850,7 +866,7 @@
+   /* <Input>                                                               */
+   /*    num_coords :: Must be the axis count of the font.                  */
+   /*                                                                       */
+-  /*    coords     :: An array of num_coords, each between [-1,1].         */
++  /*    coords     :: An array of `num_coords', each between [-1,1].       */
+   /*                                                                       */
+   /* <Return>                                                              */
+   /*    FreeType error code.  0 means success.                             */
+@@ -879,7 +895,7 @@
+ 
+     if ( face->blend == NULL )
+     {
+-      if ( (error = TT_Get_MM_Var( face, NULL)) != 0 )
++      if ( ( error = TT_Get_MM_Var( face, NULL ) ) != 0 )
+         goto Exit;
+     }
+ 
+@@ -892,7 +908,7 @@
+       goto Exit;
+     }
+ 
+-    for ( i = 0; i < num_coords; ++i )
++    for ( i = 0; i < num_coords; i++ )
+       if ( coords[i] < -0x00010000L || coords[i] > 0x00010000L )
+       {
+         error = FT_THROW( Invalid_Argument );
+@@ -900,7 +916,7 @@
+       }
+ 
+     if ( blend->glyphoffsets == NULL )
+-      if ( (error = ft_var_load_gvar( face )) != 0 )
++      if ( ( error = ft_var_load_gvar( face ) ) != 0 )
+         goto Exit;
+ 
+     if ( blend->normalizedcoords == NULL )
+@@ -917,7 +933,8 @@
+     else
+     {
+       manageCvt = mcvt_retain;
+-      for ( i = 0; i < num_coords; ++i )
++
++      for ( i = 0; i < num_coords; i++ )
+       {
+         if ( blend->normalizedcoords[i] != coords[i] )
+         {
+@@ -1008,7 +1025,7 @@
+ 
+     if ( face->blend == NULL )
+     {
+-      if ( (error = TT_Get_MM_Var( face, NULL )) != 0 )
++      if ( ( error = TT_Get_MM_Var( face, NULL ) ) != 0 )
+         goto Exit;
+     }
+ 
+@@ -1029,7 +1046,7 @@
+       goto Exit;
+ 
+     a = mmvar->axis;
+-    for ( i = 0; i < mmvar->num_axis; ++i, ++a )
++    for ( i = 0; i < mmvar->num_axis; i++, a++ )
+     {
+       if ( coords[i] > a->maximum || coords[i] < a->minimum )
+       {
+@@ -1038,11 +1055,13 @@
+       }
+ 
+       if ( coords[i] < a->def )
+-        normalized[i] = -FT_DivFix( coords[i] - a->def, a->minimum - a->def );
++        normalized[i] = -FT_DivFix( coords[i] - a->def,
++                                    a->minimum - a->def );
+       else if ( a->maximum == a->def )
+         normalized[i] = 0;
+       else
+-        normalized[i] = FT_DivFix( coords[i] - a->def, a->maximum - a->def );
++        normalized[i] = FT_DivFix( coords[i] - a->def,
++                                   a->maximum - a->def );
+     }
+ 
+     if ( !blend->avar_checked )
+@@ -1051,9 +1070,9 @@
+     if ( blend->avar_segment != NULL )
+     {
+       av = blend->avar_segment;
+-      for ( i = 0; i < mmvar->num_axis; ++i, ++av )
++      for ( i = 0; i < mmvar->num_axis; i++, av++ )
+       {
+-        for ( j = 1; j < (FT_UInt)av->pairCount; ++j )
++        for ( j = 1; j < (FT_UInt)av->pairCount; j++ )
+           if ( normalized[i] < av->correspondence[j].fromCoord )
+           {
+             normalized[i] =
+@@ -1181,7 +1200,7 @@
+     /* tuplecount, but John Jenkins says that shared points don't apply */
+     /* to `cvar', and no other flags are defined.                       */
+ 
+-    for ( i = 0; i < ( tupleCount & 0xFFF ); ++i )
++    for ( i = 0; i < ( tupleCount & 0xFFF ); i++ )
+     {
+       FT_UInt   tupleDataSize;
+       FT_UInt   tupleIndex;
+@@ -1196,7 +1215,7 @@
+ 
+       if ( tupleIndex & GX_TI_EMBEDDED_TUPLE_COORD )
+       {
+-        for ( j = 0; j < blend->num_axis; ++j )
++        for ( j = 0; j < blend->num_axis; j++ )
+           tuple_coords[j] = FT_GET_SHORT() << 2; /* convert from        */
+                                                  /* short frac to fixed */
+       }
+@@ -1205,7 +1224,7 @@
+         /* skip this tuple; it makes no sense */
+ 
+         if ( tupleIndex & GX_TI_INTERMEDIATE_TUPLE )
+-          for ( j = 0; j < 2 * blend->num_axis; ++j )
++          for ( j = 0; j < 2 * blend->num_axis; j++ )
+             (void)FT_GET_SHORT();
+ 
+         offsetToData += tupleDataSize;
+@@ -1214,9 +1233,9 @@
+ 
+       if ( tupleIndex & GX_TI_INTERMEDIATE_TUPLE )
+       {
+-        for ( j = 0; j < blend->num_axis; ++j )
++        for ( j = 0; j < blend->num_axis; j++ )
+           im_start_coords[j] = FT_GET_SHORT() << 2;
+-        for ( j = 0; j < blend->num_axis; ++j )
++        for ( j = 0; j < blend->num_axis; j++ )
+           im_end_coords[j] = FT_GET_SHORT() << 2;
+       }
+ 
+@@ -1244,22 +1263,23 @@
+                                              point_count == 0 ? face->cvt_size
+                                                               : point_count );
+       if ( localpoints == NULL || deltas == NULL )
+-        /* failure, ignore it */;
++        ; /* failure, ignore it */
+ 
+       else if ( localpoints == ALL_POINTS )
+       {
+         /* this means that there are deltas for every entry in cvt */
+-        for ( j = 0; j < face->cvt_size; ++j )
++        for ( j = 0; j < face->cvt_size; j++ )
+           face->cvt[j] = (FT_Short)( face->cvt[j] +
+                                      FT_MulFix( deltas[j], apply ) );
+       }
+ 
+       else
+       {
+-        for ( j = 0; j < point_count; ++j )
++        for ( j = 0; j < point_count; j++ )
+         {
+           int  pindex = localpoints[j];
+ 
++
+           face->cvt[pindex] = (FT_Short)( face->cvt[pindex] +
+                                           FT_MulFix( deltas[j], apply ) );
+         }
+@@ -1378,7 +1398,7 @@
+       FT_Stream_SeekSet( stream, here );
+     }
+ 
+-    for ( i = 0; i < ( tupleCount & GX_TC_TUPLE_COUNT_MASK ); ++i )
++    for ( i = 0; i < ( tupleCount & GX_TC_TUPLE_COUNT_MASK ); i++ )
+     {
+       FT_UInt   tupleDataSize;
+       FT_UInt   tupleIndex;
+@@ -1390,7 +1410,7 @@
+ 
+       if ( tupleIndex & GX_TI_EMBEDDED_TUPLE_COORD )
+       {
+-        for ( j = 0; j < blend->num_axis; ++j )
++        for ( j = 0; j < blend->num_axis; j++ )
+           tuple_coords[j] = FT_GET_SHORT() << 2;  /* convert from        */
+                                                   /* short frac to fixed */
+       }
+@@ -1400,18 +1420,16 @@
+         goto Fail3;
+       }
+       else
+-      {
+         FT_MEM_COPY(
+           tuple_coords,
+-          &blend->tuplecoords[(tupleIndex & 0xFFF) * blend->num_axis],
++          &blend->tuplecoords[( tupleIndex & 0xFFF ) * blend->num_axis],
+           blend->num_axis * sizeof ( FT_Fixed ) );
+-      }
+ 
+       if ( tupleIndex & GX_TI_INTERMEDIATE_TUPLE )
+       {
+-        for ( j = 0; j < blend->num_axis; ++j )
++        for ( j = 0; j < blend->num_axis; j++ )
+           im_start_coords[j] = FT_GET_SHORT() << 2;
+-        for ( j = 0; j < blend->num_axis; ++j )
++        for ( j = 0; j < blend->num_axis; j++ )
+           im_end_coords[j] = FT_GET_SHORT() << 2;
+       }
+ 
+@@ -1455,7 +1473,7 @@
+       else if ( points == ALL_POINTS )
+       {
+         /* this means that there are deltas for every point in the glyph */
+-        for ( j = 0; j < n_points; ++j )
++        for ( j = 0; j < n_points; j++ )
+         {
+           delta_xy[j].x += FT_MulFix( deltas_x[j], apply );
+           delta_xy[j].y += FT_MulFix( deltas_y[j], apply );
+@@ -1464,7 +1482,7 @@
+ 
+       else
+       {
+-        for ( j = 0; j < point_count; ++j )
++        for ( j = 0; j < point_count; j++ )
+         {
+           if ( localpoints[j] >= n_points )
+             continue;
+@@ -1510,7 +1528,7 @@
+   /*    tt_done_blend                                                      */
+   /*                                                                       */
+   /* <Description>                                                         */
+-  /*    Frees the blend internal data structure.                           */
++  /*    Free the blend internal data structure.                            */
+   /*                                                                       */
+   FT_LOCAL_DEF( void )
+   tt_done_blend( FT_Memory  memory,
+@@ -1526,7 +1544,7 @@
+ 
+       if ( blend->avar_segment != NULL )
+       {
+-        for ( i = 0; i < blend->num_axis; ++i )
++        for ( i = 0; i < blend->num_axis; i++ )
+           FT_FREE( blend->avar_segment[i].correspondence );
+         FT_FREE( blend->avar_segment );
+       }
+-- 
+2.3.4
+
+From eee7d8baa156f8488e1351b84bb2f8ebf20fec82 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Tue, 10 Mar 2015 11:15:15 +0100
+Subject: [PATCH] [base] Rename `FT_Bitmap_New' to `FT_Bitmap_Init'.
+
+* include/ftbitmap.h, src/base/ftbitmap.c: Implement it.
+Update all callers.
+
+* docs/CHANGES: Updated.
+---
+ ChangeLog           |  9 +++++++++
+ docs/CHANGES        |  6 ++++++
+ include/ftbitmap.h  | 12 ++++++++++--
+ src/base/ftbitmap.c | 14 ++++++++++++--
+ src/base/ftglyph.c  |  2 +-
+ src/base/ftobjs.c   |  2 +-
+ src/sfnt/ttsbit.c   |  2 +-
+ 7 files changed, 40 insertions(+), 7 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index d242616..c9d5ece 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,12 @@
++2015-03-10  Werner Lemberg  <wl@gnu.org>
++
++	[base] Rename `FT_Bitmap_New' to `FT_Bitmap_Init'.
++
++	* include/ftbitmap.h, src/base/ftbitmap.c: Implement it.
++	Update all callers.
++
++	* docs/CHANGES: Updated.
++
+ 2015-03-06  Werner Lemberg  <wl@gnu.org>
+ 
+ 	* src/sfnt/ttload.c (tt_face_load_font_dir): Fix compiler warning.
+diff --git a/docs/CHANGES b/docs/CHANGES
+index 352563d..02dd5bd 100644
+--- a/docs/CHANGES
++++ b/docs/CHANGES
+@@ -21,6 +21,8 @@ CHANGES BETWEEN 2.5.5 and 2.6
+       need the lock  to be held as  long as the same  `FT_Face' is not
+       used from multiple threads at the same time.
+ 
++    - Thai script support has been added to the auto-hinter.
++
+ 
+   III. MISCELLANEOUS
+ 
+@@ -32,6 +34,10 @@ CHANGES BETWEEN 2.5.5 and 2.6
+       This  change doesn't  break  the ABI;  however,  it might  cause
+       compiler warnings.
+ 
++    - Function `FT_Bitmap_New'  has been renamed to  `FT_Bitmap_Init',
++      since this  name better  reflects its  function.   For backwards
++      compatibility, the old function name is still available.
++
+ 
+ ======================================================================
+ 
+diff --git a/include/ftbitmap.h b/include/ftbitmap.h
+index 4a1e83c..46cc47b 100644
+--- a/include/ftbitmap.h
++++ b/include/ftbitmap.h
+@@ -55,7 +55,7 @@ FT_BEGIN_HEADER
+   /*************************************************************************/
+   /*                                                                       */
+   /* <Function>                                                            */
+-  /*    FT_Bitmap_New                                                      */
++  /*    FT_Bitmap_Init                                                     */
+   /*                                                                       */
+   /* <Description>                                                         */
+   /*    Initialize a pointer to an @FT_Bitmap structure.                   */
+@@ -63,6 +63,14 @@ FT_BEGIN_HEADER
+   /* <InOut>                                                               */
+   /*    abitmap :: A pointer to the bitmap structure.                      */
+   /*                                                                       */
++  /* <Note>                                                                */
++  /*    A deprecated name for the same function is `FT_Bitmap_New'.        */
++  /*                                                                       */
++  FT_EXPORT( void )
++  FT_Bitmap_Init( FT_Bitmap  *abitmap );
++
++
++  /* deprecated */
+   FT_EXPORT( void )
+   FT_Bitmap_New( FT_Bitmap  *abitmap );
+ 
+@@ -202,7 +210,7 @@ FT_BEGIN_HEADER
+   /*    FT_Bitmap_Done                                                     */
+   /*                                                                       */
+   /* <Description>                                                         */
+-  /*    Destroy a bitmap object created with @FT_Bitmap_New.               */
++  /*    Destroy a bitmap object initialized with @FT_Bitmap_Init.          */
+   /*                                                                       */
+   /* <Input>                                                               */
+   /*    library :: A handle to a library object.                           */
+diff --git a/src/base/ftbitmap.c b/src/base/ftbitmap.c
+index 094a7a1..a54572a 100644
+--- a/src/base/ftbitmap.c
++++ b/src/base/ftbitmap.c
+@@ -31,6 +31,16 @@
+   /* documentation is in ftbitmap.h */
+ 
+   FT_EXPORT_DEF( void )
++  FT_Bitmap_Init( FT_Bitmap  *abitmap )
++  {
++    if ( abitmap )
++      *abitmap = null_bitmap;
++  }
++
++
++  /* deprecated function name; retained for ABI compatibility */
++
++  FT_EXPORT_DEF( void )
+   FT_Bitmap_New( FT_Bitmap  *abitmap )
+   {
+     if ( abitmap )
+@@ -297,7 +307,7 @@
+ 
+ 
+         /* convert to 8bpp */
+-        FT_Bitmap_New( &tmp );
++        FT_Bitmap_Init( &tmp );
+         error = FT_Bitmap_Convert( library, bitmap, &tmp, 1 );
+         if ( error )
+           return error;
+@@ -759,7 +769,7 @@
+       FT_Error   error;
+ 
+ 
+-      FT_Bitmap_New( &bitmap );
++      FT_Bitmap_Init( &bitmap );
+       error = FT_Bitmap_Copy( slot->library, &slot->bitmap, &bitmap );
+       if ( error )
+         return error;
+diff --git a/src/base/ftglyph.c b/src/base/ftglyph.c
+index 2c10a99..d83018f 100644
+--- a/src/base/ftglyph.c
++++ b/src/base/ftglyph.c
+@@ -82,7 +82,7 @@
+     }
+     else
+     {
+-      FT_Bitmap_New( &glyph->bitmap );
++      FT_Bitmap_Init( &glyph->bitmap );
+       error = FT_Bitmap_Copy( library, &slot->bitmap, &glyph->bitmap );
+     }
+ 
+diff --git a/src/base/ftobjs.c b/src/base/ftobjs.c
+index 33d23bf..cf7841f 100644
+--- a/src/base/ftobjs.c
++++ b/src/base/ftobjs.c
+@@ -4123,7 +4123,7 @@
+       FT_Error   err;
+ 
+ 
+-      FT_Bitmap_New( &bitmap );
++      FT_Bitmap_Init( &bitmap );
+ 
+       /* this also converts the bitmap flow to `down' (i.e., pitch > 0) */
+       err = FT_Bitmap_Convert( library, &slot->bitmap, &bitmap, 1 );
+diff --git a/src/sfnt/ttsbit.c b/src/sfnt/ttsbit.c
+index 9f0f452..143f276 100644
+--- a/src/sfnt/ttsbit.c
++++ b/src/sfnt/ttsbit.c
+@@ -1448,7 +1448,7 @@
+       FT_Library  library = face->root.glyph->library;
+ 
+ 
+-      FT_Bitmap_New( &new_map );
++      FT_Bitmap_Init( &new_map );
+ 
+       /* Convert to 8bit grayscale. */
+       error = FT_Bitmap_Convert( library, map, &new_map, 1 );
+-- 
+2.3.4
+
+From 6b832c872d9726fd3f0979b3f95c7fa618fb50f2 Mon Sep 17 00:00:00 2001
+From: Alexei Podtelezhnikov <apodtele@gmail.com>
+Date: Tue, 10 Mar 2015 23:25:49 -0400
+Subject: [PATCH] Fix Savannah bug #44412 (part 1).
+
+* src/base/ftstroke.c (ft_stroker_inside): Handle near U-turns.
+---
+ ChangeLog           | 6 ++++++
+ src/base/ftstroke.c | 4 +++-
+ 2 files changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index c9d5ece..6b7b963 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,9 @@
++2015-03-10  Alexei Podtelezhnikov <apodtele@gmail.com>
++
++	Fix Savannah bug #44412 (part 1).
++
++	* src/base/ftstroke.c (ft_stroker_inside): Handle near U-turns.
++
+ 2015-03-10  Werner Lemberg  <wl@gnu.org>
+ 
+ 	[base] Rename `FT_Bitmap_New' to `FT_Bitmap_Init'.
+diff --git a/src/base/ftstroke.c b/src/base/ftstroke.c
+index 434d0d8..842ee30 100644
+--- a/src/base/ftstroke.c
++++ b/src/base/ftstroke.c
+@@ -999,7 +999,9 @@
+ 
+     /* Only intersect borders if between two lineto's and both */
+     /* lines are long enough (line_length is zero for curves). */
+-    if ( !border->movable || line_length == 0 )
++    /* Also avoid U-turns of nearly 180 degree.                */
++    if ( !border->movable || line_length == 0  ||
++         theta > 0x59C000 || theta < -0x59C000 )
+       intersect = FALSE;
+     else
+     {
+-- 
+2.3.4
+
+From 0633995b558975fabe3082f50836b93d5077a03e Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Wed, 11 Mar 2015 06:30:23 +0100
+Subject: [PATCH] Rename `ftxf86.[ch]' to `ftfntfmt.[ch]'.
+
+CMakeLists.txt, builds/amiga/makefile, builds/amiga/makefile.os4,
+builds/amiga/smakefile, builds/mac/FreeType.m68k_cfm.make.txt,
+builds/mac/FreeType.m68k_far.make.txt,
+builds/mac/FreeType.ppc_carbon.make.txt,
+builds/mac/FreeType.ppc_classic.make.txt, builds/symbian/bld.inf,
+builds/symbian/freetype.mmp, builds/wince/vc2005-ce/freetype.vcproj,
+builds/wince/vc2008-ce/freetype.vcproj,
+builds/windows/vc2005/freetype.vcproj,
+builds/windows/vc2008/freetype.vcproj,
+builds/windows/vc2010/freetype.vcxproj,
+builds/windows/vc2010/freetype.vcxproj.filters,
+builds/windows/visualc/freetype.dsp,
+builds/windows/visualc/freetype.vcproj,
+builds/windows/visualce/freetype.dsp,
+builds/windows/visualce/freetype.vcproj, docs/INSTALL.ANY,
+include/config/ftheader.h, include/ftfntfmt.h, modules.cfg,
+src/base/ftfntfmt.c, vms_make.com: Updated.
+---
+ CMakeLists.txt                                 |  2 +-
+ ChangeLog                                      | 22 +++++++
+ builds/amiga/makefile                          | 16 ++---
+ builds/amiga/makefile.os4                      | 16 ++---
+ builds/amiga/smakefile                         | 10 +--
+ builds/mac/FreeType.m68k_cfm.make.txt          |  6 +-
+ builds/mac/FreeType.m68k_far.make.txt          |  6 +-
+ builds/mac/FreeType.ppc_carbon.make.txt        |  6 +-
+ builds/mac/FreeType.ppc_classic.make.txt       |  6 +-
+ builds/symbian/bld.inf                         |  2 +-
+ builds/symbian/freetype.mmp                    |  1 +
+ builds/wince/vc2005-ce/freetype.vcproj         |  4 +-
+ builds/wince/vc2008-ce/freetype.vcproj         |  8 +--
+ builds/windows/vc2005/freetype.vcproj          |  4 +-
+ builds/windows/vc2008/freetype.vcproj          |  8 +--
+ builds/windows/vc2010/freetype.vcxproj         |  2 +-
+ builds/windows/vc2010/freetype.vcxproj.filters |  6 +-
+ builds/windows/visualc/freetype.dsp            |  8 +--
+ builds/windows/visualc/freetype.vcproj         |  8 +--
+ builds/windows/visualce/freetype.dsp           |  8 +--
+ builds/windows/visualce/freetype.vcproj        |  8 +--
+ docs/INSTALL.ANY                               |  2 +-
+ include/config/ftheader.h                      |  2 +-
+ include/ftfntfmt.h                             | 84 ++++++++++++++++++++++++++
+ include/ftxf86.h                               | 84 --------------------------
+ modules.cfg                                    | 10 +--
+ src/base/ftfntfmt.c                            | 40 ++++++++++++
+ src/base/ftxf86.c                              | 40 ------------
+ vms_make.com                                   |  4 +-
+ 29 files changed, 223 insertions(+), 200 deletions(-)
+ create mode 100644 include/ftfntfmt.h
+ delete mode 100644 include/ftxf86.h
+ create mode 100644 src/base/ftfntfmt.c
+ delete mode 100644 src/base/ftxf86.c
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 6954dc9..edb116b 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -135,6 +135,7 @@ set(BASE_SRCS
+   src/base/ftcid.c
+   src/base/ftdbgmem.c
+   src/base/ftdebug.c
++  src/base/ftfntfmt.c
+   src/base/ftfstype.c
+   src/base/ftgasp.c
+   src/base/ftgloadr.c
+@@ -158,7 +159,6 @@ set(BASE_SRCS
+   src/base/fttype1.c
+   src/base/ftutil.c
+   src/base/ftwinfnt.c
+-  src/base/ftxf86.c
+   src/bdf/bdf.c
+   src/bzip2/ftbzip2.c
+   src/cache/ftcache.c
+diff --git a/ChangeLog b/ChangeLog
+index 6b7b963..37bcd90 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,25 @@
++2015-03-11  Werner Lemberg  <wl@gnu.org>
++
++	Rename `ftxf86.[ch]' to `ftfntfmt.[ch]'.
++
++	CMakeLists.txt, builds/amiga/makefile, builds/amiga/makefile.os4,
++	builds/amiga/smakefile, builds/mac/FreeType.m68k_cfm.make.txt,
++	builds/mac/FreeType.m68k_far.make.txt,
++	builds/mac/FreeType.ppc_carbon.make.txt,
++	builds/mac/FreeType.ppc_classic.make.txt, builds/symbian/bld.inf,
++	builds/symbian/freetype.mmp, builds/wince/vc2005-ce/freetype.vcproj,
++	builds/wince/vc2008-ce/freetype.vcproj,
++	builds/windows/vc2005/freetype.vcproj,
++	builds/windows/vc2008/freetype.vcproj,
++	builds/windows/vc2010/freetype.vcxproj,
++	builds/windows/vc2010/freetype.vcxproj.filters,
++	builds/windows/visualc/freetype.dsp,
++	builds/windows/visualc/freetype.vcproj,
++	builds/windows/visualce/freetype.dsp,
++	builds/windows/visualce/freetype.vcproj, docs/INSTALL.ANY,
++	include/config/ftheader.h, include/ftfntfmt.h, modules.cfg,
++	src/base/ftfntfmt.c, vms_make.com: Updated.
++
+ 2015-03-10  Alexei Podtelezhnikov <apodtele@gmail.com>
+ 
+ 	Fix Savannah bug #44412 (part 1).
+diff --git a/builds/amiga/makefile b/builds/amiga/makefile
+index 89e3e77..bcb45b9 100644
+--- a/builds/amiga/makefile
++++ b/builds/amiga/makefile
+@@ -96,6 +96,9 @@ ftbitmap.ppc.o: $(FTSRC)/base/ftbitmap.c
+ ftcid.ppc.o: $(FTSRC)/base/ftcid.c
+ 	$(CC) -c $(CFLAGS) -o $@ $<
+ 
++ftfntfmt.ppc.o: $(FTSRC)/base/ftfntfmt.c
++	$(CC) -c $(CFLAGS) -o $@ $<
++
+ ftfstype.ppc.o: $(FTSRC)/base/ftfstype.c
+ 	$(CC) -c $(CFLAGS) -o $@ $<
+ 
+@@ -135,9 +138,6 @@ fttype1.ppc.o: $(FTSRC)/base/fttype1.c
+ ftwinfnt.ppc.o: $(FTSRC)/base/ftwinfnt.c
+ 	$(CC) -c $(CFLAGS) -o $@ $<
+ 
+-ftxf86.ppc.o: $(FTSRC)/base/ftxf86.c
+-	$(CC) -c $(CFLAGS) -o $@ $<
+-
+ #
+ # FreeType2 library autofitting module
+ #
+@@ -269,11 +269,11 @@ gxvalid.ppc.o: $(FTSRC)/gxvalid/gxvalid.c
+ otvalid.ppc.o: $(FTSRC)/otvalid/otvalid.c
+ 	$(CC) -c $(CFLAGS) -o $@ $<
+ 
+-BASEPPC = ftbase.ppc.o ftbbox.ppc.o ftbdf.ppc.o ftbitmap.ppc.o ftcid.ppc.o   \
+-	  ftfstype.ppc.o ftgasp.ppc.o ftglyph.ppc.o ftgxval.ppc.o            \
+-	  ftlcdfil.ppc.o ftmm.ppc.o ftotval.ppc.o ftpatent.ppc.o ftpfr.ppc.o \
+-	  ftstroke.ppc.o ftsynth.ppc.o fttype1.ppc.o ftwinfnt.ppc.o          \
+-	  ftxf86.ppc.o
++BASEPPC = ftbase.ppc.o ftbbox.ppc.o ftbdf.ppc.o ftbitmap.ppc.o ftcid.ppc.o \
++	  ftfntfmt.ppc.oftfstype.ppc.o ftgasp.ppc.o ftglyph.ppc.o          \
++	  ftgxval.ppc.o ftlcdfil.ppc.o ftmm.ppc.o ftotval.ppc.o            \
++	  ftpatent.ppc.o ftpfr.ppc.o ftstroke.ppc.o ftsynth.ppc.o          \
++	  fttype1.ppc.o ftwinfnt.ppc.o
+ 
+ DEBUGPPC = ftdebug.ppc.o ftdebugpure.ppc.o
+ 
+diff --git a/builds/amiga/makefile.os4 b/builds/amiga/makefile.os4
+index f602e73..481fe59 100644
+--- a/builds/amiga/makefile.os4
++++ b/builds/amiga/makefile.os4
+@@ -99,6 +99,9 @@ ftdebug.ppc.o: FT:src/base/ftdebug.c
+ ftdebugpure.ppc.o: src/base/ftdebug.c
+ 	$(CC) -c $(CFLAGS) -o $@ src/base/ftdebug.c
+ 
++ftfntfmt.ppc.o: FT:src/base/ftfntfmt.c
++	$(CC) -c $(CFLAGS) -o $@ /FT/src/base/ftfntfmt.c
++
+ ftfstype.ppc.o: FT:src/base/ftfstype.c
+ 	$(CC) -c $(CFLAGS) -o $@ /FT/src/base/ftfstype.c
+ 
+@@ -138,9 +141,6 @@ fttype1.ppc.o: FT:src/base/fttype1.c
+ ftwinfnt.ppc.o: FT:src/base/ftwinfnt.c
+ 	$(CC) -c $(CFLAGS) -o $@ /FT/src/base/ftwinfnt.c
+ 
+-ftxf86.ppc.o: FT:src/base/ftxf86.c
+-	$(CC) -c $(CFLAGS) -o $@ /FT/src/base/ftxf86.c
+-
+ #
+ # FreeType2 library autofitting module
+ #
+@@ -273,11 +273,11 @@ gxvalid.ppc.o: FT:src/gxvalid/gxvalid.c
+ otvalid.ppc.o: FT:src/otvalid/otvalid.c
+ 	$(CC) -c $(CFLAGS) -o $@ /FT/src/otvalid/otvalid.c
+ 
+-BASE = ftbase.ppc.o ftbbox.ppc.o ftbdf.ppc.o ftbitmap.ppc.o ftcid.ppc.o   \
+-       ftfstype.ppc.o ftgasp.ppc.o ftglyph.ppc.o ftgxval.ppc.o            \
+-       ftlcdfil.ppc.o ftmm.ppc.o ftotval.ppc.o ftpatent.ppc.o ftpfr.ppc.o \
+-       ftstroke.ppc.o ftsynth.ppc.o fttype1.ppc.o ftwinfnt.ppc.o          \
+-       ftxf86.ppc.o
++BASE = ftbase.ppc.o ftbbox.ppc.o ftbdf.ppc.o ftbitmap.ppc.o ftcid.ppc.o \
++       ftfntfmt.ppc.o ftfstype.ppc.o ftgasp.ppc.o ftglyph.ppc.o         \
++       ftgxval.ppc.o ftlcdfil.ppc.o ftmm.ppc.o ftotval.ppc.o            \
++       ftpatent.ppc.o ftpfr.ppc.o ftstroke.ppc.o ftsynth.ppc.o          \
++       fttype1.ppc.o ftwinfnt.ppc.o
+ 
+ DEBUG = ftdebug.ppc.o ftdebugpure.ppc.o
+ 
+diff --git a/builds/amiga/smakefile b/builds/amiga/smakefile
+index 2b82ac6..156beb2 100644
+--- a/builds/amiga/smakefile
++++ b/builds/amiga/smakefile
+@@ -42,9 +42,9 @@
+ # (and either ftdebug.o or ftdebugpure.o if you enabled FT_DEBUG_LEVEL_ERROR or
+ # FT_DEBUG_LEVEL_TRACE in include/config/ftoption.h).
+ 
+-OBJBASE = ftbase.o ftbbox.o ftbdf.o ftbitmap.o ftcid.o ftfstype.o ftgasp.o   \
+-	  ftglyph.o ftgxval.o ftlcdfil.o ftmm.o ftotval.o ftpatent.o ftpfr.o \
+-	  ftstroke.o ftsynth.o fttype1.o ftwinfnt.o ftxf86.o
++OBJBASE = ftbase.o ftbbox.o ftbdf.o ftbitmap.o ftcid.o ftfntfmt.o ftfstype.o \
++	  ftgasp.o ftglyph.o ftgxval.o ftlcdfil.o ftmm.o ftotval.o           \
++	  ftpatent.o ftpfr.o ftstroke.o ftsynth.o fttype1.o ftwinfnt.o
+ 
+ OBJSYSTEM = ftsystem.o ftsystempure.o
+ 
+@@ -133,6 +133,8 @@ ftbitmap.o: $(CORE)base/ftbitmap.c
+ 	sc $(SCFLAGS) objname=$@ $<
+ ftcid.o: $(CORE)base/ftcid.c
+ 	sc $(SCFLAGS) objname=$@ $<
++ftfntfmt.o: $(CORE)base/ftfntfmt.c
++	sc $(SCFLAGS) objname=$@ $<
+ ftfstype.o: $(CORE)base/ftfstype.c
+ 	sc $(SCFLAGS) objname=$@ $<
+ ftgasp.o: $(CORE)base/ftgasp.c
+@@ -159,8 +161,6 @@ fttype1.o: $(CORE)base/fttype1.c
+ 	sc $(SCFLAGS) objname=$@ $<
+ ftwinfnt.o: $(CORE)base/ftwinfnt.c
+ 	sc $(SCFLAGS) objname=$@ $<
+-ftxf86.o: $(CORE)base/ftxf86.c
+-	sc $(SCFLAGS) objname=$@ $<
+ 
+ #
+ # freetype library autofitter module
+diff --git a/builds/mac/FreeType.m68k_cfm.make.txt b/builds/mac/FreeType.m68k_cfm.make.txt
+index 425f9f9..c0a55f5 100644
+--- a/builds/mac/FreeType.m68k_cfm.make.txt
++++ b/builds/mac/FreeType.m68k_cfm.make.txt
+@@ -38,6 +38,7 @@ SrcFiles        =  \xB6
+ 				  :src:base:ftbdf.c \xB6
+ 				  :src:base:ftbitmap.c \xB6
+ 				  :src:base:ftdebug.c \xB6
++				  :src:base:ftfntfmt.c \xB6
+ 				  :src:base:ftfstype.c \xB6
+ 				  :src:base:ftglyph.c \xB6
+ 				  :src:base:ftgxval.c \xB6
+@@ -50,7 +51,6 @@ SrcFiles        =  \xB6
+ 				  :src:base:ftsystem.c \xB6
+ 				  :src:base:fttype1.c \xB6
+ 				  :src:base:ftwinfnt.c \xB6
+-				  :src:base:ftxf86.c \xB6
+ 				  :src:cache:ftcache.c \xB6
+ 				  :src:bdf:bdf.c \xB6
+ 				  :src:cff:cff.c \xB6
+@@ -83,6 +83,7 @@ ObjFiles-68K    =  \xB6
+ 				  "{ObjDir}ftbdf.c.o" \xB6
+ 				  "{ObjDir}ftbitmap.c.o" \xB6
+ 				  "{ObjDir}ftdebug.c.o" \xB6
++				  "{ObjDir}ftfntfmt.c.o" \xB6
+ 				  "{ObjDir}ftfstype.c.o" \xB6
+ 				  "{ObjDir}ftglyph.c.o" \xB6
+ 				  "{ObjDir}ftgxval.c.o" \xB6
+@@ -95,7 +96,6 @@ ObjFiles-68K    =  \xB6
+ 				  "{ObjDir}ftsystem.c.o" \xB6
+ 				  "{ObjDir}fttype1.c.o" \xB6
+ 				  "{ObjDir}ftwinfnt.c.o" \xB6
+-				  "{ObjDir}ftxf86.c.o" \xB6
+ 				  "{ObjDir}ftcache.c.o" \xB6
+ 				  "{ObjDir}bdf.c.o" \xB6
+ 				  "{ObjDir}cff.c.o" \xB6
+@@ -161,6 +161,7 @@ FreeType.m68k_cfm.o  \xC4\xC4  {ObjFiles-68K} {LibFiles-68K} {\xA5MondoBuild\xA5
+ "{ObjDir}ftbdf.c.o" \xC4 :src:base:ftbdf.c
+ "{ObjDir}ftbitmap.c.o" \xC4 :src:base:ftbitmap.c
+ "{ObjDir}ftdebug.c.o" \xC4 :src:base:ftdebug.c
++"{ObjDir}ftfntfmt.c.o" \xC4 :src:base:ftfntfmt.c
+ "{ObjDir}ftfstype.c.o" \xC4 :src:base:ftfstype.c
+ "{ObjDir}ftglyph.c.o" \xC4 :src:base:ftglyph.c
+ "{ObjDir}ftgxval.c.o" \xC4 :src:base:ftgxval.c
+@@ -173,7 +174,6 @@ FreeType.m68k_cfm.o  \xC4\xC4  {ObjFiles-68K} {LibFiles-68K} {\xA5MondoBuild\xA5
+ "{ObjDir}ftsystem.c.o" \xC4 :src:base:ftsystem.c
+ "{ObjDir}fttype1.c.o" \xC4 :src:base:fttype1.c
+ "{ObjDir}ftwinfnt.c.o" \xC4 :src:base:ftwinfnt.c
+-"{ObjDir}ftxf86.c.o" \xC4 :src:base:ftxf86.c
+ "{ObjDir}ftcache.c.o" \xC4 :src:cache:ftcache.c
+ "{ObjDir}bdf.c.o" \xC4 :src:bdf:bdf.c
+ "{ObjDir}cff.c.o" \xC4 :src:cff:cff.c
+diff --git a/builds/mac/FreeType.m68k_far.make.txt b/builds/mac/FreeType.m68k_far.make.txt
+index ebf5a1b..e9b7f6f 100644
+--- a/builds/mac/FreeType.m68k_far.make.txt
++++ b/builds/mac/FreeType.m68k_far.make.txt
+@@ -37,6 +37,7 @@ SrcFiles        =  \xB6
+ 				  :src:base:ftbdf.c \xB6
+ 				  :src:base:ftbitmap.c \xB6
+ 				  :src:base:ftdebug.c \xB6
++				  :src:base:ftfntfmt.c \xB6
+ 				  :src:base:ftfstype.c \xB6
+ 				  :src:base:ftglyph.c \xB6
+ 				  :src:base:ftgxval.c \xB6
+@@ -49,7 +50,6 @@ SrcFiles        =  \xB6
+ 				  :src:base:ftsystem.c \xB6
+ 				  :src:base:fttype1.c \xB6
+ 				  :src:base:ftwinfnt.c \xB6
+-				  :src:base:ftxf86.c \xB6
+ 				  :src:cache:ftcache.c \xB6
+ 				  :src:bdf:bdf.c \xB6
+ 				  :src:cff:cff.c \xB6
+@@ -82,6 +82,7 @@ ObjFiles-68K    =  \xB6
+ 				  "{ObjDir}ftbdf.c.o" \xB6
+ 				  "{ObjDir}ftbitmap.c.o" \xB6
+ 				  "{ObjDir}ftdebug.c.o" \xB6
++				  "{ObjDir}ftfntfmt.c.o" \xB6
+ 				  "{ObjDir}ftfstype.c.o" \xB6
+ 				  "{ObjDir}ftglyph.c.o" \xB6
+ 				  "{ObjDir}ftgxval.c.o" \xB6
+@@ -94,7 +95,6 @@ ObjFiles-68K    =  \xB6
+ 				  "{ObjDir}ftsystem.c.o" \xB6
+ 				  "{ObjDir}fttype1.c.o" \xB6
+ 				  "{ObjDir}ftwinfnt.c.o" \xB6
+-				  "{ObjDir}ftxf86.c.o" \xB6
+ 				  "{ObjDir}ftcache.c.o" \xB6
+ 				  "{ObjDir}bdf.c.o" \xB6
+ 				  "{ObjDir}cff.c.o" \xB6
+@@ -160,6 +160,7 @@ FreeType.m68k_far.o  \xC4\xC4  {ObjFiles-68K} {LibFiles-68K} {\xA5MondoBuild\xA5
+ "{ObjDir}ftbdf.c.o" \xC4 :src:base:ftbdf.c
+ "{ObjDir}ftbitmap.c.o" \xC4 :src:base:ftbitmap.c
+ "{ObjDir}ftdebug.c.o" \xC4 :src:base:ftdebug.c
++"{ObjDir}ftfntfmt.c.o" \xC4 :src:base:ftfntfmt.c
+ "{ObjDir}ftfstype.c.o" \xC4 :src:base:ftfstype.c
+ "{ObjDir}ftglyph.c.o" \xC4 :src:base:ftglyph.c
+ "{ObjDir}ftgxval.c.o" \xC4 :src:base:ftgxval.c
+@@ -172,7 +173,6 @@ FreeType.m68k_far.o  \xC4\xC4  {ObjFiles-68K} {LibFiles-68K} {\xA5MondoBuild\xA5
+ "{ObjDir}ftsystem.c.o" \xC4 :src:base:ftsystem.c
+ "{ObjDir}fttype1.c.o" \xC4 :src:base:fttype1.c
+ "{ObjDir}ftwinfnt.c.o" \xC4 :src:base:ftwinfnt.c
+-"{ObjDir}ftxf86.c.o" \xC4 :src:base:ftxf86.c
+ "{ObjDir}ftcache.c.o" \xC4 :src:cache:ftcache.c
+ "{ObjDir}bdf.c.o" \xC4 :src:bdf:bdf.c
+ "{ObjDir}cff.c.o" \xC4 :src:cff:cff.c
+diff --git a/builds/mac/FreeType.ppc_carbon.make.txt b/builds/mac/FreeType.ppc_carbon.make.txt
+index 2926413..9eb1dac 100644
+--- a/builds/mac/FreeType.ppc_carbon.make.txt
++++ b/builds/mac/FreeType.ppc_carbon.make.txt
+@@ -38,6 +38,7 @@ SrcFiles        =  \xB6
+ 				  :src:base:ftbdf.c \xB6
+ 				  :src:base:ftbitmap.c \xB6
+ 				  :src:base:ftdebug.c \xB6
++				  :src:base:ftfntfmt.c \xB6
+ 				  :src:base:ftfstype.c \xB6
+ 				  :src:base:ftglyph.c \xB6
+ 				  :src:base:ftgxval.c \xB6
+@@ -50,7 +51,6 @@ SrcFiles        =  \xB6
+ 				  :src:base:ftsystem.c \xB6
+ 				  :src:base:fttype1.c \xB6
+ 				  :src:base:ftwinfnt.c \xB6
+-				  :src:base:ftxf86.c \xB6
+ 				  :src:cache:ftcache.c \xB6
+ 				  :src:bdf:bdf.c \xB6
+ 				  :src:cff:cff.c \xB6
+@@ -83,6 +83,7 @@ ObjFiles-PPC    =  \xB6
+ 				  "{ObjDir}ftbdf.c.x" \xB6
+ 				  "{ObjDir}ftbitmap.c.x" \xB6
+ 				  "{ObjDir}ftdebug.c.x" \xB6
++				  "{ObjDir}ftfntfmt.c.x" \xB6
+ 				  "{ObjDir}ftfstype.c.x" \xB6
+ 				  "{ObjDir}ftglyph.c.x" \xB6
+ 				  "{ObjDir}ftgxval.c.x" \xB6
+@@ -95,7 +96,6 @@ ObjFiles-PPC    =  \xB6
+ 				  "{ObjDir}ftsystem.c.x" \xB6
+ 				  "{ObjDir}fttype1.c.x" \xB6
+ 				  "{ObjDir}ftwinfnt.c.x" \xB6
+-				  "{ObjDir}ftxf86.c.x" \xB6
+ 				  "{ObjDir}ftcache.c.x" \xB6
+ 				  "{ObjDir}bdf.c.x" \xB6
+ 				  "{ObjDir}cff.c.x" \xB6
+@@ -164,6 +164,7 @@ FreeType.ppc_carbon.o  \xC4\xC4  {ObjFiles-PPC} {LibFiles-PPC} {\xA5MondoBuild\x
+ "{ObjDir}ftbdf.c.x" \xC4 :src:base:ftbdf.c
+ "{ObjDir}ftbitmap.c.x" \xC4 :src:base:ftbitmap.c
+ "{ObjDir}ftdebug.c.x" \xC4 :src:base:ftdebug.c
++"{ObjDir}ftfntfmt.c.x" \xC4 :src:base:ftfntfmt.c
+ "{ObjDir}ftfstype.c.x" \xC4 :src:base:ftfstype.c
+ "{ObjDir}ftglyph.c.x" \xC4 :src:base:ftglyph.c
+ "{ObjDir}ftgxval.c.x" \xC4 :src:base:ftgxval.c
+@@ -176,7 +177,6 @@ FreeType.ppc_carbon.o  \xC4\xC4  {ObjFiles-PPC} {LibFiles-PPC} {\xA5MondoBuild\x
+ "{ObjDir}ftsystem.c.x" \xC4 :src:base:ftsystem.c
+ "{ObjDir}fttype1.c.x" \xC4 :src:base:fttype1.c
+ "{ObjDir}ftwinfnt.c.x" \xC4 :src:base:ftwinfnt.c
+-"{ObjDir}ftxf86.c.x" \xC4 :src:base:ftxf86.c
+ "{ObjDir}ftcache.c.x" \xC4 :src:cache:ftcache.c
+ "{ObjDir}bdf.c.x" \xC4 :src:bdf:bdf.c
+ "{ObjDir}cff.c.x" \xC4 :src:cff:cff.c
+diff --git a/builds/mac/FreeType.ppc_classic.make.txt b/builds/mac/FreeType.ppc_classic.make.txt
+index 377de9a..0627eea 100644
+--- a/builds/mac/FreeType.ppc_classic.make.txt
++++ b/builds/mac/FreeType.ppc_classic.make.txt
+@@ -38,6 +38,7 @@ SrcFiles        =  \xB6
+ 				  :src:base:ftbdf.c \xB6
+ 				  :src:base:ftbitmap.c \xB6
+ 				  :src:base:ftdebug.c \xB6
++				  :src:base:ftfntfmt.c \xB6
+ 				  :src:base:ftfstype.c \xB6
+ 				  :src:base:ftglyph.c \xB6
+ 				  :src:base:ftgxval.c \xB6
+@@ -50,7 +51,6 @@ SrcFiles        =  \xB6
+ 				  :src:base:ftsystem.c \xB6
+ 				  :src:base:fttype1.c \xB6
+ 				  :src:base:ftwinfnt.c \xB6
+-				  :src:base:ftxf86.c \xB6
+ 				  :src:cache:ftcache.c \xB6
+ 				  :src:bdf:bdf.c \xB6
+ 				  :src:cff:cff.c \xB6
+@@ -83,6 +83,7 @@ ObjFiles-PPC    =  \xB6
+ 				  "{ObjDir}ftbdf.c.x" \xB6
+ 				  "{ObjDir}ftbitmap.c.x" \xB6
+ 				  "{ObjDir}ftdebug.c.x" \xB6
++				  "{ObjDir}ftfntfmt.c.x" \xB6
+ 				  "{ObjDir}ftfstype.c.x" \xB6
+ 				  "{ObjDir}ftglyph.c.x" \xB6
+ 				  "{ObjDir}ftgxval.c.x" \xB6
+@@ -95,7 +96,6 @@ ObjFiles-PPC    =  \xB6
+ 				  "{ObjDir}ftsystem.c.x" \xB6
+ 				  "{ObjDir}fttype1.c.x" \xB6
+ 				  "{ObjDir}ftwinfnt.c.x" \xB6
+-				  "{ObjDir}ftxf86.c.x" \xB6
+ 				  "{ObjDir}ftcache.c.x" \xB6
+ 				  "{ObjDir}bdf.c.x" \xB6
+ 				  "{ObjDir}cff.c.x" \xB6
+@@ -164,6 +164,7 @@ FreeType.ppc_classic.o  \xC4\xC4  {ObjFiles-PPC} {LibFiles-PPC} {\xA5MondoBuild\
+ "{ObjDir}ftbdf.c.x" \xC4 :src:base:ftbdf.c
+ "{ObjDir}ftbitmap.c.x" \xC4 :src:base:ftbitmap.c
+ "{ObjDir}ftdebug.c.x" \xC4 :src:base:ftdebug.c
++"{ObjDir}ftfntfmt.c.x" \xC4 :src:base:ftfntfmt.c
+ "{ObjDir}ftfstype.c.x" \xC4 :src:base:ftfstype.c
+ "{ObjDir}ftglyph.c.x" \xC4 :src:base:ftglyph.c
+ "{ObjDir}ftgxval.c.x" \xC4 :src:base:ftgxval.c
+@@ -176,7 +177,6 @@ FreeType.ppc_classic.o  \xC4\xC4  {ObjFiles-PPC} {LibFiles-PPC} {\xA5MondoBuild\
+ "{ObjDir}ftsystem.c.x" \xC4 :src:base:ftsystem.c
+ "{ObjDir}fttype1.c.x" \xC4 :src:base:fttype1.c
+ "{ObjDir}ftwinfnt.c.x" \xC4 :src:base:ftwinfnt.c
+-"{ObjDir}ftxf86.c.x" \xC4 :src:base:ftxf86.c
+ "{ObjDir}ftcache.c.x" \xC4 :src:cache:ftcache.c
+ "{ObjDir}bdf.c.x" \xC4 :src:bdf:bdf.c
+ "{ObjDir}cff.c.x" \xC4 :src:cff:cff.c
+diff --git a/builds/symbian/bld.inf b/builds/symbian/bld.inf
+index 2ab4228..d3637f2 100644
+--- a/builds/symbian/bld.inf
++++ b/builds/symbian/bld.inf
+@@ -32,6 +32,7 @@ PRJ_EXPORTS
+ ../../include/ftcid.h		ftcid.h
+ ../../include/fterrdef.h	fterrdef.h
+ ../../include/fterrors.h	fterrors.h
++../../include/ftfntfmt.h	ftfntfmt.h
+ ../../include/ftgasp.h		ftgasp.h
+ ../../include/ftglyph.h		ftglyph.h
+ ../../include/ftgxval.h		ftgxval.h
+@@ -58,7 +59,6 @@ PRJ_EXPORTS
+ ../../include/fttrigon.h	fttrigon.h
+ ../../include/fttypes.h		fttypes.h
+ ../../include/ftwinfnt.h	ftwinfnt.h
+-../../include/ftxf86.h		ftxf86.h
+ ../../include/t1tables.h	t1tables.h
+ ../../include/ttnameid.h	ttnameid.h
+ ../../include/tttables.h	tttables.h
+diff --git a/builds/symbian/freetype.mmp b/builds/symbian/freetype.mmp
+index 9ccdb68..b7691f0 100644
+--- a/builds/symbian/freetype.mmp
++++ b/builds/symbian/freetype.mmp
+@@ -28,6 +28,7 @@ source ftbbox.c
+ source ftbdf.c
+ source ftbitmap.c
+ source ftcid.c
++source ftfntfmt.c
+ source ftfstype.c
+ source ftgasp.c
+ source ftglyph.c
+diff --git a/builds/wince/vc2005-ce/freetype.vcproj b/builds/wince/vc2005-ce/freetype.vcproj
+index 5614235..2345df4 100644
+--- a/builds/wince/vc2005-ce/freetype.vcproj
++++ b/builds/wince/vc2005-ce/freetype.vcproj
+@@ -2135,6 +2135,8 @@
+         </File>
+         <File RelativePath="..\..\..\src\base\ftcid.c">
+         </File>
++        <File RelativePath="..\..\..\src\base\ftfntfmt.c">
++        </File>
+         <File RelativePath="..\..\..\src\base\ftgxval.c">
+         </File>
+         <File RelativePath="..\..\..\src\base\ftlcdfil.c">
+@@ -2279,8 +2281,6 @@
+         </File>
+         <File RelativePath="..\..\..\src\base\ftwinfnt.c">
+         </File>
+-        <File RelativePath="..\..\..\src\base\ftxf86.c">
+-        </File>
+         <File RelativePath="..\..\..\src\pcf\pcf.c">
+           <FileConfiguration Name="Release|Pocket PC 2003 (ARMV4)">
+             <Tool Name="VCCLCompilerTool" Optimization="2" AdditionalIncludeDirectories="" PreprocessorDefinitions="" />
+diff --git a/builds/wince/vc2008-ce/freetype.vcproj b/builds/wince/vc2008-ce/freetype.vcproj
+index e36ccb0..ad0e695 100644
+--- a/builds/wince/vc2008-ce/freetype.vcproj
++++ b/builds/wince/vc2008-ce/freetype.vcproj
+@@ -7872,6 +7872,10 @@
+ 					>
+ 				</File>
+ 				<File
++					RelativePath="..\..\..\src\base\ftfntfmt.c"
++					>
++				</File>
++				<File
+ 					RelativePath="..\..\..\src\base\ftgxval.c"
+ 					>
+ 				</File>
+@@ -8331,10 +8335,6 @@
+ 					>
+ 				</File>
+ 				<File
+-					RelativePath="..\..\..\src\base\ftxf86.c"
+-					>
+-				</File>
+-				<File
+ 					RelativePath="..\..\..\src\pcf\pcf.c"
+ 					>
+ 					<FileConfiguration
+diff --git a/builds/windows/vc2005/freetype.vcproj b/builds/windows/vc2005/freetype.vcproj
+index 5880b7d..b57965c 100644
+--- a/builds/windows/vc2005/freetype.vcproj
++++ b/builds/windows/vc2005/freetype.vcproj
+@@ -346,6 +346,8 @@
+       <Filter Name="FT_MODULES">
+         <File RelativePath="..\..\..\src\base\ftbbox.c">
+         </File>
++        <File RelativePath="..\..\..\src\base\ftfntfmt.c">
++        </File>
+         <File RelativePath="..\..\..\src\base\ftmm.c">
+           <FileConfiguration Name="Release|Win32">
+             <Tool Name="VCCLCompilerTool" Optimization="2" AdditionalIncludeDirectories="" PreprocessorDefinitions="" />
+@@ -374,8 +376,6 @@
+         </File>
+         <File RelativePath="..\..\..\src\base\ftwinfnt.c">
+         </File>
+-        <File RelativePath="..\..\..\src\base\ftxf86.c">
+-        </File>
+         <File RelativePath="..\..\..\src\base\ftlcdfil.c">
+         </File>
+         <File RelativePath="..\..\..\src\base\ftgxval.c">
+diff --git a/builds/windows/vc2008/freetype.vcproj b/builds/windows/vc2008/freetype.vcproj
+index 95d722b..8ce4316 100644
+--- a/builds/windows/vc2008/freetype.vcproj
++++ b/builds/windows/vc2008/freetype.vcproj
+@@ -1237,6 +1237,10 @@
+ 					>
+ 				</File>
+ 				<File
++					RelativePath="..\..\..\src\base\ftfntfmt.c"
++					>
++				</File>
++				<File
+ 					RelativePath="..\..\..\src\base\ftmm.c"
+ 					>
+ 					<FileConfiguration
+@@ -1320,10 +1324,6 @@
+ 					>
+ 				</File>
+ 				<File
+-					RelativePath="..\..\..\src\base\ftxf86.c"
+-					>
+-				</File>
+-				<File
+ 					RelativePath="..\..\..\src\base\ftlcdfil.c"
+ 					>
+ 				</File>
+diff --git a/builds/windows/vc2010/freetype.vcxproj b/builds/windows/vc2010/freetype.vcxproj
+index 7cafe45..640b4a0 100644
+--- a/builds/windows/vc2010/freetype.vcxproj
++++ b/builds/windows/vc2010/freetype.vcxproj
+@@ -1122,6 +1122,7 @@
+       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+     </ClCompile>
+     <ClCompile Include="..\..\..\src\base\ftbbox.c" />
++    <ClCompile Include="..\..\..\src\base\ftfntfmt.c" />
+     <ClCompile Include="..\..\..\src\base\ftmm.c">
+       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug Multithreaded|Win32'">Disabled</Optimization>
+       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug Multithreaded|x64'">Disabled</Optimization>
+@@ -1170,7 +1171,6 @@
+     <ClCompile Include="..\..\..\src\base\ftsynth.c" />
+     <ClCompile Include="..\..\..\src\base\fttype1.c" />
+     <ClCompile Include="..\..\..\src\base\ftwinfnt.c" />
+-    <ClCompile Include="..\..\..\src\base\ftxf86.c" />
+     <ClCompile Include="..\..\..\src\base\ftlcdfil.c" />
+     <ClCompile Include="..\..\..\src\base\ftgxval.c" />
+     <ClCompile Include="..\..\..\src\base\ftotval.c" />
+diff --git a/builds/windows/vc2010/freetype.vcxproj.filters b/builds/windows/vc2010/freetype.vcxproj.filters
+index 99fc43f..f762b0b 100644
+--- a/builds/windows/vc2010/freetype.vcxproj.filters
++++ b/builds/windows/vc2010/freetype.vcxproj.filters
+@@ -65,6 +65,9 @@
+     <ClCompile Include="..\..\..\src\base\ftbbox.c">
+       <Filter>Source Files\FT_MODULES</Filter>
+     </ClCompile>
++    <ClCompile Include="..\..\..\src\base\ftfntfmt.c">
++      <Filter>Source Files\FT_MODULES</Filter>
++    </ClCompile>
+     <ClCompile Include="..\..\..\src\base\ftmm.c">
+       <Filter>Source Files\FT_MODULES</Filter>
+     </ClCompile>
+@@ -80,9 +83,6 @@
+     <ClCompile Include="..\..\..\src\base\ftwinfnt.c">
+       <Filter>Source Files\FT_MODULES</Filter>
+     </ClCompile>
+-    <ClCompile Include="..\..\..\src\base\ftxf86.c">
+-      <Filter>Source Files\FT_MODULES</Filter>
+-    </ClCompile>
+     <ClCompile Include="..\..\..\src\base\ftlcdfil.c">
+       <Filter>Source Files\FT_MODULES</Filter>
+     </ClCompile>
+diff --git a/builds/windows/visualc/freetype.dsp b/builds/windows/visualc/freetype.dsp
+index cf76f7c..fa5c52b 100644
+--- a/builds/windows/visualc/freetype.dsp
++++ b/builds/windows/visualc/freetype.dsp
+@@ -226,6 +226,10 @@ SOURCE=..\..\..\src\base\ftbitmap.c
+ # End Source File
+ # Begin Source File
+ 
++SOURCE=..\..\..\src\base\ftfntfmt.c
++# End Source File
++# Begin Source File
++
+ SOURCE=..\..\..\src\base\ftfstype.c
+ # End Source File
+ # Begin Source File
+@@ -301,10 +305,6 @@ SOURCE=..\..\..\src\base\ftwinfnt.c
+ # End Source File
+ # Begin Source File
+ 
+-SOURCE=..\..\..\src\base\ftxf86.c
+-# End Source File
+-# Begin Source File
+-
+ SOURCE=..\..\..\src\pcf\pcf.c
+ # SUBTRACT CPP /Fr
+ # End Source File
+diff --git a/builds/windows/visualc/freetype.vcproj b/builds/windows/visualc/freetype.vcproj
+index a71a0e9..8edb3ad 100644
+--- a/builds/windows/visualc/freetype.vcproj
++++ b/builds/windows/visualc/freetype.vcproj
+@@ -1236,6 +1236,10 @@
+ 					>
+ 				</File>
+ 				<File
++					RelativePath="..\..\..\src\base\ftfntfmt.c"
++					>
++				</File>
++				<File
+ 					RelativePath="..\..\..\src\base\ftmm.c"
+ 					>
+ 					<FileConfiguration
+@@ -1319,10 +1323,6 @@
+ 					>
+ 				</File>
+ 				<File
+-					RelativePath="..\..\..\src\base\ftxf86.c"
+-					>
+-				</File>
+-				<File
+ 					RelativePath="..\..\..\src\base\ftlcdfil.c"
+ 					>
+ 				</File>
+diff --git a/builds/windows/visualce/freetype.dsp b/builds/windows/visualce/freetype.dsp
+index cf76f7c..fa5c52b 100644
+--- a/builds/windows/visualce/freetype.dsp
++++ b/builds/windows/visualce/freetype.dsp
+@@ -226,6 +226,10 @@ SOURCE=..\..\..\src\base\ftbitmap.c
+ # End Source File
+ # Begin Source File
+ 
++SOURCE=..\..\..\src\base\ftfntfmt.c
++# End Source File
++# Begin Source File
++
+ SOURCE=..\..\..\src\base\ftfstype.c
+ # End Source File
+ # Begin Source File
+@@ -301,10 +305,6 @@ SOURCE=..\..\..\src\base\ftwinfnt.c
+ # End Source File
+ # Begin Source File
+ 
+-SOURCE=..\..\..\src\base\ftxf86.c
+-# End Source File
+-# Begin Source File
+-
+ SOURCE=..\..\..\src\pcf\pcf.c
+ # SUBTRACT CPP /Fr
+ # End Source File
+diff --git a/builds/windows/visualce/freetype.vcproj b/builds/windows/visualce/freetype.vcproj
+index e4cddfb..137a022 100644
+--- a/builds/windows/visualce/freetype.vcproj
++++ b/builds/windows/visualce/freetype.vcproj
+@@ -8262,6 +8262,10 @@
+ 					>
+ 				</File>
+ 				<File
++					RelativePath="..\..\..\src\base\ftfntfmt.c"
++					>
++				</File>
++				<File
+ 					RelativePath="..\..\..\src\base\ftmm.c"
+ 					>
+ 					<FileConfiguration
+@@ -8705,10 +8709,6 @@
+ 					>
+ 				</File>
+ 				<File
+-					RelativePath="..\..\..\src\base\ftxf86.c"
+-					>
+-				</File>
+-				<File
+ 					RelativePath="..\..\..\src\base\ftlcdfil.c"
+ 					>
+ 				</File>
+diff --git a/docs/INSTALL.ANY b/docs/INSTALL.ANY
+index 8b5c5bf..e7d6ddd 100644
+--- a/docs/INSTALL.ANY
++++ b/docs/INSTALL.ANY
+@@ -39,6 +39,7 @@ I. Standard procedure
+       src/base/ftbdf.c        -- optional, see <ftbdf.h>
+       src/base/ftbitmap.c     -- optional, see <ftbitmap.h>
+       src/base/ftcid.c        -- optional, see <ftcid.h>
++      src/base/ftfntfmt.c     -- optional, see <ftfntfmt.h>
+       src/base/ftfstype.c     -- optional
+       src/base/ftgasp.c       -- optional, see <ftgasp.h>
+       src/base/ftgxval.c      -- optional, see <ftgxval.h>
+@@ -51,7 +52,6 @@ I. Standard procedure
+       src/base/ftsynth.c      -- optional, see <ftsynth.h>
+       src/base/fttype1.c      -- optional, see <t1tables.h>
+       src/base/ftwinfnt.c     -- optional, see <ftwinfnt.h>
+-      src/base/ftxf86.c       -- optional, see <ftxf86.h>
+ 
+       src/base/ftmac.c        -- only on the Macintosh
+ 
+diff --git a/include/config/ftheader.h b/include/config/ftheader.h
+index 0a9fcd3..77d9187 100644
+--- a/include/config/ftheader.h
++++ b/include/config/ftheader.h
+@@ -717,7 +717,7 @@
+    *   FreeType~2 API which provides functions specific to the XFree86 and
+    *   X.Org X11 servers.
+    */
+-#define FT_XFREE86_H  <ftxf86.h>
++#define FT_XFREE86_H  <ftfntfmt.h>
+ 
+ 
+   /*************************************************************************
+diff --git a/include/ftfntfmt.h b/include/ftfntfmt.h
+new file mode 100644
+index 0000000..c1bf146
+--- /dev/null
++++ b/include/ftfntfmt.h
+@@ -0,0 +1,84 @@
++/***************************************************************************/
++/*                                                                         */
++/*  ftfntfmt.h                                                             */
++/*                                                                         */
++/*    Support functions for X11.                                           */
++/*                                                                         */
++/*  Copyright 2002-2015 by                                                 */
++/*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
++/*                                                                         */
++/*  This file is part of the FreeType project, and may only be used,       */
++/*  modified, and distributed under the terms of the FreeType project      */
++/*  license, LICENSE.TXT.  By continuing to use, modify, or distribute     */
++/*  this file you indicate that you have read the license and              */
++/*  understand and accept it fully.                                        */
++/*                                                                         */
++/***************************************************************************/
++
++
++#ifndef __FTXF86_H__
++#define __FTXF86_H__
++
++#include <ft2build.h>
++#include FT_FREETYPE_H
++
++#ifdef FREETYPE_H
++#error "freetype.h of FreeType 1 has been loaded!"
++#error "Please fix the directory search order for header files"
++#error "so that freetype.h of FreeType 2 is found first."
++#endif
++
++
++FT_BEGIN_HEADER
++
++
++  /*************************************************************************/
++  /*                                                                       */
++  /* <Section>                                                             */
++  /*   font_formats                                                        */
++  /*                                                                       */
++  /* <Title>                                                               */
++  /*   Font Formats                                                        */
++  /*                                                                       */
++  /* <Abstract>                                                            */
++  /*   Getting the font format.                                            */
++  /*                                                                       */
++  /* <Description>                                                         */
++  /*   The single function in this section can be used to get the font     */
++  /*   format.  Note that this information is not needed normally;         */
++  /*   however, there are special cases (like in PDF devices) where it is  */
++  /*   important to differentiate, in spite of FreeType's uniform API.     */
++  /*                                                                       */
++  /*   This function is in the X11/xf86 namespace for historical reasons   */
++  /*   and in no way depends on that windowing system.                     */
++  /*                                                                       */
++  /*************************************************************************/
++
++
++  /*************************************************************************/
++  /*                                                                       */
++  /* <Function>                                                            */
++  /*   FT_Get_X11_Font_Format                                              */
++  /*                                                                       */
++  /* <Description>                                                         */
++  /*   Return a string describing the format of a given face, using values */
++  /*   that can be used as an X11 FONT_PROPERTY.  Possible values are      */
++  /*   `TrueType', `Type~1', `BDF', `PCF', `Type~42', `CID~Type~1', `CFF', */
++  /*   `PFR', and `Windows~FNT'.                                           */
++  /*                                                                       */
++  /* <Input>                                                               */
++  /*   face ::                                                             */
++  /*     Input face handle.                                                */
++  /*                                                                       */
++  /* <Return>                                                              */
++  /*   Font format string.  NULL in case of error.                         */
++  /*                                                                       */
++  FT_EXPORT( const char* )
++  FT_Get_X11_Font_Format( FT_Face  face );
++
++  /* */
++
++
++FT_END_HEADER
++
++#endif /* __FTXF86_H__ */
+diff --git a/include/ftxf86.h b/include/ftxf86.h
+deleted file mode 100644
+index 2269b4e..0000000
+--- a/include/ftxf86.h
++++ /dev/null
+@@ -1,84 +0,0 @@
+-/***************************************************************************/
+-/*                                                                         */
+-/*  ftxf86.h                                                               */
+-/*                                                                         */
+-/*    Support functions for X11.                                           */
+-/*                                                                         */
+-/*  Copyright 2002-2015 by                                                 */
+-/*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+-/*                                                                         */
+-/*  This file is part of the FreeType project, and may only be used,       */
+-/*  modified, and distributed under the terms of the FreeType project      */
+-/*  license, LICENSE.TXT.  By continuing to use, modify, or distribute     */
+-/*  this file you indicate that you have read the license and              */
+-/*  understand and accept it fully.                                        */
+-/*                                                                         */
+-/***************************************************************************/
+-
+-
+-#ifndef __FTXF86_H__
+-#define __FTXF86_H__
+-
+-#include <ft2build.h>
+-#include FT_FREETYPE_H
+-
+-#ifdef FREETYPE_H
+-#error "freetype.h of FreeType 1 has been loaded!"
+-#error "Please fix the directory search order for header files"
+-#error "so that freetype.h of FreeType 2 is found first."
+-#endif
+-
+-
+-FT_BEGIN_HEADER
+-
+-
+-  /*************************************************************************/
+-  /*                                                                       */
+-  /* <Section>                                                             */
+-  /*   font_formats                                                        */
+-  /*                                                                       */
+-  /* <Title>                                                               */
+-  /*   Font Formats                                                        */
+-  /*                                                                       */
+-  /* <Abstract>                                                            */
+-  /*   Getting the font format.                                            */
+-  /*                                                                       */
+-  /* <Description>                                                         */
+-  /*   The single function in this section can be used to get the font     */
+-  /*   format.  Note that this information is not needed normally;         */
+-  /*   however, there are special cases (like in PDF devices) where it is  */
+-  /*   important to differentiate, in spite of FreeType's uniform API.     */
+-  /*                                                                       */
+-  /*   This function is in the X11/xf86 namespace for historical reasons   */
+-  /*   and in no way depends on that windowing system.                     */
+-  /*                                                                       */
+-  /*************************************************************************/
+-
+-
+-  /*************************************************************************/
+-  /*                                                                       */
+-  /* <Function>                                                            */
+-  /*   FT_Get_X11_Font_Format                                              */
+-  /*                                                                       */
+-  /* <Description>                                                         */
+-  /*   Return a string describing the format of a given face, using values */
+-  /*   that can be used as an X11 FONT_PROPERTY.  Possible values are      */
+-  /*   `TrueType', `Type~1', `BDF', `PCF', `Type~42', `CID~Type~1', `CFF', */
+-  /*   `PFR', and `Windows~FNT'.                                           */
+-  /*                                                                       */
+-  /* <Input>                                                               */
+-  /*   face ::                                                             */
+-  /*     Input face handle.                                                */
+-  /*                                                                       */
+-  /* <Return>                                                              */
+-  /*   Font format string.  NULL in case of error.                         */
+-  /*                                                                       */
+-  FT_EXPORT( const char* )
+-  FT_Get_X11_Font_Format( FT_Face  face );
+-
+-  /* */
+-
+-
+-FT_END_HEADER
+-
+-#endif /* __FTXF86_H__ */
+diff --git a/modules.cfg b/modules.cfg
+index ccb18d5..32f78c1 100644
+--- a/modules.cfg
++++ b/modules.cfg
+@@ -168,6 +168,11 @@ BASE_EXTENSIONS += ftbitmap.c
+ # See include/ftcid.h for the API.
+ BASE_EXTENSIONS += ftcid.c
+ 
++# Support functions for X11.
++#
++# See include/ftfntfmt.h for the API.
++BASE_EXTENSIONS += ftfntfmt.c
++
+ # Access FSType information.  Needs fttype1.c.
+ #
+ # See include/freetype.h for the API.
+@@ -235,11 +240,6 @@ BASE_EXTENSIONS += fttype1.c
+ # See include/ftwinfnt.h for the API.
+ BASE_EXTENSIONS += ftwinfnt.c
+ 
+-# Support functions for X11.
+-#
+-# See include/ftxf86.h for the API.
+-BASE_EXTENSIONS += ftxf86.c
+-
+ ####
+ #### The components `ftsystem.c' (for memory allocation and stream I/O
+ #### management) and `ftdebug.c' (for emitting debug messages to the user)
+diff --git a/src/base/ftfntfmt.c b/src/base/ftfntfmt.c
+new file mode 100644
+index 0000000..b9e9395
+--- /dev/null
++++ b/src/base/ftfntfmt.c
+@@ -0,0 +1,40 @@
++/***************************************************************************/
++/*                                                                         */
++/*  ftfntfmt.c                                                             */
++/*                                                                         */
++/*    FreeType utility file for X11 support (body).                        */
++/*                                                                         */
++/*  Copyright 2002-2015 by                                                 */
++/*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
++/*                                                                         */
++/*  This file is part of the FreeType project, and may only be used,       */
++/*  modified, and distributed under the terms of the FreeType project      */
++/*  license, LICENSE.TXT.  By continuing to use, modify, or distribute     */
++/*  this file you indicate that you have read the license and              */
++/*  understand and accept it fully.                                        */
++/*                                                                         */
++/***************************************************************************/
++
++
++#include <ft2build.h>
++#include FT_XFREE86_H
++#include FT_INTERNAL_OBJECTS_H
++#include FT_SERVICE_XFREE86_NAME_H
++
++
++  /* documentation is in ftfntfmt.h */
++
++  FT_EXPORT_DEF( const char* )
++  FT_Get_X11_Font_Format( FT_Face  face )
++  {
++    const char*  result = NULL;
++
++
++    if ( face )
++      FT_FACE_FIND_SERVICE( face, result, XF86_NAME );
++
++    return result;
++  }
++
++
++/* END */
+diff --git a/src/base/ftxf86.c b/src/base/ftxf86.c
+deleted file mode 100644
+index a0f2558..0000000
+--- a/src/base/ftxf86.c
++++ /dev/null
+@@ -1,40 +0,0 @@
+-/***************************************************************************/
+-/*                                                                         */
+-/*  ftxf86.c                                                               */
+-/*                                                                         */
+-/*    FreeType utility file for X11 support (body).                        */
+-/*                                                                         */
+-/*  Copyright 2002-2015 by                                                 */
+-/*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+-/*                                                                         */
+-/*  This file is part of the FreeType project, and may only be used,       */
+-/*  modified, and distributed under the terms of the FreeType project      */
+-/*  license, LICENSE.TXT.  By continuing to use, modify, or distribute     */
+-/*  this file you indicate that you have read the license and              */
+-/*  understand and accept it fully.                                        */
+-/*                                                                         */
+-/***************************************************************************/
+-
+-
+-#include <ft2build.h>
+-#include FT_XFREE86_H
+-#include FT_INTERNAL_OBJECTS_H
+-#include FT_SERVICE_XFREE86_NAME_H
+-
+-
+-  /* documentation is in ftxf86.h */
+-
+-  FT_EXPORT_DEF( const char* )
+-  FT_Get_X11_Font_Format( FT_Face  face )
+-  {
+-    const char*  result = NULL;
+-
+-
+-    if ( face )
+-      FT_FACE_FIND_SERVICE( face, result, XF86_NAME );
+-
+-    return result;
+-  }
+-
+-
+-/* END */
+diff --git a/vms_make.com b/vms_make.com
+index 5b7da39..f2b97fa 100644
+--- a/vms_make.com
++++ b/vms_make.com
+@@ -356,8 +356,8 @@ $ deck
+ CFLAGS=$(COMP_FLAGS)$(DEBUG)/include=([--.builds.vms],[--.include],[--.src.base])
+ 
+ OBJS=ftbase.obj,ftinit.obj,ftglyph.obj,ftdebug.obj,ftbdf.obj,ftmm.obj,\
+-     fttype1.obj,ftxf86.obj,ftpfr.obj,ftstroke.obj,ftwinfnt.obj,ftbbox.obj,\
+-     ftbitmap.obj ftlcdfil.obj ftgasp.obj
++     fttype1.obj,ftfntfmt.obj,ftpfr.obj,ftstroke.obj,ftwinfnt.obj,ftbbox.obj,\
++     ftbitmap.obj,ftlcdfil.obj,ftgasp.obj
+ 
+ all : $(OBJS)
+         library [--.lib]freetype.olb $(OBJS)
+-- 
+2.3.4
+
+From cb0f7b65a8ccfb41ec1b7272183b234c94434dad Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Wed, 11 Mar 2015 06:51:27 +0100
+Subject: [PATCH] Fix automatic copyright updating.
+
+* src/tools/update-copyright: Make scanning of `no-copyright'
+actually work.
+
+* src/tools/no-copyright: Don't include README in general.
+---
+ ChangeLog                  | 9 +++++++++
+ src/tools/no-copyright     | 1 -
+ src/tools/update-copyright | 4 ++--
+ 3 files changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 37bcd90..1b6cc00 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,5 +1,14 @@
+ 2015-03-11  Werner Lemberg  <wl@gnu.org>
+ 
++	Fix automatic copyright updating.
++
++	* src/tools/update-copyright: Make scanning of `no-copyright'
++	actually work.
++
++	* src/tools/no-copyright: Don't include README in general.
++
++2015-03-11  Werner Lemberg  <wl@gnu.org>
++
+ 	Rename `ftxf86.[ch]' to `ftfntfmt.[ch]'.
+ 
+ 	CMakeLists.txt, builds/amiga/makefile, builds/amiga/makefile.os4,
+diff --git a/src/tools/no-copyright b/src/tools/no-copyright
+index 464ece0..5011e3f 100644
+--- a/src/tools/no-copyright
++++ b/src/tools/no-copyright
+@@ -26,7 +26,6 @@ src/bdf/bdflib.c
+ src/bdf/module.mk
+ src/bdf/README
+ src/bdf/rules.mk
+-README
+ #
+ src/pcf/module.mk
+ src/pcf/pcf.c
+diff --git a/src/tools/update-copyright b/src/tools/update-copyright
+index 81add0a..4a8bf9b 100755
+--- a/src/tools/update-copyright
++++ b/src/tools/update-copyright
+@@ -6,8 +6,8 @@
+ topdir=`git rev-parse --show-toplevel`
+ toolsdir=$topdir/src/tools
+ 
+-git ls-files $topdir                    \
+-| sed 's|^|./|'                         \
++git ls-files --full-name $topdir        \
++| sed 's|^|../../|'                     \
+ | grep -vFf $toolsdir/no-copyright      \
+ | xargs $toolsdir/update-copyright-year
+ 
+-- 
+2.3.4
+
+From 3e587796755dbb6be2756b5cd82884feb7da9159 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Wed, 11 Mar 2015 07:14:15 +0100
+Subject: [PATCH] Minor copyright and e-mail address issues.
+
+---
+ README                               | 2 +-
+ README.git                           | 2 +-
+ builds/amiga/README                  | 2 +-
+ include/internal/services/svttcmap.h | 4 +---
+ src/bzip2/Jamfile                    | 3 +--
+ src/bzip2/ftbzip2.c                  | 3 +--
+ src/bzip2/rules.mk                   | 3 +--
+ src/gxvalid/README                   | 2 +-
+ src/lzw/ftlzw.c                      | 3 +--
+ src/lzw/rules.mk                     | 3 +--
+ src/tools/glnames.py                 | 2 +-
+ vms_make.com                         | 4 ++--
+ 12 files changed, 13 insertions(+), 20 deletions(-)
+
+diff --git a/README b/README
+index f00a1ab..706cd9a 100644
+--- a/README
++++ b/README
+@@ -70,7 +70,7 @@
+ 
+ ----------------------------------------------------------------------
+ 
+-Copyright 2006-2014 by
++Copyright 2006-2015 by
+ David Turner, Robert Wilhelm, and Werner Lemberg.
+ 
+ This  file is  part of  the FreeType  project, and  may only  be used,
+diff --git a/README.git b/README.git
+index 021c121..2350e78 100644
+--- a/README.git
++++ b/README.git
+@@ -37,7 +37,7 @@ repository.
+ 
+ ----------------------------------------------------------------------
+ 
+-Copyright 2005-2010, 2013 by
++Copyright 2005-2015 by
+ David Turner, Robert Wilhelm, and Werner Lemberg.
+ 
+ This  file is  part of  the FreeType  project, and  may only  be used,
+diff --git a/builds/amiga/README b/builds/amiga/README
+index 85fcc43..1a68b10 100644
+--- a/builds/amiga/README
++++ b/builds/amiga/README
+@@ -1,7 +1,7 @@
+ 
+ README for the builds/amiga subdirectory.
+ 
+-Copyright 2005, 2013 by
++Copyright 2005-2015 by
+ Werner Lemberg and Detlef W�rkner.
+ 
+ This file is part of the FreeType project, and may only be used, modified,
+diff --git a/include/internal/services/svttcmap.h b/include/internal/services/svttcmap.h
+index ed31843..4351a9a 100644
+--- a/include/internal/services/svttcmap.h
++++ b/include/internal/services/svttcmap.h
+@@ -5,9 +5,7 @@
+ /*    The FreeType TrueType/sfnt cmap extra information service.           */
+ /*                                                                         */
+ /*  Copyright 2003-2015 by                                                 */
+-/*  Masatake YAMATO, Redhat K.K.                                           */
+-/*                                                                         */
+-/*  Copyright 2003, 2008, 2009, 2012, 2013 by                              */
++/*  Masatake YAMATO, Redhat K.K.,                                          */
+ /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+ /*                                                                         */
+ /*  This file is part of the FreeType project, and may only be used,       */
+diff --git a/src/bzip2/Jamfile b/src/bzip2/Jamfile
+index 9ae502d..53f850e 100644
+--- a/src/bzip2/Jamfile
++++ b/src/bzip2/Jamfile
+@@ -3,8 +3,7 @@
+ # Copyright 2010-2015 by
+ # Joel Klinghed
+ #
+-# Based on src/lzw/Jamfile, Copyright 2004, 2006 by
+-# David Turner, Robert Wilhelm, and Werner Lemberg.
++# based on `src/lzw/Jamfile'
+ #
+ # This file is part of the FreeType project, and may only be used, modified,
+ # and distributed under the terms of the FreeType project license,
+diff --git a/src/bzip2/ftbzip2.c b/src/bzip2/ftbzip2.c
+index 1c29dc0..4dfc9c8 100644
+--- a/src/bzip2/ftbzip2.c
++++ b/src/bzip2/ftbzip2.c
+@@ -11,8 +11,7 @@
+ /*  Copyright 2010-2015 by                                                 */
+ /*  Joel Klinghed.                                                         */
+ /*                                                                         */
+-/*  Based on src/gzip/ftgzip.c, Copyright 2002 - 2010 by                   */
+-/*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
++/*  based on `src/gzip/ftgzip.c'                                           */
+ /*                                                                         */
+ /*  This file is part of the FreeType project, and may only be used,       */
+ /*  modified, and distributed under the terms of the FreeType project      */
+diff --git a/src/bzip2/rules.mk b/src/bzip2/rules.mk
+index 707369e..7040588 100644
+--- a/src/bzip2/rules.mk
++++ b/src/bzip2/rules.mk
+@@ -5,8 +5,7 @@
+ # Copyright 2010-2015 by
+ # Joel Klinghed.
+ #
+-# Based on src/lzw/rules.mk, Copyright 2004-2006 by
+-# Albert Chin-A-Young.
++# based on `src/lzw/rules.mk'
+ #
+ # This file is part of the FreeType project, and may only be used, modified,
+ # and distributed under the terms of the FreeType project license,
+diff --git a/src/gxvalid/README b/src/gxvalid/README
+index 28e535b..60f2fc1 100644
+--- a/src/gxvalid/README
++++ b/src/gxvalid/README
+@@ -518,7 +518,7 @@ gxvalid: TrueType GX validator
+ 
+ ------------------------------------------------------------------------
+ 
+-Copyright 2004, 2005, 2007 by
++Copyright 2004-2015 by
+ suzuki toshiya, Masatake YAMATO, Red hat K.K.,
+ David Turner, Robert Wilhelm, and Werner Lemberg.
+ 
+diff --git a/src/lzw/ftlzw.c b/src/lzw/ftlzw.c
+index 50fc44f..5664ff9 100644
+--- a/src/lzw/ftlzw.c
++++ b/src/lzw/ftlzw.c
+@@ -11,8 +11,7 @@
+ /*  Copyright 2004-2015 by                                                 */
+ /*  Albert Chin-A-Young.                                                   */
+ /*                                                                         */
+-/*  Based on code in src/gzip/ftgzip.c, Copyright 2004 by                  */
+-/*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
++/*  based on code in `src/gzip/ftgzip.c'                                   */
+ /*                                                                         */
+ /*  This file is part of the FreeType project, and may only be used,       */
+ /*  modified, and distributed under the terms of the FreeType project      */
+diff --git a/src/lzw/rules.mk b/src/lzw/rules.mk
+index c98c0fd..ab1c02f 100644
+--- a/src/lzw/rules.mk
++++ b/src/lzw/rules.mk
+@@ -6,8 +6,7 @@
+ # Copyright 2004-2015 by
+ # Albert Chin-A-Young.
+ #
+-# Based on src/lzw/rules.mk, Copyright 2002 by
+-# David Turner, Robert Wilhelm, and Werner Lemberg.
++# based on `src/lzw/rules.mk'
+ #
+ # This file is part of the FreeType project, and may only be used, modified,
+ # and distributed under the terms of the FreeType project license,
+diff --git a/src/tools/glnames.py b/src/tools/glnames.py
+index bca7fb1..5d9b08f 100644
+--- a/src/tools/glnames.py
++++ b/src/tools/glnames.py
+@@ -5267,7 +5267,7 @@ def main():
+   write( "/*                                                                         */\n" )
+   write( "/*    PostScript glyph names.                                              */\n" )
+   write( "/*                                                                         */\n" )
+-  write( "/*  Copyright 2005, 2008, 2011 by                                          */\n" )
++  write( "/*  Copyright 2005-2015 by                                                 */\n" )
+   write( "/*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */\n" )
+   write( "/*                                                                         */\n" )
+   write( "/*  This file is part of the FreeType project, and may only be used,       */\n" )
+diff --git a/vms_make.com b/vms_make.com
+index f2b97fa..73522bf 100644
+--- a/vms_make.com
++++ b/vms_make.com
+@@ -23,7 +23,7 @@ $! * LOPTS - Options to be passed to the link command
+ $! * CCOPT - Options to be passed to the C compiler
+ $!
+ $! In case of problems with the install you might contact me at
+-$! zinser@zinser.no-ip.info(preferred) or
++$! zinser@zinser.no-ip.info (preferred) or
+ $! zinser@sysdev.deutsche-boerse.com (work)
+ $!
+ $! Make procedure history for Freetype2
+@@ -1197,7 +1197,7 @@ $! Analyze Object files for OpenVMS AXP to extract Procedure and Data
+ $! information to build a symbol vector for a shareable image
+ $! All the "brains" of this logic was suggested by Hartmut Becker
+ $! (Hartmut.Becker@compaq.com). All the bugs were introduced by me
+-$! (zinser@decus.de), so if you do have problem reports please do not
++$! (zinser@zinser.no-ip.info), so if you do have problem reports please do not
+ $! bother Hartmut/HP, but get in touch with me
+ $!
+ $! Version history
+-- 
+2.3.4
+
+From f4d1c11faa116daad655b50828a434babbdaed2a Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Wed, 11 Mar 2015 07:32:58 +0100
+Subject: [PATCH] Rename `FT_Get_X11_Font_Format' to `FT_Get_Font_Format'.
+
+* include/ftfntfmt.h, src/base/ftfntfmt.c: Implement it.
+
+* docs/CHANGES: Updated.
+---
+ ChangeLog           |  8 ++++++++
+ docs/CHANGES        |  9 +++++++--
+ include/ftfntfmt.h  | 26 +++++++++++++++++---------
+ modules.cfg         |  2 +-
+ src/base/ftfntfmt.c | 17 ++++++++++++++++-
+ 5 files changed, 49 insertions(+), 13 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 1b6cc00..8c5e281 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,5 +1,13 @@
+ 2015-03-11  Werner Lemberg  <wl@gnu.org>
+ 
++	[base] Rename `FT_Get_X11_Font_Format' to `FT_Get_Font_Format'.
++
++	* include/ftfntfmt.h, src/base/ftfntfmt.c: Implement it.
++
++	* docs/CHANGES: Updated.
++
++2015-03-11  Werner Lemberg  <wl@gnu.org>
++
+ 	Fix automatic copyright updating.
+ 
+ 	* src/tools/update-copyright: Make scanning of `no-copyright'
+diff --git a/docs/CHANGES b/docs/CHANGES
+index 02dd5bd..17fe4bc 100644
+--- a/docs/CHANGES
++++ b/docs/CHANGES
+@@ -34,10 +34,15 @@ CHANGES BETWEEN 2.5.5 and 2.6
+       This  change doesn't  break  the ABI;  however,  it might  cause
+       compiler warnings.
+ 
+-    - Function `FT_Bitmap_New'  has been renamed to  `FT_Bitmap_Init',
+-      since this  name better  reflects its  function.   For backwards
++    - Function `FT_Bitmap_New'  has been renamed  to `FT_Bitmap_Init',
++      since  this name  better reflects  its function.   For backwards
+       compatibility, the old function name is still available.
+ 
++    - Function   `FT_Get_X11_Font_Format'   has    been   renamed   to
++      `FT_Get_Font_Format',  since  this   name  better  reflects  its
++      function.  For backwards compatibility, the old function name is
++      still available.
++
+ 
+ ======================================================================
+ 
+diff --git a/include/ftfntfmt.h b/include/ftfntfmt.h
+index c1bf146..b3e65e3 100644
+--- a/include/ftfntfmt.h
++++ b/include/ftfntfmt.h
+@@ -2,7 +2,7 @@
+ /*                                                                         */
+ /*  ftfntfmt.h                                                             */
+ /*                                                                         */
+-/*    Support functions for X11.                                           */
++/*    Support functions for font formats.                                  */
+ /*                                                                         */
+ /*  Copyright 2002-2015 by                                                 */
+ /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+@@ -49,22 +49,20 @@ FT_BEGIN_HEADER
+   /*   however, there are special cases (like in PDF devices) where it is  */
+   /*   important to differentiate, in spite of FreeType's uniform API.     */
+   /*                                                                       */
+-  /*   This function is in the X11/xf86 namespace for historical reasons   */
+-  /*   and in no way depends on that windowing system.                     */
+-  /*                                                                       */
+   /*************************************************************************/
+ 
+ 
+   /*************************************************************************/
+   /*                                                                       */
+   /* <Function>                                                            */
+-  /*   FT_Get_X11_Font_Format                                              */
++  /*   FT_Get_Font_Format                                                  */
+   /*                                                                       */
+   /* <Description>                                                         */
+-  /*   Return a string describing the format of a given face, using values */
+-  /*   that can be used as an X11 FONT_PROPERTY.  Possible values are      */
+-  /*   `TrueType', `Type~1', `BDF', `PCF', `Type~42', `CID~Type~1', `CFF', */
+-  /*   `PFR', and `Windows~FNT'.                                           */
++  /*   Return a string describing the format of a given face.  Possible    */
++  /*   values are `TrueType', `Type~1', `BDF', `PCF', `Type~42',           */
++  /*   `CID~Type~1', `CFF', `PFR', and `Windows~FNT'.                      */
++  /*                                                                       */
++  /*   The return value is suitable to be used as an X11 FONT_PROPERTY.    */
+   /*                                                                       */
+   /* <Input>                                                               */
+   /*   face ::                                                             */
+@@ -73,9 +71,19 @@ FT_BEGIN_HEADER
+   /* <Return>                                                              */
+   /*   Font format string.  NULL in case of error.                         */
+   /*                                                                       */
++  /* <Note>                                                                */
++  /*   A deprecated name for the same function is                          */
++  /*   `FT_Get_X11_Font_Format'.                                           */
++  /*                                                                       */
++  FT_EXPORT( const char* )
++  FT_Get_Font_Format( FT_Face  face );
++
++
++  /* deprecated */
+   FT_EXPORT( const char* )
+   FT_Get_X11_Font_Format( FT_Face  face );
+ 
++
+   /* */
+ 
+ 
+diff --git a/modules.cfg b/modules.cfg
+index 32f78c1..9ba66df 100644
+--- a/modules.cfg
++++ b/modules.cfg
+@@ -168,7 +168,7 @@ BASE_EXTENSIONS += ftbitmap.c
+ # See include/ftcid.h for the API.
+ BASE_EXTENSIONS += ftcid.c
+ 
+-# Support functions for X11.
++# Support functions for font formats.
+ #
+ # See include/ftfntfmt.h for the API.
+ BASE_EXTENSIONS += ftfntfmt.c
+diff --git a/src/base/ftfntfmt.c b/src/base/ftfntfmt.c
+index b9e9395..38a5b60 100644
+--- a/src/base/ftfntfmt.c
++++ b/src/base/ftfntfmt.c
+@@ -2,7 +2,7 @@
+ /*                                                                         */
+ /*  ftfntfmt.c                                                             */
+ /*                                                                         */
+-/*    FreeType utility file for X11 support (body).                        */
++/*    FreeType utility file for font formats (body).                       */
+ /*                                                                         */
+ /*  Copyright 2002-2015 by                                                 */
+ /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+@@ -25,6 +25,21 @@
+   /* documentation is in ftfntfmt.h */
+ 
+   FT_EXPORT_DEF( const char* )
++  FT_Get_Font_Format( FT_Face  face )
++  {
++    const char*  result = NULL;
++
++
++    if ( face )
++      FT_FACE_FIND_SERVICE( face, result, XF86_NAME );
++
++    return result;
++  }
++
++
++  /* deprecated function name; retained for ABI compatibility */
++
++  FT_EXPORT_DEF( const char* )
+   FT_Get_X11_Font_Format( FT_Face  face )
+   {
+     const char*  result = NULL;
+-- 
+2.3.4
+
+From dd7028c46e1b812e88ea0c965a52de409ad35ae7 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Wed, 11 Mar 2015 07:45:05 +0100
+Subject: [PATCH] Rename `FT_XFREE86_H' to `FT_FONT_FORMATS_H'.
+
+* include/config/ftheader.h: Implement it.
+* src/base/ftfntfmt.c, docs/CHANGES: Updated.
+---
+ ChangeLog                 |  7 +++++++
+ docs/CHANGES              |  4 ++++
+ include/config/ftheader.h | 10 ++++++----
+ src/base/ftfntfmt.c       |  2 +-
+ 4 files changed, 18 insertions(+), 5 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 8c5e281..ff35a16 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,5 +1,12 @@
+ 2015-03-11  Werner Lemberg  <wl@gnu.org>
+ 
++	[base] Rename `FT_XFREE86_H' to `FT_FONT_FORMATS_H'.
++
++	* include/config/ftheader.h: Implement it.
++	* src/base/ftfntfmt.c, docs/CHANGES: Updated.
++
++2015-03-11  Werner Lemberg  <wl@gnu.org>
++
+ 	[base] Rename `FT_Get_X11_Font_Format' to `FT_Get_Font_Format'.
+ 
+ 	* include/ftfntfmt.h, src/base/ftfntfmt.c: Implement it.
+diff --git a/docs/CHANGES b/docs/CHANGES
+index 17fe4bc..2153e3a 100644
+--- a/docs/CHANGES
++++ b/docs/CHANGES
+@@ -43,6 +43,10 @@ CHANGES BETWEEN 2.5.5 and 2.6
+       function.  For backwards compatibility, the old function name is
+       still available.
+ 
++      Additionally, the header  file macro for this  function has been
++      renamed to  `FT_FONT_FORMATS_H' (the old name  `FT_XFREE86_H' is
++      retained for backwards compatibility).
++
+ 
+ ======================================================================
+ 
+diff --git a/include/config/ftheader.h b/include/config/ftheader.h
+index 77d9187..4906bc1 100644
+--- a/include/config/ftheader.h
++++ b/include/config/ftheader.h
+@@ -710,14 +710,16 @@
+   /*************************************************************************
+    *
+    * @macro:
+-   *   FT_XFREE86_H
++   *   FT_FONT_FORMATS_H
+    *
+    * @description:
+    *   A macro used in #include statements to name the file containing the
+-   *   FreeType~2 API which provides functions specific to the XFree86 and
+-   *   X.Org X11 servers.
++   *   FreeType~2 API which provides functions specific to font formats.
+    */
+-#define FT_XFREE86_H  <ftfntfmt.h>
++#define FT_FONT_FORMATS_H  <ftfntfmt.h>
++
++  /* deprecated */
++#define FT_XFREE86_H  FT_FONT_FORMATS_H
+ 
+ 
+   /*************************************************************************
+diff --git a/src/base/ftfntfmt.c b/src/base/ftfntfmt.c
+index 38a5b60..7f913d6 100644
+--- a/src/base/ftfntfmt.c
++++ b/src/base/ftfntfmt.c
+@@ -17,7 +17,7 @@
+ 
+ 
+ #include <ft2build.h>
+-#include FT_XFREE86_H
++#include FT_FONT_FORMATS_H
+ #include FT_INTERNAL_OBJECTS_H
+ #include FT_SERVICE_XFREE86_NAME_H
+ 
+-- 
+2.3.4
+
+From ba53879ea92c585a93763d6746e8c49554271775 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Wed, 11 Mar 2015 07:50:15 +0100
+Subject: [PATCH] Minor.
+
+---
+ include/ftfntfmt.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/include/ftfntfmt.h b/include/ftfntfmt.h
+index b3e65e3..1f8ff28 100644
+--- a/include/ftfntfmt.h
++++ b/include/ftfntfmt.h
+@@ -16,8 +16,8 @@
+ /***************************************************************************/
+ 
+ 
+-#ifndef __FTXF86_H__
+-#define __FTXF86_H__
++#ifndef __FTFNTFMT_H__
++#define __FTFNTFMT_H__
+ 
+ #include <ft2build.h>
+ #include FT_FREETYPE_H
+@@ -89,4 +89,4 @@ FT_BEGIN_HEADER
+ 
+ FT_END_HEADER
+ 
+-#endif /* __FTXF86_H__ */
++#endif /* __FTFNTFMT_H__ */
+-- 
+2.3.4
+
+From a451638ec55be06aabb3a99b7461679dc750c80a Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Wed, 11 Mar 2015 08:09:13 +0100
+Subject: [PATCH] Rename `svxf86nm.h' to `svfntfmt.h'; update related symbols.
+
+* include/internal/ftserv.h (FT_SERVICE_XFREE86_NAME_H): Renamed
+to...
+(FT_SERVICE_FONT_FORMAT_H): This.
+
+* include/internal/services/svfntfmt.h (FT_XF86_FORMAT_*): Renamed
+to ...
+(FT_FONT_FORMAT_*): This.
+
+src/base/ftfntfmt.c, src/bdf/bdfdrivr.c, src/cff/cffdrivr.c,
+src/cid/cidriver.c, src/pcf/pcfdrivr.c, src/pfr/pfrdrivr.c,
+src/truetype/ttdriver.c, src/type1/t1driver.c,
+src/type42/t42drivr.c, src/winfonts/winfnt.c: Updated.
+---
+ ChangeLog                            | 17 +++++++++++
+ include/internal/ftserv.h            |  2 +-
+ include/internal/services/svfntfmt.h | 55 ++++++++++++++++++++++++++++++++++++
+ include/internal/services/svxf86nm.h | 55 ------------------------------------
+ src/base/ftfntfmt.c                  |  6 ++--
+ src/bdf/bdfdrivr.c                   |  6 ++--
+ src/cff/cffdrivr.c                   |  6 ++--
+ src/cid/cidriver.c                   |  4 +--
+ src/pcf/pcfdrivr.c                   |  6 ++--
+ src/pfr/pfrdrivr.c                   |  4 +--
+ src/truetype/ttdriver.c              |  6 ++--
+ src/type1/t1driver.c                 |  4 +--
+ src/type42/t42drivr.c                |  4 +--
+ src/winfonts/winfnt.c                |  6 ++--
+ 14 files changed, 99 insertions(+), 82 deletions(-)
+ create mode 100644 include/internal/services/svfntfmt.h
+ delete mode 100644 include/internal/services/svxf86nm.h
+
+diff --git a/ChangeLog b/ChangeLog
+index ff35a16..431a405 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,5 +1,22 @@
+ 2015-03-11  Werner Lemberg  <wl@gnu.org>
+ 
++	Rename `svxf86nm.h' to `svfntfmt.h'; update related symbols.
++
++	* include/internal/ftserv.h (FT_SERVICE_XFREE86_NAME_H): Renamed
++	to...
++	(FT_SERVICE_FONT_FORMAT_H): This.
++
++	* include/internal/services/svfntfmt.h (FT_XF86_FORMAT_*): Renamed
++	to ...
++	(FT_FONT_FORMAT_*): This.
++
++	src/base/ftfntfmt.c, src/bdf/bdfdrivr.c, src/cff/cffdrivr.c,
++	src/cid/cidriver.c, src/pcf/pcfdrivr.c, src/pfr/pfrdrivr.c,
++	src/truetype/ttdriver.c, src/type1/t1driver.c,
++	src/type42/t42drivr.c, src/winfonts/winfnt.c: Updated.
++
++2015-03-11  Werner Lemberg  <wl@gnu.org>
++
+ 	[base] Rename `FT_XFREE86_H' to `FT_FONT_FORMATS_H'.
+ 
+ 	* include/config/ftheader.h: Implement it.
+diff --git a/include/internal/ftserv.h b/include/internal/ftserv.h
+index af9690d..8f837e4 100644
+--- a/include/internal/ftserv.h
++++ b/include/internal/ftserv.h
+@@ -750,7 +750,7 @@ FT_BEGIN_HEADER
+ #define FT_SERVICE_TRUETYPE_ENGINE_H    <internal/services/svtteng.h>
+ #define FT_SERVICE_TT_CMAP_H            <internal/services/svttcmap.h>
+ #define FT_SERVICE_WINFNT_H             <internal/services/svwinfnt.h>
+-#define FT_SERVICE_XFREE86_NAME_H       <internal/services/svxf86nm.h>
++#define FT_SERVICE_FONT_FORMAT_H        <internal/services/svfntfmt.h>
+ #define FT_SERVICE_TRUETYPE_GLYF_H      <internal/services/svttglyf.h>
+ 
+  /* */
+diff --git a/include/internal/services/svfntfmt.h b/include/internal/services/svfntfmt.h
+new file mode 100644
+index 0000000..f8b3617
+--- /dev/null
++++ b/include/internal/services/svfntfmt.h
+@@ -0,0 +1,55 @@
++/***************************************************************************/
++/*                                                                         */
++/*  svfntfmt.h                                                             */
++/*                                                                         */
++/*    The FreeType font format service (specification only).               */
++/*                                                                         */
++/*  Copyright 2003-2015 by                                                 */
++/*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
++/*                                                                         */
++/*  This file is part of the FreeType project, and may only be used,       */
++/*  modified, and distributed under the terms of the FreeType project      */
++/*  license, LICENSE.TXT.  By continuing to use, modify, or distribute     */
++/*  this file you indicate that you have read the license and              */
++/*  understand and accept it fully.                                        */
++/*                                                                         */
++/***************************************************************************/
++
++
++#ifndef __SVFNTFMT_H__
++#define __SVFNTFMT_H__
++
++#include FT_INTERNAL_SERVICE_H
++
++
++FT_BEGIN_HEADER
++
++
++  /*
++   *  A trivial service used to return the name of a face's font driver,
++   *  according to the XFree86 nomenclature.  Note that the service data
++   *  is a simple constant string pointer.
++   */
++
++#define FT_SERVICE_ID_FONT_FORMAT  "font-format"
++
++#define FT_FONT_FORMAT_TRUETYPE  "TrueType"
++#define FT_FONT_FORMAT_TYPE_1    "Type 1"
++#define FT_FONT_FORMAT_BDF       "BDF"
++#define FT_FONT_FORMAT_PCF       "PCF"
++#define FT_FONT_FORMAT_TYPE_42   "Type 42"
++#define FT_FONT_FORMAT_CID       "CID Type 1"
++#define FT_FONT_FORMAT_CFF       "CFF"
++#define FT_FONT_FORMAT_PFR       "PFR"
++#define FT_FONT_FORMAT_WINFNT    "Windows FNT"
++
++  /* */
++
++
++FT_END_HEADER
++
++
++#endif /* __SVFNTFMT_H__ */
++
++
++/* END */
+diff --git a/include/internal/services/svxf86nm.h b/include/internal/services/svxf86nm.h
+deleted file mode 100644
+index fd447ee..0000000
+--- a/include/internal/services/svxf86nm.h
++++ /dev/null
+@@ -1,55 +0,0 @@
+-/***************************************************************************/
+-/*                                                                         */
+-/*  svxf86nm.h                                                             */
+-/*                                                                         */
+-/*    The FreeType XFree86 services (specification only).                  */
+-/*                                                                         */
+-/*  Copyright 2003-2015 by                                                 */
+-/*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
+-/*                                                                         */
+-/*  This file is part of the FreeType project, and may only be used,       */
+-/*  modified, and distributed under the terms of the FreeType project      */
+-/*  license, LICENSE.TXT.  By continuing to use, modify, or distribute     */
+-/*  this file you indicate that you have read the license and              */
+-/*  understand and accept it fully.                                        */
+-/*                                                                         */
+-/***************************************************************************/
+-
+-
+-#ifndef __SVXF86NM_H__
+-#define __SVXF86NM_H__
+-
+-#include FT_INTERNAL_SERVICE_H
+-
+-
+-FT_BEGIN_HEADER
+-
+-
+-  /*
+-   *  A trivial service used to return the name of a face's font driver,
+-   *  according to the XFree86 nomenclature.  Note that the service data
+-   *  is a simple constant string pointer.
+-   */
+-
+-#define FT_SERVICE_ID_XF86_NAME  "xf86-driver-name"
+-
+-#define FT_XF86_FORMAT_TRUETYPE  "TrueType"
+-#define FT_XF86_FORMAT_TYPE_1    "Type 1"
+-#define FT_XF86_FORMAT_BDF       "BDF"
+-#define FT_XF86_FORMAT_PCF       "PCF"
+-#define FT_XF86_FORMAT_TYPE_42   "Type 42"
+-#define FT_XF86_FORMAT_CID       "CID Type 1"
+-#define FT_XF86_FORMAT_CFF       "CFF"
+-#define FT_XF86_FORMAT_PFR       "PFR"
+-#define FT_XF86_FORMAT_WINFNT    "Windows FNT"
+-
+-  /* */
+-
+-
+-FT_END_HEADER
+-
+-
+-#endif /* __SVXF86NM_H__ */
+-
+-
+-/* END */
+diff --git a/src/base/ftfntfmt.c b/src/base/ftfntfmt.c
+index 7f913d6..98e7431 100644
+--- a/src/base/ftfntfmt.c
++++ b/src/base/ftfntfmt.c
+@@ -19,7 +19,7 @@
+ #include <ft2build.h>
+ #include FT_FONT_FORMATS_H
+ #include FT_INTERNAL_OBJECTS_H
+-#include FT_SERVICE_XFREE86_NAME_H
++#include FT_SERVICE_FONT_FORMAT_H
+ 
+ 
+   /* documentation is in ftfntfmt.h */
+@@ -31,7 +31,7 @@
+ 
+ 
+     if ( face )
+-      FT_FACE_FIND_SERVICE( face, result, XF86_NAME );
++      FT_FACE_FIND_SERVICE( face, result, FONT_FORMAT );
+ 
+     return result;
+   }
+@@ -46,7 +46,7 @@
+ 
+ 
+     if ( face )
+-      FT_FACE_FIND_SERVICE( face, result, XF86_NAME );
++      FT_FACE_FIND_SERVICE( face, result, FONT_FORMAT );
+ 
+     return result;
+   }
+diff --git a/src/bdf/bdfdrivr.c b/src/bdf/bdfdrivr.c
+index 6d7dced..4f03116 100644
+--- a/src/bdf/bdfdrivr.c
++++ b/src/bdf/bdfdrivr.c
+@@ -33,7 +33,7 @@ THE SOFTWARE.
+ #include FT_TRUETYPE_IDS_H
+ 
+ #include FT_SERVICE_BDF_H
+-#include FT_SERVICE_XFREE86_NAME_H
++#include FT_SERVICE_FONT_FORMAT_H
+ 
+ #include "bdf.h"
+ #include "bdfdrivr.h"
+@@ -836,8 +836,8 @@ THE SOFTWARE.
+ 
+   static const FT_ServiceDescRec  bdf_services[] =
+   {
+-    { FT_SERVICE_ID_BDF,       &bdf_service_bdf },
+-    { FT_SERVICE_ID_XF86_NAME, FT_XF86_FORMAT_BDF },
++    { FT_SERVICE_ID_BDF,         &bdf_service_bdf },
++    { FT_SERVICE_ID_FONT_FORMAT, FT_FONT_FORMAT_BDF },
+     { NULL, NULL }
+   };
+ 
+diff --git a/src/cff/cffdrivr.c b/src/cff/cffdrivr.c
+index 8c12a5b..35e23b9 100644
+--- a/src/cff/cffdrivr.c
++++ b/src/cff/cffdrivr.c
+@@ -35,7 +35,7 @@
+ #include "cfferrs.h"
+ #include "cffpic.h"
+ 
+-#include FT_SERVICE_XFREE86_NAME_H
++#include FT_SERVICE_FONT_FORMAT_H
+ #include FT_SERVICE_GLYPH_DICT_H
+ #include FT_SERVICE_PROPERTIES_H
+ #include FT_CFF_DRIVER_H
+@@ -715,7 +715,7 @@
+ #ifndef FT_CONFIG_OPTION_NO_GLYPH_NAMES
+   FT_DEFINE_SERVICEDESCREC7(
+     cff_services,
+-    FT_SERVICE_ID_XF86_NAME,            FT_XF86_FORMAT_CFF,
++    FT_SERVICE_ID_FONT_FORMAT,          FT_FONT_FORMAT_CFF,
+     FT_SERVICE_ID_POSTSCRIPT_INFO,      &CFF_SERVICE_PS_INFO_GET,
+     FT_SERVICE_ID_POSTSCRIPT_FONT_NAME, &CFF_SERVICE_PS_NAME_GET,
+     FT_SERVICE_ID_GLYPH_DICT,           &CFF_SERVICE_GLYPH_DICT_GET,
+@@ -726,7 +726,7 @@
+ #else
+   FT_DEFINE_SERVICEDESCREC6(
+     cff_services,
+-    FT_SERVICE_ID_XF86_NAME,            FT_XF86_FORMAT_CFF,
++    FT_SERVICE_ID_FONT_FORMAT,          FT_FONT_FORMAT_CFF,
+     FT_SERVICE_ID_POSTSCRIPT_INFO,      &CFF_SERVICE_PS_INFO_GET,
+     FT_SERVICE_ID_POSTSCRIPT_FONT_NAME, &CFF_SERVICE_PS_NAME_GET,
+     FT_SERVICE_ID_TT_CMAP,              &CFF_SERVICE_GET_CMAP_INFO_GET,
+diff --git a/src/cid/cidriver.c b/src/cid/cidriver.c
+index 4e86151..07c4cc4 100644
+--- a/src/cid/cidriver.c
++++ b/src/cid/cidriver.c
+@@ -24,7 +24,7 @@
+ #include "ciderrs.h"
+ 
+ #include FT_SERVICE_POSTSCRIPT_NAME_H
+-#include FT_SERVICE_XFREE86_NAME_H
++#include FT_SERVICE_FONT_FORMAT_H
+ #include FT_SERVICE_POSTSCRIPT_INFO_H
+ #include FT_SERVICE_CID_H
+ 
+@@ -168,7 +168,7 @@
+ 
+   static const FT_ServiceDescRec  cid_services[] =
+   {
+-    { FT_SERVICE_ID_XF86_NAME,            FT_XF86_FORMAT_CID },
++    { FT_SERVICE_ID_FONT_FORMAT,          FT_FONT_FORMAT_CID },
+     { FT_SERVICE_ID_POSTSCRIPT_FONT_NAME, &cid_service_ps_name },
+     { FT_SERVICE_ID_POSTSCRIPT_INFO,      &cid_service_ps_info },
+     { FT_SERVICE_ID_CID,                  &cid_service_cid_info },
+diff --git a/src/pcf/pcfdrivr.c b/src/pcf/pcfdrivr.c
+index 09baccf..552049e 100644
+--- a/src/pcf/pcfdrivr.c
++++ b/src/pcf/pcfdrivr.c
+@@ -48,7 +48,7 @@ THE SOFTWARE.
+ #define FT_COMPONENT  trace_pcfread
+ 
+ #include FT_SERVICE_BDF_H
+-#include FT_SERVICE_XFREE86_NAME_H
++#include FT_SERVICE_FONT_FORMAT_H
+ 
+ 
+   /*************************************************************************/
+@@ -669,8 +669,8 @@ THE SOFTWARE.
+ 
+   static const FT_ServiceDescRec  pcf_services[] =
+   {
+-    { FT_SERVICE_ID_BDF,       &pcf_service_bdf },
+-    { FT_SERVICE_ID_XF86_NAME, FT_XF86_FORMAT_PCF },
++    { FT_SERVICE_ID_BDF,         &pcf_service_bdf },
++    { FT_SERVICE_ID_FONT_FORMAT, FT_FONT_FORMAT_PCF },
+     { NULL, NULL }
+   };
+ 
+diff --git a/src/pfr/pfrdrivr.c b/src/pfr/pfrdrivr.c
+index bc9d1f8..af6e674 100644
+--- a/src/pfr/pfrdrivr.c
++++ b/src/pfr/pfrdrivr.c
+@@ -20,7 +20,7 @@
+ #include FT_INTERNAL_DEBUG_H
+ #include FT_INTERNAL_STREAM_H
+ #include FT_SERVICE_PFR_H
+-#include FT_SERVICE_XFREE86_NAME_H
++#include FT_SERVICE_FONT_FORMAT_H
+ #include "pfrdrivr.h"
+ #include "pfrobjs.h"
+ 
+@@ -153,7 +153,7 @@
+   static const FT_ServiceDescRec  pfr_services[] =
+   {
+     { FT_SERVICE_ID_PFR_METRICS, &pfr_metrics_service_rec },
+-    { FT_SERVICE_ID_XF86_NAME,   FT_XF86_FORMAT_PFR },
++    { FT_SERVICE_ID_FONT_FORMAT, FT_FONT_FORMAT_PFR },
+     { NULL, NULL }
+   };
+ 
+diff --git a/src/truetype/ttdriver.c b/src/truetype/ttdriver.c
+index 043d0df..08b30c9 100644
+--- a/src/truetype/ttdriver.c
++++ b/src/truetype/ttdriver.c
+@@ -20,7 +20,7 @@
+ #include FT_INTERNAL_DEBUG_H
+ #include FT_INTERNAL_STREAM_H
+ #include FT_INTERNAL_SFNT_H
+-#include FT_SERVICE_XFREE86_NAME_H
++#include FT_SERVICE_FONT_FORMAT_H
+ 
+ #ifdef TT_CONFIG_OPTION_GX_VAR_SUPPORT
+ #include FT_MULTIPLE_MASTERS_H
+@@ -448,7 +448,7 @@
+ #ifdef TT_CONFIG_OPTION_GX_VAR_SUPPORT
+   FT_DEFINE_SERVICEDESCREC5(
+     tt_services,
+-    FT_SERVICE_ID_XF86_NAME,       FT_XF86_FORMAT_TRUETYPE,
++    FT_SERVICE_ID_FONT_FORMAT,     FT_FONT_FORMAT_TRUETYPE,
+     FT_SERVICE_ID_MULTI_MASTERS,   &TT_SERVICE_GX_MULTI_MASTERS_GET,
+     FT_SERVICE_ID_TRUETYPE_ENGINE, &tt_service_truetype_engine,
+     FT_SERVICE_ID_TT_GLYF,         &TT_SERVICE_TRUETYPE_GLYF_GET,
+@@ -456,7 +456,7 @@
+ #else
+   FT_DEFINE_SERVICEDESCREC4(
+     tt_services,
+-    FT_SERVICE_ID_XF86_NAME,       FT_XF86_FORMAT_TRUETYPE,
++    FT_SERVICE_ID_FONT_FORMAT,     FT_FONT_FORMAT_TRUETYPE,
+     FT_SERVICE_ID_TRUETYPE_ENGINE, &tt_service_truetype_engine,
+     FT_SERVICE_ID_TT_GLYF,         &TT_SERVICE_TRUETYPE_GLYF_GET,
+     FT_SERVICE_ID_PROPERTIES,      &TT_SERVICE_PROPERTIES_GET )
+diff --git a/src/type1/t1driver.c b/src/type1/t1driver.c
+index 80f0ce5..571f2d2 100644
+--- a/src/type1/t1driver.c
++++ b/src/type1/t1driver.c
+@@ -32,7 +32,7 @@
+ 
+ #include FT_SERVICE_MULTIPLE_MASTERS_H
+ #include FT_SERVICE_GLYPH_DICT_H
+-#include FT_SERVICE_XFREE86_NAME_H
++#include FT_SERVICE_FONT_FORMAT_H
+ #include FT_SERVICE_POSTSCRIPT_NAME_H
+ #include FT_SERVICE_POSTSCRIPT_CMAPS_H
+ #include FT_SERVICE_POSTSCRIPT_INFO_H
+@@ -592,7 +592,7 @@
+   {
+     { FT_SERVICE_ID_POSTSCRIPT_FONT_NAME, &t1_service_ps_name },
+     { FT_SERVICE_ID_GLYPH_DICT,           &t1_service_glyph_dict },
+-    { FT_SERVICE_ID_XF86_NAME,            FT_XF86_FORMAT_TYPE_1 },
++    { FT_SERVICE_ID_FONT_FORMAT,          FT_FONT_FORMAT_TYPE_1 },
+     { FT_SERVICE_ID_POSTSCRIPT_INFO,      &t1_service_ps_info },
+ 
+ #ifndef T1_CONFIG_OPTION_NO_AFM
+diff --git a/src/type42/t42drivr.c b/src/type42/t42drivr.c
+index 768d7f3..2907096 100644
+--- a/src/type42/t42drivr.c
++++ b/src/type42/t42drivr.c
+@@ -41,7 +41,7 @@
+ #include "t42error.h"
+ #include FT_INTERNAL_DEBUG_H
+ 
+-#include FT_SERVICE_XFREE86_NAME_H
++#include FT_SERVICE_FONT_FORMAT_H
+ #include FT_SERVICE_GLYPH_DICT_H
+ #include FT_SERVICE_POSTSCRIPT_NAME_H
+ #include FT_SERVICE_POSTSCRIPT_INFO_H
+@@ -180,7 +180,7 @@
+     { FT_SERVICE_ID_GLYPH_DICT,           &t42_service_glyph_dict },
+     { FT_SERVICE_ID_POSTSCRIPT_FONT_NAME, &t42_service_ps_font_name },
+     { FT_SERVICE_ID_POSTSCRIPT_INFO,      &t42_service_ps_info },
+-    { FT_SERVICE_ID_XF86_NAME,            FT_XF86_FORMAT_TYPE_42 },
++    { FT_SERVICE_ID_FONT_FORMAT,          FT_FONT_FORMAT_TYPE_42 },
+     { NULL, NULL }
+   };
+ 
+diff --git a/src/winfonts/winfnt.c b/src/winfonts/winfnt.c
+index 558bf8f..81f7ea3 100644
+--- a/src/winfonts/winfnt.c
++++ b/src/winfonts/winfnt.c
+@@ -28,7 +28,7 @@
+ #include "winfnt.h"
+ #include "fnterrs.h"
+ #include FT_SERVICE_WINFNT_H
+-#include FT_SERVICE_XFREE86_NAME_H
++#include FT_SERVICE_FONT_FORMAT_H
+ 
+   /*************************************************************************/
+   /*                                                                       */
+@@ -1108,8 +1108,8 @@
+ 
+   static const FT_ServiceDescRec  winfnt_services[] =
+   {
+-    { FT_SERVICE_ID_XF86_NAME, FT_XF86_FORMAT_WINFNT },
+-    { FT_SERVICE_ID_WINFNT,    &winfnt_service_rec },
++    { FT_SERVICE_ID_FONT_FORMAT, FT_FONT_FORMAT_WINFNT },
++    { FT_SERVICE_ID_WINFNT,      &winfnt_service_rec },
+     { NULL, NULL }
+   };
+ 
+-- 
+2.3.4
+
+From d3284462c3f227a4bc396fa9f3b716e46d43f5c8 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Wed, 11 Mar 2015 16:45:58 +0100
+Subject: [PATCH] [autofit] Add support for Arabic script.
+
+Thanks to Titus Nemeth <tn@tntypography.eu> for guidance!
+
+* src/autofit/afblue.dat: Add blue zone data for Arabic.
+
+* src/autofit/afblue.c, src/autofit/afblue.h: Regenerated.
+
+* src/autofit/afscript.h: Add Arabic standard characters.
+
+* src/autofit/afranges.c: Add Arabic data.
+
+* src/autofit/afstyles.h: Add Arabic data.
+
+* docs/CHANGES: Document it.
+---
+ ChangeLog              | 18 +++++++++++
+ docs/CHANGES           |  2 ++
+ src/autofit/afblue.c   |  7 +++++
+ src/autofit/afblue.dat | 10 +++++++
+ src/autofit/afblue.h   | 81 ++++++++++++++++++++++++++------------------------
+ src/autofit/afranges.c | 11 +++++++
+ src/autofit/afscript.h |  5 ++++
+ src/autofit/afstyles.h |  8 +++++
+ 8 files changed, 103 insertions(+), 39 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 431a405..37e5e48 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,5 +1,23 @@
+ 2015-03-11  Werner Lemberg  <wl@gnu.org>
+ 
++	[autofit] Add support for Arabic script.
++
++	Thanks to Titus Nemeth <tn@tntypography.eu> for guidance!
++
++	* src/autofit/afblue.dat: Add blue zone data for Arabic.
++
++	* src/autofit/afblue.c, src/autofit/afblue.h: Regenerated.
++
++	* src/autofit/afscript.h: Add Arabic standard characters.
++
++	* src/autofit/afranges.c: Add Arabic data.
++
++	* src/autofit/afstyles.h: Add Arabic data.
++
++	* docs/CHANGES: Document it.
++
++2015-03-11  Werner Lemberg  <wl@gnu.org>
++
+ 	Rename `svxf86nm.h' to `svfntfmt.h'; update related symbols.
+ 
+ 	* include/internal/ftserv.h (FT_SERVICE_XFREE86_NAME_H): Renamed
+diff --git a/docs/CHANGES b/docs/CHANGES
+index 2153e3a..b85a71e 100644
+--- a/docs/CHANGES
++++ b/docs/CHANGES
+@@ -23,6 +23,8 @@ CHANGES BETWEEN 2.5.5 and 2.6
+ 
+     - Thai script support has been added to the auto-hinter.
+ 
++    - Arabic script support has been added to the auto-hinter.
++
+ 
+   III. MISCELLANEOUS
+ 
+diff --git a/src/autofit/afblue.c b/src/autofit/afblue.c
+index 1f9869f..e2b2451 100644
+--- a/src/autofit/afblue.c
++++ b/src/autofit/afblue.c
+@@ -26,6 +26,10 @@
+   af_blue_strings[] =
+   {
+     /* */
++    '\xD8', '\xA7', '\xD8', '\xA5', '\xD9', '\x84', '\xD9', '\x83', '\xD8', '\xB7', '\xD8', '\xB8',  /* ا إ ل ك ط ظ */
++    '\0',
++    '\xD8', '\xAA', '\xD8', '\xAB', '\xD8', '\xB7', '\xD8', '\xB8', '\xD9', '\x83',  /* ت ث ط ظ ك */
++    '\0',
+     '\xD0', '\x91', '\xD0', '\x92', '\xD0', '\x95', '\xD0', '\x9F', '\xD0', '\x97', '\xD0', '\x9E', '\xD0', '\xA1', '\xD0', '\xAD',  /* БВЕПЗОСЭ */
+     '\0',
+     '\xD0', '\x91', '\xD0', '\x92', '\xD0', '\x95', '\xD0', '\xA8', '\xD0', '\x97', '\xD0', '\x9E', '\xD0', '\xA1', '\xD0', '\xAD',  /* БВЕШЗОСЭ */
+@@ -135,6 +139,9 @@
+   af_blue_stringsets[] =
+   {
+     /* */
++    { AF_BLUE_STRING_ARABIC_TOP,   AF_BLUE_PROPERTY_LATIN_TOP },
++    { AF_BLUE_STRING_ARABIC_JOIN,  0                          },
++    { AF_BLUE_STRING_MAX,          0                          },
+     { AF_BLUE_STRING_CYRILLIC_CAPITAL_TOP,     AF_BLUE_PROPERTY_LATIN_TOP        },
+     { AF_BLUE_STRING_CYRILLIC_CAPITAL_BOTTOM,  0                                 },
+     { AF_BLUE_STRING_CYRILLIC_SMALL,           AF_BLUE_PROPERTY_LATIN_TOP      |
+diff --git a/src/autofit/afblue.dat b/src/autofit/afblue.dat
+index 4c35b22..fd5684e 100644
+--- a/src/autofit/afblue.dat
++++ b/src/autofit/afblue.dat
+@@ -67,6 +67,11 @@
+ 
+ AF_BLUE_STRING_ENUM AF_BLUE_STRINGS_ARRAY AF_BLUE_STRING_MAX_LEN:
+ 
++  AF_BLUE_STRING_ARABIC_TOP
++    "ا إ ل ك ط ظ"
++  AF_BLUE_STRING_ARABIC_JOIN
++    "ت ث ط ظ ك"
++
+   AF_BLUE_STRING_CYRILLIC_CAPITAL_TOP
+     "БВЕПЗОСЭ"
+   AF_BLUE_STRING_CYRILLIC_CAPITAL_BOTTOM
+@@ -283,6 +288,11 @@ AF_BLUE_STRING_ENUM AF_BLUE_STRINGS_ARRAY AF_BLUE_STRING_MAX_LEN:
+ 
+ AF_BLUE_STRINGSET_ENUM AF_BLUE_STRINGSETS_ARRAY AF_BLUE_STRINGSET_MAX_LEN:
+ 
++  AF_BLUE_STRINGSET_ARAB
++    { AF_BLUE_STRING_ARABIC_TOP,   AF_BLUE_PROPERTY_LATIN_TOP }
++    { AF_BLUE_STRING_ARABIC_JOIN,  0                          }
++    { AF_BLUE_STRING_MAX,          0                          }
++
+   AF_BLUE_STRINGSET_CYRL
+     { AF_BLUE_STRING_CYRILLIC_CAPITAL_TOP,     AF_BLUE_PROPERTY_LATIN_TOP        }
+     { AF_BLUE_STRING_CYRILLIC_CAPITAL_BOTTOM,  0                                 }
+diff --git a/src/autofit/afblue.h b/src/autofit/afblue.h
+index c27de4f..94e33a9 100644
+--- a/src/autofit/afblue.h
++++ b/src/autofit/afblue.h
+@@ -74,37 +74,39 @@ FT_BEGIN_HEADER
+ 
+   typedef enum  AF_Blue_String_
+   {
+-    AF_BLUE_STRING_CYRILLIC_CAPITAL_TOP = 0,
+-    AF_BLUE_STRING_CYRILLIC_CAPITAL_BOTTOM = 17,
+-    AF_BLUE_STRING_CYRILLIC_SMALL = 34,
+-    AF_BLUE_STRING_CYRILLIC_SMALL_DESCENDER = 51,
+-    AF_BLUE_STRING_DEVANAGARI_BASE = 58,
+-    AF_BLUE_STRING_DEVANAGARI_TOP = 83,
+-    AF_BLUE_STRING_DEVANAGARI_HEAD = 108,
+-    AF_BLUE_STRING_DEVANAGARI_BOTTOM = 133,
+-    AF_BLUE_STRING_GREEK_CAPITAL_TOP = 140,
+-    AF_BLUE_STRING_GREEK_CAPITAL_BOTTOM = 155,
+-    AF_BLUE_STRING_GREEK_SMALL_BETA_TOP = 168,
+-    AF_BLUE_STRING_GREEK_SMALL = 181,
+-    AF_BLUE_STRING_GREEK_SMALL_DESCENDER = 198,
+-    AF_BLUE_STRING_HEBREW_TOP = 215,
+-    AF_BLUE_STRING_HEBREW_BOTTOM = 232,
+-    AF_BLUE_STRING_HEBREW_DESCENDER = 245,
+-    AF_BLUE_STRING_LATIN_CAPITAL_TOP = 256,
+-    AF_BLUE_STRING_LATIN_CAPITAL_BOTTOM = 265,
+-    AF_BLUE_STRING_LATIN_SMALL_F_TOP = 274,
+-    AF_BLUE_STRING_LATIN_SMALL = 282,
+-    AF_BLUE_STRING_LATIN_SMALL_DESCENDER = 290,
+-    AF_BLUE_STRING_TELUGU_TOP = 296,
+-    AF_BLUE_STRING_TELUGU_BOTTOM = 318,
+-    AF_BLUE_STRING_THAI_TOP = 340,
+-    AF_BLUE_STRING_THAI_BOTTOM = 359,
+-    AF_BLUE_STRING_THAI_ASCENDER = 381,
+-    AF_BLUE_STRING_THAI_LARGE_ASCENDER = 391,
+-    AF_BLUE_STRING_THAI_DESCENDER = 401,
+-    AF_BLUE_STRING_THAI_LARGE_DESCENDER = 414,
+-    AF_BLUE_STRING_THAI_DIGIT_TOP = 421,
+-    af_blue_1_1 = 430,
++    AF_BLUE_STRING_ARABIC_TOP = 0,
++    AF_BLUE_STRING_ARABIC_JOIN = 13,
++    AF_BLUE_STRING_CYRILLIC_CAPITAL_TOP = 24,
++    AF_BLUE_STRING_CYRILLIC_CAPITAL_BOTTOM = 41,
++    AF_BLUE_STRING_CYRILLIC_SMALL = 58,
++    AF_BLUE_STRING_CYRILLIC_SMALL_DESCENDER = 75,
++    AF_BLUE_STRING_DEVANAGARI_BASE = 82,
++    AF_BLUE_STRING_DEVANAGARI_TOP = 107,
++    AF_BLUE_STRING_DEVANAGARI_HEAD = 132,
++    AF_BLUE_STRING_DEVANAGARI_BOTTOM = 157,
++    AF_BLUE_STRING_GREEK_CAPITAL_TOP = 164,
++    AF_BLUE_STRING_GREEK_CAPITAL_BOTTOM = 179,
++    AF_BLUE_STRING_GREEK_SMALL_BETA_TOP = 192,
++    AF_BLUE_STRING_GREEK_SMALL = 205,
++    AF_BLUE_STRING_GREEK_SMALL_DESCENDER = 222,
++    AF_BLUE_STRING_HEBREW_TOP = 239,
++    AF_BLUE_STRING_HEBREW_BOTTOM = 256,
++    AF_BLUE_STRING_HEBREW_DESCENDER = 269,
++    AF_BLUE_STRING_LATIN_CAPITAL_TOP = 280,
++    AF_BLUE_STRING_LATIN_CAPITAL_BOTTOM = 289,
++    AF_BLUE_STRING_LATIN_SMALL_F_TOP = 298,
++    AF_BLUE_STRING_LATIN_SMALL = 306,
++    AF_BLUE_STRING_LATIN_SMALL_DESCENDER = 314,
++    AF_BLUE_STRING_TELUGU_TOP = 320,
++    AF_BLUE_STRING_TELUGU_BOTTOM = 342,
++    AF_BLUE_STRING_THAI_TOP = 364,
++    AF_BLUE_STRING_THAI_BOTTOM = 383,
++    AF_BLUE_STRING_THAI_ASCENDER = 405,
++    AF_BLUE_STRING_THAI_LARGE_ASCENDER = 415,
++    AF_BLUE_STRING_THAI_DESCENDER = 425,
++    AF_BLUE_STRING_THAI_LARGE_DESCENDER = 438,
++    AF_BLUE_STRING_THAI_DIGIT_TOP = 445,
++    af_blue_1_1 = 454,
+ #ifdef AF_CONFIG_OPTION_CJK
+     AF_BLUE_STRING_CJK_TOP = af_blue_1_1 + 1,
+     AF_BLUE_STRING_CJK_BOTTOM = af_blue_1_1 + 153,
+@@ -162,14 +164,15 @@ FT_BEGIN_HEADER
+ 
+   typedef enum  AF_Blue_Stringset_
+   {
+-    AF_BLUE_STRINGSET_CYRL = 0,
+-    AF_BLUE_STRINGSET_DEVA = 6,
+-    AF_BLUE_STRINGSET_GREK = 12,
+-    AF_BLUE_STRINGSET_HEBR = 19,
+-    AF_BLUE_STRINGSET_LATN = 23,
+-    AF_BLUE_STRINGSET_TELU = 30,
+-    AF_BLUE_STRINGSET_THAI = 33,
+-    af_blue_2_1 = 41,
++    AF_BLUE_STRINGSET_ARAB = 0,
++    AF_BLUE_STRINGSET_CYRL = 3,
++    AF_BLUE_STRINGSET_DEVA = 9,
++    AF_BLUE_STRINGSET_GREK = 15,
++    AF_BLUE_STRINGSET_HEBR = 22,
++    AF_BLUE_STRINGSET_LATN = 26,
++    AF_BLUE_STRINGSET_TELU = 33,
++    AF_BLUE_STRINGSET_THAI = 36,
++    af_blue_2_1 = 44,
+ #ifdef AF_CONFIG_OPTION_CJK
+     AF_BLUE_STRINGSET_HANI = af_blue_2_1 + 0,
+     af_blue_2_1_1 = af_blue_2_1 + 2,
+diff --git a/src/autofit/afranges.c b/src/autofit/afranges.c
+index 15837b4..c1e0afb 100644
+--- a/src/autofit/afranges.c
++++ b/src/autofit/afranges.c
+@@ -19,6 +19,17 @@
+ #include "afranges.h"
+ 
+ 
++  const AF_Script_UniRangeRec  af_arab_uniranges[] =
++  {
++    AF_UNIRANGE_REC(  0x0600UL,  0x06FFUL ),  /* Arabic                                 */
++    AF_UNIRANGE_REC(  0x0750UL,  0x07FFUL ),  /* Arabic Supplement                      */
++    AF_UNIRANGE_REC(  0x08A0UL,  0x08FFUL ),  /* Arabic Extended-A                      */
++    AF_UNIRANGE_REC(  0xFB50UL,  0xFDFFUL ),  /* Arabic Presentation Forms-A            */
++    AF_UNIRANGE_REC(  0xFE70UL,  0xFEFFUL ),  /* Arabic Presentation Forms-B            */
++    AF_UNIRANGE_REC( 0x1EE00UL, 0x1EEFFUL ),  /* Arabic Mathematical Alphabetic Symbols */
++    AF_UNIRANGE_REC(       0UL,       0UL )
++  };
++
+   const AF_Script_UniRangeRec  af_cyrl_uniranges[] =
+   {
+     AF_UNIRANGE_REC(  0x0400UL,  0x04FFUL ),  /* Cyrillic            */
+diff --git a/src/autofit/afscript.h b/src/autofit/afscript.h
+index 362c75e..dfcc830 100644
+--- a/src/autofit/afscript.h
++++ b/src/autofit/afscript.h
+@@ -26,6 +26,11 @@
+   /* script name tag, followed by a string of standard characters (to */
+   /* derive the standard width and height of stems).                  */
+ 
++  SCRIPT( arab, ARAB,
++          "Arabic",
++          HB_SCRIPT_ARABIC,
++          0x644, 0x62D, 0x640 ) /* ل ح ـ */
++
+   SCRIPT( cyrl, CYRL,
+           "Cyrillic",
+           HB_SCRIPT_CYRILLIC,
+diff --git a/src/autofit/afstyles.h b/src/autofit/afstyles.h
+index a65b429..bfd5bb9 100644
+--- a/src/autofit/afstyles.h
++++ b/src/autofit/afstyles.h
+@@ -80,6 +80,14 @@
+                        "default",                        \
+                        DEFAULT )
+ 
++
++  STYLE( arab_dflt, ARAB_DFLT,
++         "Arabic default style",
++         AF_WRITING_SYSTEM_LATIN,
++         AF_SCRIPT_ARAB,
++         AF_BLUE_STRINGSET_ARAB,
++         AF_COVERAGE_DEFAULT )
++
+   META_STYLE_LATIN( cyrl, CYRL, "Cyrillic" )
+ 
+   META_STYLE_LATIN( grek, GREK, "Greek" )
+-- 
+2.3.4
+
+From 6a17172687cbcef081f2acb3e7257d2c9305c2aa Mon Sep 17 00:00:00 2001
+From: Alexei Podtelezhnikov <apodtele@gmail.com>
+Date: Tue, 17 Mar 2015 22:43:08 -0400
+Subject: [PATCH] Fix Savannah bug #44412 (part 2).
+
+* src/base/fttrigon.c (FT_Sin, FT_Cos, FT_Tan): Call `FT_Vector_Unit'.
+---
+ ChangeLog           |  6 ++++++
+ src/base/fttrigon.c | 17 +++++++++--------
+ 2 files changed, 15 insertions(+), 8 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 37e5e48..3b21ff6 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,9 @@
++2015-03-17  Alexei Podtelezhnikov <apodtele@gmail.com>
++
++	Fix Savannah bug #44412 (part 2).
++
++	* src/base/fttrigon.c (FT_Sin, FT_Cos, FT_Tan): Call `FT_Vector_Unit'.
++
+ 2015-03-11  Werner Lemberg  <wl@gnu.org>
+ 
+ 	[autofit] Add support for Arabic script.
+diff --git a/src/base/fttrigon.c b/src/base/fttrigon.c
+index a55920e..8972ba8 100644
+--- a/src/base/fttrigon.c
++++ b/src/base/fttrigon.c
+@@ -299,11 +299,9 @@
+     FT_Vector  v;
+ 
+ 
+-    v.x = FT_TRIG_SCALE >> 8;
+-    v.y = 0;
+-    ft_trig_pseudo_rotate( &v, angle );
++    FT_Vector_Unit( &v, angle );
+ 
+-    return ( v.x + 0x80L ) >> 8;
++    return v.x;
+   }
+ 
+ 
+@@ -312,7 +310,12 @@
+   FT_EXPORT_DEF( FT_Fixed )
+   FT_Sin( FT_Angle  angle )
+   {
+-    return FT_Cos( FT_ANGLE_PI2 - angle );
++    FT_Vector  v;
++
++
++    FT_Vector_Unit( &v, angle );
++
++    return v.y;
+   }
+ 
+ 
+@@ -324,9 +327,7 @@
+     FT_Vector  v;
+ 
+ 
+-    v.x = FT_TRIG_SCALE >> 8;
+-    v.y = 0;
+-    ft_trig_pseudo_rotate( &v, angle );
++    FT_Vector_Unit( &v, angle );
+ 
+     return FT_DivFix( v.y, v.x );
+   }
+-- 
+2.3.4
+
+From 772a5e5ddd2861e9b27de745699670e746442e0e Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Fri, 20 Mar 2015 09:40:10 +0100
+Subject: [PATCH] Update links to Apple's TrueType specification.
+
+---
+ devel/ftoption.h           | 2 +-
+ include/config/ftoption.h  | 2 +-
+ include/internal/tttypes.h | 6 ++----
+ include/ttnameid.h         | 2 +-
+ src/gxvalid/gxvjust.c      | 2 +-
+ src/gxvalid/gxvtrak.c      | 2 +-
+ src/tools/glnames.py       | 2 +-
+ 7 files changed, 8 insertions(+), 10 deletions(-)
+
+diff --git a/devel/ftoption.h b/devel/ftoption.h
+index d08a467..2065142 100644
+--- a/devel/ftoption.h
++++ b/devel/ftoption.h
+@@ -669,7 +669,7 @@ FT_BEGIN_HEADER
+   /* fonts will not have them.                                             */
+   /*                                                                       */
+   /*   http://www.microsoft.com/typography/otspec/glyf.htm                 */
+-  /*   http://fonts.apple.com/TTRefMan/RM06/Chap6glyf.html                 */
++  /*   https://developer.apple.com/fonts/TrueType-Reference-Manual/RM06/Chap6glyf.html */
+   /*                                                                       */
+ #undef TT_CONFIG_OPTION_COMPONENT_OFFSET_SCALED
+ 
+diff --git a/include/config/ftoption.h b/include/config/ftoption.h
+index 34b71b2..a8ca4c8 100644
+--- a/include/config/ftoption.h
++++ b/include/config/ftoption.h
+@@ -669,7 +669,7 @@ FT_BEGIN_HEADER
+   /* fonts will not have them.                                             */
+   /*                                                                       */
+   /*   http://www.microsoft.com/typography/otspec/glyf.htm                 */
+-  /*   http://fonts.apple.com/TTRefMan/RM06/Chap6glyf.html                 */
++  /*   https://developer.apple.com/fonts/TrueType-Reference-Manual/RM06/Chap6glyf.html */
+   /*                                                                       */
+ #undef TT_CONFIG_OPTION_COMPONENT_OFFSET_SCALED
+ 
+diff --git a/include/internal/tttypes.h b/include/internal/tttypes.h
+index 1d48f11..1d442f7 100644
+--- a/include/internal/tttypes.h
++++ b/include/internal/tttypes.h
+@@ -614,8 +614,7 @@ FT_BEGIN_HEADER
+   /*                       in use by other platforms (e.g. Newton).        */
+   /*                       For details, please see                         */
+   /*                                                                       */
+-  /*                         http://fonts.apple.com/                       */
+-  /*                                TTRefMan/RM06/Chap6bloc.html           */
++  /*                         https://developer.apple.com/fonts/TrueType-Reference-Manual/RM06/Chap6bloc.html */
+   /*                                                                       */
+   /*   hori             :: The line metrics for horizontal layouts.        */
+   /*                                                                       */
+@@ -635,8 +634,7 @@ FT_BEGIN_HEADER
+   /*   flags            :: Is this a vertical or horizontal strike?  For   */
+   /*                       details, please see                             */
+   /*                                                                       */
+-  /*                         http://fonts.apple.com/                       */
+-  /*                                TTRefMan/RM06/Chap6bloc.html           */
++  /*                         https://developer.apple.com/fonts/TrueType-Reference-Manual/RM06/Chap6bloc.html */
+   /*                                                                       */
+   typedef struct  TT_SBit_StrikeRec_
+   {
+diff --git a/include/ttnameid.h b/include/ttnameid.h
+index 873b266..c9585f2 100644
+--- a/include/ttnameid.h
++++ b/include/ttnameid.h
+@@ -321,7 +321,7 @@ FT_BEGIN_HEADER
+   /*                                                                       */
+   /* The canonical source for the Apple assigned Language ID's is at       */
+   /*                                                                       */
+-  /*   https://developer.apple.com/fonts/TTRefMan/RM06/Chap6name.html      */
++  /*   https://developer.apple.com/fonts/TrueType-Reference-Manual/RM06/Chap6name.html */
+   /*                                                                       */
+ #define TT_MAC_LANGID_ENGLISH                       0
+ #define TT_MAC_LANGID_FRENCH                        1
+diff --git a/src/gxvalid/gxvjust.c b/src/gxvalid/gxvjust.c
+index add90d2..55b44bc 100644
+--- a/src/gxvalid/gxvjust.c
++++ b/src/gxvalid/gxvjust.c
+@@ -42,7 +42,7 @@
+ 
+   /*
+    * referred `just' table format specification:
+-   * http://developer.apple.com/fonts/TTRefMan/RM06/Chap6just.html
++   * https://developer.apple.com/fonts/TrueType-Reference-Manual/RM06/Chap6just.html
+    * last updated 2000.
+    * ----------------------------------------------
+    * [JUST HEADER]: GXV_JUST_HEADER_SIZE
+diff --git a/src/gxvalid/gxvtrak.c b/src/gxvalid/gxvtrak.c
+index cafc99c..c4d29e4 100644
+--- a/src/gxvalid/gxvtrak.c
++++ b/src/gxvalid/gxvtrak.c
+@@ -49,7 +49,7 @@
+ 
+     /*
+      * referred track table format specification:
+-     * http://developer.apple.com/fonts/TTRefMan/RM06/Chap6trak.html
++     * https://developer.apple.com/fonts/TrueType-Reference-Manual/RM06/Chap6trak.html
+      * last update was 1996.
+      * ----------------------------------------------
+      * [MINIMUM HEADER]: GXV_TRAK_SIZE_MIN
+diff --git a/src/tools/glnames.py b/src/tools/glnames.py
+index 5d9b08f..0ad554c 100644
+--- a/src/tools/glnames.py
++++ b/src/tools/glnames.py
+@@ -35,7 +35,7 @@ import sys, string, struct, re, os.path
+ #
+ # See
+ #
+-#   http://fonts.apple.com/TTRefMan/RM06/Chap6post.html
++#   https://developer.apple.com/fonts/TrueType-Reference-Manual/RM06/Chap6post.html
+ #
+ # for the official list.
+ #
+-- 
+2.3.4
+
+From 2d7284e962b5fe93c8f5c95768239d7480e50d28 Mon Sep 17 00:00:00 2001
+From: Alexei Podtelezhnikov <apodtele@gmail.com>
+Date: Fri, 20 Mar 2015 21:34:19 -0400
+Subject: [PATCH] * src/base/fttrigon.c (FT_Vector_Rotate): Minor refactoring.
+
+---
+ ChangeLog           |  4 ++++
+ src/base/fttrigon.c | 41 ++++++++++++++++++++---------------------
+ 2 files changed, 24 insertions(+), 21 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 3b21ff6..2185d92 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,7 @@
++2015-03-20  Alexei Podtelezhnikov <apodtele@gmail.com>
++
++	* src/base/fttrigon.c (FT_Vector_Rotate): Minor refactoring.
++
+ 2015-03-17  Alexei Podtelezhnikov <apodtele@gmail.com>
+ 
+ 	Fix Savannah bug #44412 (part 2).
+diff --git a/src/base/fttrigon.c b/src/base/fttrigon.c
+index 8972ba8..4255245 100644
+--- a/src/base/fttrigon.c
++++ b/src/base/fttrigon.c
+@@ -389,33 +389,32 @@
+     FT_Vector  v;
+ 
+ 
+-    if ( !vec )
++    if ( !vec || !angle )
+       return;
+ 
+-    v.x   = vec->x;
+-    v.y   = vec->y;
++    v = *vec;
+ 
+-    if ( angle && ( v.x != 0 || v.y != 0 ) )
+-    {
+-      shift = ft_trig_prenorm( &v );
+-      ft_trig_pseudo_rotate( &v, angle );
+-      v.x = ft_trig_downscale( v.x );
+-      v.y = ft_trig_downscale( v.y );
++    if ( v.x == 0 && v.y == 0 )
++      return;
+ 
+-      if ( shift > 0 )
+-      {
+-        FT_Int32  half = (FT_Int32)1L << ( shift - 1 );
++    shift = ft_trig_prenorm( &v );
++    ft_trig_pseudo_rotate( &v, angle );
++    v.x = ft_trig_downscale( v.x );
++    v.y = ft_trig_downscale( v.y );
+ 
++    if ( shift > 0 )
++    {
++      FT_Int32  half = (FT_Int32)1L << ( shift - 1 );
+ 
+-        vec->x = ( v.x + half + FT_SIGN_LONG( v.x ) ) >> shift;
+-        vec->y = ( v.y + half + FT_SIGN_LONG( v.y ) ) >> shift;
+-      }
+-      else
+-      {
+-        shift  = -shift;
+-        vec->x = (FT_Pos)( (FT_ULong)v.x << shift );
+-        vec->y = (FT_Pos)( (FT_ULong)v.y << shift );
+-      }
++
++      vec->x = ( v.x + half + FT_SIGN_LONG( v.x ) ) >> shift;
++      vec->y = ( v.y + half + FT_SIGN_LONG( v.y ) ) >> shift;
++    }
++    else
++    {
++      shift  = -shift;
++      vec->x = (FT_Pos)( (FT_ULong)v.x << shift );
++      vec->y = (FT_Pos)( (FT_ULong)v.y << shift );
+     }
+   }
+ 
+-- 
+2.3.4
+
+From 6cc425db912497bdced7004e4b6af0dca2852ca4 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Sat, 21 Mar 2015 06:51:07 +0100
+Subject: [PATCH] [truetype] Improve `gvar' handling.
+
+* src/truetype/ttgxvar.c (ft_var_readpackedpoints): Correctly handle
+single-element runs.  Cf. glyph `Q' in Skia.ttf with weights larger
+than the default.
+---
+ ChangeLog              | 8 ++++++++
+ src/truetype/ttgxvar.c | 4 ++--
+ 2 files changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 2185d92..8dc1ce2 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,11 @@
++2015-03-21  Werner Lemberg  <wl@gnu.org>
++
++	[truetype] Improve `gvar' handling.
++
++	* src/truetype/ttgxvar.c (ft_var_readpackedpoints): Correctly handle
++	single-element runs.  Cf. glyph `Q' in Skia.ttf with weights larger
++	than the default.
++
+ 2015-03-20  Alexei Podtelezhnikov <apodtele@gmail.com>
+ 
+ 	* src/base/fttrigon.c (FT_Vector_Rotate): Minor refactoring.
+diff --git a/src/truetype/ttgxvar.c b/src/truetype/ttgxvar.c
+index 2652e75..77796f0 100644
+--- a/src/truetype/ttgxvar.c
++++ b/src/truetype/ttgxvar.c
+@@ -164,7 +164,7 @@
+         first       = FT_GET_USHORT();
+         points[i++] = first;
+ 
+-        if ( runcnt < 1 || i + runcnt >= n )
++        if ( runcnt < 1 || i + runcnt > n )
+           goto Exit;
+ 
+         /* first point not included in run count */
+@@ -179,7 +179,7 @@
+         first       = FT_GET_BYTE();
+         points[i++] = first;
+ 
+-        if ( runcnt < 1 || i + runcnt >= n )
++        if ( runcnt < 1 || i + runcnt > n )
+           goto Exit;
+ 
+         for ( j = 0; j < runcnt; j++ )
+-- 
+2.3.4
+
+From dac5644ceaf07cf8c13b639bae176af7bb42643c Mon Sep 17 00:00:00 2001
+From: Alexei Podtelezhnikov <apodtele@gmail.com>
+Date: Sat, 21 Mar 2015 23:30:16 -0400
+Subject: [PATCH] [base] Optimize `FT_Angle_Diff'.
+
+Under normal circumstances we are usually close to the desired range
+of angle values, so that the remainder is not really necessary.
+
+* src/base/fttrigon.c (FT_Angle_Diff): Use loops instead of remainder.
+
+* src/autofit/aftypes.h (AF_ANGLE_DIFF): Ditto in the unused macro.
+---
+ ChangeLog             | 11 +++++++++++
+ src/autofit/aftypes.h |  5 ++---
+ src/base/fttrigon.c   |  5 ++---
+ 3 files changed, 15 insertions(+), 6 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 8dc1ce2..7a4e3b2 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,14 @@
++2015-03-21  Alexei Podtelezhnikov <apodtele@gmail.com>
++
++	[base] Optimize `FT_Angle_Diff'.
++
++	Under normal circumstances we are usually close to the desired range
++	of angle values, so that the remainder is not really necessary.
++
++	* src/base/fttrigon.c (FT_Angle_Diff): Use loops instead of remainder.
++
++	* src/autofit/aftypes.h (AF_ANGLE_DIFF): Ditto in the unused macro.
++
+ 2015-03-21  Werner Lemberg  <wl@gnu.org>
+ 
+ 	[truetype] Improve `gvar' handling.
+diff --git a/src/autofit/aftypes.h b/src/autofit/aftypes.h
+index 1666674..e105dc8 100644
+--- a/src/autofit/aftypes.h
++++ b/src/autofit/aftypes.h
+@@ -138,11 +138,10 @@ extern void*  _af_debug_hints;
+     AF_Angle  _delta = (angle2) - (angle1);     \
+                                                 \
+                                                 \
+-    _delta %= AF_ANGLE_2PI;                     \
+-    if ( _delta < 0 )                           \
++    while ( _delta <= -AF_ANGLE_PI )            \
+       _delta += AF_ANGLE_2PI;                   \
+                                                 \
+-    if ( _delta > AF_ANGLE_PI )                 \
++    while ( _delta > AF_ANGLE_PI )              \
+       _delta -= AF_ANGLE_2PI;                   \
+                                                 \
+     result = _delta;                            \
+diff --git a/src/base/fttrigon.c b/src/base/fttrigon.c
+index 4255245..5b24304 100644
+--- a/src/base/fttrigon.c
++++ b/src/base/fttrigon.c
+@@ -512,11 +512,10 @@
+     FT_Angle  delta = angle2 - angle1;
+ 
+ 
+-    delta %= FT_ANGLE_2PI;
+-    if ( delta < 0 )
++    while ( delta <= -FT_ANGLE_PI )
+       delta += FT_ANGLE_2PI;
+ 
+-    if ( delta > FT_ANGLE_PI )
++    while ( delta > FT_ANGLE_PI )
+       delta -= FT_ANGLE_2PI;
+ 
+     return delta;
+-- 
+2.3.4
+
+From 8ce3026304d3167c1f7b6b36d75a139050145b11 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Fri, 27 Mar 2015 08:33:47 +0100
+Subject: [PATCH] [cff] Trace charstring nesting levels.
+
+* src/cff/cf2intrp.c (cf2_interpT2CharString) <cf2_cmdCALLGSUBR,
+cf2_cmdCALLSUBR, cf2_cmdRETURN>: Implement it.
+
+* src/cff/cffgload.c (cff_decoder_parse_charstrings)
+<cff_op_callsubr, cff_op_callgsubr, cff_op_return>: Ditto.
+---
+ ChangeLog          | 10 ++++++++++
+ src/cff/cf2intrp.c | 12 +++++++-----
+ src/cff/cffgload.c | 11 ++++++++---
+ 3 files changed, 25 insertions(+), 8 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 7a4e3b2..7d58921 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,13 @@
++2015-03-27  Werner Lemberg  <wl@gnu.org>
++
++	[cff] Trace charstring nesting levels.
++
++	* src/cff/cf2intrp.c (cf2_interpT2CharString) <cf2_cmdCALLGSUBR,
++	cf2_cmdCALLSUBR, cf2_cmdRETURN>: Implement it.
++
++	* src/cff/cffgload.c (cff_decoder_parse_charstrings)
++	<cff_op_callsubr, cff_op_callgsubr, cff_op_return>: Ditto.
++
+ 2015-03-21  Alexei Podtelezhnikov <apodtele@gmail.com>
+ 
+ 	[base] Optimize `FT_Angle_Diff'.
+diff --git a/src/cff/cf2intrp.c b/src/cff/cf2intrp.c
+index 5ee4e55..d7f7a7b 100644
+--- a/src/cff/cf2intrp.c
++++ b/src/cff/cf2intrp.c
+@@ -771,8 +771,9 @@
+           switch ( op1 )
+           {
+           case cf2_cmdCALLGSUBR:
+-            FT_TRACE4(( "(%d)\n",
+-                        subrIndex + (CF2_UInt)decoder->globals_bias ));
++            FT_TRACE4(( " (idx %d, entering level %d)\n",
++                        subrIndex + (CF2_UInt)decoder->globals_bias,
++                        charstringIndex + 1 ));
+ 
+             if ( cf2_initGlobalRegionBuffer( decoder,
+                                              subrIndex,
+@@ -785,8 +786,9 @@
+ 
+           default:
+             /* cf2_cmdCALLSUBR */
+-            FT_TRACE4(( "(%d)\n",
+-                        subrIndex + (CF2_UInt)decoder->locals_bias ));
++            FT_TRACE4(( " (idx %d, entering level %d)\n",
++                        subrIndex + (CF2_UInt)decoder->locals_bias,
++                        charstringIndex + 1 ));
+ 
+             if ( cf2_initLocalRegionBuffer( decoder,
+                                             subrIndex,
+@@ -802,7 +804,7 @@
+         continue; /* do not clear the stack */
+ 
+       case cf2_cmdRETURN:
+-        FT_TRACE4(( " return\n" ));
++        FT_TRACE4(( " return (leaving level %d)\n", charstringIndex ));
+ 
+         if ( charstringIndex < 1 )
+         {
+diff --git a/src/cff/cffgload.c b/src/cff/cffgload.c
+index 414790a..b5bc4a2 100644
+--- a/src/cff/cffgload.c
++++ b/src/cff/cffgload.c
+@@ -2389,7 +2389,9 @@
+                                       decoder->locals_bias );
+ 
+ 
+-            FT_TRACE4(( " callsubr(%d)\n", idx ));
++            FT_TRACE4(( " callsubr (idx %d, entering level %d)\n",
++                        idx,
++                        zone - decoder->zones + 1 ));
+ 
+             if ( idx >= decoder->num_locals )
+             {
+@@ -2431,7 +2433,9 @@
+                                       decoder->globals_bias );
+ 
+ 
+-            FT_TRACE4(( " callgsubr(%d)\n", idx ));
++            FT_TRACE4(( " callgsubr (idx %d, entering level %d)\n",
++                        idx,
++                        zone - decoder->zones + 1 ));
+ 
+             if ( idx >= decoder->num_globals )
+             {
+@@ -2468,7 +2472,8 @@
+           break;
+ 
+         case cff_op_return:
+-          FT_TRACE4(( " return\n" ));
++          FT_TRACE4(( " return (leaving level %d)\n",
++                      decoder->zone - decoder->zones ));
+ 
+           if ( decoder->zone <= decoder->zones )
+           {
+-- 
+2.3.4
+
+From dd5d6d7a8021b0950054f6b1b2166a1ff184d101 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Sun, 29 Mar 2015 10:04:22 +0200
+Subject: [PATCH] [type1] Minor.
+
+* src/type1/t1load.c (T1_Set_MM_Blend, T1_Set_MM_Design): Use
+FT_THROW.
+(T1_Set_Var_Design): Use T1_MAX_MM_AXIS and FT_THROW.
+---
+ ChangeLog          |   8 +++
+ src/type1/t1load.c | 143 ++++++++++++++++++++++++-----------------------------
+ 2 files changed, 73 insertions(+), 78 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 7d58921..4bb3ca0 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,5 +1,13 @@
+ 2015-03-27  Werner Lemberg  <wl@gnu.org>
+ 
++	[type1] Minor.
++
++	* src/type1/t1load.c (T1_Set_MM_Blend, T1_Set_MM_Design): Use
++	FT_THROW.
++	(T1_Set_Var_Design): Use T1_MAX_MM_AXIS and FT_THROW.
++
++2015-03-27  Werner Lemberg  <wl@gnu.org>
++
+ 	[cff] Trace charstring nesting levels.
+ 
+ 	* src/cff/cf2intrp.c (cf2_interpT2CharString) <cf2_cmdCALLGSUBR,
+diff --git a/src/type1/t1load.c b/src/type1/t1load.c
+index 66ed9cb..acfa486 100644
+--- a/src/type1/t1load.c
++++ b/src/type1/t1load.c
+@@ -368,44 +368,39 @@
+                    FT_Fixed*  coords )
+   {
+     PS_Blend  blend = face->blend;
+-    FT_Error  error;
+     FT_UInt   n, m;
+ 
+ 
+-    error = FT_ERR( Invalid_Argument );
++    if ( !blend || blend->num_axis != num_coords )
++      return FT_THROW( Invalid_Argument );
+ 
+-    if ( blend && blend->num_axis == num_coords )
++    /* recompute the weight vector from the blend coordinates */
++    for ( n = 0; n < blend->num_designs; n++ )
+     {
+-      /* recompute the weight vector from the blend coordinates */
+-      for ( n = 0; n < blend->num_designs; n++ )
+-      {
+-        FT_Fixed  result = 0x10000L;  /* 1.0 fixed */
++      FT_Fixed  result = 0x10000L;  /* 1.0 fixed */
+ 
+ 
+-        for ( m = 0; m < blend->num_axis; m++ )
+-        {
+-          FT_Fixed  factor;
++      for ( m = 0; m < blend->num_axis; m++ )
++      {
++        FT_Fixed  factor;
+ 
+ 
+-          /* get current blend axis position */
+-          factor = coords[m];
+-          if ( factor < 0 )
+-            factor = 0;
+-          if ( factor > 0x10000L )
+-            factor = 0x10000L;
++        /* get current blend axis position */
++        factor = coords[m];
++        if ( factor < 0 )
++          factor = 0;
++        if ( factor > 0x10000L )
++          factor = 0x10000L;
+ 
+-          if ( ( n & ( 1 << m ) ) == 0 )
+-            factor = 0x10000L - factor;
++        if ( ( n & ( 1 << m ) ) == 0 )
++          factor = 0x10000L - factor;
+ 
+-          result = FT_MulFix( result, factor );
+-        }
+-        blend->weight_vector[n] = result;
++        result = FT_MulFix( result, factor );
+       }
+-
+-      error = FT_Err_Ok;
++      blend->weight_vector[n] = result;
+     }
+ 
+-    return error;
++    return FT_Err_Ok;
+   }
+ 
+ 
+@@ -415,68 +410,63 @@
+                     FT_Long*  coords )
+   {
+     PS_Blend  blend = face->blend;
+-    FT_Error  error;
+     FT_UInt   n, p;
++    FT_Fixed  final_blends[T1_MAX_MM_DESIGNS];
++
+ 
++    if ( !blend || blend->num_axis != num_coords )
++      return FT_THROW( Invalid_Argument );
+ 
+-    error = FT_ERR( Invalid_Argument );
+-    if ( blend && blend->num_axis == num_coords )
++    /* compute the blend coordinates through the blend design map */
++
++    for ( n = 0; n < blend->num_axis; n++ )
+     {
+-      /* compute the blend coordinates through the blend design map */
+-      FT_Fixed  final_blends[T1_MAX_MM_DESIGNS];
++      FT_Long       design  = coords[n];
++      FT_Fixed      the_blend;
++      PS_DesignMap  map     = blend->design_map + n;
++      FT_Long*      designs = map->design_points;
++      FT_Fixed*     blends  = map->blend_points;
++      FT_Int        before  = -1, after = -1;
+ 
+ 
+-      for ( n = 0; n < blend->num_axis; n++ )
++      for ( p = 0; p < (FT_UInt)map->num_points; p++ )
+       {
+-        FT_Long       design  = coords[n];
+-        FT_Fixed      the_blend;
+-        PS_DesignMap  map     = blend->design_map + n;
+-        FT_Long*      designs = map->design_points;
+-        FT_Fixed*     blends  = map->blend_points;
+-        FT_Int        before  = -1, after = -1;
++        FT_Long  p_design = designs[p];
+ 
+ 
+-        for ( p = 0; p < (FT_UInt)map->num_points; p++ )
++        /* exact match? */
++        if ( design == p_design )
+         {
+-          FT_Long  p_design = designs[p];
+-
+-
+-          /* exact match? */
+-          if ( design == p_design )
+-          {
+-            the_blend = blends[p];
+-            goto Found;
+-          }
+-
+-          if ( design < p_design )
+-          {
+-            after = (FT_Int)p;
+-            break;
+-          }
++          the_blend = blends[p];
++          goto Found;
++        }
+ 
+-          before = (FT_Int)p;
++        if ( design < p_design )
++        {
++          after = (FT_Int)p;
++          break;
+         }
+ 
+-        /* now interpolate if necessary */
+-        if ( before < 0 )
+-          the_blend = blends[0];
++        before = (FT_Int)p;
++      }
+ 
+-        else if ( after < 0 )
+-          the_blend = blends[map->num_points - 1];
++      /* now interpolate if necessary */
++      if ( before < 0 )
++        the_blend = blends[0];
+ 
+-        else
+-          the_blend = FT_MulDiv( design         - designs[before],
+-                                 blends [after] - blends [before],
+-                                 designs[after] - designs[before] );
++      else if ( after < 0 )
++        the_blend = blends[map->num_points - 1];
+ 
+-      Found:
+-        final_blends[n] = the_blend;
+-      }
++      else
++        the_blend = FT_MulDiv( design         - designs[before],
++                               blends [after] - blends [before],
++                               designs[after] - designs[before] );
+ 
+-      error = T1_Set_MM_Blend( face, num_coords, final_blends );
++    Found:
++      final_blends[n] = the_blend;
+     }
+ 
+-    return error;
++    return T1_Set_MM_Blend( face, num_coords, final_blends );
+   }
+ 
+ 
+@@ -490,20 +480,17 @@
+                      FT_UInt    num_coords,
+                      FT_Fixed*  coords )
+   {
+-     FT_Long   lcoords[4];          /* maximum axis count is 4 */
+-     FT_UInt   i;
+-     FT_Error  error;
++     FT_Long  lcoords[T1_MAX_MM_AXIS];
++     FT_UInt  i;
++
+ 
++     if ( num_coords > T1_MAX_MM_AXIS || num_coords == 0 )
++       return FT_THROW( Invalid_Argument );
+ 
+-     error = FT_ERR( Invalid_Argument );
+-     if ( num_coords <= 4 && num_coords > 0 )
+-     {
+-       for ( i = 0; i < num_coords; ++i )
+-         lcoords[i] = FIXED_TO_INT( coords[i] );
+-       error = T1_Set_MM_Design( face, num_coords, lcoords );
+-     }
++     for ( i = 0; i < num_coords; ++i )
++       lcoords[i] = FIXED_TO_INT( coords[i] );
+ 
+-     return error;
++     return T1_Set_MM_Design( face, num_coords, lcoords );
+   }
+ 
+ 
+-- 
+2.3.4
+
+From 10e2bb8b3deb85859c0dd254804959826f3be2ed Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Sun, 29 Mar 2015 13:32:47 +0200
+Subject: [PATCH] [type1, truetype] Make the MM API more flexible w.r.t.
+ `num_coords'.
+
+This commit allows `num_coords' to be larger or smaller than the
+number of available axes while selecting a design instance, either
+ignoring excess data or using defaults if data is missing.
+
+* src/truetype/ttgxvar.c (TT_Set_MM_Blend, TT_Set_Var_Design):
+Implement it.
+
+* src/type1/t1load.c (T1_Set_MM_Blend, T1_Set_MM_Design,
+T1_Set_Var_Design): Ditto.
+---
+ ChangeLog              | 16 +++++++++++++++-
+ include/ftmm.h         | 26 ++++++++++++++++----------
+ src/truetype/ttgxvar.c | 44 ++++++++++++++++++++++++++++----------------
+ src/type1/t1load.c     | 29 +++++++++++++++++++++--------
+ 4 files changed, 80 insertions(+), 35 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 4bb3ca0..abefef0 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,4 +1,18 @@
+-2015-03-27  Werner Lemberg  <wl@gnu.org>
++2015-03-29  Werner Lemberg  <wl@gnu.org>
++
++	[type1, truetype] Make the MM API more flexible w.r.t. `num_coords'.
++
++	This commit allows `num_coords' to be larger or smaller than the
++	number of available axes while selecting a design instance, either
++	ignoring excess data or using defaults if data is missing.
++
++	* src/truetype/ttgxvar.c (TT_Set_MM_Blend, TT_Set_Var_Design):
++	Implement it.
++
++	* src/type1/t1load.c (T1_Set_MM_Blend, T1_Set_MM_Design,
++	T1_Set_Var_Design): Ditto.
++
++2015-03-29  Werner Lemberg  <wl@gnu.org>
+ 
+ 	[type1] Minor.
+ 
+diff --git a/include/ftmm.h b/include/ftmm.h
+index 7d079f6..6ef4798 100644
+--- a/include/ftmm.h
++++ b/include/ftmm.h
+@@ -95,8 +95,8 @@ FT_BEGIN_HEADER
+   /*                                                                       */
+   /*    num_designs :: Number of designs; should be normally 2^num_axis    */
+   /*                   even though the Type~1 specification strangely      */
+-  /*                   allows for intermediate designs to be present. This */
+-  /*                   number cannot exceed~16.                            */
++  /*                   allows for intermediate designs to be present.      */
++  /*                   This number cannot exceed~16.                       */
+   /*                                                                       */
+   /*    axis        :: A table of axis descriptors.                        */
+   /*                                                                       */
+@@ -201,10 +201,10 @@ FT_BEGIN_HEADER
+   /*                       associated with them.  The font can tell the    */
+   /*                       user that, for example, Weight=1.5 is `Bold'.   */
+   /*                                                                       */
+-  /*    axis            :: A table of axis descriptors.                    */
++  /*    axis            :: An axis descriptor table.                       */
+   /*                       GX fonts contain slightly more data than MM.    */
+   /*                                                                       */
+-  /*    namedstyles     :: A table of named styles.                        */
++  /*    namedstyle      :: A named style table.                            */
+   /*                       Only meaningful with GX.                        */
+   /*                                                                       */
+   typedef struct  FT_MM_Var_
+@@ -280,8 +280,10 @@ FT_BEGIN_HEADER
+   /*    face       :: A handle to the source face.                         */
+   /*                                                                       */
+   /* <Input>                                                               */
+-  /*    num_coords :: The number of design coordinates (must be equal to   */
+-  /*                  the number of axes in the font).                     */
++  /*    num_coords :: The number of available design coordinates.  If it   */
++  /*                  is larger than the number of axes, ignore the excess */
++  /*                  values.  If it is smaller than the number of axes,   */
++  /*                  use default values for the remaining axes.           */
+   /*                                                                       */
+   /*    coords     :: An array of design coordinates.                      */
+   /*                                                                       */
+@@ -307,8 +309,10 @@ FT_BEGIN_HEADER
+   /*    face       :: A handle to the source face.                         */
+   /*                                                                       */
+   /* <Input>                                                               */
+-  /*    num_coords :: The number of design coordinates (must be equal to   */
+-  /*                  the number of axes in the font).                     */
++  /*    num_coords :: The number of available design coordinates.  If it   */
++  /*                  is larger than the number of axes, ignore the excess */
++  /*                  values.  If it is smaller than the number of axes,   */
++  /*                  use default values for the remaining axes.           */
+   /*                                                                       */
+   /*    coords     :: An array of design coordinates.                      */
+   /*                                                                       */
+@@ -334,8 +338,10 @@ FT_BEGIN_HEADER
+   /*    face       :: A handle to the source face.                         */
+   /*                                                                       */
+   /* <Input>                                                               */
+-  /*    num_coords :: The number of design coordinates (must be equal to   */
+-  /*                  the number of axes in the font).                     */
++  /*    num_coords :: The number of available design coordinates.  If it   */
++  /*                  is larger than the number of axes, ignore the excess */
++  /*                  values.  If it is smaller than the number of axes,   */
++  /*                  use default values for the remaining axes.           */
+   /*                                                                       */
+   /*    coords     :: The design coordinates array (each element must be   */
+   /*                  between 0 and 1.0).                                  */
+diff --git a/src/truetype/ttgxvar.c b/src/truetype/ttgxvar.c
+index 77796f0..940f288 100644
+--- a/src/truetype/ttgxvar.c
++++ b/src/truetype/ttgxvar.c
+@@ -864,7 +864,10 @@
+   /*                  Initialize the blend structure with `gvar' data.     */
+   /*                                                                       */
+   /* <Input>                                                               */
+-  /*    num_coords :: Must be the axis count of the font.                  */
++  /*    num_coords :: The number of available coordinates.  If it is       */
++  /*                  larger than the number of axes, ignore the excess    */
++  /*                  values.  If it is smaller than the number of axes,   */
++  /*                  use the default value (0) for the remaining axes.    */
+   /*                                                                       */
+   /*    coords     :: An array of `num_coords', each between [-1,1].       */
+   /*                                                                       */
+@@ -902,11 +905,8 @@
+     blend = face->blend;
+     mmvar = blend->mmvar;
+ 
+-    if ( num_coords != mmvar->num_axis )
+-    {
+-      error = FT_THROW( Invalid_Argument );
+-      goto Exit;
+-    }
++    if ( num_coords > mmvar->num_axis )
++      num_coords = mmvar->num_axis;
+ 
+     for ( i = 0; i < num_coords; i++ )
+       if ( coords[i] < -0x00010000L || coords[i] > 0x00010000L )
+@@ -921,7 +921,7 @@
+ 
+     if ( blend->normalizedcoords == NULL )
+     {
+-      if ( FT_NEW_ARRAY( blend->normalizedcoords, num_coords ) )
++      if ( FT_NEW_ARRAY( blend->normalizedcoords, mmvar->num_axis ) )
+         goto Exit;
+ 
+       manageCvt = mcvt_modify;
+@@ -943,13 +943,22 @@
+         }
+       }
+ 
++      for ( ; i < mmvar->num_axis; i++ )
++      {
++        if ( blend->normalizedcoords[i] != 0 )
++        {
++          manageCvt = mcvt_load;
++          break;
++        }
++      }
++
+       /* If we don't change the blend coords then we don't need to do  */
+       /* anything to the cvt table.  It will be correct.  Otherwise we */
+       /* no longer have the original cvt (it was modified when we set  */
+       /* the blend last time), so we must reload and then modify it.   */
+     }
+ 
+-    blend->num_axis = num_coords;
++    blend->num_axis = mmvar->num_axis;
+     FT_MEM_COPY( blend->normalizedcoords,
+                  coords,
+                  num_coords * sizeof ( FT_Fixed ) );
+@@ -1001,7 +1010,10 @@
+   /*                  Initialize the blend struct with `gvar' data.        */
+   /*                                                                       */
+   /* <Input>                                                               */
+-  /*    num_coords :: This must be the axis count of the font.             */
++  /*    num_coords :: The number of available coordinates.  If it is       */
++  /*                  larger than the number of axes, ignore the excess    */
++  /*                  values.  If it is smaller than the number of axes,   */
++  /*                  use the default values for the remaining axes.       */
+   /*                                                                       */
+   /*    coords     :: A coordinate array with `num_coords' elements.       */
+   /*                                                                       */
+@@ -1032,11 +1044,8 @@
+     blend = face->blend;
+     mmvar = blend->mmvar;
+ 
+-    if ( num_coords != mmvar->num_axis )
+-    {
+-      error = FT_THROW( Invalid_Argument );
+-      goto Exit;
+-    }
++    if ( num_coords > mmvar->num_axis )
++      num_coords = mmvar->num_axis;
+ 
+     /* Axis normalization is a two stage process.  First we normalize */
+     /* based on the [min,def,max] values for the axis to be [-1,0,1]. */
+@@ -1046,7 +1055,7 @@
+       goto Exit;
+ 
+     a = mmvar->axis;
+-    for ( i = 0; i < mmvar->num_axis; i++, a++ )
++    for ( i = 0; i < num_coords; i++, a++ )
+     {
+       if ( coords[i] > a->maximum || coords[i] < a->minimum )
+       {
+@@ -1064,6 +1073,9 @@
+                                    a->maximum - a->def );
+     }
+ 
++    for ( ; i < mmvar->num_axis; i++ )
++      normalized[i] = 0;
++
+     if ( !blend->avar_checked )
+       ft_var_load_avar( face );
+ 
+@@ -1087,7 +1099,7 @@
+       }
+     }
+ 
+-    error = TT_Set_MM_Blend( face, num_coords, normalized );
++    error = TT_Set_MM_Blend( face, mmvar->num_axis, normalized );
+ 
+   Exit:
+     FT_FREE( normalized );
+diff --git a/src/type1/t1load.c b/src/type1/t1load.c
+index acfa486..39acef2 100644
+--- a/src/type1/t1load.c
++++ b/src/type1/t1load.c
+@@ -371,9 +371,12 @@
+     FT_UInt   n, m;
+ 
+ 
+-    if ( !blend || blend->num_axis != num_coords )
++    if ( !blend )
+       return FT_THROW( Invalid_Argument );
+ 
++    if ( num_coords > blend->num_axis )
++      num_coords = blend->num_axis;
++
+     /* recompute the weight vector from the blend coordinates */
+     for ( n = 0; n < blend->num_designs; n++ )
+     {
+@@ -385,8 +388,9 @@
+         FT_Fixed  factor;
+ 
+ 
+-        /* get current blend axis position */
+-        factor = coords[m];
++        /* get current blend axis position;                  */
++        /* use a default value if we don't have a coordinate */
++        factor = m < num_coords ? coords[m] : 0x8000;
+         if ( factor < 0 )
+           factor = 0;
+         if ( factor > 0x10000L )
+@@ -414,14 +418,17 @@
+     FT_Fixed  final_blends[T1_MAX_MM_DESIGNS];
+ 
+ 
+-    if ( !blend || blend->num_axis != num_coords )
++    if ( !blend )
+       return FT_THROW( Invalid_Argument );
+ 
++    if ( num_coords > blend->num_axis )
++      num_coords = blend->num_axis;
++
+     /* compute the blend coordinates through the blend design map */
+ 
+     for ( n = 0; n < blend->num_axis; n++ )
+     {
+-      FT_Long       design  = coords[n];
++      FT_Long       design;
+       FT_Fixed      the_blend;
+       PS_DesignMap  map     = blend->design_map + n;
+       FT_Long*      designs = map->design_points;
+@@ -429,6 +436,12 @@
+       FT_Int        before  = -1, after = -1;
+ 
+ 
++      /* use a default value if we don't have a coordinate */
++      if ( n < num_coords )
++        design = coords[n];
++      else
++        design = ( designs[map->num_points - 1] - designs[0] ) / 2;
++
+       for ( p = 0; p < (FT_UInt)map->num_points; p++ )
+       {
+         FT_Long  p_design = designs[p];
+@@ -466,7 +479,7 @@
+       final_blends[n] = the_blend;
+     }
+ 
+-    return T1_Set_MM_Blend( face, num_coords, final_blends );
++    return T1_Set_MM_Blend( face, blend->num_axis, final_blends );
+   }
+ 
+ 
+@@ -484,8 +497,8 @@
+      FT_UInt  i;
+ 
+ 
+-     if ( num_coords > T1_MAX_MM_AXIS || num_coords == 0 )
+-       return FT_THROW( Invalid_Argument );
++     if ( num_coords > T1_MAX_MM_AXIS )
++       num_coords = T1_MAX_MM_AXIS;
+ 
+      for ( i = 0; i < num_coords; ++i )
+        lcoords[i] = FIXED_TO_INT( coords[i] );
+-- 
+2.3.4
+
+From f353a38e87a894a0a3280f5e27278831a1a2aaad Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Sun, 29 Mar 2015 14:47:49 +0200
+Subject: [PATCH] [cff] Fix Savannah bug #44629.
+
+* src/cff/cf2font.h (CF2_MAX_SUBR), src/cff/cffgload.h
+(CFF_MAX_SUBRS_CALLS): Set to 16.
+---
+ ChangeLog          | 7 +++++++
+ src/cff/cf2font.h  | 7 ++++++-
+ src/cff/cffgload.h | 7 ++++++-
+ 3 files changed, 19 insertions(+), 2 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index abefef0..ef7c131 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,5 +1,12 @@
+ 2015-03-29  Werner Lemberg  <wl@gnu.org>
+ 
++	[cff] Fix Savannah bug #44629.
++
++	* src/cff/cf2font.h (CF2_MAX_SUBR), src/cff/cffgload.h
++	(CFF_MAX_SUBRS_CALLS): Set to 16.
++
++2015-03-29  Werner Lemberg  <wl@gnu.org>
++
+ 	[type1, truetype] Make the MM API more flexible w.r.t. `num_coords'.
+ 
+ 	This commit allows `num_coords' to be larger or smaller than the
+diff --git a/src/cff/cf2font.h b/src/cff/cf2font.h
+index d8860ce..86cf02f 100644
+--- a/src/cff/cf2font.h
++++ b/src/cff/cf2font.h
+@@ -48,7 +48,12 @@ FT_BEGIN_HEADER
+ 
+ 
+ #define CF2_OPERAND_STACK_SIZE  48
+-#define CF2_MAX_SUBR            10 /* maximum subroutine nesting */
++#define CF2_MAX_SUBR            16 /* maximum subroutine nesting;         */
++                                   /* only 10 are allowed but there exist */
++                                   /* fonts like `HiraKakuProN-W3.ttf'    */
++                                   /* (Hiragino Kaku Gothic ProN W3;      */
++                                   /* 8.2d6e1; 2014-12-19) that exceed    */
++                                   /* this limit                          */
+ 
+ 
+   /* typedef is in `cf2glue.h' */
+diff --git a/src/cff/cffgload.h b/src/cff/cffgload.h
+index 5c52d43..5f2655f 100644
+--- a/src/cff/cffgload.h
++++ b/src/cff/cffgload.h
+@@ -29,7 +29,12 @@ FT_BEGIN_HEADER
+ 
+ 
+ #define CFF_MAX_OPERANDS        48
+-#define CFF_MAX_SUBRS_CALLS     32
++#define CFF_MAX_SUBRS_CALLS     16  /* maximum subroutine nesting;         */
++                                    /* only 10 are allowed but there exist */
++                                    /* fonts like `HiraKakuProN-W3.ttf'    */
++                                    /* (Hiragino Kaku Gothic ProN W3;      */
++                                    /* 8.2d6e1; 2014-12-19) that exceed    */
++                                    /* this limit                          */
+ #define CFF_MAX_TRANS_ELEMENTS  32
+ 
+ 
+-- 
+2.3.4
+
