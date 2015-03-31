@@ -6,10 +6,18 @@ CHANGELOG
 ---------
 
 
+2015-03-30
+~~~~~~~~~~
+
+### freetype2-infinality-ultimate, rev. 2.5.5-4
+
+* The code base was merged with the upstream changes up to 2015.03.30.
+
+
 2015-03-05
 ~~~~~~~~~~
 
-### freetype2-infinality-ultimate, rev. 2.5.5-3 (incl. multilib)
+### freetype2-infinality-ultimate, rev. 2.5.5-3
 
 * The code base was merged with the upstream changes up to 2015.03.01.
 * The Infinality patchset was revised and updated accordingly (compatibility
@@ -19,11 +27,12 @@ CHANGELOG
 2014-12-31
 ~~~~~~~~~~
 
-### freetype2-infinality-ultimate, rev. 2.5.5-2 (incl. multilib)
+### freetype2-infinality-ultimate, rev. 2.5.5-2
 
 * The code base was merged with the upstream changes up to 2015.01.23.
 * The Infinality patchset was revised and updated accordingly.
 * `infinality-settings` was update to rev. 0.4.8.3.
+
 
 2014-12-30
 ~~~~~~~~~~
@@ -31,6 +40,7 @@ CHANGELOG
 ### freetype2-infinality-ultimate, rev. 2.5.5-1 (inc. multilib)
 
 * Version upgrade release, 2.5.5.
+
 
 2014-12-23
 ~~~~~~~~~~
@@ -116,7 +126,7 @@ CHANGELOG
 2014-08-15
 ~~~~~~~~~~
 
-### freetype2-infinality-ultimate, rev. 2.5.3-10 (incl. multilib)
+### freetype2-infinality-ultimate, rev. 2.5.3-10
 
 * Merging with most recent upstream commits.
 
@@ -124,7 +134,7 @@ CHANGELOG
 2014-07-29
 ~~~~~~~~~~
 
-### freetype2-infinality-ultimate, rev. 2.5.3-9 (incl. multilib)
+### freetype2-infinality-ultimate, rev. 2.5.3-9
 
 * Merging with most recent upstream commits.
 * `infinality-settings.sh` was updated to v. 0.4.7.5.
@@ -133,7 +143,7 @@ CHANGELOG
 2014-07-08
 ~~~~~~~~~~
 
-### freetype2-infinality-ultimate, rev. 2.5.3-8 (incl. multilib)
+### freetype2-infinality-ultimate, rev. 2.5.3-8
 
 * Merging with most recent upstream commits.
 * Updating Infinality patchset accordingly.
@@ -142,7 +152,7 @@ CHANGELOG
 2014-05-15
 ~~~~~~~~~~
 
-### freetype2-infinality-ultimate, rev. 2.5.3-5 (incl. multilib)
+### freetype2-infinality-ultimate, rev. 2.5.3-5
 
 * Semi-major upgrade, introducing most changes and fixes present in the
   development branch of the upstream `freetype2`.
