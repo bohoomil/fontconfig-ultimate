@@ -189,7 +189,7 @@ index e228548..c0e44a5 100644
                dist = FT_MulFix( dist, scale );
                if ( dist < best_dist )
                {
-@@ -2080,8 +2129,31 @@
+@@ -2089,8 +2138,31 @@
      FT_Pos           dist     = width;
      FT_Int           sign     = 0;
      FT_Int           vertical = ( dim == AF_DIMENSION_VERT );
@@ -221,7 +221,7 @@ index e228548..c0e44a5 100644
      if ( !AF_LATIN_HINTS_DO_STEM_ADJUST( hints ) ||
           axis->extra_light                       )
        return width;
-@@ -2091,9 +2163,73 @@
+@@ -2100,9 +2172,73 @@
        dist = -width;
        sign = 1;
      }
@@ -296,7 +296,7 @@ index e228548..c0e44a5 100644
      {
        /* smooth hinting process: very lightly quantize the stem width */
  
-@@ -2153,6 +2289,9 @@
+@@ -2162,6 +2298,9 @@
        }
      }
      else
@@ -306,7 +306,7 @@ index e228548..c0e44a5 100644
      {
        /* strong hinting process: snap the stem width to integer pixels */
  
-@@ -2160,7 +2299,10 @@
+@@ -2169,7 +2308,10 @@
  
  
        dist = af_latin_snap_width( axis->widths, axis->width_count, dist );
@@ -318,7 +318,7 @@ index e228548..c0e44a5 100644
        if ( vertical )
        {
          /* in the case of vertical hinting, always round */
-@@ -2223,6 +2365,32 @@
+@@ -2232,6 +2374,32 @@
      }
  
    Done_Width:
@@ -351,7 +351,7 @@ index e228548..c0e44a5 100644
      if ( sign )
        dist = -dist;
  
-@@ -2244,6 +2412,8 @@
+@@ -2253,6 +2421,8 @@
                                                          base_edge->flags,
                                                          stem_edge->flags );
  
@@ -360,7 +360,7 @@ index e228548..c0e44a5 100644
  
      stem_edge->pos = base_edge->pos + fitted_width;
  
-@@ -2804,8 +2974,32 @@
+@@ -2813,8 +2983,32 @@
      int       dim;
  
      AF_LatinAxis  axis;
@@ -394,7 +394,7 @@ index e228548..c0e44a5 100644
      error = af_glyph_hints_reload( hints, outline );
      if ( error )
        goto Exit;
-@@ -2871,7 +3065,11 @@
+@@ -2882,7 +3076,11 @@
      }
  
      af_glyph_hints_save( hints, outline );

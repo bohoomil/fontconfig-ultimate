@@ -34696,4 +34696,2888 @@ index 5c52d43..5f2655f 100644
  
 -- 
 2.3.4
+From 16217e5f22127cbe3aed6375b446629228098b90 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Wed, 1 Apr 2015 13:13:56 +0200
+Subject: [PATCH] * src/autofit/afhints.c (af_glyph_hints_done): Fix minor
+ thinko.
+
+---
+ ChangeLog             | 4 ++++
+ src/autofit/afhints.c | 4 +++-
+ 2 files changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index ef7c131..97bf293 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,7 @@
++2015-04-01  Werner Lemberg  <wl@gnu.org>
++
++	* src/autofit/afhints.c (af_glyph_hints_done): Fix minor thinko.
++
+ 2015-03-29  Werner Lemberg  <wl@gnu.org>
+ 
+ 	[cff] Fix Savannah bug #44629.
+diff --git a/src/autofit/afhints.c b/src/autofit/afhints.c
+index 3186077..ab32dd0 100644
+--- a/src/autofit/afhints.c
++++ b/src/autofit/afhints.c
+@@ -533,13 +533,15 @@
+   FT_LOCAL_DEF( void )
+   af_glyph_hints_done( AF_GlyphHints  hints )
+   {
+-    FT_Memory  memory = hints->memory;
++    FT_Memory  memory;
+     int        dim;
+ 
+ 
+     if ( !( hints && hints->memory ) )
+       return;
+ 
++    memory = hints->memory;
++
+     /*
+      *  note that we don't need to free the segment and edge
+      *  buffers since they are really within the hints->points array
+-- 
+2.3.6
+
+From db8df797d088e2e861bafb81dedb4106f15523be Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Wed, 1 Apr 2015 13:30:55 +0200
+Subject: [PATCH] [autofit] Make debugging stuff work again.
+
+The interface to ftgrid was broken in the series of commits starting
+with
+
+  [autofit] Allocate AF_Loader on the stack instead of AF_Module.
+
+from 2015-01-14.
+
+* src/autofit/afmodule.c (_af_debug_hints_rec) [FT_DEBUG_AUTOFIT]:
+Use a global AF_GlyphHintsRec object for debugging.
+(af_autofitter_done, af_autofitter_load_glyph): Updated.
+
+* src/autofit/afloader.c (af_loader_init, af_loader_done): Updated.
+---
+ ChangeLog              | 17 +++++++++++++++++
+ src/autofit/afloader.c |  7 -------
+ src/autofit/afmodule.c | 44 ++++++++++++++++++++++++++++++++++++++++----
+ 3 files changed, 57 insertions(+), 11 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 97bf293..6693943 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,5 +1,22 @@
+ 2015-04-01  Werner Lemberg  <wl@gnu.org>
+ 
++	[autofit] Make debugging stuff work again.
++
++	The interface to ftgrid was broken in the series of commits starting
++	with
++
++	  [autofit] Allocate AF_Loader on the stack instead of AF_Module.
++
++	from 2015-01-14.
++
++	* src/autofit/afmodule.c (_af_debug_hints_rec) [FT_DEBUG_AUTOFIT]:
++	Use a global AF_GlyphHintsRec object for debugging.
++	(af_autofitter_done, af_autofitter_load_glyph): Updated.
++
++	* src/autofit/afloader.c (af_loader_init, af_loader_done): Updated.
++
++2015-04-01  Werner Lemberg  <wl@gnu.org>
++
+ 	* src/autofit/afhints.c (af_glyph_hints_done): Fix minor thinko.
+ 
+ 2015-03-29  Werner Lemberg  <wl@gnu.org>
+diff --git a/src/autofit/afloader.c b/src/autofit/afloader.c
+index 5f68c8c..7c2fa7c 100644
+--- a/src/autofit/afloader.c
++++ b/src/autofit/afloader.c
+@@ -33,9 +33,6 @@
+     FT_ZERO( loader );
+ 
+     loader->hints = hints;
+-#ifdef FT_DEBUG_AUTOFIT
+-    _af_debug_hints = loader->hints;
+-#endif
+   }
+ 
+ 
+@@ -76,10 +73,6 @@
+     loader->face    = NULL;
+     loader->globals = NULL;
+     loader->hints   = NULL;
+-
+-#ifdef FT_DEBUG_AUTOFIT
+-    _af_debug_hints = NULL;
+-#endif
+   }
+ 
+ 
+diff --git a/src/autofit/afmodule.c b/src/autofit/afmodule.c
+index 35ce6ad..4968e01 100644
+--- a/src/autofit/afmodule.c
++++ b/src/autofit/afmodule.c
+@@ -23,10 +23,14 @@
+ #include "afpic.h"
+ 
+ #ifdef FT_DEBUG_AUTOFIT
+-  int    _af_debug_disable_horz_hints;
+-  int    _af_debug_disable_vert_hints;
+-  int    _af_debug_disable_blue_hints;
+-  void*  _af_debug_hints;
++  int  _af_debug_disable_horz_hints;
++  int  _af_debug_disable_vert_hints;
++  int  _af_debug_disable_blue_hints;
++
++  /* we use a global object instead of a local one for debugging */
++  AF_GlyphHintsRec  _af_debug_hints_rec[1];
++
++  void*  _af_debug_hints = _af_debug_hints_rec;
+ #endif
+ 
+ #include FT_INTERNAL_OBJECTS_H
+@@ -261,6 +265,11 @@
+   af_autofitter_done( FT_Module  ft_module )      /* AF_Module */
+   {
+     FT_UNUSED( ft_module );
++
++#ifdef FT_DEBUG_AUTOFIT
++    if ( _af_debug_hints_rec->memory )
++      af_glyph_hints_done( _af_debug_hints_rec );
++#endif
+   }
+ 
+ 
+@@ -274,6 +283,31 @@
+     FT_Error   error  = FT_Err_Ok;
+     FT_Memory  memory = module->root.library->memory;
+ 
++#ifdef FT_DEBUG_AUTOFIT
++
++    /* in debug mode, we use a global object that survives this routine */
++
++    AF_GlyphHints  hints = _af_debug_hints_rec;
++    AF_LoaderRec   loader[1];
++
++    FT_UNUSED( size );
++
++
++    if ( hints->memory )
++      af_glyph_hints_done( hints );
++
++    af_glyph_hints_init( hints, memory );
++    af_loader_init( loader, hints );
++
++    error = af_loader_load_glyph( loader, module, slot->face,
++                                  glyph_index, load_flags );
++
++    af_loader_done( loader );
++
++    return error;
++
++#else /* !FT_DEBUG_AUTOFIT */
++
+     AF_GlyphHintsRec  hints[1];
+     AF_LoaderRec      loader[1];
+ 
+@@ -290,6 +324,8 @@
+     af_glyph_hints_done( hints );
+ 
+     return error;
++
++#endif /* !FT_DEBUG_AUTOFIT */
+   }
+ 
+ 
+-- 
+2.3.6
+
+From a2fa657a03f17ef9cd79b4ad529f08cfe676aa1c Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Wed, 1 Apr 2015 15:55:41 +0200
+Subject: [PATCH] [autofit] Call dumper functions for tracing.
+
+* src/autofit/afcjk.c (af_cjk_hints_apply): Remove dead code.
+* src/autofit/afhints.c (af_glyph_hints_dump_points): Minor
+improvement.
+* src/autofit/afmodule.c (af_autofitter_load_glyph): Implement it.
+---
+ ChangeLog              |  9 +++++++++
+ src/autofit/afcjk.c    |  6 ------
+ src/autofit/afhints.c  | 10 +++++++---
+ src/autofit/afmodule.c |  4 ++++
+ 4 files changed, 20 insertions(+), 9 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 6693943..ff20967 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,5 +1,14 @@
+ 2015-04-01  Werner Lemberg  <wl@gnu.org>
+ 
++	[autofit] Call dumper functions for tracing.
++
++	* src/autofit/afcjk.c (af_cjk_hints_apply): Remove dead code.
++	* src/autofit/afhints.c (af_glyph_hints_dump_points): Minor
++	improvement.
++	* src/autofit/afmodule.c (af_autofitter_load_glyph): Implement it.
++
++2015-04-01  Werner Lemberg  <wl@gnu.org>
++
+ 	[autofit] Make debugging stuff work again.
+ 
+ 	The interface to ftgrid was broken in the series of commits starting
+diff --git a/src/autofit/afcjk.c b/src/autofit/afcjk.c
+index 3ce6b41..ffeebea 100644
+--- a/src/autofit/afcjk.c
++++ b/src/autofit/afcjk.c
+@@ -2239,12 +2239,6 @@
+       }
+     }
+ 
+-#if 0
+-    af_glyph_hints_dump_points( hints );
+-    af_glyph_hints_dump_segments( hints );
+-    af_glyph_hints_dump_edges( hints );
+-#endif
+-
+     af_glyph_hints_save( hints, outline );
+ 
+   Exit:
+diff --git a/src/autofit/afhints.c b/src/autofit/afhints.c
+index ab32dd0..442cf6d 100644
+--- a/src/autofit/afhints.c
++++ b/src/autofit/afhints.c
+@@ -231,9 +231,13 @@
+     AF_Point  point;
+ 
+ 
+-    AF_DUMP(( "Table of points:\n"
+-              "  [ index |  xorg |  yorg | xscale | yscale"
+-              " |  xfit |  yfit |  flags ]\n" ));
++    AF_DUMP(( "Table of points:\n" ));
++
++    if ( hints->num_points )
++      AF_DUMP(( "  [ index |  xorg |  yorg | xscale | yscale"
++                " |  xfit |  yfit |  flags ]\n" ));
++    else
++      AF_DUMP(( "  (none)\n" ));
+ 
+     for ( point = points; point < limit; point++ )
+       AF_DUMP(( "  [ %5d | %5d | %5d | %6.2f | %6.2f"
+diff --git a/src/autofit/afmodule.c b/src/autofit/afmodule.c
+index 4968e01..5b82f66 100644
+--- a/src/autofit/afmodule.c
++++ b/src/autofit/afmodule.c
+@@ -302,6 +302,10 @@
+     error = af_loader_load_glyph( loader, module, slot->face,
+                                   glyph_index, load_flags );
+ 
++    af_glyph_hints_dump_points( hints, 0 );
++    af_glyph_hints_dump_segments( hints, 0 );
++    af_glyph_hints_dump_edges( hints, 0 );
++
+     af_loader_done( loader );
+ 
+     return error;
+-- 
+2.3.6
+
+From 886f4d049391993197b409a9038138a8208dd5fe Mon Sep 17 00:00:00 2001
+From: Alexei Podtelezhnikov <apodtele@gmail.com>
+Date: Wed, 1 Apr 2015 22:57:43 -0400
+Subject: [PATCH] [autofit] Finish the thought.
+
+* src/autofit/afhints.c (af_direction_compute): make sure the long arm
+is never negative so that its `FT_ABS' is not necessary.
+---
+ ChangeLog             | 7 +++++++
+ src/autofit/afhints.c | 8 ++++----
+ 2 files changed, 11 insertions(+), 4 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index ff20967..3200560 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,10 @@
++2015-03-21  Alexei Podtelezhnikov <apodtele@gmail.com>
++
++	[autofit] Finish the thought.
++
++	* src/autofit/afhints.c (af_direction_compute): make sure the long arm
++	is never negative so that its `FT_ABS' is not necessary.
++
+ 2015-04-01  Werner Lemberg  <wl@gnu.org>
+ 
+ 	[autofit] Call dumper functions for tracing.
+diff --git a/src/autofit/afhints.c b/src/autofit/afhints.c
+index 442cf6d..723e721 100644
+--- a/src/autofit/afhints.c
++++ b/src/autofit/afhints.c
+@@ -509,15 +509,15 @@
+       else
+       {
+         dir = AF_DIR_DOWN;
+-        ll  = dy;
++        ll  = -dy;
+         ss  = dx;
+       }
+     }
+ 
+-    /* return no direction if arm lengths differ too much            */
++    /* return no direction if arm lengths do not differ enough       */
+     /* (value 14 is heuristic, corresponding to approx. 4.1 degrees) */
+-    ss *= 14;
+-    if ( FT_ABS( ll ) <= FT_ABS( ss ) )
++    /* the long arm is never negative                                */
++    if ( ll <= 14 * FT_ABS( ss ) )
+       dir = AF_DIR_NONE;
+ 
+     return dir;
+-- 
+2.3.6
+
+From 770b5d0647b6102a60db06840e40f860da5810b8 Mon Sep 17 00:00:00 2001
+From: Alexei Podtelezhnikov <apodtele@gmail.com>
+Date: Thu, 2 Apr 2015 23:15:36 -0400
+Subject: [PATCH] * src/autofit/aflatin.c (af_latin_hint_edges): Reduce logic.
+
+---
+ ChangeLog             | 6 +++++-
+ src/autofit/aflatin.c | 2 +-
+ 2 files changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 3200560..ea80980 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,4 +1,8 @@
+-2015-03-21  Alexei Podtelezhnikov <apodtele@gmail.com>
++2015-04-02  Alexei Podtelezhnikov <apodtele@gmail.com>
++
++	* src/autofit/aflatin.c (af_latin_hint_edges): Reduce logic.
++
++2015-04-01  Alexei Podtelezhnikov <apodtele@gmail.com>
+ 
+ 	[autofit] Finish the thought.
+ 
+diff --git a/src/autofit/aflatin.c b/src/autofit/aflatin.c
+index e228548..ad162ae 100644
+--- a/src/autofit/aflatin.c
++++ b/src/autofit/aflatin.c
+@@ -2334,7 +2334,7 @@
+           FT_Byte  neutral2 = edge2->flags & AF_EDGE_NEUTRAL;
+ 
+ 
+-          if ( ( neutral && neutral2 ) || neutral2 )
++          if ( neutral2 )
+           {
+             edge2->blue_edge = NULL;
+             edge2->flags    &= ~AF_EDGE_NEUTRAL;
+-- 
+2.3.6
+
+From 67b912d2fa17caa921f513cae180c7aae28b1bc6 Mon Sep 17 00:00:00 2001
+From: Alexei Podtelezhnikov <apodtele@gmail.com>
+Date: Fri, 3 Apr 2015 22:38:11 -0400
+Subject: [PATCH] * src/autofit/afhints.c (af_glyph_hints_reload): Use do-while
+ loop.
+
+---
+ ChangeLog             |  4 ++++
+ src/autofit/afhints.c | 15 +++++----------
+ 2 files changed, 9 insertions(+), 10 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index ea80980..985a889 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,7 @@
++2015-04-03  Alexei Podtelezhnikov <apodtele@gmail.com>
++
++	* src/autofit/afhints.c (af_glyph_hints_reload): Use do-while loop.
++
+ 2015-04-02  Alexei Podtelezhnikov <apodtele@gmail.com>
+ 
+ 	* src/autofit/aflatin.c (af_latin_hint_edges): Reduce logic.
+diff --git a/src/autofit/afhints.c b/src/autofit/afhints.c
+index 723e721..728a599 100644
+--- a/src/autofit/afhints.c
++++ b/src/autofit/afhints.c
+@@ -792,8 +792,6 @@
+ 
+           FT_Pos  out_x, out_y;
+ 
+-          FT_Bool  is_first;
+-
+ 
+           /* since the first point of a contour could be part of a */
+           /* series of near points, go backwards to find the first */
+@@ -844,17 +842,13 @@
+           out_x = 0;
+           out_y = 0;
+ 
+-          is_first = 1;
+-
+-          for ( point = first;
+-                point != first || is_first;
+-                point = point->next )
++          next = first;
++          do
+           {
+             AF_Direction  out_dir;
+ 
+ 
+-            is_first = 0;
+-
++            point = next;
+             next = point->next;
+ 
+             out_x += next->fx - point->fx;
+@@ -886,7 +880,8 @@
+ 
+             out_x = 0;
+             out_y = 0;
+-          }
++
++          } while ( next != first );
+         }
+ 
+         /*
+-- 
+2.3.6
+
+From 5cd21551131ef3a9690ecbefcc9782286ee5199e Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Fri, 10 Apr 2015 07:01:01 +0200
+Subject: [PATCH] [cff] Update advance width handling to OpenType 1.7.
+
+Problem reported by Behdad.
+
+* src/cff/cffdrivr.c (cff_get_advances): Handle SFNT case
+separately.
+
+* src/cff/cffgload.c (cff_slot_load): Use advance width and side
+bearing values from `hmtx' table if present.
+---
+ ChangeLog                  | 12 +++++++++
+ include/internal/tttypes.h |  2 +-
+ src/cff/cffdrivr.c         | 62 ++++++++++++++++++++++++++++++++++++++++++++++
+ src/cff/cffgload.c         | 40 ++++++++++++++++++++++--------
+ 4 files changed, 105 insertions(+), 11 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 985a889..ad0c031 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,15 @@
++2015-04-10  Werner Lemberg  <wl@gnu.org>
++
++	[cff] Update advance width handling to OpenType 1.7.
++
++	Problem reported by Behdad.
++
++	* src/cff/cffdrivr.c (cff_get_advances): Handle SFNT case
++	separately.
++
++	* src/cff/cffgload.c (cff_slot_load): Use advance width and side
++	bearing values from `hmtx' table if present.
++
+ 2015-04-03  Alexei Podtelezhnikov <apodtele@gmail.com>
+ 
+ 	* src/autofit/afhints.c (af_glyph_hints_reload): Use do-while loop.
+diff --git a/include/internal/tttypes.h b/include/internal/tttypes.h
+index 1d442f7..31dd0aa 100644
+--- a/include/internal/tttypes.h
++++ b/include/internal/tttypes.h
+@@ -1111,7 +1111,7 @@ FT_BEGIN_HEADER
+   /*                            This field also contains the associated    */
+   /*                            vertical metrics table (`vmtx'), if found. */
+   /*                            IMPORTANT: The contents of this field is   */
+-  /*                            undefined if the `verticalInfo' field is   */
++  /*                            undefined if the `vertical_info' field is  */
+   /*                            unset.                                     */
+   /*                                                                       */
+   /*    num_names            :: The number of name records within this     */
+diff --git a/src/cff/cffdrivr.c b/src/cff/cffdrivr.c
+index 35e23b9..f46a1c5 100644
+--- a/src/cff/cffdrivr.c
++++ b/src/cff/cffdrivr.c
+@@ -195,6 +195,68 @@
+     FT_GlyphSlot  slot  = face->glyph;
+ 
+ 
++    if ( FT_IS_SFNT( face ) )
++    {
++      /* OpenType 1.7 mandates that the data from `hmtx' table be used; */
++      /* it is no longer necessary that those values are identical to   */
++      /* the values in the `CFF' table                                  */
++
++      TT_Face   ttface = (TT_Face)face;
++      FT_Short  dummy;
++
++
++      if ( flags & FT_LOAD_VERTICAL_LAYOUT )
++      {
++        /* check whether we have data from the `vmtx' table at all; */
++        /* otherwise we extract the info from the CFF glyphstrings  */
++        /* (instead of synthesizing a global value using the `OS/2' */
++        /* table)                                                   */
++        if ( !ttface->vertical_info )
++          goto Missing_Table;
++
++        for ( nn = 0; nn < count; nn++ )
++        {
++          FT_UShort  ah;
++
++
++          ( (SFNT_Service)ttface->sfnt )->get_metrics( ttface,
++                                                       1,
++                                                       start + nn,
++                                                       &dummy,
++                                                       &ah );
++
++          FT_TRACE5(( "  idx %d: advance height %d font units\n",
++                      start + nn, ah ));
++          advances[nn] = ah;
++        }
++      }
++      else
++      {
++        /* check whether we have data from the `hmtx' table at all */
++        if ( !ttface->horizontal.number_Of_HMetrics )
++          goto Missing_Table;
++
++        for ( nn = 0; nn < count; nn++ )
++        {
++          FT_UShort  aw;
++
++
++          ( (SFNT_Service)ttface->sfnt )->get_metrics( ttface,
++                                                       0,
++                                                       start + nn,
++                                                       &dummy,
++                                                       &aw );
++
++          FT_TRACE5(( "  idx %d: advance width %d font units\n",
++                      start + nn, aw ));
++          advances[nn] = aw;
++        }
++      }
++
++      return error;
++    }
++
++  Missing_Table:
+     flags |= (FT_UInt32)FT_LOAD_ADVANCE_ONLY;
+ 
+     for ( nn = 0; nn < count; nn++ )
+diff --git a/src/cff/cffgload.c b/src/cff/cffgload.c
+index b5bc4a2..d731387 100644
+--- a/src/cff/cffgload.c
++++ b/src/cff/cffgload.c
+@@ -2725,7 +2725,7 @@
+                                 face->vertical_info                   &&
+                                 face->vertical.number_Of_VMetrics > 0 );
+ 
+-          /* get the vertical metrics from the vtmx table if we have one */
++          /* get the vertical metrics from the vmtx table if we have one */
+           if ( has_vertical_info )
+           {
+             (void)( (SFNT_Service)face->sfnt )->get_metrics( face, 1,
+@@ -2953,25 +2953,43 @@
+         FT_Bool            has_vertical_info;
+ 
+ 
+-        /* copy the _unscaled_ advance width */
+-        metrics->horiAdvance                    = decoder.glyph_width;
+-        glyph->root.linearHoriAdvance           = decoder.glyph_width;
++        if ( face->horizontal.number_Of_HMetrics )
++        {
++          FT_Short   horiBearingX = 0;
++          FT_UShort  horiAdvance  = 0;
++
++
++          ( (SFNT_Service)face->sfnt )->get_metrics( face, 0,
++                                                     glyph_index,
++                                                     &horiBearingX,
++                                                     &horiAdvance );
++          metrics->horiAdvance          = horiAdvance;
++          metrics->horiBearingX         = horiBearingX;
++          glyph->root.linearHoriAdvance = horiAdvance;
++        }
++        else
++        {
++          /* copy the _unscaled_ advance width */
++          metrics->horiAdvance          = decoder.glyph_width;
++          glyph->root.linearHoriAdvance = decoder.glyph_width;
++        }
++
+         glyph->root.internal->glyph_transformed = 0;
+ 
+         has_vertical_info = FT_BOOL( face->vertical_info                   &&
+                                      face->vertical.number_Of_VMetrics > 0 );
+ 
+-        /* get the vertical metrics from the vtmx table if we have one */
++        /* get the vertical metrics from the vmtx table if we have one */
+         if ( has_vertical_info )
+         {
+           FT_Short   vertBearingY = 0;
+           FT_UShort  vertAdvance  = 0;
+ 
+ 
+-          (void)( (SFNT_Service)face->sfnt )->get_metrics( face, 1,
+-                                                           glyph_index,
+-                                                           &vertBearingY,
+-                                                           &vertAdvance );
++          ( (SFNT_Service)face->sfnt )->get_metrics( face, 1,
++                                                     glyph_index,
++                                                     &vertBearingY,
++                                                     &vertAdvance );
+           metrics->vertBearingY = vertBearingY;
+           metrics->vertAdvance  = vertAdvance;
+         }
+@@ -3046,7 +3064,9 @@
+         metrics->width  = cbox.xMax - cbox.xMin;
+         metrics->height = cbox.yMax - cbox.yMin;
+ 
+-        metrics->horiBearingX = cbox.xMin;
++        if ( !face->horizontal.number_Of_HMetrics )
++          metrics->horiBearingX = cbox.xMin;
++
+         metrics->horiBearingY = cbox.yMax;
+ 
+         if ( has_vertical_info )
+-- 
+2.3.6
+
+From 9de55e03555728842a72ac58913ad261104ad07b Mon Sep 17 00:00:00 2001
+From: Alexei Podtelezhnikov <apodtele@gmail.com>
+Date: Fri, 10 Apr 2015 23:45:11 -0400
+Subject: [PATCH] [base] NULL.
+
+---
+ src/base/ftdbgmem.c |  6 +++---
+ src/base/ftglyph.c  |  2 +-
+ src/base/ftinit.c   |  8 ++++----
+ src/base/ftobjs.c   | 54 ++++++++++++++++++++++++++---------------------------
+ src/base/ftstream.c | 16 ++++++++--------
+ src/base/ftsystem.c |  6 +++---
+ src/base/ftutil.c   | 10 +++++-----
+ 7 files changed, 51 insertions(+), 51 deletions(-)
+
+diff --git a/src/base/ftdbgmem.c b/src/base/ftdbgmem.c
+index 06fa6f0..6f20313 100644
+--- a/src/base/ftdbgmem.c
++++ b/src/base/ftdbgmem.c
+@@ -35,7 +35,7 @@
+ 
+ #include FT_CONFIG_STANDARD_LIBRARY_H
+ 
+-  FT_BASE_DEF( const char* )  _ft_debug_file   = 0;
++  FT_BASE_DEF( const char* )  _ft_debug_file   = NULL;
+   FT_BASE_DEF( long )         _ft_debug_lineno = 0;
+ 
+   extern void
+@@ -361,7 +361,7 @@
+       while ( node )
+       {
+         next       = node->link;
+-        node->link = 0;
++        node->link = NULL;
+ 
+         if ( node->size > 0 )
+         {
+@@ -383,7 +383,7 @@
+         ft_mem_table_free( table, node );
+         node = next;
+       }
+-      table->buckets[i] = 0;
++      table->buckets[i] = NULL;
+     }
+ 
+     ft_mem_table_free( table, table->buckets );
+diff --git a/src/base/ftglyph.c b/src/base/ftglyph.c
+index d83018f..cb7fc37 100644
+--- a/src/base/ftglyph.c
++++ b/src/base/ftglyph.c
+@@ -291,7 +291,7 @@
+      FT_Glyph   glyph  = NULL;
+ 
+ 
+-     *aglyph = 0;
++     *aglyph = NULL;
+ 
+      if ( !FT_ALLOC( glyph, clazz->glyph_size ) )
+      {
+diff --git a/src/base/ftinit.c b/src/base/ftinit.c
+index 6a41f96..cc95e6a 100644
+--- a/src/base/ftinit.c
++++ b/src/base/ftinit.c
+@@ -138,7 +138,7 @@
+ #include FT_CONFIG_MODULES_H
+ 
+     FT_FREE( classes );
+-    pic_container->default_module_classes = 0;
++    pic_container->default_module_classes = NULL;
+   }
+ 
+ 
+@@ -164,7 +164,7 @@
+ 
+     memory = library->memory;
+ 
+-    pic_container->default_module_classes = 0;
++    pic_container->default_module_classes = NULL;
+ 
+     if ( FT_ALLOC( classes, sizeof ( FT_Module_Class* ) *
+                               ( FT_NUM_MODULE_CLASSES + 1 ) ) )
+@@ -172,8 +172,8 @@
+ 
+     /* initialize all pointers to 0, especially the last one */
+     for ( i = 0; i < FT_NUM_MODULE_CLASSES; i++ )
+-      classes[i] = 0;
+-    classes[FT_NUM_MODULE_CLASSES] = 0;
++      classes[i] = NULL;
++    classes[FT_NUM_MODULE_CLASSES] = NULL;
+ 
+     i = 0;
+ 
+diff --git a/src/base/ftobjs.c b/src/base/ftobjs.c
+index cf7841f..9c3332c 100644
+--- a/src/base/ftobjs.c
++++ b/src/base/ftobjs.c
+@@ -158,7 +158,7 @@
+     FT_Stream  stream = NULL;
+ 
+ 
+-    *astream = 0;
++    *astream = NULL;
+ 
+     if ( !library )
+       return FT_THROW( Invalid_Library_Handle );
+@@ -353,10 +353,10 @@
+     slot->bitmap_left   = 0;
+     slot->bitmap_top    = 0;
+     slot->num_subglyphs = 0;
+-    slot->subglyphs     = 0;
+-    slot->control_data  = 0;
++    slot->subglyphs     = NULL;
++    slot->control_data  = NULL;
+     slot->control_len   = 0;
+-    slot->other         = 0;
++    slot->other         = NULL;
+     slot->format        = FT_GLYPH_FORMAT_NONE;
+ 
+     slot->linearHoriAdvance = 0;
+@@ -387,7 +387,7 @@
+       if ( FT_DRIVER_USES_OUTLINES( driver ) )
+       {
+         FT_GlyphLoader_Done( slot->internal->loader );
+-        slot->internal->loader = 0;
++        slot->internal->loader = NULL;
+       }
+ 
+       FT_FREE( slot->internal );
+@@ -438,7 +438,7 @@
+         *aslot = slot;
+     }
+     else if ( aslot )
+-      *aslot = 0;
++      *aslot = NULL;
+ 
+ 
+   Exit:
+@@ -932,7 +932,7 @@
+                       (FT_List_Destructor)destroy_size,
+                       memory,
+                       driver );
+-    face->size = 0;
++    face->size = NULL;
+ 
+     /* now discard client data */
+     if ( face->generic.finalizer )
+@@ -950,7 +950,7 @@
+       face->stream,
+       ( face->face_flags & FT_FACE_FLAG_EXTERNAL_STREAM ) != 0 );
+ 
+-    face->stream = 0;
++    face->stream = NULL;
+ 
+     /* get rid of it */
+     if ( face->internal )
+@@ -1153,7 +1153,7 @@
+       int  i;
+ 
+ 
+-      face->internal->incremental_interface = 0;
++      face->internal->incremental_interface = NULL;
+       for ( i = 0; i < num_params && !face->internal->incremental_interface;
+             i++ )
+         if ( params[i].tag == FT_PARAM_TAG_INCREMENTAL )
+@@ -1195,7 +1195,7 @@
+         clazz->done_face( face );
+       FT_FREE( internal );
+       FT_FREE( face );
+-      *aface = 0;
++      *aface = NULL;
+     }
+ 
+     return error;
+@@ -1298,8 +1298,8 @@
+     FT_FREE( stream->base );
+ 
+     stream->size  = 0;
+-    stream->base  = 0;
+-    stream->close = 0;
++    stream->base  = NULL;
++    stream->close = NULL;
+   }
+ 
+ 
+@@ -1323,7 +1323,7 @@
+     if ( !base )
+       return FT_THROW( Invalid_Argument );
+ 
+-    *astream = 0;
++    *astream = NULL;
+     memory = library->memory;
+     if ( FT_NEW( stream ) )
+       goto Exit;
+@@ -1938,7 +1938,7 @@
+     FT_Bool    is_darwin_vfs, vfs_rfork_has_no_font = FALSE; /* not tested */
+ 
+     FT_Open_Args  args2;
+-    FT_Stream     stream2 = 0;
++    FT_Stream     stream2 = NULL;
+ 
+ 
+     FT_Raccess_Guess( library, stream,
+@@ -2099,7 +2099,7 @@
+       if ( FT_MODULE_IS_DRIVER( driver ) )
+       {
+         FT_Int         num_params = 0;
+-        FT_Parameter*  params     = 0;
++        FT_Parameter*  params     = NULL;
+ 
+ 
+         if ( args->flags & FT_OPEN_PARAMS )
+@@ -2133,7 +2133,7 @@
+         if ( FT_MODULE_IS_DRIVER( cur[0] ) )
+         {
+           FT_Int         num_params = 0;
+-          FT_Parameter*  params     = 0;
++          FT_Parameter*  params     = NULL;
+ 
+ 
+           driver = FT_DRIVER( cur[0] );
+@@ -2444,8 +2444,8 @@
+     FT_Driver        driver;
+     FT_Driver_Class  clazz;
+ 
+-    FT_Size          size = 0;
+-    FT_ListNode      node = 0;
++    FT_Size          size = NULL;
++    FT_ListNode      node = NULL;
+ 
+ 
+     if ( !face )
+@@ -2457,7 +2457,7 @@
+     if ( !face->driver )
+       return FT_THROW( Invalid_Driver_Handle );
+ 
+-    *asize = 0;
++    *asize = NULL;
+ 
+     driver = face->driver;
+     clazz  = driver->clazz;
+@@ -2470,7 +2470,7 @@
+     size->face = face;
+ 
+     /* for now, do not use any internal fields in size objects */
+-    size->internal = 0;
++    size->internal = NULL;
+ 
+     if ( clazz->init_size )
+       error = clazz->init_size( size );
+@@ -2528,7 +2528,7 @@
+ 
+       if ( face->size == size )
+       {
+-        face->size = 0;
++        face->size = NULL;
+         if ( face->sizes_list.head )
+           face->size = (FT_Size)(face->sizes_list.head->data);
+       }
+@@ -3848,7 +3848,7 @@
+                       FT_ListNode*     node )
+   {
+     FT_ListNode  cur;
+-    FT_Renderer  result = 0;
++    FT_Renderer  result = NULL;
+ 
+ 
+     if ( !library )
+@@ -3860,7 +3860,7 @@
+     {
+       if ( *node )
+         cur = (*node)->next;
+-      *node = 0;
++      *node = NULL;
+     }
+ 
+     while ( cur )
+@@ -4080,7 +4080,7 @@
+ 
+     default:
+       {
+-        FT_ListNode  node = 0;
++        FT_ListNode  node = NULL;
+ 
+ 
+         /* small shortcut for the very common case */
+@@ -4215,7 +4215,7 @@
+ 
+ 
+     if ( library && library->auto_hinter == module )
+-      library->auto_hinter = 0;
++      library->auto_hinter = NULL;
+ 
+     /* if the module is a renderer */
+     if ( FT_MODULE_IS_RENDERER( module ) )
+@@ -4465,7 +4465,7 @@
+             cur[0] = cur[1];
+             cur++;
+           }
+-          limit[0] = 0;
++          limit[0] = NULL;
+ 
+           /* destroy the module */
+           Destroy_Module( module );
+@@ -4793,7 +4793,7 @@
+         if ( module )
+         {
+           Destroy_Module( module );
+-          library->modules[n] = 0;
++          library->modules[n] = NULL;
+         }
+       }
+     }
+diff --git a/src/base/ftstream.c b/src/base/ftstream.c
+index 408dbf8..b68f3f8 100644
+--- a/src/base/ftstream.c
++++ b/src/base/ftstream.c
+@@ -39,9 +39,9 @@
+     stream->base   = (FT_Byte*) base;
+     stream->size   = size;
+     stream->pos    = 0;
+-    stream->cursor = 0;
+-    stream->read   = 0;
+-    stream->close  = 0;
++    stream->cursor = NULL;
++    stream->read   = NULL;
++    stream->close  = NULL;
+   }
+ 
+ 
+@@ -203,8 +203,8 @@
+       *pbytes = (FT_Byte*)stream->cursor;
+ 
+       /* equivalent to FT_Stream_ExitFrame(), with no memory block release */
+-      stream->cursor = 0;
+-      stream->limit  = 0;
++      stream->cursor = NULL;
++      stream->limit  = NULL;
+     }
+ 
+     return error;
+@@ -226,7 +226,7 @@
+       FT_FREE( *pbytes );
+ #endif
+     }
+-    *pbytes = 0;
++    *pbytes = NULL;
+   }
+ 
+ 
+@@ -335,8 +335,8 @@
+       FT_FREE( stream->base );
+ #endif
+     }
+-    stream->cursor = 0;
+-    stream->limit  = 0;
++    stream->cursor = NULL;
++    stream->limit  = NULL;
+   }
+ 
+ 
+diff --git a/src/base/ftsystem.c b/src/base/ftsystem.c
+index 5809a59..1938fd8 100644
+--- a/src/base/ftsystem.c
++++ b/src/base/ftsystem.c
+@@ -171,7 +171,7 @@
+ 
+     stream->descriptor.pointer = NULL;
+     stream->size               = 0;
+-    stream->base               = 0;
++    stream->base               = NULL;
+   }
+ 
+ 
+@@ -232,7 +232,7 @@
+ 
+     stream->descriptor.pointer = NULL;
+     stream->pathname.pointer   = (char*)filepathname;
+-    stream->base               = 0;
++    stream->base               = NULL;
+     stream->pos                = 0;
+     stream->read               = NULL;
+     stream->close              = NULL;
+@@ -292,7 +292,7 @@
+     memory = (FT_Memory)ft_smalloc( sizeof ( *memory ) );
+     if ( memory )
+     {
+-      memory->user    = 0;
++      memory->user    = NULL;
+       memory->alloc   = ft_alloc;
+       memory->realloc = ft_realloc;
+       memory->free    = ft_free;
+diff --git a/src/base/ftutil.c b/src/base/ftutil.c
+index 8c15afc..f5b72db 100644
+--- a/src/base/ftutil.c
++++ b/src/base/ftutil.c
+@@ -275,7 +275,7 @@
+ 
+     before = list->tail;
+ 
+-    node->next = 0;
++    node->next = NULL;
+     node->prev = before;
+ 
+     if ( before )
+@@ -302,7 +302,7 @@
+     after = list->head;
+ 
+     node->next = after;
+-    node->prev = 0;
++    node->prev = NULL;
+ 
+     if ( !after )
+       list->tail = node;
+@@ -366,7 +366,7 @@
+     else
+       list->tail = before;
+ 
+-    node->prev       = 0;
++    node->prev       = NULL;
+     node->next       = list->head;
+     list->head->prev = node;
+     list->head       = node;
+@@ -433,8 +433,8 @@
+       cur = next;
+     }
+ 
+-    list->head = 0;
+-    list->tail = 0;
++    list->head = NULL;
++    list->tail = NULL;
+   }
+ 
+ 
+-- 
+2.3.6
+
+From adb08efcf1c661bbff0b71672a293f06c51e58a4 Mon Sep 17 00:00:00 2001
+From: Alexei Podtelezhnikov <apodtele@gmail.com>
+Date: Sat, 11 Apr 2015 23:54:19 -0400
+Subject: [PATCH] [bdf,pcf,truetype] NULL.
+
+---
+ src/bdf/bdfdrivr.c     | 4 ++--
+ src/bdf/bdflib.c       | 6 +++---
+ src/pcf/pcfread.c      | 8 ++++----
+ src/truetype/ttgload.c | 4 ++--
+ 4 files changed, 11 insertions(+), 11 deletions(-)
+
+diff --git a/src/bdf/bdfdrivr.c b/src/bdf/bdfdrivr.c
+index 4f03116..4b3fb76 100644
+--- a/src/bdf/bdfdrivr.c
++++ b/src/bdf/bdfdrivr.c
+@@ -420,7 +420,7 @@ THE SOFTWARE.
+           goto Exit;
+       }
+       else
+-        bdfface->family_name = 0;
++        bdfface->family_name = NULL;
+ 
+       if ( ( error = bdf_interpret_style( face ) ) != 0 )
+         goto Exit;
+@@ -509,7 +509,7 @@ THE SOFTWARE.
+ 
+       /* charmaps */
+       {
+-        bdf_property_t  *charset_registry = 0, *charset_encoding = 0;
++        bdf_property_t  *charset_registry, *charset_encoding;
+         FT_Bool          unicode_charmap  = 0;
+ 
+ 
+diff --git a/src/bdf/bdflib.c b/src/bdf/bdflib.c
+index c1d4e59..8655d0e 100644
+--- a/src/bdf/bdflib.c
++++ b/src/bdf/bdflib.c
+@@ -683,7 +683,7 @@
+     unsigned long     lineno, buf_size;
+     int               refill, hold, to_skip;
+     ptrdiff_t         bytes, start, end, cursor, avail;
+-    char*             buf    = 0;
++    char*             buf    = NULL;
+     FT_Memory         memory = stream->memory;
+     FT_Error          error  = FT_Err_Ok;
+ 
+@@ -1751,7 +1751,7 @@
+         glyph->encoding = p->glyph_enc;
+ 
+         /* Reset the initial glyph info. */
+-        p->glyph_name = 0;
++        p->glyph_name = NULL;
+       }
+       else
+       {
+@@ -1779,7 +1779,7 @@
+           /* kept.                                                */
+           FT_FREE( p->glyph_name );
+ 
+-        p->glyph_name = 0;
++        p->glyph_name = NULL;
+       }
+ 
+       /* Clear the flags that might be added when width and height are */
+diff --git a/src/pcf/pcfread.c b/src/pcf/pcfread.c
+index 3cdd9ed..039af33 100644
+--- a/src/pcf/pcfread.c
++++ b/src/pcf/pcfread.c
+@@ -448,14 +448,14 @@ THE SOFTWARE.
+   pcf_get_properties( FT_Stream  stream,
+                       PCF_Face   face )
+   {
+-    PCF_ParseProperty  props      = 0;
++    PCF_ParseProperty  props      = NULL;
+     PCF_Property       properties = NULL;
+     FT_ULong           nprops, i;
+     FT_ULong           format, size;
+     FT_Error           error;
+     FT_Memory          memory     = FT_FACE( face )->memory;
+     FT_ULong           string_size;
+-    FT_String*         strings    = 0;
++    FT_String*         strings    = NULL;
+ 
+ 
+     error = pcf_seek_to_table_type( stream,
+@@ -620,7 +620,7 @@ THE SOFTWARE.
+     FT_Error    error;
+     FT_Memory   memory  = FT_FACE( face )->memory;
+     FT_ULong    format, size;
+-    PCF_Metric  metrics = 0;
++    PCF_Metric  metrics = NULL;
+     FT_ULong    nmetrics, i;
+ 
+ 
+@@ -1316,7 +1316,7 @@ THE SOFTWARE.
+ 
+       /* set up charset */
+       {
+-        PCF_Property  charset_registry = 0, charset_encoding = 0;
++        PCF_Property  charset_registry, charset_encoding;
+ 
+ 
+         charset_registry = pcf_find_property( face, "CHARSET_REGISTRY" );
+diff --git a/src/truetype/ttgload.c b/src/truetype/ttgload.c
+index bb0931e..b380271 100644
+--- a/src/truetype/ttgload.c
++++ b/src/truetype/ttgload.c
+@@ -409,7 +409,7 @@
+ 
+     /* reading the bytecode instructions */
+     load->glyph->control_len  = 0;
+-    load->glyph->control_data = 0;
++    load->glyph->control_data = NULL;
+ 
+     if ( p + 2 > limit )
+       goto Invalid_Outline;
+@@ -1730,7 +1730,7 @@
+ 
+       {
+         FT_UInt      n, num_base_points;
+-        FT_SubGlyph  subglyph       = 0;
++        FT_SubGlyph  subglyph       = NULL;
+ 
+         FT_UInt      num_points     = start_point;
+         FT_UInt      num_subglyphs  = gloader->current.num_subglyphs;
+-- 
+2.3.6
+
+From eabc8d72e0dddf8fa85ba07677ba4ba565283e1e Mon Sep 17 00:00:00 2001
+From: Alexei Podtelezhnikov <apodtele@gmail.com>
+Date: Sun, 12 Apr 2015 23:16:48 -0400
+Subject: [PATCH] [psaux,psnames,type1,type42] NULL.
+
+---
+ src/psaux/afmparse.c   |  2 +-
+ src/psaux/psobjs.c     | 10 +++++-----
+ src/psaux/t1decode.c   |  2 +-
+ src/psnames/psmodule.c |  2 +-
+ src/type1/t1gload.c    |  2 +-
+ src/type1/t1load.c     |  4 ++--
+ src/type1/t1objs.c     |  8 ++++----
+ src/type1/t1parse.c    |  8 ++++----
+ src/type42/t42objs.c   | 16 ++++++++--------
+ src/type42/t42parse.c  |  4 ++--
+ 10 files changed, 29 insertions(+), 29 deletions(-)
+
+diff --git a/src/psaux/afmparse.c b/src/psaux/afmparse.c
+index 0a86853..3ad44ec 100644
+--- a/src/psaux/afmparse.c
++++ b/src/psaux/afmparse.c
+@@ -446,7 +446,7 @@
+                        FT_Offset*  len )
+   {
+     AFM_Stream  stream = parser->stream;
+-    char*       key    = 0;  /* make stupid compiler happy */
++    char*       key    = NULL;  /* make stupid compiler happy */
+ 
+ 
+     if ( line )
+diff --git a/src/psaux/psobjs.c b/src/psaux/psobjs.c
+index a0c0e09..c7cbc67 100644
+--- a/src/psaux/psobjs.c
++++ b/src/psaux/psobjs.c
+@@ -81,7 +81,7 @@
+     table->max_elems = count;
+     table->init      = 0xDEADBEEFUL;
+     table->num_elems = 0;
+-    table->block     = 0;
++    table->block     = NULL;
+     table->capacity  = 0;
+     table->cursor    = 0;
+ 
+@@ -619,8 +619,8 @@
+ 
+ 
+     token->type  = T1_TOKEN_TYPE_NONE;
+-    token->start = 0;
+-    token->limit = 0;
++    token->start = NULL;
++    token->limit = NULL;
+ 
+     /* first of all, skip leading whitespace */
+     ps_parser_skip_spaces( parser );
+@@ -701,7 +701,7 @@
+ 
+     if ( !token->limit )
+     {
+-      token->start = 0;
++      token->start = NULL;
+       token->type  = T1_TOKEN_TYPE_NONE;
+     }
+ 
+@@ -1547,7 +1547,7 @@
+       FT_GlyphLoader_Rewind( loader );
+ 
+       builder->hints_globals = size->internal;
+-      builder->hints_funcs   = 0;
++      builder->hints_funcs   = NULL;
+ 
+       if ( hinting )
+         builder->hints_funcs = glyph->internal->glyph_hints;
+diff --git a/src/psaux/t1decode.c b/src/psaux/t1decode.c
+index 4386119..2e19928 100644
+--- a/src/psaux/t1decode.c
++++ b/src/psaux/t1decode.c
+@@ -1581,7 +1581,7 @@
+ 
+     /* retrieve PSNames interface from list of current modules */
+     {
+-      FT_Service_PsCMaps  psnames = 0;
++      FT_Service_PsCMaps  psnames;
+ 
+ 
+       FT_FACE_FIND_GLOBAL_SERVICE( face, psnames, POSTSCRIPT_CMAPS );
+diff --git a/src/psnames/psmodule.c b/src/psnames/psmodule.c
+index 448be1e..0f04c2f 100644
+--- a/src/psnames/psmodule.c
++++ b/src/psnames/psmodule.c
+@@ -312,7 +312,7 @@
+ 
+     /* we first allocate the table */
+     table->num_maps = 0;
+-    table->maps     = 0;
++    table->maps     = NULL;
+ 
+     if ( !FT_NEW_ARRAY( table->maps, num_glyphs + EXTRA_GLYPH_LIST_SIZE ) )
+     {
+diff --git a/src/type1/t1gload.c b/src/type1/t1gload.c
+index 4af8d71..829e874 100644
+--- a/src/type1/t1gload.c
++++ b/src/type1/t1gload.c
+@@ -504,7 +504,7 @@
+ 
+       /* Set the control data to null - it is no longer available if   */
+       /* loaded incrementally.                                         */
+-      t1glyph->control_data = 0;
++      t1glyph->control_data = NULL;
+       t1glyph->control_len  = 0;
+     }
+ #endif
+diff --git a/src/type1/t1load.c b/src/type1/t1load.c
+index 39acef2..376c90c 100644
+--- a/src/type1/t1load.c
++++ b/src/type1/t1load.c
+@@ -2213,8 +2213,8 @@
+     /* the `lengths' field must be released later             */
+     type1->glyph_names_block    = loader.glyph_names.block;
+     type1->glyph_names          = (FT_String**)loader.glyph_names.elements;
+-    loader.glyph_names.block    = 0;
+-    loader.glyph_names.elements = 0;
++    loader.glyph_names.block    = NULL;
++    loader.glyph_names.elements = NULL;
+ 
+     /* we must now build type1.encoding when we have a custom array */
+     if ( type1->encoding_type == T1_ENCODING_TYPE_ARRAY )
+diff --git a/src/type1/t1objs.c b/src/type1/t1objs.c
+index 74fb4fa..af89888 100644
+--- a/src/type1/t1objs.c
++++ b/src/type1/t1objs.c
+@@ -86,7 +86,7 @@
+       if ( funcs )
+         funcs->destroy( (PSH_Globals)size->root.internal );
+ 
+-      size->root.internal = 0;
++      size->root.internal = NULL;
+     }
+   }
+ 
+@@ -144,7 +144,7 @@
+   FT_LOCAL_DEF( void )
+   T1_GlyphSlot_Done( FT_GlyphSlot  slot )
+   {
+-    slot->internal->glyph_hints = 0;
++    slot->internal->glyph_hints = NULL;
+   }
+ 
+ 
+@@ -224,7 +224,7 @@
+     }
+ 
+     T1_Done_Blend( face );
+-    face->blend = 0;
++    face->blend = NULL;
+ #endif
+ 
+     /* release font info strings */
+@@ -457,7 +457,7 @@
+ 
+       /* no embedded bitmap support */
+       root->num_fixed_sizes = 0;
+-      root->available_sizes = 0;
++      root->available_sizes = NULL;
+ 
+       root->bbox.xMin =   type1->font_bbox.xMin            >> 16;
+       root->bbox.yMin =   type1->font_bbox.yMin            >> 16;
+diff --git a/src/type1/t1parse.c b/src/type1/t1parse.c
+index feea224..c73b2b2 100644
+--- a/src/type1/t1parse.c
++++ b/src/type1/t1parse.c
+@@ -143,13 +143,13 @@
+     FT_ULong   size;
+ 
+ 
+-    psaux->ps_parser_funcs->init( &parser->root, 0, 0, memory );
++    psaux->ps_parser_funcs->init( &parser->root, NULL, NULL, memory );
+ 
+     parser->stream       = stream;
+     parser->base_len     = 0;
+-    parser->base_dict    = 0;
++    parser->base_dict    = NULL;
+     parser->private_len  = 0;
+-    parser->private_dict = 0;
++    parser->private_dict = NULL;
+     parser->in_pfb       = 0;
+     parser->in_memory    = 0;
+     parser->single_block = 0;
+@@ -445,7 +445,7 @@
+         parser->single_block = 1;
+         parser->private_dict = parser->base_dict;
+         parser->private_len  = size;
+-        parser->base_dict    = 0;
++        parser->base_dict    = NULL;
+         parser->base_len     = 0;
+       }
+ 
+diff --git a/src/type42/t42objs.c b/src/type42/t42objs.c
+index d0a05d6..2756adf 100644
+--- a/src/type42/t42objs.c
++++ b/src/type42/t42objs.c
+@@ -92,8 +92,8 @@
+     /* the `lengths' field must be released later             */
+     type1->glyph_names_block    = loader.glyph_names.block;
+     type1->glyph_names          = (FT_String**)loader.glyph_names.elements;
+-    loader.glyph_names.block    = 0;
+-    loader.glyph_names.elements = 0;
++    loader.glyph_names.block    = NULL;
++    loader.glyph_names.elements = NULL;
+ 
+     /* we must now build type1.encoding when we have a custom array */
+     if ( type1->encoding_type == T1_ENCODING_TYPE_ARRAY )
+@@ -285,7 +285,7 @@
+ 
+     /* no embedded bitmap support */
+     root->num_fixed_sizes = 0;
+-    root->available_sizes = 0;
++    root->available_sizes = NULL;
+ 
+     /* Load the TTF font embedded in the T42 font */
+     {
+@@ -461,8 +461,8 @@
+     FT_FREE( face->unicode_map.maps );
+     face->unicode_map.num_maps = 0;
+ 
+-    face->root.family_name = 0;
+-    face->root.style_name  = 0;
++    face->root.family_name = NULL;
++    face->root.style_name  = NULL;
+   }
+ 
+ 
+@@ -632,10 +632,10 @@
+     slot->bitmap_left   = 0;
+     slot->bitmap_top    = 0;
+     slot->num_subglyphs = 0;
+-    slot->subglyphs     = 0;
+-    slot->control_data  = 0;
++    slot->subglyphs     = NULL;
++    slot->control_data  = NULL;
+     slot->control_len   = 0;
+-    slot->other         = 0;
++    slot->other         = NULL;
+     slot->format        = FT_GLYPH_FORMAT_NONE;
+ 
+     slot->linearHoriAdvance = 0;
+diff --git a/src/type42/t42parse.c b/src/type42/t42parse.c
+index d046408..109e996 100644
+--- a/src/type42/t42parse.c
++++ b/src/type42/t42parse.c
+@@ -142,11 +142,11 @@
+     FT_Long   size;
+ 
+ 
+-    psaux->ps_parser_funcs->init( &parser->root, 0, 0, memory );
++    psaux->ps_parser_funcs->init( &parser->root, NULL, NULL, memory );
+ 
+     parser->stream    = stream;
+     parser->base_len  = 0;
+-    parser->base_dict = 0;
++    parser->base_dict = NULL;
+     parser->in_memory = 0;
+ 
+     /*******************************************************************/
+-- 
+2.3.6
+
+From eae1b3e3711d9c9e653b1b05e24f2220c5a3c186 Mon Sep 17 00:00:00 2001
+From: Alexei Podtelezhnikov <apodtele@gmail.com>
+Date: Mon, 13 Apr 2015 22:40:17 -0400
+Subject: [PATCH] [autofit,pshinter] NULL.
+
+---
+ src/autofit/afcjk.c    | 12 ++++++------
+ src/autofit/aflatin.c  |  2 +-
+ src/autofit/aflatin2.c |  8 ++++----
+ src/pshinter/pshalgo.c | 18 +++++++++---------
+ src/pshinter/pshglob.c |  6 +++---
+ src/pshinter/pshrec.c  |  8 ++++----
+ 6 files changed, 27 insertions(+), 27 deletions(-)
+
+diff --git a/src/autofit/afcjk.c b/src/autofit/afcjk.c
+index ffeebea..4792c20 100644
+--- a/src/autofit/afcjk.c
++++ b/src/autofit/afcjk.c
+@@ -863,19 +863,19 @@
+ 
+               if ( link == seg2 )
+               {
+-                seg->link  = 0;
++                seg->link  = NULL;
+                 seg->serif = link1;
+               }
+               else if ( link == link2 )
+               {
+-                seg->link  = 0;
++                seg->link  = NULL;
+                 seg->serif = seg1;
+               }
+             }
+           }
+           else
+           {
+-            seg1->link = link1->link = 0;
++            seg1->link = link1->link = NULL;
+ 
+             break;
+           }
+@@ -892,7 +892,7 @@
+         seg2->num_linked++;
+         if ( seg2->link != seg1 )
+         {
+-          seg1->link = 0;
++          seg1->link = NULL;
+ 
+           if ( seg2->score < dist_threshold || seg1->score < seg2->score * 4 )
+             seg1->serif = seg2->link;
+@@ -1159,7 +1159,7 @@
+         /*      Example: the `c' in cour.pfa at size 13     */
+ 
+         if ( edge->serif && edge->link )
+-          edge->serif = 0;
++          edge->serif = NULL;
+       }
+     }
+ 
+@@ -1712,7 +1712,7 @@
+     AF_Edge       edge_limit = edges + axis->num_edges;
+     FT_PtrDist    n_edges;
+     AF_Edge       edge;
+-    AF_Edge       anchor   = 0;
++    AF_Edge       anchor   = NULL;
+     FT_Pos        delta    = 0;
+     FT_Int        skipped  = 0;
+     FT_Bool       has_last_stem = FALSE;
+diff --git a/src/autofit/aflatin.c b/src/autofit/aflatin.c
+index ad162ae..a6e2541 100644
+--- a/src/autofit/aflatin.c
++++ b/src/autofit/aflatin.c
+@@ -1792,7 +1792,7 @@
+         /*      Example: the `c' in cour.pfa at size 13     */
+ 
+         if ( edge->serif && edge->link )
+-          edge->serif = 0;
++          edge->serif = NULL;
+       }
+     }
+ 
+diff --git a/src/autofit/aflatin2.c b/src/autofit/aflatin2.c
+index 1560fb1..3e9360d 100644
+--- a/src/autofit/aflatin2.c
++++ b/src/autofit/aflatin2.c
+@@ -1048,7 +1048,7 @@
+       {
+         if ( seg2->link != seg1 )
+         {
+-          seg1->link  = 0;
++          seg1->link  = NULL;
+           seg1->serif = seg2->link;
+         }
+       }
+@@ -1128,7 +1128,7 @@
+ 
+     for ( seg = segments; seg < segment_limit; seg++ )
+     {
+-      AF_Edge  found = 0;
++      AF_Edge  found = NULL;
+       FT_Int   ee;
+ 
+ 
+@@ -1355,7 +1355,7 @@
+         /*      Example: the `c' in cour.pfa at size 13     */
+ 
+         if ( edge->serif && edge->link )
+-          edge->serif = 0;
++          edge->serif = NULL;
+       }
+     }
+ 
+@@ -1837,7 +1837,7 @@
+     AF_Edge       edges      = axis->edges;
+     AF_Edge       edge_limit = edges + axis->num_edges;
+     AF_Edge       edge;
+-    AF_Edge       anchor     = 0;
++    AF_Edge       anchor     = NULL;
+     FT_Int        has_serifs = 0;
+     FT_Pos        anchor_drift = 0;
+ 
+diff --git a/src/pshinter/pshalgo.c b/src/pshinter/pshalgo.c
+index 1d3dedb..bfdb3ed 100644
+--- a/src/pshinter/pshalgo.c
++++ b/src/pshinter/pshalgo.c
+@@ -30,9 +30,9 @@
+ 
+ 
+ #ifdef DEBUG_HINTER
+-  PSH_Hint_Table  ps_debug_hint_table = 0;
+-  PSH_HintFunc    ps_debug_hint_func  = 0;
+-  PSH_Glyph       ps_debug_glyph      = 0;
++  PSH_Hint_Table  ps_debug_hint_table = NULL;
++  PSH_HintFunc    ps_debug_hint_func  = NULL;
++  PSH_Glyph       ps_debug_glyph      = NULL;
+ #endif
+ 
+ 
+@@ -65,13 +65,13 @@
+   {
+     FT_FREE( table->zones );
+     table->num_zones = 0;
+-    table->zone      = 0;
++    table->zone      = NULL;
+ 
+     FT_FREE( table->sort );
+     FT_FREE( table->hints );
+     table->num_hints   = 0;
+     table->max_hints   = 0;
+-    table->sort_global = 0;
++    table->sort_global = NULL;
+   }
+ 
+ 
+@@ -119,7 +119,7 @@
+       PSH_Hint   hint2;
+ 
+ 
+-      hint->parent = 0;
++      hint->parent = NULL;
+       for ( ; count > 0; count--, sorted++ )
+       {
+         hint2 = sorted[0];
+@@ -192,7 +192,7 @@
+     table->sort_global = table->sort + count;
+     table->num_hints   = 0;
+     table->num_zones   = 0;
+-    table->zone        = 0;
++    table->zone        = NULL;
+ 
+     /* initialize the `table->hints' array */
+     {
+@@ -1140,7 +1140,7 @@
+     glyph->num_points   = 0;
+     glyph->num_contours = 0;
+ 
+-    glyph->memory = 0;
++    glyph->memory = NULL;
+   }
+ 
+ 
+@@ -2035,7 +2035,7 @@
+       /* count the number of strong points in this contour */
+       next      = start + contour->count;
+       fit_count = 0;
+-      first     = 0;
++      first     = NULL;
+ 
+       for ( point = start; point < next; point++ )
+         if ( psh_point_is_fitted( point ) )
+diff --git a/src/pshinter/pshglob.c b/src/pshinter/pshglob.c
+index 85d87d5..6723b71 100644
+--- a/src/pshinter/pshglob.c
++++ b/src/pshinter/pshglob.c
+@@ -23,7 +23,7 @@
+ #include "pshglob.h"
+ 
+ #ifdef DEBUG_HINTER
+-  PSH_Globals  ps_debug_globals = 0;
++  PSH_Globals  ps_debug_globals = NULL;
+ #endif
+ 
+ 
+@@ -369,7 +369,7 @@
+   {
+     FT_UInt         count;
+     FT_UInt         num;
+-    PSH_Blue_Table  table = 0;
++    PSH_Blue_Table  table = NULL;
+ 
+     /*                                                        */
+     /* Determine whether we need to suppress overshoots or    */
+@@ -635,7 +635,7 @@
+       FT_FREE( globals );
+ 
+ #ifdef DEBUG_HINTER
+-      ps_debug_globals = 0;
++      ps_debug_globals = NULL;
+ #endif
+     }
+   }
+diff --git a/src/pshinter/pshrec.c b/src/pshinter/pshrec.c
+index db4e151..f8895fc 100644
+--- a/src/pshinter/pshrec.c
++++ b/src/pshinter/pshrec.c
+@@ -31,7 +31,7 @@
+ #define FT_COMPONENT  trace_pshrec
+ 
+ #ifdef DEBUG_HINTER
+-  PS_Hints  ps_debug_hints         = 0;
++  PS_Hints  ps_debug_hints         = NULL;
+   int       ps_debug_no_horz_hints = 0;
+   int       ps_debug_no_vert_hints = 0;
+ #endif
+@@ -85,7 +85,7 @@
+   {
+     FT_Error  error = FT_Err_Ok;
+     FT_UInt   count;
+-    PS_Hint   hint = 0;
++    PS_Hint   hint = NULL;
+ 
+ 
+     count = table->num_hints;
+@@ -254,7 +254,7 @@
+   {
+     FT_UInt   count;
+     FT_Error  error = FT_Err_Ok;
+-    PS_Mask   mask  = 0;
++    PS_Mask   mask  = NULL;
+ 
+ 
+     count = table->num_masks;
+@@ -810,7 +810,7 @@
+     ps_dimension_done( &hints->dimension[1], memory );
+ 
+     hints->error  = FT_Err_Ok;
+-    hints->memory = 0;
++    hints->memory = NULL;
+   }
+ 
+ 
+-- 
+2.3.6
+
+From 792db0b9a9d60c32f18ba7df58ba5395348ab650 Mon Sep 17 00:00:00 2001
+From: Alexei Podtelezhnikov <apodtele@gmail.com>
+Date: Wed, 15 Apr 2015 23:20:23 -0400
+Subject: [PATCH] [cff,cid,pfr,sfnt,winfonts] NULL.
+
+---
+ src/cff/cffgload.c    |  6 +++---
+ src/cff/cffobjs.c     |  2 +-
+ src/cid/cidgload.c    |  2 +-
+ src/cid/cidload.c     |  2 +-
+ src/cid/cidobjs.c     | 10 +++++-----
+ src/pfr/pfrobjs.c     |  2 +-
+ src/sfnt/sfobjs.c     |  6 +++---
+ src/sfnt/ttpost.c     |  6 +++---
+ src/winfonts/winfnt.c |  4 ++--
+ 9 files changed, 20 insertions(+), 20 deletions(-)
+
+diff --git a/src/cff/cffgload.c b/src/cff/cffgload.c
+index d731387..43054f8 100644
+--- a/src/cff/cffgload.c
++++ b/src/cff/cffgload.c
+@@ -273,8 +273,8 @@
+       builder->current = &loader->current.outline;
+       FT_GlyphLoader_Rewind( loader );
+ 
+-      builder->hints_globals = 0;
+-      builder->hints_funcs   = 0;
++      builder->hints_globals = NULL;
++      builder->hints_funcs   = NULL;
+ 
+       if ( hinting && size )
+       {
+@@ -2872,7 +2872,7 @@
+       /* fonts.                                                       */
+       if ( face->root.internal->incremental_interface )
+       {
+-        glyph->root.control_data = 0;
++        glyph->root.control_data = NULL;
+         glyph->root.control_len = 0;
+       }
+       else
+diff --git a/src/cff/cffobjs.c b/src/cff/cffobjs.c
+index b1003a5..4a1ef11 100644
+--- a/src/cff/cffobjs.c
++++ b/src/cff/cffobjs.c
+@@ -342,7 +342,7 @@
+   FT_LOCAL_DEF( void )
+   cff_slot_done( FT_GlyphSlot  slot )
+   {
+-    slot->internal->glyph_hints = 0;
++    slot->internal->glyph_hints = NULL;
+   }
+ 
+ 
+diff --git a/src/cid/cidgload.c b/src/cid/cidgload.c
+index bacf3da..d06293c 100644
+--- a/src/cid/cidgload.c
++++ b/src/cid/cidgload.c
+@@ -47,7 +47,7 @@
+     FT_ULong       fd_select;
+     FT_Stream      stream       = face->cid_stream;
+     FT_Error       error        = FT_Err_Ok;
+-    FT_Byte*       charstring   = 0;
++    FT_Byte*       charstring   = NULL;
+     FT_Memory      memory       = face->root.memory;
+     FT_ULong       glyph_length = 0;
+     PSAux_Service  psaux        = (PSAux_Service)face->psaux;
+diff --git a/src/cid/cidload.c b/src/cid/cidload.c
+index 460186e..6f35860 100644
+--- a/src/cid/cidload.c
++++ b/src/cid/cidload.c
+@@ -413,7 +413,7 @@
+     FT_Int         n;
+     CID_Subrs      subr;
+     FT_UInt        max_offsets = 0;
+-    FT_ULong*      offsets = 0;
++    FT_ULong*      offsets = NULL;
+     PSAux_Service  psaux = (PSAux_Service)face->psaux;
+ 
+ 
+diff --git a/src/cid/cidobjs.c b/src/cid/cidobjs.c
+index dc86679..a3d6895 100644
+--- a/src/cid/cidobjs.c
++++ b/src/cid/cidobjs.c
+@@ -49,7 +49,7 @@
+   FT_LOCAL_DEF( void )
+   cid_slot_done( FT_GlyphSlot  slot )
+   {
+-    slot->internal->glyph_hints = 0;
++    slot->internal->glyph_hints = NULL;
+   }
+ 
+ 
+@@ -122,7 +122,7 @@
+       if ( funcs )
+         funcs->destroy( (PSH_Globals)cidsize->internal );
+ 
+-      cidsize->internal = 0;
++      cidsize->internal = NULL;
+     }
+   }
+ 
+@@ -243,8 +243,8 @@
+     FT_FREE( cid->registry );
+     FT_FREE( cid->ordering );
+ 
+-    cidface->family_name = 0;
+-    cidface->style_name  = 0;
++    cidface->family_name = NULL;
++    cidface->style_name  = NULL;
+ 
+     FT_FREE( face->binary_data );
+     FT_FREE( face->cid_stream );
+@@ -421,7 +421,7 @@
+ 
+       /* no embedded bitmap support */
+       cidface->num_fixed_sizes = 0;
+-      cidface->available_sizes = 0;
++      cidface->available_sizes = NULL;
+ 
+       cidface->bbox.xMin =   cid->font_bbox.xMin            >> 16;
+       cidface->bbox.yMin =   cid->font_bbox.yMin            >> 16;
+diff --git a/src/pfr/pfrobjs.c b/src/pfr/pfrobjs.c
+index edd9c7f..aababf4 100644
+--- a/src/pfr/pfrobjs.c
++++ b/src/pfr/pfrobjs.c
+@@ -192,7 +192,7 @@
+       pfrface->style_name = phy_font->style_name;
+ 
+       pfrface->num_fixed_sizes = 0;
+-      pfrface->available_sizes = 0;
++      pfrface->available_sizes = NULL;
+ 
+       pfrface->bbox         = phy_font->bbox;
+       pfrface->units_per_EM = (FT_UShort)phy_font->outline_resolution;
+diff --git a/src/sfnt/sfobjs.c b/src/sfnt/sfobjs.c
+index 39c37e1..40c27fa 100644
+--- a/src/sfnt/sfobjs.c
++++ b/src/sfnt/sfobjs.c
+@@ -376,8 +376,8 @@
+     FT_FREE( stream->base );
+ 
+     stream->size  = 0;
+-    stream->base  = 0;
+-    stream->close = 0;
++    stream->base  = NULL;
++    stream->close = NULL;
+   }
+ 
+ 
+@@ -1570,7 +1570,7 @@
+ 
+     FT_FREE( face->postscript_name );
+ 
+-    face->sfnt = 0;
++    face->sfnt = NULL;
+   }
+ 
+ 
+diff --git a/src/sfnt/ttpost.c b/src/sfnt/ttpost.c
+index 92d2316..8d29d1e 100644
+--- a/src/sfnt/ttpost.c
++++ b/src/sfnt/ttpost.c
+@@ -163,8 +163,8 @@
+     FT_Int      num_glyphs;
+     FT_UShort   num_names;
+ 
+-    FT_UShort*  glyph_indices = 0;
+-    FT_Char**   name_strings  = 0;
++    FT_UShort*  glyph_indices = NULL;
++    FT_Char**   name_strings  = NULL;
+ 
+ 
+     if ( FT_READ_USHORT( num_glyphs ) )
+@@ -316,7 +316,7 @@
+     FT_Error   error;
+ 
+     FT_Int     num_glyphs;
+-    FT_Char*   offset_table = 0;
++    FT_Char*   offset_table = NULL;
+ 
+     FT_UNUSED( post_limit );
+ 
+diff --git a/src/winfonts/winfnt.c b/src/winfonts/winfnt.c
+index 81f7ea3..06f1861 100644
+--- a/src/winfonts/winfnt.c
++++ b/src/winfonts/winfnt.c
+@@ -201,7 +201,7 @@
+     FT_FREE( font->family_name );
+ 
+     FT_FREE( font );
+-    face->font = 0;
++    face->font = NULL;
+   }
+ 
+ 
+@@ -277,7 +277,7 @@
+     WinMZ_HeaderRec  mz_header;
+ 
+ 
+-    face->font = 0;
++    face->font = NULL;
+ 
+     /* does it begin with an MZ header? */
+     if ( FT_STREAM_SEEK( 0 )                                      ||
+-- 
+2.3.6
+
+From 58f48f0ddcff3eec125e8a72bfc14e41c9da7c6f Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Thu, 16 Apr 2015 20:11:49 +0200
+Subject: [PATCH] [autofit] Add debugging hook to disable warper.
+
+* src/autofit/afmodule.c (_af_debug_disable_warper)
+[FT_DEBUG_AUTOFIT]: New global variable.
+
+* src/autofit/aftypes.h: Updated.
+(AF_SCALER_FLAG_NO_WARPER): New macro (not actively used yet).
+
+* src/autofit/afhints.h (AF_HINTS_DO_WARP): New macro.
+
+* src/autofi/aflatin.c (af_latin_hints_apply)
+[AF_CONFIG_OPTION_USE_WARPER]: Use `AF_HINTS_DO_WARP' to control use
+of warper.
+
+* src/autofit/afcjk.c (af_cjk_hints_init, af_cjk_hints_apply)
+[AF_CONFIG_OPTION_USE_WARPER]: Synchronize with `aflatin.c'.
+
+* src/autofit/aflatin2.c (af_latin2_hints_apply)
+[AF_CONFIG_OPTION_USE_WARPER]: Synchronize with `aflatin.c'.
+---
+ ChangeLog              | 22 ++++++++++++++++++++++
+ src/autofit/afcjk.c    | 13 ++++++++++---
+ src/autofit/afhints.h  |  7 +++++++
+ src/autofit/aflatin.c  | 13 +++++++++----
+ src/autofit/aflatin2.c | 14 +++++++-------
+ src/autofit/afmodule.c |  1 +
+ src/autofit/aftypes.h  |  2 ++
+ 7 files changed, 58 insertions(+), 14 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index ad0c031..8c37e9b 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,25 @@
++2015-04-16  Werner Lemberg  <wl@gnu.org>
++
++	[autofit] Add debugging hook to disable warper.
++
++	* src/autofit/afmodule.c (_af_debug_disable_warper)
++	[FT_DEBUG_AUTOFIT]: New global variable.
++
++	* src/autofit/aftypes.h: Updated.
++	(AF_SCALER_FLAG_NO_WARPER): New macro (not actively used yet).
++
++	* src/autofit/afhints.h (AF_HINTS_DO_WARP): New macro.
++
++	* src/autofi/aflatin.c (af_latin_hints_apply)
++	[AF_CONFIG_OPTION_USE_WARPER]: Use `AF_HINTS_DO_WARP' to control use
++	of warper.
++
++	* src/autofit/afcjk.c (af_cjk_hints_init, af_cjk_hints_apply)
++	[AF_CONFIG_OPTION_USE_WARPER]: Synchronize with `aflatin.c'.
++
++	* src/autofit/aflatin2.c (af_latin2_hints_apply)
++	[AF_CONFIG_OPTION_USE_WARPER]: Synchronize with `aflatin.c'.
++
+ 2015-04-10  Werner Lemberg  <wl@gnu.org>
+ 
+ 	[cff] Update advance width handling to OpenType 1.7.
+diff --git a/src/autofit/afcjk.c b/src/autofit/afcjk.c
+index 4792c20..31fe2cc 100644
+--- a/src/autofit/afcjk.c
++++ b/src/autofit/afcjk.c
+@@ -1301,7 +1301,7 @@
+     /* compute flags depending on render mode, etc. */
+     mode = metrics->root.scaler.render_mode;
+ 
+-#ifdef AF_CONFIG_OPTION_USE_WARPER
++#if 0 /* AF_CONFIG_OPTION_USE_WARPER */
+     if ( mode == FT_RENDER_MODE_LCD || mode == FT_RENDER_MODE_LCD_V )
+       metrics->root.scaler.render_mode = mode = FT_RENDER_MODE_NORMAL;
+ #endif
+@@ -2190,7 +2190,13 @@
+       goto Exit;
+ 
+     /* analyze glyph outline */
++#ifdef AF_CONFIG_OPTION_USE_WARPER
++    if ( ( metrics->root.scaler.render_mode == FT_RENDER_MODE_LIGHT &&
++           AF_HINTS_DO_WARP( hints )                                ) ||
++         AF_HINTS_DO_HORIZONTAL( hints )                              )
++#else
+     if ( AF_HINTS_DO_HORIZONTAL( hints ) )
++#endif
+     {
+       error = af_cjk_hints_detect_features( hints, AF_DIMENSION_HORZ );
+       if ( error )
+@@ -2216,8 +2222,9 @@
+       {
+ 
+ #ifdef AF_CONFIG_OPTION_USE_WARPER
+-        if ( dim == AF_DIMENSION_HORZ                                  &&
+-             metrics->root.scaler.render_mode == FT_RENDER_MODE_NORMAL )
++        if ( dim == AF_DIMENSION_HORZ                                 &&
++             metrics->root.scaler.render_mode == FT_RENDER_MODE_LIGHT &&
++             AF_HINTS_DO_WARP( hints )                                )
+         {
+           AF_WarperRec  warper;
+           FT_Fixed      scale;
+diff --git a/src/autofit/afhints.h b/src/autofit/afhints.h
+index cfb107d..3a6dc6c 100644
+--- a/src/autofit/afhints.h
++++ b/src/autofit/afhints.h
+@@ -387,6 +387,10 @@ FT_BEGIN_HEADER
+ 
+ #define AF_HINTS_DO_BLUES( h )  ( !_af_debug_disable_blue_hints )
+ 
++#define AF_HINTS_DO_WARP( h )                                       \
++          ( !_af_debug_disable_warper                            && \
++            !AF_HINTS_TEST_SCALER( h, AF_SCALER_FLAG_NO_WARPER ) )
++
+ #else /* !FT_DEBUG_AUTOFIT */
+ 
+ #define AF_HINTS_DO_HORIZONTAL( h )                                \
+@@ -400,6 +404,9 @@ FT_BEGIN_HEADER
+ 
+ #define AF_HINTS_DO_BLUES( h )  1
+ 
++#define AF_HINTS_DO_WARP( h )                                  \
++          !AF_HINTS_TEST_SCALER( h, AF_SCALER_FLAG_NO_WARPER )
++
+ #endif /* !FT_DEBUG_AUTOFIT */
+ 
+ 
+diff --git a/src/autofit/aflatin.c b/src/autofit/aflatin.c
+index a6e2541..61d8724 100644
+--- a/src/autofit/aflatin.c
++++ b/src/autofit/aflatin.c
+@@ -1996,6 +1996,9 @@
+     /*
+      *  In `light' hinting mode we disable horizontal hinting completely.
+      *  We also do it if the face is italic.
++     *
++     *  However, if warping is enabled (which only works in `light' hinting
++     *  mode), advance widths get adjusted, too.
+      */
+     if ( mode == FT_RENDER_MODE_LIGHT                      ||
+          ( face->style_flags & FT_STYLE_FLAG_ITALIC ) != 0 )
+@@ -2812,8 +2815,9 @@
+ 
+     /* analyze glyph outline */
+ #ifdef AF_CONFIG_OPTION_USE_WARPER
+-    if ( metrics->root.scaler.render_mode == FT_RENDER_MODE_LIGHT ||
+-         AF_HINTS_DO_HORIZONTAL( hints )                          )
++    if ( ( metrics->root.scaler.render_mode == FT_RENDER_MODE_LIGHT &&
++           AF_HINTS_DO_WARP( hints )                                ) ||
++         AF_HINTS_DO_HORIZONTAL( hints )                              )
+ #else
+     if ( AF_HINTS_DO_HORIZONTAL( hints ) )
+ #endif
+@@ -2845,7 +2849,8 @@
+     {
+ #ifdef AF_CONFIG_OPTION_USE_WARPER
+       if ( dim == AF_DIMENSION_HORZ                                 &&
+-           metrics->root.scaler.render_mode == FT_RENDER_MODE_LIGHT )
++           metrics->root.scaler.render_mode == FT_RENDER_MODE_LIGHT &&
++           AF_HINTS_DO_WARP( hints )                                )
+       {
+         AF_WarperRec  warper;
+         FT_Fixed      scale;
+@@ -2858,7 +2863,7 @@
+                                   scale, delta );
+         continue;
+       }
+-#endif
++#endif /* AF_CONFIG_OPTION_USE_WARPER */
+ 
+       if ( ( dim == AF_DIMENSION_HORZ && AF_HINTS_DO_HORIZONTAL( hints ) ) ||
+            ( dim == AF_DIMENSION_VERT && AF_HINTS_DO_VERTICAL( hints ) )   )
+diff --git a/src/autofit/aflatin2.c b/src/autofit/aflatin2.c
+index 3e9360d..d23c65a 100644
+--- a/src/autofit/aflatin2.c
++++ b/src/autofit/aflatin2.c
+@@ -1513,9 +1513,7 @@
+ 
+ #if 0 /* #ifdef AF_CONFIG_OPTION_USE_WARPER */
+     if ( mode == FT_RENDER_MODE_LCD || mode == FT_RENDER_MODE_LCD_V )
+-    {
+       metrics->root.scaler.render_mode = mode = FT_RENDER_MODE_NORMAL;
+-    }
+ #endif
+ 
+     scaler_flags = hints->scaler_flags;
+@@ -2310,8 +2308,9 @@
+ 
+     /* analyze glyph outline */
+ #ifdef AF_CONFIG_OPTION_USE_WARPER
+-    if ( metrics->root.scaler.render_mode == FT_RENDER_MODE_LIGHT ||
+-         AF_HINTS_DO_HORIZONTAL( hints ) )
++    if ( ( metrics->root.scaler.render_mode == FT_RENDER_MODE_LIGHT &&
++           AF_HINTS_DO_WARP( hints )                                ) ||
++         AF_HINTS_DO_HORIZONTAL( hints )                              )
+ #else
+     if ( AF_HINTS_DO_HORIZONTAL( hints ) )
+ #endif
+@@ -2334,8 +2333,9 @@
+     for ( dim = 0; dim < AF_DIMENSION_MAX; dim++ )
+     {
+ #ifdef AF_CONFIG_OPTION_USE_WARPER
+-      if ( ( dim == AF_DIMENSION_HORZ &&
+-             metrics->root.scaler.render_mode == FT_RENDER_MODE_LIGHT ) )
++      if ( dim == AF_DIMENSION_HORZ                                 &&
++           metrics->root.scaler.render_mode == FT_RENDER_MODE_LIGHT &&
++           AF_HINTS_DO_WARP( hints )                                )
+       {
+         AF_WarperRec  warper;
+         FT_Fixed      scale;
+@@ -2346,7 +2346,7 @@
+         af_glyph_hints_scale_dim( hints, dim, scale, delta );
+         continue;
+       }
+-#endif
++#endif /* AF_CONFIG_OPTION_USE_WARPER */
+ 
+       if ( ( dim == AF_DIMENSION_HORZ && AF_HINTS_DO_HORIZONTAL( hints ) ) ||
+            ( dim == AF_DIMENSION_VERT && AF_HINTS_DO_VERTICAL( hints ) )   )
+diff --git a/src/autofit/afmodule.c b/src/autofit/afmodule.c
+index 5b82f66..06b05ce 100644
+--- a/src/autofit/afmodule.c
++++ b/src/autofit/afmodule.c
+@@ -26,6 +26,7 @@
+   int  _af_debug_disable_horz_hints;
+   int  _af_debug_disable_vert_hints;
+   int  _af_debug_disable_blue_hints;
++  int  _af_debug_disable_warper;
+ 
+   /* we use a global object instead of a local one for debugging */
+   AF_GlyphHintsRec  _af_debug_hints_rec[1];
+diff --git a/src/autofit/aftypes.h b/src/autofit/aftypes.h
+index e105dc8..0a40860 100644
+--- a/src/autofit/aftypes.h
++++ b/src/autofit/aftypes.h
+@@ -59,6 +59,7 @@ FT_BEGIN_HEADER
+ extern int    _af_debug_disable_horz_hints;
+ extern int    _af_debug_disable_vert_hints;
+ extern int    _af_debug_disable_blue_hints;
++extern int    _af_debug_disable_warper;
+ extern void*  _af_debug_hints;
+ 
+ #endif /* FT_DEBUG_AUTOFIT */
+@@ -170,6 +171,7 @@ extern void*  _af_debug_hints;
+ #define AF_SCALER_FLAG_NO_HORIZONTAL  1U /* disable horizontal hinting */
+ #define AF_SCALER_FLAG_NO_VERTICAL    2U /* disable vertical hinting   */
+ #define AF_SCALER_FLAG_NO_ADVANCE     4U /* disable advance hinting    */
++#define AF_SCALER_FLAG_NO_WARPER      8U /* disable warper             */
+ 
+ 
+   typedef struct  AF_ScalerRec_
+-- 
+2.3.6
+
+From b51f01583fa4ed036fff0e6ebc4b9da095bd62c4 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Tue, 21 Apr 2015 06:47:52 +0200
+Subject: [PATCH] Minor.
+
+---
+ include/freetype.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/include/freetype.h b/include/freetype.h
+index 8df75cb..8078685 100644
+--- a/include/freetype.h
++++ b/include/freetype.h
+@@ -1160,7 +1160,7 @@ FT_BEGIN_HEADER
+   /*      TrueType bytecode instructions to move and scale all of its      */
+   /*      subglyphs.                                                       */
+   /*                                                                       */
+-  /*      It is not possible to autohint such fonts using                  */
++  /*      It is not possible to auto-hint such fonts using                 */
+   /*      @FT_LOAD_FORCE_AUTOHINT; it will also ignore                     */
+   /*      @FT_LOAD_NO_HINTING.  You have to set both @FT_LOAD_NO_HINTING   */
+   /*      and @FT_LOAD_NO_AUTOHINT to really disable hinting; however, you */
+@@ -1669,11 +1669,11 @@ FT_BEGIN_HEADER
+   /*                         needs to know about the image format.         */
+   /*                                                                       */
+   /*    lsb_delta         :: The difference between hinted and unhinted    */
+-  /*                         left side bearing while autohinting is        */
++  /*                         left side bearing while auto-hinting is       */
+   /*                         active.  Zero otherwise.                      */
+   /*                                                                       */
+   /*    rsb_delta         :: The difference between hinted and unhinted    */
+-  /*                         right side bearing while autohinting is       */
++  /*                         right side bearing while auto-hinting is      */
+   /*                         active.  Zero otherwise.                      */
+   /*                                                                       */
+   /* <Note>                                                                */
+@@ -1696,7 +1696,7 @@ FT_BEGIN_HEADER
+   /*    `slot->format' is also changed to @FT_GLYPH_FORMAT_BITMAP.         */
+   /*                                                                       */
+   /* <Note>                                                                */
+-  /*    Here a small pseudo code fragment that shows how to use            */
++  /*    Here is a small pseudo code fragment that shows how to use         */
+   /*    `lsb_delta' and `rsb_delta':                                       */
+   /*                                                                       */
+   /*    {                                                                  */
+-- 
+2.3.6
+
+From 12661a5ae0e7d1e258fcadde09088d158b0188a5 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Tue, 21 Apr 2015 07:13:59 +0200
+Subject: [PATCH] [autofit] Introduce `warping' property.
+
+This code replaces the debugging hook from the previous commit with
+a better, more generic solution.
+
+* include/ftautoh.h: Document it.
+
+* src/autofit/afmodule.h (AF_ModuleRec)
+[AF_CONFIG_OPTION_USE_WARPER]: Add `warping' field.
+
+* src/autofit/afmodule.c (_af_debug_disable_warper): Remove.
+(af_property_set, af_property_get, af_autofitter_init)
+[AF_CONFIG_OPTION_USE_WARPER]: Handle `warping' option.
+
+* src/autofit/afhints.h (AF_HINTS_DO_WARP): Remove use of the no
+longer existing `_af_debug_disable_warper'.
+
+* src/autofit/afcjk.c (af_cjk_hints_init), src/autofit/aflatin.c
+(af_latin_hints_init), src/autofit/aflatin2.c (af_latin2_hints_init)
+[AF_CONFIG_OPTION_USE_WARPER]: Add `AF_SCALER_FLAG_NO_WARPER' to the
+scaler flags if warping is off.
+
+* src/autofit/aftypes.h: Updated.
+---
+ ChangeLog                 | 26 ++++++++++++++++++++++++
+ devel/ftoption.h          |  6 ++++--
+ include/config/ftoption.h |  6 ++++--
+ include/ftautoh.h         | 50 ++++++++++++++++++++++++++++++++++++++++++++++-
+ src/autofit/afcjk.c       |  6 ++++++
+ src/autofit/afhints.h     | 15 +++++---------
+ src/autofit/aflatin.c     |  6 ++++++
+ src/autofit/aflatin2.c    |  6 ++++++
+ src/autofit/afmodule.c    | 28 +++++++++++++++++++++++++-
+ src/autofit/afmodule.h    |  7 +++++--
+ src/autofit/aftypes.h     |  1 -
+ 11 files changed, 138 insertions(+), 19 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 8c37e9b..7efbb14 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,29 @@
++2015-04-21  Werner Lemberg  <wl@gnu.org>
++
++	[autofit] Introduce `warping' property.
++
++	This code replaces the debugging hook from the previous commit with
++	a better, more generic solution.
++
++	* include/ftautoh.h: Document it.
++
++	* src/autofit/afmodule.h (AF_ModuleRec)
++	[AF_CONFIG_OPTION_USE_WARPER]: Add `warping' field.
++
++	* src/autofit/afmodule.c (_af_debug_disable_warper): Remove.
++	(af_property_set, af_property_get, af_autofitter_init)
++	[AF_CONFIG_OPTION_USE_WARPER]: Handle `warping' option.
++
++	* src/autofit/afhints.h (AF_HINTS_DO_WARP): Remove use of the no
++	longer existing `_af_debug_disable_warper'.
++
++	* src/autofit/afcjk.c (af_cjk_hints_init), src/autofit/aflatin.c
++	(af_latin_hints_init), src/autofit/aflatin2.c (af_latin2_hints_init)
++	[AF_CONFIG_OPTION_USE_WARPER]: Add `AF_SCALER_FLAG_NO_WARPER' to the
++	scaler flags if warping is off.
++
++	* src/autofit/aftypes.h: Updated.
++
+ 2015-04-16  Werner Lemberg  <wl@gnu.org>
+ 
+ 	[autofit] Add debugging hook to disable warper.
+diff --git a/devel/ftoption.h b/devel/ftoption.h
+index 2065142..805fe3d 100644
+--- a/devel/ftoption.h
++++ b/devel/ftoption.h
+@@ -820,8 +820,10 @@ FT_BEGIN_HEADER
+   /* grid.  To find out the optimal scaling and shifting value, various    */
+   /* parameter combinations are tried and scored.                          */
+   /*                                                                       */
+-  /* This experimental option is only active if the render mode is         */
+-  /* FT_RENDER_MODE_LIGHT.                                                 */
++  /* This experimental option is active only if the rendering mode is      */
++  /* FT_RENDER_MODE_LIGHT; you can switch warping on and off with the      */
++  /* `warping' property of the auto-hinter (see file `ftautoh.h' for more  */
++  /* information).                                                         */
+   /*                                                                       */
+ #define AF_CONFIG_OPTION_USE_WARPER
+ 
+diff --git a/include/config/ftoption.h b/include/config/ftoption.h
+index a8ca4c8..2243fcc 100644
+--- a/include/config/ftoption.h
++++ b/include/config/ftoption.h
+@@ -820,8 +820,10 @@ FT_BEGIN_HEADER
+   /* grid.  To find out the optimal scaling and shifting value, various    */
+   /* parameter combinations are tried and scored.                          */
+   /*                                                                       */
+-  /* This experimental option is only active if the render mode is         */
+-  /* FT_RENDER_MODE_LIGHT.                                                 */
++  /* This experimental option is active only if the rendering mode is      */
++  /* FT_RENDER_MODE_LIGHT; you can switch warping on and off with the      */
++  /* `warping' property of the auto-hinter (see file `ftautoh.h' for more  */
++  /* information).                                                         */
+   /*                                                                       */
+ /* #define AF_CONFIG_OPTION_USE_WARPER */
+ 
+diff --git a/include/ftautoh.h b/include/ftautoh.h
+index 06941da..3f0ff9d 100644
+--- a/include/ftautoh.h
++++ b/include/ftautoh.h
+@@ -300,7 +300,7 @@ FT_BEGIN_HEADER
+    * @description:
+    *   *Experimental* *only*
+    *
+-   *   If Freetype gets compiled with FT_CONFIG_OPTION_USE_HARFBUZZ to make
++   *   If FreeType gets compiled with FT_CONFIG_OPTION_USE_HARFBUZZ to make
+    *   the HarfBuzz library access OpenType features for getting better
+    *   glyph coverages, this property sets the (auto-fitter) script to be
+    *   used for the default (OpenType) script data of a font's GSUB table.
+@@ -391,6 +391,54 @@ FT_BEGIN_HEADER
+ 
+   } FT_Prop_IncreaseXHeight;
+ 
++
++  /**************************************************************************
++   *
++   * @property:
++   *   warping
++   *
++   * @description:
++   *   *Experimental* *only*
++   *
++   *   If FreeType gets compiled with option AF_CONFIG_OPTION_USE_WARPER to
++   *   activate the warp hinting code in the auto-hinter, this property
++   *   switches warping on and off.
++   *
++   *   Warping only works in `light' auto-hinting mode.  The idea of the
++   *   code is to slightly scale and shift a glyph along the non-hinted
++   *   dimension (which is usually the horizontal axis) so that as much of
++   *   its segments are aligned (more or less) to the grid.  To find out a
++   *   glyph's optimal scaling and shifting value, various parameter
++   *   combinations are tried and scored.
++   *
++   *   By default, warping is on.  The example below shows how to switch off
++   *   warping (omitting the error handling).
++   *
++   *   {
++   *     FT_Library  library;
++   *     FT_Bool     warping = 0;
++   *
++   *
++   *     FT_Init_FreeType( &library );
++   *
++   *     FT_Property_Set( library, "autofitter",
++   *                               "warping", &warping );
++   *   }
++   *
++   * @note:
++   *   This property can be used with @FT_Property_Get also.
++   *
++   *   The warping code can also change advance widths.  Have a look at the
++   *   `lsb_delta' and `rsb_delta' fields in the @FT_GlyphSlotRec structure
++   *   for details on improving inter-glyph distances while rendering.
++   *
++   *   Since warping is a global property of the auto-hinter it is best to
++   *   change its value before rendering any face.  Otherwise, you should
++   *   reload all faces that get auto-hinted in `light' hinting mode.
++   *
++   */
++
++
+   /* */
+ 
+ 
+diff --git a/src/autofit/afcjk.c b/src/autofit/afcjk.c
+index 31fe2cc..905408b 100644
+--- a/src/autofit/afcjk.c
++++ b/src/autofit/afcjk.c
+@@ -1334,6 +1334,12 @@
+ 
+     scaler_flags |= AF_SCALER_FLAG_NO_ADVANCE;
+ 
++#ifdef AF_CONFIG_OPTION_USE_WARPER
++    /* get (global) warper flag */
++    if ( !metrics->root.globals->module->warping )
++      scaler_flags |= AF_SCALER_FLAG_NO_WARPER;
++#endif
++
+     hints->scaler_flags = scaler_flags;
+     hints->other_flags  = other_flags;
+ 
+diff --git a/src/autofit/afhints.h b/src/autofit/afhints.h
+index 3a6dc6c..a64c7a4 100644
+--- a/src/autofit/afhints.h
++++ b/src/autofit/afhints.h
+@@ -382,15 +382,8 @@ FT_BEGIN_HEADER
+           ( !_af_debug_disable_vert_hints                          && \
+             !AF_HINTS_TEST_SCALER( h, AF_SCALER_FLAG_NO_VERTICAL ) )
+ 
+-#define AF_HINTS_DO_ADVANCE( h )                                \
+-          !AF_HINTS_TEST_SCALER( h, AF_SCALER_FLAG_NO_ADVANCE )
+-
+ #define AF_HINTS_DO_BLUES( h )  ( !_af_debug_disable_blue_hints )
+ 
+-#define AF_HINTS_DO_WARP( h )                                       \
+-          ( !_af_debug_disable_warper                            && \
+-            !AF_HINTS_TEST_SCALER( h, AF_SCALER_FLAG_NO_WARPER ) )
+-
+ #else /* !FT_DEBUG_AUTOFIT */
+ 
+ #define AF_HINTS_DO_HORIZONTAL( h )                                \
+@@ -399,15 +392,17 @@ FT_BEGIN_HEADER
+ #define AF_HINTS_DO_VERTICAL( h )                                \
+           !AF_HINTS_TEST_SCALER( h, AF_SCALER_FLAG_NO_VERTICAL )
+ 
++#define AF_HINTS_DO_BLUES( h )  1
++
++#endif /* !FT_DEBUG_AUTOFIT */
++
++
+ #define AF_HINTS_DO_ADVANCE( h )                                \
+           !AF_HINTS_TEST_SCALER( h, AF_SCALER_FLAG_NO_ADVANCE )
+ 
+-#define AF_HINTS_DO_BLUES( h )  1
+-
+ #define AF_HINTS_DO_WARP( h )                                  \
+           !AF_HINTS_TEST_SCALER( h, AF_SCALER_FLAG_NO_WARPER )
+ 
+-#endif /* !FT_DEBUG_AUTOFIT */
+ 
+ 
+   FT_LOCAL( AF_Direction )
+diff --git a/src/autofit/aflatin.c b/src/autofit/aflatin.c
+index 61d8724..893e986 100644
+--- a/src/autofit/aflatin.c
++++ b/src/autofit/aflatin.c
+@@ -2004,6 +2004,12 @@
+          ( face->style_flags & FT_STYLE_FLAG_ITALIC ) != 0 )
+       scaler_flags |= AF_SCALER_FLAG_NO_HORIZONTAL;
+ 
++#ifdef AF_CONFIG_OPTION_USE_WARPER
++    /* get (global) warper flag */
++    if ( !metrics->root.globals->module->warping )
++      scaler_flags |= AF_SCALER_FLAG_NO_WARPER;
++#endif
++
+     hints->scaler_flags = scaler_flags;
+     hints->other_flags  = other_flags;
+ 
+diff --git a/src/autofit/aflatin2.c b/src/autofit/aflatin2.c
+index d23c65a..ac9f933 100644
+--- a/src/autofit/aflatin2.c
++++ b/src/autofit/aflatin2.c
+@@ -1550,6 +1550,12 @@
+          ( face->style_flags & FT_STYLE_FLAG_ITALIC ) != 0 )
+       scaler_flags |= AF_SCALER_FLAG_NO_HORIZONTAL;
+ 
++#ifdef AF_CONFIG_OPTION_USE_WARPER
++    /* get (global) warper flag */
++    if ( !metrics->root.globals->module->warping )
++      scaler_flags |= AF_SCALER_FLAG_NO_WARPER;
++#endif
++
+     hints->scaler_flags = scaler_flags;
+     hints->other_flags  = other_flags;
+ 
+diff --git a/src/autofit/afmodule.c b/src/autofit/afmodule.c
+index 06b05ce..57f97e9 100644
+--- a/src/autofit/afmodule.c
++++ b/src/autofit/afmodule.c
+@@ -26,7 +26,6 @@
+   int  _af_debug_disable_horz_hints;
+   int  _af_debug_disable_vert_hints;
+   int  _af_debug_disable_blue_hints;
+-  int  _af_debug_disable_warper;
+ 
+   /* we use a global object instead of a local one for debugging */
+   AF_GlyphHintsRec  _af_debug_hints_rec[1];
+@@ -146,6 +145,17 @@
+ 
+       return error;
+     }
++#ifdef AF_CONFIG_OPTION_USE_WARPER
++    else if ( !ft_strcmp( property_name, "warping" ) )
++    {
++      FT_Bool*  warping = (FT_Bool*)value;
++
++
++      module->warping = *warping;
++
++      return error;
++    }
++#endif /* AF_CONFIG_OPTION_USE_WARPER */
+ 
+     FT_TRACE0(( "af_property_set: missing property `%s'\n",
+                 property_name ));
+@@ -162,6 +172,9 @@
+     AF_Module  module         = (AF_Module)ft_module;
+     FT_UInt    fallback_style = module->fallback_style;
+     FT_UInt    default_script = module->default_script;
++#ifdef AF_CONFIG_OPTION_USE_WARPER
++    FT_Bool    warping        = module->warping;
++#endif
+ 
+ 
+     if ( !ft_strcmp( property_name, "glyph-to-script-map" ) )
+@@ -208,7 +221,17 @@
+ 
+       return error;
+     }
++#ifdef AF_CONFIG_OPTION_USE_WARPER
++    else if ( !ft_strcmp( property_name, "warping" ) )
++    {
++      FT_Bool*  val = (FT_Bool*)value;
++
++
++      *val = warping;
+ 
++      return error;
++    }
++#endif /* AF_CONFIG_OPTION_USE_WARPER */
+ 
+     FT_TRACE0(( "af_property_get: missing property `%s'\n",
+                 property_name ));
+@@ -257,6 +280,9 @@
+ 
+     module->fallback_style = AF_STYLE_FALLBACK;
+     module->default_script = AF_SCRIPT_DEFAULT;
++#ifdef AF_CONFIG_OPTION_USE_WARPER
++    module->warping        = 1;
++#endif
+ 
+     return FT_Err_Ok;
+   }
+diff --git a/src/autofit/afmodule.h b/src/autofit/afmodule.h
+index b3c5979..b9c2fd8 100644
+--- a/src/autofit/afmodule.h
++++ b/src/autofit/afmodule.h
+@@ -28,7 +28,7 @@ FT_BEGIN_HEADER
+ 
+ 
+   /*
+-   *  This is the `extended' FT_Module structure which holds the
++   *  This is the `extended' FT_Module structure that holds the
+    *  autofitter's global data.
+    */
+ 
+@@ -38,11 +38,14 @@ FT_BEGIN_HEADER
+ 
+     FT_UInt       fallback_style;
+     FT_UInt       default_script;
++#ifdef AF_CONFIG_OPTION_USE_WARPER
++    FT_Bool       warping;
++#endif
+ 
+   } AF_ModuleRec, *AF_Module;
+ 
+ 
+-FT_DECLARE_MODULE(autofit_module_class)
++FT_DECLARE_MODULE( autofit_module_class )
+ 
+ 
+ FT_END_HEADER
+diff --git a/src/autofit/aftypes.h b/src/autofit/aftypes.h
+index 0a40860..78e3fd7 100644
+--- a/src/autofit/aftypes.h
++++ b/src/autofit/aftypes.h
+@@ -59,7 +59,6 @@ FT_BEGIN_HEADER
+ extern int    _af_debug_disable_horz_hints;
+ extern int    _af_debug_disable_vert_hints;
+ extern int    _af_debug_disable_blue_hints;
+-extern int    _af_debug_disable_warper;
+ extern void*  _af_debug_hints;
+ 
+ #endif /* FT_DEBUG_AUTOFIT */
+-- 
+2.3.6
+
+From d164f70df861dcff3495cef61c60c2ed9def060d Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Tue, 21 Apr 2015 07:51:41 +0200
+Subject: [PATCH] * docs/CHANGES: Updated.
+
+---
+ ChangeLog    |  4 ++++
+ docs/CHANGES | 39 +++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 43 insertions(+)
+
+diff --git a/ChangeLog b/ChangeLog
+index 7efbb14..d49e88a 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,5 +1,9 @@
+ 2015-04-21  Werner Lemberg  <wl@gnu.org>
+ 
++	* docs/CHANGES: Updated.
++
++2015-04-21  Werner Lemberg  <wl@gnu.org>
++
+ 	[autofit] Introduce `warping' property.
+ 
+ 	This code replaces the debugging hook from the previous commit with
+diff --git a/docs/CHANGES b/docs/CHANGES
+index b85a71e..67b7037 100644
+--- a/docs/CHANGES
++++ b/docs/CHANGES
+@@ -25,9 +25,29 @@ CHANGES BETWEEN 2.5.5 and 2.6
+ 
+     - Arabic script support has been added to the auto-hinter.
+ 
++    - Following OpenType version 1.7, advance widths and side bearing
++      values in CFFs (wrapped in an SFNT structure) are now always
++      taken from the `hmtx' table.
++
+ 
+   III. MISCELLANEOUS
+ 
++    - A new auto-hinter  property `warping' can switch on  and off the
++      warping code  if this  experimental feature  is compiled  in (by
++      defining the AF_CONFIG_OPTION_USE_WARPER configuration option).
++
++      The AF_CONFIG_OPTION_USE_WARPER option itself is an old feature,
++      available   since  2006.    Warping   only   works  in   `light'
++      auto-hinting mode.   The idea of  the code is to  slightly scale
++      and  shift a  glyph  along the  non-hinted  dimension (which  is
++      usually the horizontal axis) so that as much of its segments are
++      aligned  (more or  less) to  the grid.   To find  out a  glyph's
++      optimal   scaling   and   shifting  value,   various   parameter
++      combinations are tried and scored.
++
++      See  file  `ftautoh.h' for  more;  the  demo programs  `ftdiff',
++      `ftview', and `ftgrid' can toggle warping with key `w'.
++
+     - Some  fields  in  the  `FTC_ImageTypeRec'  structure  have  been
+       changed from signed to unsigned  type, which better reflects the
+       actual usage.  It is also an additional means to protect against
+@@ -49,6 +69,25 @@ CHANGES BETWEEN 2.5.5 and 2.6
+       renamed to  `FT_FONT_FORMATS_H' (the old name  `FT_XFREE86_H' is
+       retained for backwards compatibility).
+ 
++    - Some improvements to the GX variation font handling.
++
++    - Various improvements to the `ftgrid' demo program.
++
++      . It  can now  display  GX  and  MM  fonts  while  interactively
++        manipulating the axes (with keys F2, F3, and F4).
++
++      . Anti-aliasing rendering  modes can now be  selected (with keys
++        F5 and F6).
++
++    - Various improvements to the `ftdump' demo program.
++
++      . It now displays information on MM and GX variation axes.
++
++      . New  command line option  `-u' makes  it output data  in utf-8
++        encoding.
++
++    - The `ftmulti' demo program can now handle four MM or GX axes.
++
+ 
+ ======================================================================
+ 
+-- 
+2.3.6
+
+From 14df6b1a63f5c5773bb498063205cb79aac21173 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Wed, 22 Apr 2015 11:14:35 +0200
+Subject: [PATCH] [autofit] By default, enable warping code but switch off
+ warping.
+
+Suggested by Behdad.
+
+* include/config/ftoption.h: Define AF_CONFIG_OPTION_USE_WARPER.
+
+* src/autofit/afmodule.c (af_autofitter_init): Initialize `warping'
+with `false'.
+---
+ ChangeLog                 | 11 +++++++++++
+ devel/ftoption.h          |  2 +-
+ docs/CHANGES              |  4 +++-
+ include/config/ftoption.h |  4 ++--
+ include/ftautoh.h         |  4 ++--
+ src/autofit/afmodule.c    |  2 +-
+ 6 files changed, 20 insertions(+), 7 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index d49e88a..0de61b5 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,5 +1,16 @@
+ 2015-04-21  Werner Lemberg  <wl@gnu.org>
+ 
++	[autofit] By default, enable warping code but switch off warping.
++
++	Suggested by Behdad.
++
++	* include/config/ftoption.h: Define AF_CONFIG_OPTION_USE_WARPER.
++
++	* src/autofit/afmodule.c (af_autofitter_init): Initialize `warping'
++	with `false'.
++
++2015-04-21  Werner Lemberg  <wl@gnu.org>
++
+ 	* docs/CHANGES: Updated.
+ 
+ 2015-04-21  Werner Lemberg  <wl@gnu.org>
+diff --git a/devel/ftoption.h b/devel/ftoption.h
+index 805fe3d..ed63aa0 100644
+--- a/devel/ftoption.h
++++ b/devel/ftoption.h
+@@ -823,7 +823,7 @@ FT_BEGIN_HEADER
+   /* This experimental option is active only if the rendering mode is      */
+   /* FT_RENDER_MODE_LIGHT; you can switch warping on and off with the      */
+   /* `warping' property of the auto-hinter (see file `ftautoh.h' for more  */
+-  /* information).                                                         */
++  /* information; by default it is switched off).                          */
+   /*                                                                       */
+ #define AF_CONFIG_OPTION_USE_WARPER
+ 
+diff --git a/docs/CHANGES b/docs/CHANGES
+index 67b7037..dc851da 100644
+--- a/docs/CHANGES
++++ b/docs/CHANGES
+@@ -34,7 +34,9 @@ CHANGES BETWEEN 2.5.5 and 2.6
+ 
+     - A new auto-hinter  property `warping' can switch on  and off the
+       warping code  if this  experimental feature  is compiled  in (by
+-      defining the AF_CONFIG_OPTION_USE_WARPER configuration option).
++      defining the  AF_CONFIG_OPTION_USE_WARPER  configuration option;
++      by default  this option is  now enabled but  warping is switched
++      off).
+ 
+       The AF_CONFIG_OPTION_USE_WARPER option itself is an old feature,
+       available   since  2006.    Warping   only   works  in   `light'
+diff --git a/include/config/ftoption.h b/include/config/ftoption.h
+index 2243fcc..1536c72 100644
+--- a/include/config/ftoption.h
++++ b/include/config/ftoption.h
+@@ -823,9 +823,9 @@ FT_BEGIN_HEADER
+   /* This experimental option is active only if the rendering mode is      */
+   /* FT_RENDER_MODE_LIGHT; you can switch warping on and off with the      */
+   /* `warping' property of the auto-hinter (see file `ftautoh.h' for more  */
+-  /* information).                                                         */
++  /* information; by default it is switched off).                          */
+   /*                                                                       */
+-/* #define AF_CONFIG_OPTION_USE_WARPER */
++#define AF_CONFIG_OPTION_USE_WARPER
+ 
+   /* */
+ 
+diff --git a/include/ftautoh.h b/include/ftautoh.h
+index 3f0ff9d..cf7b76f 100644
+--- a/include/ftautoh.h
++++ b/include/ftautoh.h
+@@ -411,12 +411,12 @@ FT_BEGIN_HEADER
+    *   glyph's optimal scaling and shifting value, various parameter
+    *   combinations are tried and scored.
+    *
+-   *   By default, warping is on.  The example below shows how to switch off
++   *   By default, warping is off.  The example below shows how to switch on
+    *   warping (omitting the error handling).
+    *
+    *   {
+    *     FT_Library  library;
+-   *     FT_Bool     warping = 0;
++   *     FT_Bool     warping = 1;
+    *
+    *
+    *     FT_Init_FreeType( &library );
+diff --git a/src/autofit/afmodule.c b/src/autofit/afmodule.c
+index 57f97e9..e0cf994 100644
+--- a/src/autofit/afmodule.c
++++ b/src/autofit/afmodule.c
+@@ -281,7 +281,7 @@
+     module->fallback_style = AF_STYLE_FALLBACK;
+     module->default_script = AF_SCRIPT_DEFAULT;
+ #ifdef AF_CONFIG_OPTION_USE_WARPER
+-    module->warping        = 1;
++    module->warping        = 0;
+ #endif
+ 
+     return FT_Err_Ok;
+-- 
+2.3.6
+
+From b6c511d9d0bdd8097a50383d9371af8910c6029a Mon Sep 17 00:00:00 2001
+From: Alexei Podtelezhnikov <apodtele@gmail.com>
+Date: Fri, 24 Apr 2015 00:10:40 -0400
+Subject: [PATCH] * src/base/ftoutln.c: Minor.
+
+---
+ src/base/ftoutln.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/base/ftoutln.c b/src/base/ftoutln.c
+index 3762d36..d821c49 100644
+--- a/src/base/ftoutln.c
++++ b/src/base/ftoutln.c
+@@ -995,13 +995,13 @@
+           l = FT_MIN( l_in, l_out );
+ 
+           /* non-strict inequalities avoid divide-by-zero when q == l == 0 */
+-          if ( FT_MulFix( xstrength, q ) <= FT_MulFix( d, l ) )
++          if ( FT_MulFix( xstrength, q ) <= FT_MulFix( l, d ) )
+             shift.x = FT_MulDiv( shift.x, xstrength, d );
+           else
+             shift.x = FT_MulDiv( shift.x, l, q );
+ 
+ 
+-          if ( FT_MulFix( ystrength, q ) <= FT_MulFix( d, l ) )
++          if ( FT_MulFix( ystrength, q ) <= FT_MulFix( l, d ) )
+             shift.y = FT_MulDiv( shift.y, ystrength, d );
+           else
+             shift.y = FT_MulDiv( shift.y, l, q );
+-- 
+2.3.6
 
