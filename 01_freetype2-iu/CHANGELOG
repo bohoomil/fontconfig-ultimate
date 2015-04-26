@@ -6,6 +6,15 @@ CHANGELOG
 ---------
 
 
+2015-04-26
+~~~~~~~~~~
+
+### freetype2-infinality-ultimate, rev. 2.5.5-5
+
+* The code base was merged with the upstream changes up to 2015.04.24.
+* Fixed #85 (`infinality-settings` renamed to `infinality-settings.sh`).
+
+
 2015-03-30
 ~~~~~~~~~~
 

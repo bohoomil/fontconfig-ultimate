@@ -4,8 +4,8 @@
 
 pkgname=freetype2-infinality-ultimate
 pkgver=2.5.5
-pkgrel=4
-_patchrel=2015.03.30
+pkgrel=5
+_patchrel=2015.04.26
 pkgdesc="TrueType font rendering library with Infinality patches and custom settings."
 arch=('i686' 'x86_64')
 changelog=CHANGELOG
@@ -15,10 +15,10 @@ url="http://freetype.sourceforge.net"
 depends=('zlib' 'bzip2' 'sh' 'xorg-xrdb' 'libpng' 'harfbuzz')
 conflicts=('freetype2' 'freetype2-infinality')
 provides=("freetype2=$pkgver" 'freetype2-infinality' 'freetype2-infinality-ultimate')
-backup=('etc/X11/xinit/xinitrc.d/infinality-settings')
+backup=('etc/X11/xinit/xinitrc.d/infinality-settings.sh')
 install='infinality.install'
 source=(http://downloads.sourceforge.net/sourceforge/freetype/freetype-${pkgver}.tar.bz2
-        infinality-settings
+        infinality-settings.sh
         "01-freetype-${pkgver}-enable-valid.patch"
         "02-upstream-${_patchrel}.patch"
         "03-infinality-${pkgver}-${_patchrel}.patch")
@@ -26,8 +26,8 @@ source=(http://downloads.sourceforge.net/sourceforge/freetype/freetype-${pkgver}
 sha1sums=('7b7460ef51a8fdb17baae53c6658fc1ad000a1c2'
           'd09d96c10020772533a4280cec2425bcd1a81fa2'
           'abf7a8f726ad6359533651a8942636880febf9f6'
-          '35196c7abbc0bb2eb3061f4d8137257a467a136b'
-          '3bcba9ad74bbecd03ade27c00b2ab2b9a5deb9b7')
+          '0e9d1304858db2387d79cdded077f8ebc51125d4'
+          '359d1fbbf4a207041222cd34a47d44084e9a1056')
 
 prepare() {
   cd "freetype-${pkgver}"
@@ -67,9 +67,9 @@ package() {
 
   # freetype2 runtime settings
   install -m755 -d "${pkgdir}/etc/X11/xinit/xinitrc.d"
-  install -m755 "${srcdir}/infinality-settings" \
-    "${pkgdir}/etc/X11/xinit/xinitrc.d/infinality-settings"
+  install -m755 "${srcdir}/infinality-settings.sh" \
+    "${pkgdir}/etc/X11/xinit/xinitrc.d/infinality-settings.sh"
 
   sed -i "1i #!/bin/bash\n" \
-    "${pkgdir}/etc/X11/xinit/xinitrc.d/infinality-settings"
+    "${pkgdir}/etc/X11/xinit/xinitrc.d/infinality-settings.sh"
 }
