@@ -1,8 +1,8 @@
---- a/oxygen-fonts-5.1.1/CMakeLists.txt	2014-11-06 18:48:35.000000000 +0100
-+++ b/oxygen-fonts-5.1.1/CMakeLists.txt	2015-02-09 21:29:57.298492929 +0100
-@@ -36,34 +36,3 @@ install(FILES
- 
- feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)
+--- a/oxygen-fonts-5.3.0/CMakeLists.txt	2015-05-06 02:14:32.822156477 +0200
++++ b/oxygen-fonts-5.3.0/CMakeLists.txt	2015-05-06 02:22:03.142985121 +0200
+@@ -31,36 +31,5 @@ install(FILES
+         DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
+         COMPONENT Devel)
  
 -if(NOT DEFINED OXYGEN_FONT_INSTALL_DIR)
 -  set(OXYGEN_FONT_INSTALL_DIR  ${CMAKE_INSTALL_PREFIX}/${SHARE_INSTALL_PREFIX}/fonts/truetype/oxygen)
@@ -15,6 +15,8 @@
 -    message(FATAL_ERROR "Could not find FontForge executable")
 -endif()
 -
+ feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)
+ 
 -add_custom_target(regular ALL fontforge ${CMAKE_CURRENT_SOURCE_DIR}/generate-ttf.pe
 -                   ${CMAKE_CURRENT_SOURCE_DIR}/oxygen-fonts/Regular-400/src/Oxygen-Sans.sfd
 -                   ${CMAKE_CURRENT_BINARY_DIR}/Oxygen-Sans.ttf
