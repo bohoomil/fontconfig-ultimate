@@ -1,0 +1,42 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=ttf-comme-ibx
+pkgver=2.0
+pkgrel=1
+depends=('fontconfig')
+pkgdesc="Comme is a sans-serif UI font by Vernon Adams."
+url="http://www.newtypography.co.uk/"
+arch=('any')
+groups=('infinality-bundle-fonts-extra')
+license=('custom:OFL')
+install=$pkgname.install
+source=("comme.zip"::http://www.fontsquirrel.com/fonts/download/comme
+        45-comme.conf
+        90-tt-comme.conf)
+sha1sums=('d39668204be59e2157c6a4dc33fe0a1b7c3bc4da'
+          'edc725e5bf5738e0bd2bbc7be206b7b01d536f5e'
+          'ea58b87ecfb560ef5b6a16565e89be60d00c411b')
+
+package(){
+  cd "${srcdir}"
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 "SIL Open Font License.txt" \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"/LICENSE.txt
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  mv  "${pkgdir}"/usr/share/fonts/"${pkgname}"/"Comme-Regular (1).ttf" \
+     "${pkgdir}"/usr/share/fonts/"${pkgname}"/"Comme-Regular.ttf"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-comme.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-comme.conf
+  install -m644 90-tt-comme.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-comme.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-comme.conf .
+  ln -s ../conf.avail/90-tt-comme.conf .
+}
