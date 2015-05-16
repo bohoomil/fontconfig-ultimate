@@ -37581,3 +37581,480 @@ index 3762d36..d821c49 100644
 -- 
 2.3.6
 
+From 40623a1f3adce02f7e6dcf395f0a50f58c2e2cf7 Mon Sep 17 00:00:00 2001
+From: Alexei Podtelezhnikov <apodtele@gmail.com>
+Date: Mon, 27 Apr 2015 22:27:00 -0400
+Subject: [PATCH] [truetype] Speed up IUP.
+
+* src/truetype/ttinterp.c (_iup_worker_interpolate): Separate trivial
+snapping to the same position from true interpolation.
+---
+ ChangeLog               |  7 +++++++
+ src/truetype/ttinterp.c | 25 +++++++++++++++----------
+ 2 files changed, 22 insertions(+), 10 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 0de61b5..8bac04c 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,10 @@
++2015-04-27  Alexei Podtelezhnikov <apodtele@gmail.com>
++
++	[truetype] Speed up IUP.
++
++	* src/truetype/ttinterp.c (_iup_worker_interpolate): Separate trivial
++	snapping to the same position from true interpolation.
++
+ 2015-04-21  Werner Lemberg  <wl@gnu.org>
+ 
+ 	[autofit] By default, enable warping code but switch off warping.
+diff --git a/src/truetype/ttinterp.c b/src/truetype/ttinterp.c
+index 31c7bfa..b9ae045 100644
+--- a/src/truetype/ttinterp.c
++++ b/src/truetype/ttinterp.c
+@@ -6783,7 +6783,7 @@
+                            FT_UInt     ref2 )
+   {
+     FT_UInt     i;
+-    FT_F26Dot6  orus1, orus2, org1, org2, delta1, delta2;
++    FT_F26Dot6  orus1, orus2, org1, org2, cur1, cur2, delta1, delta2;
+ 
+ 
+     if ( p1 > p2 )
+@@ -6813,12 +6813,15 @@
+ 
+     org1   = worker->orgs[ref1].x;
+     org2   = worker->orgs[ref2].x;
+-    delta1 = worker->curs[ref1].x - org1;
+-    delta2 = worker->curs[ref2].x - org2;
++    cur1   = worker->curs[ref1].x;
++    cur2   = worker->curs[ref2].x;
++    delta1 = cur1 - org1;
++    delta2 = cur2 - org2;
+ 
+-    if ( orus1 == orus2 )
++    if ( cur1 == cur2 || orus1 == orus2 )
+     {
+-      /* simple shift of untouched points */
++
++      /* trivial snap or shift of untouched points */
+       for ( i = p1; i <= p2; i++ )
+       {
+         FT_F26Dot6  x = worker->orgs[i].x;
+@@ -6826,9 +6829,13 @@
+ 
+         if ( x <= org1 )
+           x += delta1;
+-        else
++
++        else if ( x >= org2 )
+           x += delta2;
+ 
++        else
++          x = cur1;
++
+         worker->curs[i].x = x;
+       }
+     }
+@@ -6855,12 +6862,10 @@
+           if ( !scale_valid )
+           {
+             scale_valid = 1;
+-            scale       = FT_DivFix( org2 + delta2 - ( org1 + delta1 ),
+-                                     orus2 - orus1 );
++            scale       = FT_DivFix( cur2 - cur1, orus2 - orus1 );
+           }
+ 
+-          x = ( org1 + delta1 ) +
+-              FT_MulFix( worker->orus[i].x - orus1, scale );
++          x = cur1 + FT_MulFix( worker->orus[i].x - orus1, scale );
+         }
+         worker->curs[i].x = x;
+       }
+-- 
+2.4.1
+
+From 3cc076dae765f3b3ed554fcf38dbe56edba422c3 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Tue, 28 Apr 2015 09:16:27 +0200
+Subject: [PATCH] [cff] Use `name' table for PS name if we have a SFNT-CFF.
+
+This follows the OpenType 1.7 specification.  See
+
+  http://tug.org/pipermail/tex-live/2015-April/036634.html
+
+for a discussion.
+
+* src/cff/cffdrivr.c (cff_get_ps_name): Use the `sfnt' service if we
+have an SFNT.
+---
+ ChangeLog          | 13 +++++++++++++
+ src/cff/cffdrivr.c | 20 +++++++++++++++++++-
+ 2 files changed, 32 insertions(+), 1 deletion(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 8bac04c..f86e05f 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,16 @@
++2015-04-28  Werner Lemberg  <wl@gnu.org>
++
++	[cff] Use `name' table for PS name if we have a SFNT-CFF.
++
++	This follows the OpenType 1.7 specification.  See
++
++	  http://tug.org/pipermail/tex-live/2015-April/036634.html
++
++	for a discussion.
++
++	* src/cff/cffdrivr.c (cff_get_ps_name): Use the `sfnt' service if we
++	have an SFNT.
++
+ 2015-04-27  Alexei Podtelezhnikov <apodtele@gmail.com>
+ 
+ 	[truetype] Speed up IUP.
+diff --git a/src/cff/cffdrivr.c b/src/cff/cffdrivr.c
+index f46a1c5..a718b7a 100644
+--- a/src/cff/cffdrivr.c
++++ b/src/cff/cffdrivr.c
+@@ -437,9 +437,27 @@
+   static const char*
+   cff_get_ps_name( CFF_Face  face )
+   {
+-    CFF_Font  cff = (CFF_Font)face->extra.data;
++    CFF_Font      cff  = (CFF_Font)face->extra.data;
++    SFNT_Service  sfnt = (SFNT_Service)face->sfnt;
++
++
++    /* following the OpenType specification 1.7, we return the name stored */
++    /* in the `name' table for a CFF wrapped into an SFNT container        */
++
++    if ( sfnt )
++    {
++      FT_Library             library     = FT_FACE_LIBRARY( face );
++      FT_Module              sfnt_module = FT_Get_Module( library, "sfnt" );
++      FT_Service_PsFontName  service     =
++        (FT_Service_PsFontName)ft_module_get_service(
++                                 sfnt_module,
++                                 FT_SERVICE_ID_POSTSCRIPT_FONT_NAME );
+ 
+ 
++      if ( service && service->get_ps_font_name )
++        return service->get_ps_font_name( FT_FACE( face ) );
++    }
++
+     return (const char*)cff->font_name;
+   }
+ 
+-- 
+2.4.1
+
+From 9178a1228f480e84aaf3120297b2ad49a88f7f61 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Tue, 28 Apr 2015 10:56:19 +0200
+Subject: [PATCH] Update `CHANGES' file.
+
+---
+ docs/CHANGES | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/docs/CHANGES b/docs/CHANGES
+index dc851da..999667e 100644
+--- a/docs/CHANGES
++++ b/docs/CHANGES
+@@ -25,10 +25,16 @@ CHANGES BETWEEN 2.5.5 and 2.6
+ 
+     - Arabic script support has been added to the auto-hinter.
+ 
+-    - Following OpenType version 1.7, advance widths and side bearing
+-      values in CFFs (wrapped in an SFNT structure) are now always
++    - Following OpenType version 1.7,  advance widths and side bearing
++      values in  CFFs (wrapped  in an SFNT  structure) are  now always
+       taken from the `hmtx' table.
+ 
++    - Following OpenType  version 1.7, the  PostScript font name  of a
++      CFF font (wrapped in an SFNT structure) is now always taken from
++      the `name'  table.  This is  also true for  OpenType Collections
++      (i.e., TTCs using  CFFs subfonts instead of TTFs),  where it may
++      have a significant difference.
++
+ 
+   III. MISCELLANEOUS
+ 
+-- 
+2.4.1
+
+From 409149527173a089278fd6d1b84a2a8dc911c9a6 Mon Sep 17 00:00:00 2001
+From: Alexei Podtelezhnikov <apodtele@gmail.com>
+Date: Wed, 29 Apr 2015 21:57:30 -0400
+Subject: [PATCH] [autofit] Speed up IUP.
+
+* src/autofit/afhints.c (af_iup_interp): Separate trivial snapping to
+the same position from true interpolation, use `scale' to reduce divisions.
+---
+ ChangeLog             |  8 ++++++++
+ src/autofit/afhints.c | 44 ++++++++++++++++++++------------------------
+ 2 files changed, 28 insertions(+), 24 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index f86e05f..32d2174 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,11 @@
++2015-04-29  Alexei Podtelezhnikov <apodtele@gmail.com>
++
++	[autofit] Speed up IUP.
++
++	* src/autofit/afhints.c (af_iup_interp): Separate trivial snapping to
++	the same position from true interpolation, use `scale' to reduce
++	divisions.
++
+ 2015-04-28  Werner Lemberg  <wl@gnu.org>
+ 
+ 	[cff] Use `name' table for PS name if we have a SFNT-CFF.
+diff --git a/src/autofit/afhints.c b/src/autofit/afhints.c
+index 728a599..9c7c3a2 100644
+--- a/src/autofit/afhints.c
++++ b/src/autofit/afhints.c
+@@ -1292,33 +1292,27 @@
+                  AF_Point  ref2 )
+   {
+     AF_Point  p;
+-    FT_Pos    u;
+-    FT_Pos    v1 = ref1->v;
+-    FT_Pos    v2 = ref2->v;
+-    FT_Pos    d1 = ref1->u - v1;
+-    FT_Pos    d2 = ref2->u - v2;
++    FT_Pos    u, v1, v2, u1, u2, d1, d2;
+ 
+ 
+     if ( p1 > p2 )
+       return;
+ 
+-    if ( v1 == v2 )
++    if ( ref1->v > ref2->v )
+     {
+-      for ( p = p1; p <= p2; p++ )
+-      {
+-        u = p->v;
+-
+-        if ( u <= v1 )
+-          u += d1;
+-        else
+-          u += d2;
+-
+-        p->u = u;
+-      }
+-      return;
++      p    = ref1;
++      ref1 = ref2;
++      ref2 = p;
+     }
+ 
+-    if ( v1 < v2 )
++    v1 = ref1->v;
++    v2 = ref2->v;
++    u1 = ref1->u;
++    u2 = ref2->u;
++    d1 = u1 - v1;
++    d2 = u2 - v2;
++
++    if ( u1 == u2 || v1 == v2 )
+     {
+       for ( p = p1; p <= p2; p++ )
+       {
+@@ -1329,23 +1323,25 @@
+         else if ( u >= v2 )
+           u += d2;
+         else
+-          u = ref1->u + FT_MulDiv( u - v1, ref2->u - ref1->u, v2 - v1 );
++          u = u1;
+ 
+         p->u = u;
+       }
+     }
+     else
+     {
++      FT_Fixed  scale = FT_DivFix( u2 - u1, v2 - v1 );
++
+       for ( p = p1; p <= p2; p++ )
+       {
+         u = p->v;
+ 
+-        if ( u <= v2 )
+-          u += d2;
+-        else if ( u >= v1 )
++        if ( u <= v1 )
+           u += d1;
++        else if ( u >= v2 )
++          u += d2;
+         else
+-          u = ref1->u + FT_MulDiv( u - v1, ref2->u - ref1->u, v2 - v1 );
++          u = u1 + FT_MulFix( u - v1, scale );
+ 
+         p->u = u;
+       }
+-- 
+2.4.1
+
+From d65bf72c3ec3f9f3462224f00c936da4a60efee1 Mon Sep 17 00:00:00 2001
+From: Chris Liddell <chris.liddell@artifex.com>
+Date: Tue, 12 May 2015 07:16:46 +0200
+Subject: [PATCH] [cff] fix incremental interface with new cff code.
+
+* src/cff/cf2ft.c (cf2_getSeacComponent): When using the incremental
+interface to retrieve glyph data for a SEAC, it be left to the
+incremental interface callback to apply the encoding to raw
+character index (as it was in the previous code).
+---
+ ChangeLog       |  9 +++++++++
+ src/cff/cf2ft.c | 15 ++++++++++++---
+ 2 files changed, 21 insertions(+), 3 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 32d2174..79e6b36 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,12 @@
++2015-05-12  Chris Liddell  <chris.liddell@artifex.com>
++
++	[cff] fix incremental interface with new cff code.
++
++	* src/cff/cf2ft.c (cf2_getSeacComponent): When using the incremental
++	interface to retrieve glyph data for a SEAC, it be left to the
++	incremental interface callback to apply the encoding to raw
++	character index (as it was in the previous code).
++
+ 2015-04-29  Alexei Podtelezhnikov <apodtele@gmail.com>
+ 
+ 	[autofit] Speed up IUP.
+diff --git a/src/cff/cf2ft.c b/src/cff/cf2ft.c
+index 2bb646e..d2544a2 100644
+--- a/src/cff/cf2ft.c
++++ b/src/cff/cf2ft.c
+@@ -582,9 +582,18 @@
+ 
+     FT_ZERO( buf );
+ 
+-    gid = cff_lookup_glyph_by_stdcharcode( decoder->cff, code );
+-    if ( gid < 0 )
+-      return FT_THROW( Invalid_Glyph_Format );
++#ifdef FT_CONFIG_OPTION_INCREMENTAL
++    /* Incremental fonts don't necessarily have valid charsets.        */
++    /* They use the character code, not the glyph index, in this case. */
++    if ( decoder->builder.face->root.internal->incremental_interface )
++      gid = code;
++    else
++#endif /* FT_CONFIG_OPTION_INCREMENTAL */
++    {
++      gid = cff_lookup_glyph_by_stdcharcode( decoder->cff, code );
++      if ( gid < 0 )
++        return FT_THROW( Invalid_Glyph_Format );
++    }
+ 
+     error = cff_get_glyph_data( decoder->builder.face,
+                                 (CF2_UInt)gid,
+-- 
+2.4.1
+
+From a87fb8ccf3d9362154f92ed78da9f6e4879a531e Mon Sep 17 00:00:00 2001
+From: Chris Liddell <chris.liddell@artifex.com>
+Date: Tue, 12 May 2015 07:27:35 +0200
+Subject: [PATCH] [cff] Make the `*curveto' operators more tolerant.
+
+* src/cff/cf2intrp.c (cf2_interpT2CharString): The opcodes
+`vvcurveto', `hhcurveto', `vhcurveto', and `hvcurveto' all iterate,
+pulling values off the stack until the stack is exhausted.
+Implicitly the stack must be a multiple (or for subtly different
+behaviour) a multiple plus a specific number of extra values deep.
+If that's not the case, enforce it (as the old code did).
+---
+ ChangeLog          | 11 +++++++++++
+ src/cff/cf2intrp.c | 25 ++++++++++++++++++++++---
+ 2 files changed, 33 insertions(+), 3 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 79e6b36..3cbd45d 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,5 +1,16 @@
+ 2015-05-12  Chris Liddell  <chris.liddell@artifex.com>
+ 
++	[cff] Make the `*curveto' operators more tolerant.
++
++	* src/cff/cf2intrp.c (cf2_interpT2CharString): The opcodes
++	`vvcurveto', `hhcurveto', `vhcurveto', and `hvcurveto' all iterate,
++	pulling values off the stack until the stack is exhausted.
++	Implicitly the stack must be a multiple (or for subtly different
++	behaviour) a multiple plus a specific number of extra values deep.
++	If that's not the case, enforce it (as the old code did).
++
++2015-05-12  Chris Liddell  <chris.liddell@artifex.com>
++
+ 	[cff] fix incremental interface with new cff code.
+ 
+ 	* src/cff/cf2ft.c (cf2_getSeacComponent): When using the incremental
+diff --git a/src/cff/cf2intrp.c b/src/cff/cf2intrp.c
+index d7f7a7b..537e060 100644
+--- a/src/cff/cf2intrp.c
++++ b/src/cff/cf2intrp.c
+@@ -1298,10 +1298,16 @@
+ 
+       case cf2_cmdVVCURVETO:
+         {
+-          CF2_UInt  count = cf2_stack_count( opStack );
++          CF2_UInt  count, count1 = cf2_stack_count( opStack );
+           CF2_UInt  index = 0;
+ 
+ 
++          /* if `cf2_stack_count' isn't of the form 4n or 4n+1, */
++          /* we enforce it by clearing the second bit           */
++          /* (and sorting the stack indexing to suit)           */
++          count  = count1 & ~2;
++          index += count1 - count;
++
+           FT_TRACE4(( " vvcurveto\n" ));
+ 
+           while ( index < count )
+@@ -1337,10 +1343,16 @@
+ 
+       case cf2_cmdHHCURVETO:
+         {
+-          CF2_UInt  count = cf2_stack_count( opStack );
++          CF2_UInt  count, count1 = cf2_stack_count( opStack );
+           CF2_UInt  index = 0;
+ 
+ 
++          /* if `cf2_stack_count' isn't of the form 4n or 4n+1, */
++          /* we enforce it by clearing the second bit           */
++          /* (and sorting the stack indexing to suit)           */
++          count  = count1 & ~2;
++          index += count1 - count;
++
+           FT_TRACE4(( " hhcurveto\n" ));
+ 
+           while ( index < count )
+@@ -1377,12 +1389,19 @@
+       case cf2_cmdVHCURVETO:
+       case cf2_cmdHVCURVETO:
+         {
+-          CF2_UInt  count = cf2_stack_count( opStack );
++          CF2_UInt  count, count1 = cf2_stack_count( opStack );
+           CF2_UInt  index = 0;
+ 
+           FT_Bool  alternate = op1 == cf2_cmdHVCURVETO;
+ 
+ 
++          /* if `cf2_stack_count' isn't of the form 8n, 8n+1, */
++          /* 8n+4, or 8n+5, we enforce it by clearing the     */
++          /* second bit                                       */
++          /* (and sorting the stack indexing to suit)         */
++          count  = count1 & ~2;
++          index += count1 - count;
++
+           FT_TRACE4(( alternate ? " hvcurveto\n" : " vhcurveto\n" ));
+ 
+           while ( index < count )
+-- 
+2.4.1
+
