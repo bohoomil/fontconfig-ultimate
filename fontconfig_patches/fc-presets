@@ -193,7 +193,7 @@ custom_postjob(){
       rm -f 35-repl-custom.conf 2>/dev/null
     elif [[ $check_current == *free* ]] || [[ $check_current == *ms* ]]; then
       if [ ! -f 35-repl-custom ]; then
-        ln -s ../conf.avail.infinality/35-repl-custom.conf . 2>/dev/null
+        ln -s $presets_dir/35-repl-custom.conf . 2>/dev/null
       fi
     fi
   done
