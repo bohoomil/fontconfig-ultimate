@@ -6,7 +6,15 @@ CHANGELOG
 ---------
 
 
-2015-04-26
+2015-05-31
+~~~~~~~~~~
+
+### freetype2-infinality-ultimate, rev. 2.5.5-7
+
+* The code base was merged with the upstream changes up to 2015.05.31.
+
+
+2015-05-12
 ~~~~~~~~~~
 
 ### freetype2-infinality-ultimate, rev. 2.5.5-6

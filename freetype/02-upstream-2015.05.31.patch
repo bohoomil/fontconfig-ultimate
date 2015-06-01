@@ -38058,3 +38058,2489 @@ index d7f7a7b..537e060 100644
 -- 
 2.4.1
 
+From 0a6b6ff7c662cbec5564641b580a04fffbe10a2d Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Sun, 17 May 2015 22:54:48 +0200
+Subject: [PATCH] [truetype] Fix loading of composite glyphs.
+
+* src/truetype/ttgload.c (TT_Load_Composite_Glyph): If the
+ARGS_ARE_XY_VALUES flag is not set, handle argument values as
+unsigned.  I trust `ttx' (which has exactly such code) that it does
+the right thing here...
+
+The reason that noone has ever noticed this bug is probably the fact
+that point-aligned subglyphs are rare, as are subglyphs with a
+number of points in the range [128;255], which is quite large (or
+even in the range [32768;65535], which is extremely unlikely).
+---
+ ChangeLog              | 14 ++++++++++++++
+ src/truetype/ttgload.c | 26 +++++++++++++++++++++-----
+ 2 files changed, 35 insertions(+), 5 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 3cbd45d..122082e 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,17 @@
++2015-05-17  Werner Lemberg  <wl@gnu.org>
++
++	[truetype] Fix loading of composite glyphs.
++
++	* src/truetype/ttgload.c (TT_Load_Composite_Glyph): If the
++	ARGS_ARE_XY_VALUES flag is not set, handle argument values as
++	unsigned.  I trust `ttx' (which has exactly such code) that it does
++	the right thing here...
++
++	The reason that noone has ever noticed this bug is probably the fact
++	that point-aligned subglyphs are rare, as are subglyphs with a
++	number of points in the range [128;255], which is quite large (or
++	even in the range [32768;65535], which is extremely unlikely).
++
+ 2015-05-12  Chris Liddell  <chris.liddell@artifex.com>
+ 
+ 	[cff] Make the `*curveto' operators more tolerant.
+diff --git a/src/truetype/ttgload.c b/src/truetype/ttgload.c
+index b380271..fd97009 100644
+--- a/src/truetype/ttgload.c
++++ b/src/truetype/ttgload.c
+@@ -621,15 +621,31 @@
+         goto Invalid_Composite;
+ 
+       /* read arguments */
+-      if ( subglyph->flags & ARGS_ARE_WORDS )
++      if ( subglyph->flags & ARGS_ARE_XY_VALUES )
+       {
+-        subglyph->arg1 = FT_NEXT_SHORT( p );
+-        subglyph->arg2 = FT_NEXT_SHORT( p );
++        if ( subglyph->flags & ARGS_ARE_WORDS )
++        {
++          subglyph->arg1 = FT_NEXT_SHORT( p );
++          subglyph->arg2 = FT_NEXT_SHORT( p );
++        }
++        else
++        {
++          subglyph->arg1 = FT_NEXT_CHAR( p );
++          subglyph->arg2 = FT_NEXT_CHAR( p );
++        }
+       }
+       else
+       {
+-        subglyph->arg1 = FT_NEXT_CHAR( p );
+-        subglyph->arg2 = FT_NEXT_CHAR( p );
++        if ( subglyph->flags & ARGS_ARE_WORDS )
++        {
++          subglyph->arg1 = (FT_Int)FT_NEXT_USHORT( p );
++          subglyph->arg2 = (FT_Int)FT_NEXT_USHORT( p );
++        }
++        else
++        {
++          subglyph->arg1 = (FT_Int)FT_NEXT_BYTE( p );
++          subglyph->arg2 = (FT_Int)FT_NEXT_BYTE( p );
++        }
+       }
+ 
+       /* read transform */
+-- 
+2.4.2
+
+From 790b8dfbffad6bc25c3fca9b5f6feda8dece4661 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Wed, 20 May 2015 12:33:40 +0200
+Subject: [PATCH] [truetype] Minor.
+
+---
+ ChangeLog               |  7 +++++++
+ src/truetype/ttinterp.c | 12 ++++++------
+ 2 files changed, 13 insertions(+), 6 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 122082e..2929e7c 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,10 @@
++2015-05-20  Werner Lemberg  <wl@gnu.org>
++
++	[truetype] Minor.
++
++	* src/truetype/ttinterp.h (SetSuperRound): Fix type of `GridPeriod'
++	argument.
++
+ 2015-05-17  Werner Lemberg  <wl@gnu.org>
+ 
+ 	[truetype] Fix loading of composite glyphs.
+diff --git a/src/truetype/ttinterp.c b/src/truetype/ttinterp.c
+index b9ae045..0e536af 100644
+--- a/src/truetype/ttinterp.c
++++ b/src/truetype/ttinterp.c
+@@ -1930,7 +1930,7 @@
+         val = 0;
+     }
+ 
+-    return  val;
++    return val;
+   }
+ 
+ 
+@@ -2273,7 +2273,7 @@
+   /*                                                                       */
+   static void
+   SetSuperRound( TT_ExecContext  exc,
+-                 FT_F26Dot6      GridPeriod,
++                 FT_F2Dot14      GridPeriod,
+                  FT_Long         selector )
+   {
+     switch ( (FT_Int)( selector & 0xC0 ) )
+@@ -2291,7 +2291,6 @@
+         break;
+ 
+       /* This opcode is reserved, but... */
+-
+       case 0xC0:
+         exc->period = GridPeriod;
+         break;
+@@ -2321,9 +2320,10 @@
+     else
+       exc->threshold = ( (FT_Int)( selector & 0x0F ) - 4 ) * exc->period / 8;
+ 
+-    exc->period    /= 256;
+-    exc->phase     /= 256;
+-    exc->threshold /= 256;
++    /* convert to F26Dot6 format */
++    exc->period    >>= 8;
++    exc->phase     >>= 8;
++    exc->threshold >>= 8;
+   }
+ 
+ 
+-- 
+2.4.2
+
+From c61cad868b32e6c7f8e1f3bf89719c137e52eaf8 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Fri, 22 May 2015 22:02:15 +0200
+Subject: [PATCH] [truetype] Support selector index 3 of the INSTCTRL
+ instruction.
+
+This flag activates `native ClearType hinting', disabling backwards
+compatibility mode as described in Greg Hitchcocks whitepaper.  In
+other words, it enables unrestricted functionality of all TrueType
+instructions in ClearType.
+
+* src/truetype/ttgload.c (tt_get_metrics): Call `sph_set_tweaks'
+unconditionally.
+(tt_loader_init): Unset `ignore_x_mode' flag if bit 2 of
+`GS.instruct_control' is active.
+
+* src/truetype/ttinterp.c (Ins_INSTCTRL): Handle selector index 3.
+(Ins_GETINFO): Updated.
+
+* docs/CHANGES: Document it.
+---
+ ChangeLog               | 19 +++++++++++++++++++
+ docs/CHANGES            |  3 +++
+ src/truetype/ttgload.c  | 23 +++++++++++++++--------
+ src/truetype/ttinterp.c | 49 +++++++++++++++++++++++++++++++++++++------------
+ 4 files changed, 74 insertions(+), 20 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 2929e7c..6b5c54c 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,5 +1,24 @@
+ 2015-05-20  Werner Lemberg  <wl@gnu.org>
+ 
++	[truetype] Support selector index 3 of the INSTCTRL instruction.
++
++	This flag activates `native ClearType hinting', disabling backwards
++	compatibility mode as described in Greg Hitchcocks whitepaper.  In
++	other words, it enables unrestricted functionality of all TrueType
++	instructions in ClearType.
++
++	* src/truetype/ttgload.c (tt_get_metrics): Call `sph_set_tweaks'
++	unconditionally.
++	(tt_loader_init): Unset `ignore_x_mode' flag if bit 2 of
++	`GS.instruct_control' is active.
++
++	* src/truetype/ttinterp.c (Ins_INSTCTRL): Handle selector index 3.
++	(Ins_GETINFO): Updated.
++
++	* docs/CHANGES: Document it.
++
++2015-05-20  Werner Lemberg  <wl@gnu.org>
++
+ 	[truetype] Minor.
+ 
+ 	* src/truetype/ttinterp.h (SetSuperRound): Fix type of `GridPeriod'
+diff --git a/docs/CHANGES b/docs/CHANGES
+index 999667e..e706e1f 100644
+--- a/docs/CHANGES
++++ b/docs/CHANGES
+@@ -35,6 +35,9 @@ CHANGES BETWEEN 2.5.5 and 2.6
+       (i.e., TTCs using  CFFs subfonts instead of TTFs),  where it may
+       have a significant difference.
+ 
++    - Fonts natively hinted for  ClearType are now supported, properly
++      handling selector index 3 of the INSTCTRL bytecode instruction.
++
+ 
+   III. MISCELLANEOUS
+ 
+diff --git a/src/truetype/ttgload.c b/src/truetype/ttgload.c
+index fd97009..ca07944 100644
+--- a/src/truetype/ttgload.c
++++ b/src/truetype/ttgload.c
+@@ -153,14 +153,16 @@
+     loader->vadvance     = advance_height;
+ 
+ #ifdef TT_CONFIG_OPTION_SUBPIXEL_HINTING
+-    if ( driver->interpreter_version == TT_INTERPRETER_VERSION_38 )
++    if ( driver->interpreter_version == TT_INTERPRETER_VERSION_38 &&
++         loader->exec                                             )
+     {
+-      if ( loader->exec )
+-        loader->exec->sph_tweak_flags = 0;
++      loader->exec->sph_tweak_flags = 0;
+ 
+-      /* this may not be the right place for this, but it works */
+-      if ( loader->exec && loader->exec->ignore_x_mode )
+-        sph_set_tweaks( loader, glyph_index );
++      /* This may not be the right place for this, but it works...  */
++      /* Note that we have to unconditionally load the tweaks since */
++      /* it is possible that glyphs individually switch ClearType's */
++      /* backwards compatibility mode on and off.                   */
++      sph_set_tweaks( loader, glyph_index );
+     }
+ #endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
+ 
+@@ -2256,7 +2258,7 @@
+         /* requires a re-execution of the CVT program                 */
+         if ( grayscale != exec->grayscale )
+         {
+-          FT_TRACE4(( "tt_loader_init: grayscale change,"
++          FT_TRACE4(( "tt_loader_init: grayscale hinting change,"
+                       " re-executing `prep' table\n" ));
+ 
+           exec->grayscale = grayscale;
+@@ -2276,7 +2278,7 @@
+           return error;
+       }
+ 
+-      /* see whether the cvt program has disabled hinting */
++      /* check whether the cvt program has disabled hinting */
+       if ( exec->GS.instruct_control & 1 )
+         load_flags |= FT_LOAD_NO_HINTING;
+ 
+@@ -2284,6 +2286,11 @@
+       if ( exec->GS.instruct_control & 2 )
+         exec->GS = tt_default_graphics_state;
+ 
++      /* check whether we have a font hinted for ClearType --           */
++      /* note that this flag can also be modified in a glyph's bytecode */
++      if ( exec->GS.instruct_control & 4 )
++        exec->ignore_x_mode = 0;
++
+       exec->pedantic_hinting = FT_BOOL( load_flags & FT_LOAD_PEDANTIC );
+       loader->exec = exec;
+       loader->instructions = exec->glyphIns;
+diff --git a/src/truetype/ttinterp.c b/src/truetype/ttinterp.c
+index 0e536af..8ef7526 100644
+--- a/src/truetype/ttinterp.c
++++ b/src/truetype/ttinterp.c
+@@ -4924,8 +4924,9 @@
+ 
+ #ifdef TT_CONFIG_OPTION_SUBPIXEL_HINTING
+     /* Disable Type 2 Vacuform Rounds - e.g. Arial Narrow */
+-    if ( SUBPIXEL_HINTING                        &&
+-         exc->ignore_x_mode && FT_ABS( D ) == 64 )
++    if ( SUBPIXEL_HINTING   &&
++         exc->ignore_x_mode &&
++         FT_ABS( D ) == 64  )
+       D += 1;
+ #endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
+ 
+@@ -5152,24 +5153,42 @@
+   Ins_INSTCTRL( TT_ExecContext  exc,
+                 FT_Long*        args )
+   {
+-    FT_Long  K, L;
++    FT_Long  K, L, Kf;
+ 
+ 
+     K = args[1];
+     L = args[0];
+ 
+-    if ( K < 1 || K > 2 )
++    /* selector values cannot be `OR'ed;                 */
++    /* they are indices starting with index 1, not flags */
++    if ( K < 1 || K > 3 )
+     {
+       if ( exc->pedantic_hinting )
+         exc->error = FT_THROW( Invalid_Reference );
+       return;
+     }
+ 
++    /* convert index to flag value */
++    Kf = 1 << ( K - 1 );
++
+     if ( L != 0 )
+-        L = K;
++    {
++      /* arguments to selectors look like flag values */
++      if ( L != Kf )
++      {
++        if ( exc->pedantic_hinting )
++          exc->error = FT_THROW( Invalid_Reference );
++        return;
++      }
++    }
+ 
+-    exc->GS.instruct_control = FT_BOOL(
+-      ( (FT_Byte)exc->GS.instruct_control & ~(FT_Byte)K ) | (FT_Byte)L );
++    exc->GS.instruct_control &= ~(FT_Byte)Kf;
++    exc->GS.instruct_control |= (FT_Byte)L;
++
++    /* INSTCTRL modifying flag 3 also has an effect */
++    /* outside of the CVT program                   */
++    if ( K == 3 )
++      exc->ignore_x_mode = FT_BOOL( L == 4 );
+   }
+ 
+ 
+@@ -7284,11 +7303,18 @@
+     /*                              */
+     if ( SUBPIXEL_HINTING     &&
+          ( args[0] & 1 ) != 0 &&
+-         exc->ignore_x_mode   )
++         exc->subpixel        )
+     {
+-      K = exc->rasterizer_version;
+-      FT_TRACE7(( "Setting rasterizer version %d\n",
+-                  exc->rasterizer_version ));
++      if ( exc->ignore_x_mode )
++      {
++        /* if in ClearType backwards compatibility mode,        */
++        /* we sometimes change the TrueType version dynamically */
++        K = exc->rasterizer_version;
++        FT_TRACE7(( "Setting rasterizer version %d\n",
++                    exc->rasterizer_version ));
++      }
++      else
++        K = TT_INTERPRETER_VERSION_38;
+     }
+     else
+ #endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
+@@ -7322,7 +7348,6 @@
+ #ifdef TT_CONFIG_OPTION_SUBPIXEL_HINTING
+ 
+     if ( SUBPIXEL_HINTING                                     &&
+-         exc->ignore_x_mode                                   &&
+          exc->rasterizer_version >= TT_INTERPRETER_VERSION_35 )
+     {
+ 
+-- 
+2.4.2
+
+From bb435da213cf6221fdc060adb75cac8a8468ac12 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Sat, 23 May 2015 07:21:25 +0200
+Subject: [PATCH] [truetype] Minor.
+
+* src/truetype/ttinterp.h (TT_ExecContext):
+ s/subpixel/subpixel_hinting.
+
+* src/truetype/ttgload.c, src/truetype/ttgload.h: Updated.
+---
+ ChangeLog               | 11 ++++++++++-
+ src/truetype/ttgload.c  | 37 ++++++++++++++++++++-----------------
+ src/truetype/ttinterp.c |  8 ++++----
+ src/truetype/ttinterp.h |  2 +-
+ 4 files changed, 35 insertions(+), 23 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 6b5c54c..b15accb 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,4 +1,13 @@
+-2015-05-20  Werner Lemberg  <wl@gnu.org>
++2015-05-23  Werner Lemberg  <wl@gnu.org>
++
++	[truetype] Minor.
++
++	* src/truetype/ttinterp.h (TT_ExecContext):
++	 s/subpixel/subpixel_hinting.
++
++	* src/truetype/ttgload.c, src/truetype/ttgload.h: Updated.
++
++2015-05-22  Werner Lemberg  <wl@gnu.org>
+ 
+ 	[truetype] Support selector index 3 of the INSTCTRL instruction.
+ 
+diff --git a/src/truetype/ttgload.c b/src/truetype/ttgload.c
+index ca07944..b2033a6 100644
+--- a/src/truetype/ttgload.c
++++ b/src/truetype/ttgload.c
+@@ -1367,11 +1367,14 @@
+ #define TT_LOADER_SET_PP( loader )                                          \
+           do                                                                \
+           {                                                                 \
+-            FT_Bool  subpixel_  = loader->exec ? loader->exec->subpixel     \
+-                                               : 0;                         \
+-            FT_Bool  grayscale_ = loader->exec ? loader->exec->grayscale    \
+-                                               : 0;                         \
+-            FT_Bool  use_aw_2_  = (FT_Bool)( subpixel_ && grayscale_ );     \
++            FT_Bool  subpixel_hinting_ = loader->exec                       \
++                                           ? loader->exec->subpixel_hinting \
++                                           : 0;                             \
++            FT_Bool  grayscale_        = loader->exec                       \
++                                           ? loader->exec->grayscale        \
++                                           : 0;                             \
++            FT_Bool  use_aw_2_         = (FT_Bool)( subpixel_hinting_ &&    \
++                                                    grayscale_        );    \
+                                                                             \
+                                                                             \
+             (loader)->pp1.x = (loader)->bbox.xMin - (loader)->left_bearing; \
+@@ -2133,7 +2136,7 @@
+ #ifdef TT_CONFIG_OPTION_SUBPIXEL_HINTING
+       TT_Driver  driver = (TT_Driver)FT_FACE_DRIVER( face );
+ 
+-      FT_Bool  subpixel = FALSE;
++      FT_Bool  subpixel_hinting = FALSE;
+ 
+ #if 0
+       /* not used yet */
+@@ -2167,24 +2170,24 @@
+ 
+       if ( driver->interpreter_version == TT_INTERPRETER_VERSION_38 )
+       {
+-        subpixel = FT_BOOL( ( FT_LOAD_TARGET_MODE( load_flags ) !=
+-                              FT_RENDER_MODE_MONO               )  &&
+-                            SPH_OPTION_SET_SUBPIXEL                );
++        subpixel_hinting = FT_BOOL( ( FT_LOAD_TARGET_MODE( load_flags ) !=
++                                      FT_RENDER_MODE_MONO               )  &&
++                                    SPH_OPTION_SET_SUBPIXEL                );
+ 
+-        if ( subpixel )
++        if ( subpixel_hinting )
+           grayscale = FALSE;
+         else if ( SPH_OPTION_SET_GRAYSCALE )
+         {
+-          grayscale = TRUE;
+-          subpixel  = FALSE;
++          grayscale        = TRUE;
++          subpixel_hinting = FALSE;
+         }
+         else
+           grayscale = FALSE;
+ 
+         if ( FT_IS_TRICKY( glyph->face ) )
+-          subpixel = FALSE;
++          subpixel_hinting = FALSE;
+ 
+-        exec->ignore_x_mode      = subpixel || grayscale;
++        exec->ignore_x_mode      = subpixel_hinting || grayscale;
+         exec->rasterizer_version = SPH_OPTION_SET_RASTERIZER_VERSION;
+         if ( exec->sph_tweak_flags & SPH_TWEAK_RASTERIZER_35 )
+           exec->rasterizer_version = TT_INTERPRETER_VERSION_35;
+@@ -2229,13 +2232,13 @@
+       {
+         /* a change from mono to subpixel rendering (and vice versa) */
+         /* requires a re-execution of the CVT program                */
+-        if ( subpixel != exec->subpixel )
++        if ( subpixel_hinting != exec->subpixel_hinting )
+         {
+           FT_TRACE4(( "tt_loader_init: subpixel hinting change,"
+                       " re-executing `prep' table\n" ));
+ 
+-          exec->subpixel = subpixel;
+-          reexecute      = TRUE;
++          exec->subpixel_hinting = subpixel_hinting;
++          reexecute              = TRUE;
+         }
+ 
+         /* a change from mono to grayscale rendering (and vice versa) */
+diff --git a/src/truetype/ttinterp.c b/src/truetype/ttinterp.c
+index 8ef7526..3910284 100644
+--- a/src/truetype/ttinterp.c
++++ b/src/truetype/ttinterp.c
+@@ -7301,9 +7301,9 @@
+     /* Selector Bit:  0             */
+     /* Return Bit(s): 0-7           */
+     /*                              */
+-    if ( SUBPIXEL_HINTING     &&
+-         ( args[0] & 1 ) != 0 &&
+-         exc->subpixel        )
++    if ( SUBPIXEL_HINTING      &&
++         ( args[0] & 1 ) != 0  &&
++         exc->subpixel_hinting )
+     {
+       if ( exc->ignore_x_mode )
+       {
+@@ -7358,7 +7358,7 @@
+         /* Selector Bit:  6             */
+         /* Return Bit(s): 13            */
+         /*                              */
+-        if ( ( args[0] & 64 ) != 0 && exc->subpixel )
++        if ( ( args[0] & 64 ) != 0 && exc->subpixel_hinting )
+           K |= 1 << 13;
+ 
+         /********************************/
+diff --git a/src/truetype/ttinterp.h b/src/truetype/ttinterp.h
+index bd16a0d..131ec1c 100644
+--- a/src/truetype/ttinterp.h
++++ b/src/truetype/ttinterp.h
+@@ -252,7 +252,7 @@ FT_BEGIN_HEADER
+ #ifdef TT_CONFIG_OPTION_SUBPIXEL_HINTING
+     TT_Round_Func      func_round_sphn;   /* subpixel rounding function */
+ 
+-    FT_Bool            subpixel;          /* Using subpixel hinting?       */
++    FT_Bool            subpixel_hinting;  /* Using subpixel hinting?       */
+     FT_Bool            ignore_x_mode;     /* Standard rendering mode for   */
+                                           /* subpixel hinting.  On if gray */
+                                           /* or subpixel hinting is on.    */
+-- 
+2.4.2
+
+From 25a9bd9be066c7ff31bfb345cf9c76c5e408ca04 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Sun, 24 May 2015 09:21:31 +0200
+Subject: [PATCH] Clean up and improve description of MS hinting engine
+ versions.
+
+---
+ include/ftttdrv.h | 105 +++++++++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 84 insertions(+), 21 deletions(-)
+
+diff --git a/include/ftttdrv.h b/include/ftttdrv.h
+index f1a7714..f20dd43 100644
+--- a/include/ftttdrv.h
++++ b/include/ftttdrv.h
+@@ -67,13 +67,13 @@ FT_BEGIN_HEADER
+    *   TT_CONFIG_OPTION_SUBPIXEL_HINTING is defined, and no subpixel
+    *   support otherwise (since it isn't available then).
+    *
+-   *   If subpixel hinting is on, many TrueType bytecode instructions
+-   *   behave differently compared to B/W or grayscale rendering.  The
+-   *   main idea is to render at a much increased horizontal resolution,
+-   *   then sampling down the created output to subpixel precision.
+-   *   However, many older fonts are not suited to this and must be
+-   *   specially taken care of by applying (hardcoded) font-specific
+-   *   tweaks.
++   *   If subpixel hinting is on, many TrueType bytecode instructions behave
++   *   differently compared to B/W or grayscale rendering (except if `native
++   *   ClearType' is selected by the font).  The main idea is to render at a
++   *   much increased horizontal resolution, then sampling down the created
++   *   output to subpixel precision.  However, many older fonts are not
++   *   suited to this and must be specially taken care of by applying
++   *   (hardcoded) font-specific tweaks.
+    *
+    *   Details on subpixel hinting and some of the necessary tweaks can be
+    *   found in Greg Hitchcock's whitepaper at
+@@ -135,24 +135,87 @@ FT_BEGIN_HEADER
+    *   `FT_Err_Unimplemented_Feature' error.
+    *
+    *   Depending on the graphics framework, Microsoft uses different
+-   *   bytecode engines.  As a consequence, the version numbers returned by
+-   *   a call to the `GETINFO[1]' bytecode instruction are more convoluted
+-   *   than desired.
++   *   bytecode and rendering engines.  As a consequence, the version
++   *   numbers returned by a call to the `GETINFO[1]' bytecode instruction
++   *   are more convoluted than desired.
++   *
++   *   Here are two tables that try to shed some light on the possible
++   *   values for the MS rasterizer engine, together with the additional
++   *   features introduced by it.
++   *
++   *   {
++   *     GETINFO framework               version feature
++   *     -------------------------------------------------------------------
++   *         3   GDI (Win 3.1),            v1.0  16-bit, first version
++   *             TrueImage
++   *        33   GDI (Win NT 3.1),         v1.5  32-bit
++   *             HP Laserjet
++   *        34   GDI (Win 95)              v1.6  font smoothing,
++   *                                             new SCANTYPE opcode
++   *        35   GDI (Win 98/2000)         v1.7  (UN)SCALED_COMPONENT_OFFSET
++   *                                               bits in composite glyphs
++   *        36   MGDI (Win CE 2)           v1.6+ classic ClearType
++   *        37   GDI (XP and later),       v1.8  ClearType
++   *             GDI+ old (before Vista)
++   *        38   GDI+ old (Vista, Win 7),  v1.9  subpixel ClearType,
++   *             WPF                             Y-direction ClearType,
++   *                                             additional error checking
++   *        39   DWrite (before Win 8)     v2.0  subpixel ClearType flags
++   *                                               in GETINFO opcode,
++   *                                             bug fixes
++   *        40   GDI+ (after Win 7),       v2.1  Y-direction ClearType flag
++   *             DWrite (Win 8)                    in GETINFO opcode,
++   *                                             Gray ClearType
++   *   }
++   *
++   *   The `version' field gives a rough orientation only, since some
++   *   applications provided certain features much earlier (as an example,
++   *   Microsoft Reader used subpixel and Y-direction ClearType already in
++   *   Windows 2000).  Similarly, updates to a given framework might include
++   *   improved hinting support.
+    *
+    *   {
+-   *      framework   Windows version   result of GETINFO[1]
+-   *     ----------------------------------------------------
+-   *       GDI         before XP         35
+-   *       GDI         XP and later      37
+-   *       GDI+ old    before Vista      37
+-   *       GDI+ old    Vista, 7          38
+-   *       GDI+        after 7           40
+-   *       DWrite      before 8          39
+-   *       DWrite      8 and later       40
++   *      version   sampling          rendering        comment
++   *               x        y       x           y
++   *     ---------------------------------------------------------------
++   *       v1.0   normal  normal  B/W           B/W    bi-level
++   *       v1.6   high    high    gray          gray   grayscale
++   *       v1.8   high    normal  color-filter  B/W    (GDI) ClearType
++   *       v1.9   high    high    color-filter  gray   Color ClearType
++   *       v2.1   high    normal  gray          B/W    Gray ClearType
++   *       v2.1   high    high    gray          gray   Gray ClearType
+    *   }
+    *
+-   *   Since FreeType doesn't provide all capabilities of DWrite ClearType,
+-   *   using version~38 seems justified.
++   *   Color and Gray ClearType are the two available variants of
++   *   `Y-direction ClearType', meaning grayscale rasterization along the
++   *   Y-direction; the name used in the TrueType specification for this
++   *   feature is `symmetric smoothing'.  `Classic ClearType' is the
++   *   original algorithm used before introducing a modified version in
++   *   Win~XP.  Another name for v1.6's grayscale rendering is `font
++   *   smoothing', and `Color ClearType' is sometimes also called `DWrite
++   *   ClearType'.  To differentiate between today's Color ClearType and the
++   *   earlier ClearType variant with B/W rendering along the vertical axis,
++   *   the latter is sometimes called `GDI ClearType'.
++   *
++   *   `Normal' and `high' sampling describe the (virtual) resolution to
++   *   access the rasterized outline after the hinting process.  `Normal'
++   *   means 1 sample per grid line (i.e., B/W).  In the current Microsoft
++   *   implementation, `high' means an extra virtual resolution of 16x16 (or
++   *   16x1) grid lines per pixel for bytecode instructions like `MIRP'.
++   *   After hinting, these 16 grid lines are mapped to 6x5 (or 6x1) grid
++   *   lines for color filtering if Color ClearType is activated.
++   *
++   *   Note that `Gray ClearType' is essentially the same as v1.6's
++   *   grayscale rendering.  However, the GETINFO instruction handles it
++   *   differently: v1.6 returns bit~12 (hinting for grayscale), while v2.1
++   *   returns bits~13 (hinting for ClearType), 18 (symmetrical smoothing),
++   *   and~19 (Gray ClearType).  Also, this mode respects bits 2 and~3 for
++   *   the version~1 gasp table exclusively (like Color ClearType), while
++   *   v1.6 only respects the values of version~0 (bits 0 and~1).
++   *
++   *   FreeType doesn't provide all capabilities of the most recent
++   *   ClearType incarnation, thus we identify our subpixel support as
++   *   version~38.
+    *
+    */
+ #define TT_INTERPRETER_VERSION_35  35
+-- 
+2.4.2
+
+From 7f0994820bfbf9e790a10ddaf33fde7c06212adc Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Sun, 24 May 2015 09:50:24 +0200
+Subject: [PATCH] [truetype] Fix return values of GETINFO bytecode instruction.
+
+* src/truetype/ttinterp.h (TT_ExecContextRec): New fields
+`vertical_lcd' and `gray_cleartype'.
+
+* src/truetype/ttgload.c (tt_loader_init): Initialize new fields.
+Change `symmetrical smoothing' to TRUE, since FreeType produces
+exactly this.
+
+* src/truetype/ttinterp.c (Ins_GETINFO): Fix selector/return bit
+values for symmetrical smoothing, namely 11/18.
+Handle bits for vertical LCD subpixels (8/15) and Gray ClearType
+(12/19).
+---
+ ChangeLog               | 16 ++++++++++++++++
+ src/truetype/ttgload.c  | 12 +++++++++++-
+ src/truetype/ttinterp.c | 30 ++++++++++++++++++++++++++++--
+ src/truetype/ttinterp.h |  6 +++++-
+ 4 files changed, 60 insertions(+), 4 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index b15accb..e67ff28 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,5 +1,21 @@
+ 2015-05-23  Werner Lemberg  <wl@gnu.org>
+ 
++	[truetype] Fix return values of GETINFO bytecode instruction.
++
++	* src/truetype/ttinterp.h (TT_ExecContextRec): New fields
++	`vertical_lcd' and `gray_cleartype'.
++
++	* src/truetype/ttgload.c (tt_loader_init): Initialize new fields.
++	Change `symmetrical smoothing' to TRUE, since FreeType produces
++	exactly this.
++
++	* src/truetype/ttinterp.c (Ins_GETINFO): Fix selector/return bit
++	values for symmetrical smoothing, namely 11/18.
++	Handle bits for vertical LCD subpixels (8/15) and Gray ClearType
++	(12/19).
++
++2015-05-23  Werner Lemberg  <wl@gnu.org>
++
+ 	[truetype] Minor.
+ 
+ 	* src/truetype/ttinterp.h (TT_ExecContext):
+diff --git a/src/truetype/ttgload.c b/src/truetype/ttgload.c
+index b2033a6..55d3c99 100644
+--- a/src/truetype/ttgload.c
++++ b/src/truetype/ttgload.c
+@@ -2143,7 +2143,9 @@
+       FT_Bool  compatible_widths;
+       FT_Bool  symmetrical_smoothing;
+       FT_Bool  bgr;
++      FT_Bool  vertical_lcd;
+       FT_Bool  subpixel_positioned;
++      FT_Bool  gray_cleartype;
+ #endif
+ #endif /* TT_CONFIG_OPTION_SUBPIXEL_HINTING */
+ 
+@@ -2194,9 +2196,11 @@
+ 
+ #if 1
+         exec->compatible_widths     = SPH_OPTION_SET_COMPATIBLE_WIDTHS;
+-        exec->symmetrical_smoothing = FALSE;
++        exec->symmetrical_smoothing = TRUE;
+         exec->bgr                   = FALSE;
++        exec->vertical_lcd          = FALSE;
+         exec->subpixel_positioned   = TRUE;
++        exec->gray_cleartype        = FALSE;
+ #else /* 0 */
+         exec->compatible_widths =
+           FT_BOOL( FT_LOAD_TARGET_MODE( load_flags ) !=
+@@ -2207,9 +2211,15 @@
+         exec->bgr =
+           FT_BOOL( FT_LOAD_TARGET_MODE( load_flags ) !=
+                    TT_LOAD_BGR );
++        exec->vertical_lcd =
++          FT_BOOL( FT_LOAD_TARGET_MODE( load_flags ) !=
++                   TT_LOAD_VERTICAL_LCD );
+         exec->subpixel_positioned =
+           FT_BOOL( FT_LOAD_TARGET_MODE( load_flags ) !=
+                    TT_LOAD_SUBPIXEL_POSITIONED );
++        exec->gray_cleartype =
++          FT_BOOL( FT_LOAD_TARGET_MODE( load_flags ) !=
++                   TT_LOAD_GRAY_CLEARTYPE );
+ #endif /* 0 */
+ 
+       }
+diff --git a/src/truetype/ttinterp.c b/src/truetype/ttinterp.c
+index 3910284..67f0cc8 100644
+--- a/src/truetype/ttinterp.c
++++ b/src/truetype/ttinterp.c
+@@ -7286,6 +7286,14 @@
+   /* Opcode range: 0x88                                                    */
+   /* Stack:        uint32 --> uint32                                       */
+   /*                                                                       */
++  /* XXX: UNDOCUMENTED: Selector bits higher than 9 are currently (May     */
++  /*      2015) not documented in the OpenType specification.              */
++  /*                                                                       */
++  /*      Selector bit 11 is incorrectly described as bit 8, while the     */
++  /*      real meaning of bit 8 (vertical LCD subpixels) stays             */
++  /*      undocumented.  The same mistake can be found in Greg Hitchcock's */
++  /*      whitepaper.                                                      */
++  /*                                                                       */
+   static void
+   Ins_GETINFO( TT_ExecContext  exc,
+                FT_Long*        args )
+@@ -7371,12 +7379,12 @@
+           K |= 1 << 14;
+ 
+         /********************************/
+-        /* SYMMETRICAL SMOOTHING        */
++        /* VERTICAL LCD SUBPIXELS?      */
+         /* Selector Bit:  8             */
+         /* Return Bit(s): 15            */
+         /*                              */
+         /* Functionality still needs to be added */
+-        if ( ( args[0] & 256 ) != 0 && exc->symmetrical_smoothing )
++        if ( ( args[0] & 256 ) != 0 && exc->vertical_lcd )
+           K |= 1 << 15;
+ 
+         /********************************/
+@@ -7398,6 +7406,24 @@
+           /* Functionality still needs to be added */
+           if ( ( args[0] & 1024 ) != 0 && exc->subpixel_positioned )
+             K |= 1 << 17;
++
++          /********************************/
++          /* SYMMETRICAL SMOOTHING        */
++          /* Selector Bit:  11            */
++          /* Return Bit(s): 18            */
++          /*                              */
++          /* Functionality still needs to be added */
++          if ( ( args[0] & 2048 ) != 0 && exc->symmetrical_smoothing )
++            K |= 1 << 18;
++
++          /********************************/
++          /* GRAY CLEARTYPE               */
++          /* Selector Bit:  12            */
++          /* Return Bit(s): 19            */
++          /*                              */
++          /* Functionality still needs to be added */
++          if ( ( args[0] & 4096 ) != 0 && exc->gray_cleartype )
++            K |= 1 << 19;
+         }
+       }
+     }
+diff --git a/src/truetype/ttinterp.h b/src/truetype/ttinterp.h
+index 131ec1c..32706d0 100644
+--- a/src/truetype/ttinterp.h
++++ b/src/truetype/ttinterp.h
+@@ -257,13 +257,17 @@ FT_BEGIN_HEADER
+                                           /* subpixel hinting.  On if gray */
+                                           /* or subpixel hinting is on.    */
+ 
+-    /* The following 4 aren't fully implemented but here for MS rasterizer */
++    /* The following 6 aren't fully implemented but here for MS rasterizer */
+     /* compatibility.                                                      */
+     FT_Bool            compatible_widths;     /* compatible widths?        */
+     FT_Bool            symmetrical_smoothing; /* symmetrical_smoothing?    */
+     FT_Bool            bgr;                   /* bgr instead of rgb?       */
++    FT_Bool            vertical_lcd;          /* long side of LCD subpixel */
++                                              /* rectangles is horizontal  */
+     FT_Bool            subpixel_positioned;   /* subpixel positioned       */
+                                               /* (DirectWrite ClearType)?  */
++    FT_Bool            gray_cleartype;        /* ClearType hinting but     */
++                                              /* grayscale rendering       */
+ 
+     FT_Int             rasterizer_version;    /* MS rasterizer version     */
+ 
+-- 
+2.4.2
+
+From a5e1f6f39bdd75c00e0c210a476f042cf32a4a30 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Sun, 24 May 2015 23:29:23 +0200
+Subject: [PATCH] [truetype] Fix commit from 2015-05-22.
+
+* src/truetype/ttgload.c, src/truetype/ttinterp.c: Guard new code
+with `TT_CONFIG_OPTION_SUBPIXEL_HINTING'.
+
+Problem reported by Nikolaus Waxweiler <madigens@gmail.com>.
+---
+ ChangeLog               | 9 +++++++++
+ src/truetype/ttgload.c  | 2 ++
+ src/truetype/ttinterp.c | 2 ++
+ 3 files changed, 13 insertions(+)
+
+diff --git a/ChangeLog b/ChangeLog
+index e67ff28..ff94729 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,12 @@
++2015-05-24  Werner Lemberg  <wl@gnu.org>
++
++	[truetype] Fix commit from 2015-05-22.
++
++	* src/truetype/ttgload.c, src/truetype/ttinterp.c: Guard new code
++	with `TT_CONFIG_OPTION_SUBPIXEL_HINTING'.
++
++	Problem reported by Nikolaus Waxweiler <madigens@gmail.com>.
++
+ 2015-05-23  Werner Lemberg  <wl@gnu.org>
+ 
+ 	[truetype] Fix return values of GETINFO bytecode instruction.
+diff --git a/src/truetype/ttgload.c b/src/truetype/ttgload.c
+index 55d3c99..d1edd7e 100644
+--- a/src/truetype/ttgload.c
++++ b/src/truetype/ttgload.c
+@@ -2299,10 +2299,12 @@
+       if ( exec->GS.instruct_control & 2 )
+         exec->GS = tt_default_graphics_state;
+ 
++#ifdef TT_CONFIG_OPTION_SUBPIXEL_HINTING
+       /* check whether we have a font hinted for ClearType --           */
+       /* note that this flag can also be modified in a glyph's bytecode */
+       if ( exec->GS.instruct_control & 4 )
+         exec->ignore_x_mode = 0;
++#endif
+ 
+       exec->pedantic_hinting = FT_BOOL( load_flags & FT_LOAD_PEDANTIC );
+       loader->exec = exec;
+diff --git a/src/truetype/ttinterp.c b/src/truetype/ttinterp.c
+index 67f0cc8..0f9fb0c 100644
+--- a/src/truetype/ttinterp.c
++++ b/src/truetype/ttinterp.c
+@@ -5185,10 +5185,12 @@
+     exc->GS.instruct_control &= ~(FT_Byte)Kf;
+     exc->GS.instruct_control |= (FT_Byte)L;
+ 
++#ifdef TT_CONFIG_OPTION_SUBPIXEL_HINTING
+     /* INSTCTRL modifying flag 3 also has an effect */
+     /* outside of the CVT program                   */
+     if ( K == 3 )
+       exc->ignore_x_mode = FT_BOOL( L == 4 );
++#endif
+   }
+ 
+ 
+-- 
+2.4.2
+
+From 366b2ea7487a54110356f60ceb972c2edc93b39d Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Thu, 28 May 2015 10:58:40 +0200
+Subject: [PATCH] * src/tools/apinames.c (names_dump): Fix invalid reference.
+
+Problem reported by Guzman Mosqueda, Jose R
+<jose.r.guzman.mosqueda@intel.com>.
+---
+ ChangeLog            | 7 +++++++
+ src/tools/apinames.c | 6 +++---
+ 2 files changed, 10 insertions(+), 3 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index ff94729..b80b492 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,10 @@
++2015-05-28  Werner Lemberg  <wl@gnu.org>
++
++	* src/tools/apinames.c (names_dump): Fix invalid reference.
++
++	Problem reported by Guzman Mosqueda, Jose R
++	<jose.r.guzman.mosqueda@intel.com>.
++
+ 2015-05-24  Werner Lemberg  <wl@gnu.org>
+ 
+ 	[truetype] Fix commit from 2015-05-22.
+diff --git a/src/tools/apinames.c b/src/tools/apinames.c
+index c85df72..9f81b1a 100644
+--- a/src/tools/apinames.c
++++ b/src/tools/apinames.c
+@@ -10,7 +10,7 @@
+  * accepted if you are using GCC for compilation (and probably by
+  * other compilers too).
+  *
+- * Author: David Turner, 2005, 2006, 2008-2013
++ * Author: David Turner, 2005, 2006, 2008-2013, 2015
+  *
+  * This code is explicitly placed into the public domain.
+  *
+@@ -156,6 +156,7 @@ names_dump( FILE*         out,
+     case OUTPUT_WATCOM_LBC:
+       {
+         const char*  dot;
++        char         temp[512];
+ 
+ 
+         if ( dll_name == NULL )
+@@ -169,8 +170,7 @@ names_dump( FILE*         out,
+         dot = strchr( dll_name, '.' );
+         if ( dot != NULL )
+         {
+-          char  temp[512];
+-          int   len = dot - dll_name;
++          int  len = dot - dll_name;
+ 
+ 
+           if ( len > (int)( sizeof ( temp ) - 1 ) )
+-- 
+2.4.2
+
+From a678560dc23f7dfa6d6cda8d0d35be37c04713e2 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Thu, 28 May 2015 17:31:15 +0200
+Subject: [PATCH] Minor.
+
+---
+ include/ftttdrv.h      | 6 +++---
+ src/autofit/afhints.c  | 1 +
+ src/truetype/ttgxvar.c | 1 +
+ 3 files changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/include/ftttdrv.h b/include/ftttdrv.h
+index f20dd43..f56040b 100644
+--- a/include/ftttdrv.h
++++ b/include/ftttdrv.h
+@@ -136,8 +136,8 @@ FT_BEGIN_HEADER
+    *
+    *   Depending on the graphics framework, Microsoft uses different
+    *   bytecode and rendering engines.  As a consequence, the version
+-   *   numbers returned by a call to the `GETINFO[1]' bytecode instruction
+-   *   are more convoluted than desired.
++   *   numbers returned by a call to the `GETINFO' bytecode instruction are
++   *   more convoluted than desired.
+    *
+    *   Here are two tables that try to shed some light on the possible
+    *   values for the MS rasterizer engine, together with the additional
+@@ -177,7 +177,7 @@ FT_BEGIN_HEADER
+    *   {
+    *      version   sampling          rendering        comment
+    *               x        y       x           y
+-   *     ---------------------------------------------------------------
++   *     --------------------------------------------------------------
+    *       v1.0   normal  normal  B/W           B/W    bi-level
+    *       v1.6   high    high    gray          gray   grayscale
+    *       v1.8   high    normal  color-filter  B/W    (GDI) ClearType
+diff --git a/src/autofit/afhints.c b/src/autofit/afhints.c
+index 9c7c3a2..37482eb 100644
+--- a/src/autofit/afhints.c
++++ b/src/autofit/afhints.c
+@@ -1332,6 +1332,7 @@
+     {
+       FT_Fixed  scale = FT_DivFix( u2 - u1, v2 - v1 );
+ 
++
+       for ( p = p1; p <= p2; p++ )
+       {
+         u = p->v;
+diff --git a/src/truetype/ttgxvar.c b/src/truetype/ttgxvar.c
+index 940f288..02ea6af 100644
+--- a/src/truetype/ttgxvar.c
++++ b/src/truetype/ttgxvar.c
+@@ -409,6 +409,7 @@
+       FT_FRAME_END
+     };
+ 
++
+     if ( ( error = face->goto_table( face,
+                                      TTAG_gvar,
+                                      stream,
+-- 
+2.4.2
+
+From cdee7d1423f8c498d1c131adc82079ffb462fb07 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Sun, 31 May 2015 11:54:42 +0200
+Subject: [PATCH] [truetype] Add tracing information to GX code.
+
+* src/truetype/ttgxvar.c (ft_var_load_avar, ft_var_load_gvar,
+ft_var_apply_tuple, TT_Get_MM_Var, TT_Set_MM_Blend,
+TT_Set_Var_Design, tt_face_vary_cvt): Do it.
+---
+ ChangeLog              |   8 ++
+ src/truetype/ttgxvar.c | 241 ++++++++++++++++++++++++++++++++++++++++++++-----
+ 2 files changed, 228 insertions(+), 21 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index b80b492..bb0bfbd 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,11 @@
++2015-05-31  Werner Lemberg  <wl@gnu.org>
++
++	[truetype] Add tracing information to GX code.
++
++	* src/truetype/ttgxvar.c (ft_var_load_avar, ft_var_load_gvar,
++	ft_var_apply_tuple, TT_Get_MM_Var, TT_Set_MM_Blend,
++	TT_Set_Var_Design, tt_face_vary_cvt): Do it.
++
+ 2015-05-28  Werner Lemberg  <wl@gnu.org>
+ 
+ 	* src/tools/apinames.c (names_dump): Fix invalid reference.
+diff --git a/src/truetype/ttgxvar.c b/src/truetype/ttgxvar.c
+index 02ea6af..aaee547 100644
+--- a/src/truetype/ttgxvar.c
++++ b/src/truetype/ttgxvar.c
+@@ -301,12 +301,15 @@
+     FT_UNUSED( error );
+ 
+ 
++    FT_TRACE2(( "AVAR " ));
++
+     blend->avar_checked = TRUE;
+-    if ( ( error = face->goto_table( face,
+-                                     TTAG_avar,
+-                                     stream,
+-                                     &table_len ) ) != 0 )
++    error = face->goto_table( face, TTAG_avar, stream, &table_len );
++    if ( error )
++    {
++      FT_TRACE2(( "is missing\n" ));
+       return;
++    }
+ 
+     if ( FT_FRAME_ENTER( table_len ) )
+       return;
+@@ -314,9 +317,20 @@
+     version   = FT_GET_LONG();
+     axisCount = FT_GET_LONG();
+ 
+-    if ( version != 0x00010000L                       ||
+-         axisCount != (FT_Long)blend->mmvar->num_axis )
++    if ( version != 0x00010000L )
++    {
++      FT_TRACE2(( "bad table version\n" ));
++      goto Exit;
++    }
++
++    FT_TRACE2(( "loaded\n" ));
++
++    if ( axisCount != (FT_Long)blend->mmvar->num_axis )
++    {
++      FT_TRACE2(( "ft_var_load_avar: number of axes in `avar' and `cvar'\n"
++                  "                  table are different\n" ));
+       goto Exit;
++    }
+ 
+     if ( FT_NEW_ARRAY( blend->avar_segment, axisCount ) )
+       goto Exit;
+@@ -324,6 +338,8 @@
+     segment = &blend->avar_segment[0];
+     for ( i = 0; i < axisCount; i++, segment++ )
+     {
++      FT_TRACE5(( "  axis %d:\n", i ));
++
+       segment->pairCount = FT_GET_USHORT();
+       if ( FT_NEW_ARRAY( segment->correspondence, segment->pairCount ) )
+       {
+@@ -343,7 +359,13 @@
+         /* convert to Fixed */
+         segment->correspondence[j].fromCoord = FT_GET_SHORT() << 2;
+         segment->correspondence[j].toCoord   = FT_GET_SHORT() << 2;
++
++        FT_TRACE5(( "    mapping %.4f to %.4f\n",
++                    segment->correspondence[j].fromCoord / 65536.0,
++                    segment->correspondence[j].toCoord / 65536.0 ));
+       }
++
++      FT_TRACE5(( "\n" ));
+     }
+ 
+   Exit:
+@@ -410,11 +432,16 @@
+     };
+ 
+ 
++    FT_TRACE2(( "GVAR " ));
++
+     if ( ( error = face->goto_table( face,
+                                      TTAG_gvar,
+                                      stream,
+                                      &table_len ) ) != 0 )
++    {
++      FT_TRACE2(( "is missing\n" ));
+       goto Exit;
++    }
+ 
+     gvar_start = FT_STREAM_POS( );
+     if ( FT_STREAM_READ_FIELDS( gvar_fields, &gvar_head ) )
+@@ -424,13 +451,26 @@
+     blend->gv_glyphcnt = gvar_head.glyphCount;
+     offsetToData       = gvar_start + gvar_head.offsetToData;
+ 
+-    if ( gvar_head.version   != (FT_Long)0x00010000L              ||
+-         gvar_head.axisCount != (FT_UShort)blend->mmvar->num_axis )
++    if ( gvar_head.version != 0x00010000L )
++    {
++      FT_TRACE1(( "bad table version\n" ));
++      error = FT_THROW( Invalid_Table );
++      goto Exit;
++    }
++
++    FT_TRACE2(( "loaded\n" ));
++
++    if ( gvar_head.axisCount != (FT_UShort)blend->mmvar->num_axis )
+     {
++      FT_TRACE1(( "ft_var_load_gvar: number of axes in `gvar' and `cvar'\n"
++                  "                  table are different\n" ));
+       error = FT_THROW( Invalid_Table );
+       goto Exit;
+     }
+ 
++    FT_TRACE5(( "gvar: there are %d shared coordinates:\n",
++                blend->tuplecount ));
++
+     if ( FT_NEW_ARRAY( blend->glyphoffsets, blend->gv_glyphcnt + 1 ) )
+       goto Exit;
+ 
+@@ -469,9 +509,19 @@
+         goto Exit;
+ 
+       for ( i = 0; i < blend->tuplecount; i++ )
++      {
++        FT_TRACE5(( "  [ " ));
+         for ( j = 0 ; j < (FT_UInt)gvar_head.axisCount; j++ )
++        {
+           blend->tuplecoords[i * gvar_head.axisCount + j] =
+             FT_GET_SHORT() << 2;                /* convert to FT_Fixed */
++          FT_TRACE5(( "%.4f ",
++            blend->tuplecoords[i * gvar_head.axisCount + j] / 65536.0 ));
++        }
++        FT_TRACE5(( "]\n" ));
++      }
++
++      FT_TRACE5(( "\n" ));
+ 
+       FT_FRAME_EXIT();
+     }
+@@ -521,46 +571,81 @@
+ 
+     for ( i = 0; i < blend->num_axis; i++ )
+     {
++      FT_TRACE6(( "    axis coordinate %d (%.4f):\n",
++                  i, blend->normalizedcoords[i] / 65536.0 ));
++
++      /* It's not clear why (for intermediate tuples) we don't need     */
++      /* to check against start/end -- the documentation says we don't. */
++      /* Similarly, it's unclear why we don't need to scale along the   */
++      /* axis.                                                          */
++
+       if ( tuple_coords[i] == 0 )
+-        /* It's not clear why (for intermediate tuples) we don't need     */
+-        /* to check against start/end -- the documentation says we don't. */
+-        /* Similarly, it's unclear why we don't need to scale along the   */
+-        /* axis.                                                          */
++      {
++        FT_TRACE6(( "      tuple coordinate is zero, ignored\n", i ));
+         continue;
++      }
+ 
+-      else if ( blend->normalizedcoords[i] == 0                           ||
+-                ( blend->normalizedcoords[i] < 0 && tuple_coords[i] > 0 ) ||
++      else if ( blend->normalizedcoords[i] == 0 )
++      {
++        FT_TRACE6(( "      axis coordinate is zero, stop\n" ));
++        apply = 0;
++        break;
++      }
++
++      else if ( ( blend->normalizedcoords[i] < 0 && tuple_coords[i] > 0 ) ||
+                 ( blend->normalizedcoords[i] > 0 && tuple_coords[i] < 0 ) )
+       {
++        FT_TRACE6(( "      tuple coordinate value %.4f is exceeded, stop\n",
++                    tuple_coords[i] / 65536.0 ));
+         apply = 0;
+         break;
+       }
+ 
+       else if ( !( tupleIndex & GX_TI_INTERMEDIATE_TUPLE ) )
++      {
++        FT_TRACE6(( "      tuple coordinate value %.4f fits\n",
++                    tuple_coords[i] / 65536.0 ));
+         /* not an intermediate tuple */
+         apply = FT_MulFix( apply,
+                            blend->normalizedcoords[i] > 0
+                              ? blend->normalizedcoords[i]
+                              : -blend->normalizedcoords[i] );
++      }
+ 
+       else if ( blend->normalizedcoords[i] <= im_start_coords[i] ||
+                 blend->normalizedcoords[i] >= im_end_coords[i]   )
+       {
++        FT_TRACE6(( "      intermediate tuple range [%.4f;%.4f] is exceeded,"
++                    " stop\n",
++                    im_start_coords[i] / 65536.0,
++                    im_end_coords[i] / 65536.0 ));
+         apply = 0;
+         break;
+       }
+ 
+       else if ( blend->normalizedcoords[i] < tuple_coords[i] )
++      {
++        FT_TRACE6(( "      intermediate tuple range [%.4f;%.4f] fits\n",
++                    im_start_coords[i] / 65536.0,
++                    im_end_coords[i] / 65536.0 ));
+         apply = FT_MulDiv( apply,
+                            blend->normalizedcoords[i] - im_start_coords[i],
+                            tuple_coords[i] - im_start_coords[i] );
++      }
+ 
+       else
++      {
++        FT_TRACE6(( "      intermediate tuple range [%.4f;%.4f] fits\n",
++                    im_start_coords[i] / 65536.0,
++                    im_end_coords[i] / 65536.0 ));
+         apply = FT_MulDiv( apply,
+                            im_end_coords[i] - blend->normalizedcoords[i],
+                            im_end_coords[i] - tuple_coords[i] );
++      }
+     }
+ 
++    FT_TRACE6(( "    apply factor is %.4f\n", apply / 65536.0 ));
++
+     return apply;
+   }
+ 
+@@ -674,14 +759,23 @@
+ 
+     if ( face->blend == NULL )
+     {
++      FT_TRACE2(( "FVAR " ));
++
+       /* both `fvar' and `gvar' must be present */
+       if ( ( error = face->goto_table( face, TTAG_gvar,
+                                        stream, &table_len ) ) != 0 )
++      {
++        FT_TRACE1(( "\n"
++                    "TT_Get_MM_Var: `gvar' table is missing\n" ));
+         goto Exit;
++      }
+ 
+       if ( ( error = face->goto_table( face, TTAG_fvar,
+                                        stream, &table_len ) ) != 0 )
++      {
++        FT_TRACE1(( "is missing\n" ));
+         goto Exit;
++      }
+ 
+       fvar_start = FT_STREAM_POS( );
+ 
+@@ -704,10 +798,16 @@
+            fvar_head.offsetToData + fvar_head.axisCount * 20U +
+              fvar_head.instanceCount * fvar_head.instanceSize > table_len )
+       {
++        FT_TRACE1(( "\n"
++                    "TT_Get_MM_Var: invalid `fvar' header\n" ));
+         error = FT_THROW( Invalid_Table );
+         goto Exit;
+       }
+ 
++      FT_TRACE2(( "loaded\n" ));
++
++      FT_TRACE5(( "number of GX style axes: %d\n", fvar_head.axisCount ));
++
+       if ( FT_NEW( face->blend ) )
+         goto Exit;
+ 
+@@ -779,9 +879,17 @@
+         a->name[3] = (FT_String)( ( a->tag       ) & 0xFF );
+         a->name[4] = '\0';
+ 
++        FT_TRACE5(( "  \"%s\": minimum=%.4f, default=%.4f, maximum=%.4f\n",
++                    a->name,
++                    a->minimum / 65536.0,
++                    a->def / 65536.0,
++                    a->maximum / 65536.0 ));
++
+         a++;
+       }
+ 
++      FT_TRACE5(( "\n" ));
++
+       ns = mmvar->namedstyle;
+       for ( i = 0; i < fvar_head.instanceCount; i++, ns++ )
+       {
+@@ -907,14 +1015,28 @@
+     mmvar = blend->mmvar;
+ 
+     if ( num_coords > mmvar->num_axis )
++    {
++      FT_TRACE2(( "TT_Set_MM_Blend: only using first %d of %d coordinates\n",
++                  mmvar->num_axis, num_coords ));
+       num_coords = mmvar->num_axis;
++    }
++
++    FT_TRACE5(( "normalized design coordinates:\n" ));
+ 
+     for ( i = 0; i < num_coords; i++ )
++    {
++      FT_TRACE5(( "  %.4f\n", coords[i] / 65536.0 ));
+       if ( coords[i] < -0x00010000L || coords[i] > 0x00010000L )
+       {
++        FT_TRACE1(( "TT_Set_MM_Blend: normalized design coordinate %.4f\n"
++                    "                 is out of range [-1;1]\n",
++                    coords[i] / 65536.0 ));
+         error = FT_THROW( Invalid_Argument );
+         goto Exit;
+       }
++    }
++
++    FT_TRACE5(( "\n" ));
+ 
+     if ( blend->glyphoffsets == NULL )
+       if ( ( error = ft_var_load_gvar( face ) ) != 0 )
+@@ -1046,7 +1168,12 @@
+     mmvar = blend->mmvar;
+ 
+     if ( num_coords > mmvar->num_axis )
++    {
++      FT_TRACE2(( "TT_Set_Var_Design:"
++                  " only using first %d of %d coordinates\n",
++                  mmvar->num_axis, num_coords ));
+       num_coords = mmvar->num_axis;
++    }
+ 
+     /* Axis normalization is a two stage process.  First we normalize */
+     /* based on the [min,def,max] values for the axis to be [-1,0,1]. */
+@@ -1055,11 +1182,19 @@
+     if ( FT_NEW_ARRAY( normalized, mmvar->num_axis ) )
+       goto Exit;
+ 
++    FT_TRACE5(( "design coordinates:\n" ));
++
+     a = mmvar->axis;
+     for ( i = 0; i < num_coords; i++, a++ )
+     {
++      FT_TRACE5(( "  %.4f\n", coords[i] / 65536.0 ));
+       if ( coords[i] > a->maximum || coords[i] < a->minimum )
+       {
++        FT_TRACE1(( "TT_Set_Var_Design: normalized design coordinate %.4f\n"
++                    "                   is out of range [%.4f;%.4f]\n",
++                    coords[i] / 65536.0,
++                    a->minimum / 65536.0,
++                    a->maximum / 65536.0 ));
+         error = FT_THROW( Invalid_Argument );
+         goto Exit;
+       }
+@@ -1074,6 +1209,8 @@
+                                    a->maximum - a->def );
+     }
+ 
++    FT_TRACE5(( "\n" ));
++
+     for ( ; i < mmvar->num_axis; i++ )
+       normalized[i] = 0;
+ 
+@@ -1082,10 +1219,15 @@
+ 
+     if ( blend->avar_segment != NULL )
+     {
++      FT_TRACE5(( "normalized design coordinates"
++                  " before applying `avar' data:\n" ));
++
+       av = blend->avar_segment;
+       for ( i = 0; i < mmvar->num_axis; i++, av++ )
+       {
+         for ( j = 1; j < (FT_UInt)av->pairCount; j++ )
++        {
++          FT_TRACE5(( "  %.4f\n", normalized[i] / 65536.0 ));
+           if ( normalized[i] < av->correspondence[j].fromCoord )
+           {
+             normalized[i] =
+@@ -1097,6 +1239,7 @@
+               av->correspondence[j - 1].toCoord;
+             break;
+           }
++        }
+       }
+     }
+ 
+@@ -1163,16 +1306,16 @@
+ 
+     if ( blend == NULL )
+     {
+-      FT_TRACE2(( "tt_face_vary_cvt: no blend specified\n" ));
+-
++      FT_TRACE2(( "\n"
++                  "tt_face_vary_cvt: no blend specified\n" ));
+       error = FT_Err_Ok;
+       goto Exit;
+     }
+ 
+     if ( face->cvt == NULL )
+     {
+-      FT_TRACE2(( "tt_face_vary_cvt: no `cvt ' table\n" ));
+-
++      FT_TRACE2(( "\n"
++                  "tt_face_vary_cvt: no `cvt ' table\n" ));
+       error = FT_Err_Ok;
+       goto Exit;
+     }
+@@ -1201,6 +1344,8 @@
+       goto FExit;
+     }
+ 
++    FT_TRACE2(( "loaded\n" ));
++
+     if ( FT_NEW_ARRAY( tuple_coords, blend->num_axis )    ||
+          FT_NEW_ARRAY( im_start_coords, blend->num_axis ) ||
+          FT_NEW_ARRAY( im_end_coords, blend->num_axis )   )
+@@ -1213,6 +1358,8 @@
+     /* tuplecount, but John Jenkins says that shared points don't apply */
+     /* to `cvar', and no other flags are defined.                       */
+ 
++    FT_TRACE5(( "cvar: there are %d tuples:\n", tupleCount ));
++
+     for ( i = 0; i < ( tupleCount & 0xFFF ); i++ )
+     {
+       FT_UInt   tupleDataSize;
+@@ -1220,6 +1367,8 @@
+       FT_Fixed  apply;
+ 
+ 
++      FT_TRACE6(( "  tuple %d:\n", i ));
++
+       tupleDataSize = FT_GET_USHORT();
+       tupleIndex    = FT_GET_USHORT();
+ 
+@@ -1280,22 +1429,70 @@
+ 
+       else if ( localpoints == ALL_POINTS )
+       {
++#ifdef FT_DEBUG_LEVEL_TRACE
++        int  count = 0;
++#endif
++
++
++        FT_TRACE7(( "    CVT deltas:\n" ));
++
+         /* this means that there are deltas for every entry in cvt */
+         for ( j = 0; j < face->cvt_size; j++ )
+-          face->cvt[j] = (FT_Short)( face->cvt[j] +
++        {
++          FT_Long  orig_cvt = face->cvt[j];
++
++
++          face->cvt[j] = (FT_Short)( orig_cvt +
+                                      FT_MulFix( deltas[j], apply ) );
++
++#ifdef FT_DEBUG_LEVEL_TRACE
++          if ( orig_cvt != face->cvt[j] )
++          {
++            FT_TRACE7(( "      %d: %d -> %d\n",
++                        j, orig_cvt, face->cvt[j] ));
++            count++;
++          }
++#endif
++        }
++
++#ifdef FT_DEBUG_LEVEL_TRACE
++        if ( !count )
++          FT_TRACE7(( "      none\n" ));
++#endif
+       }
+ 
+       else
+       {
++#ifdef FT_DEBUG_LEVEL_TRACE
++        int  count = 0;
++#endif
++
++
++        FT_TRACE7(( "    CVT deltas:\n" ));
++
+         for ( j = 0; j < point_count; j++ )
+         {
+-          int  pindex = localpoints[j];
++          int      pindex   = localpoints[j];
++          FT_Long  orig_cvt = face->cvt[pindex];
+ 
+ 
+-          face->cvt[pindex] = (FT_Short)( face->cvt[pindex] +
++          face->cvt[pindex] = (FT_Short)( orig_cvt +
+                                           FT_MulFix( deltas[j], apply ) );
++
++#ifdef FT_DEBUG_LEVEL_TRACE
++          if ( orig_cvt != face->cvt[pindex] )
++          {
++            FT_TRACE7(( "      %d: %d -> %d\n",
++                        pindex, orig_cvt, face->cvt[pindex] ));
++            count++;
++          }
++#endif
+         }
++
++#ifdef FT_DEBUG_LEVEL_TRACE
++        if ( !count )
++          FT_TRACE7(( "      none\n" ));
++#endif
+       }
+ 
+       if ( localpoints != ALL_POINTS )
+@@ -1307,6 +1504,8 @@
+       FT_Stream_SeekSet( stream, here );
+     }
+ 
++    FT_TRACE5(( "\n" ));
++
+   FExit:
+     FT_FRAME_EXIT();
+ 
+-- 
+2.4.2
+
+From 9845c1d4e96215483fd3409222690335f6052e55 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Sun, 31 May 2015 11:57:31 +0200
+Subject: [PATCH] [truetype] In GX, make intermediate tuplets work at extrema.
+
+* src/truetype/ttgxvar.c (ft_var_apply_tuple): Fix range condition.
+---
+ ChangeLog              | 6 ++++++
+ src/truetype/ttgxvar.c | 4 ++--
+ 2 files changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index bb0bfbd..123a9f9 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,5 +1,11 @@
+ 2015-05-31  Werner Lemberg  <wl@gnu.org>
+ 
++	[truetype] In GX, make intermediate tuplets work at extrema.
++
++	* src/truetype/ttgxvar.c (ft_var_apply_tuple): Fix range condition.
++
++2015-05-31  Werner Lemberg  <wl@gnu.org>
++
+ 	[truetype] Add tracing information to GX code.
+ 
+ 	* src/truetype/ttgxvar.c (ft_var_load_avar, ft_var_load_gvar,
+diff --git a/src/truetype/ttgxvar.c b/src/truetype/ttgxvar.c
+index aaee547..691307c 100644
+--- a/src/truetype/ttgxvar.c
++++ b/src/truetype/ttgxvar.c
+@@ -612,8 +612,8 @@
+                              : -blend->normalizedcoords[i] );
+       }
+ 
+-      else if ( blend->normalizedcoords[i] <= im_start_coords[i] ||
+-                blend->normalizedcoords[i] >= im_end_coords[i]   )
++      else if ( blend->normalizedcoords[i] < im_start_coords[i] ||
++                blend->normalizedcoords[i] > im_end_coords[i]   )
+       {
+         FT_TRACE6(( "      intermediate tuple range [%.4f;%.4f] is exceeded,"
+                     " stop\n",
+-- 
+2.4.2
+
+From e9df4e47e3d80e18680d38a0f54746da517ab96b Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Sun, 31 May 2015 12:21:34 +0200
+Subject: [PATCH] [truetype] In GX, make private point numbers work correctly.
+
+This is completely missing in Apple's documentation: If a `gvar'
+tuple uses private point numbers (this is, deltas are specified for
+some points only), the uncovered points must be interpolated for
+this tuple similar to the IUP bytecode instruction.  Examples that
+need this functionality are glyphs `Oslash' and `Q' in Skia.ttf.
+
+* src/truetype/ttgxvar.c (tt_delta_shift, tt_delta_interpolate,
+tt_handle_deltas): New functions.
+(TT_Vary_Get_Glyph_Deltas): Renamed to...
+(TT_Vary_Apply_Glyph_Deltas): ... this; it directly processes the
+points and does no longer return an array of deltas.
+Add tracing information.
+Call `tt_handle_deltas' to interpolate missing deltas.
+Also fix a minor memory leak in case of error.
+
+* src/truetype/ttgxvar.h: Updated.
+
+* src/truetype/ttgload.c (TT_Process_Simple_Glyph,
+load_truetype_glyph): Updated.
+---
+ ChangeLog              |  24 ++++
+ src/truetype/ttgload.c | 187 +++++++++++++++++---------
+ src/truetype/ttgxvar.c | 358 +++++++++++++++++++++++++++++++++++++++++++++----
+ src/truetype/ttgxvar.h |   8 +-
+ 4 files changed, 482 insertions(+), 95 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 123a9f9..d5ea7a0 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,5 +1,29 @@
+ 2015-05-31  Werner Lemberg  <wl@gnu.org>
+ 
++	[truetype] In GX, make private point numbers work correctly.
++
++	This is completely missing in Apple's documentation: If a `gvar'
++	tuple uses private point numbers (this is, deltas are specified for
++	some points only), the uncovered points must be interpolated for
++	this tuple similar to the IUP bytecode instruction.  Examples that
++	need this functionality are glyphs `Oslash' and `Q' in Skia.ttf.
++
++	* src/truetype/ttgxvar.c (tt_delta_shift, tt_delta_interpolate,
++	tt_handle_deltas): New functions.
++	(TT_Vary_Get_Glyph_Deltas): Renamed to...
++	(TT_Vary_Apply_Glyph_Deltas): ... this; it directly processes the
++	points and does no longer return an array of deltas.
++	Add tracing information.
++	Call `tt_handle_deltas' to interpolate missing deltas.
++	Also fix a minor memory leak in case of error.
++
++	* src/truetype/ttgxvar.h: Updated.
++
++	* src/truetype/ttgload.c (TT_Process_Simple_Glyph,
++	load_truetype_glyph): Updated.
++
++2015-05-31  Werner Lemberg  <wl@gnu.org>
++
+ 	[truetype] In GX, make intermediate tuplets work at extrema.
+ 
+ 	* src/truetype/ttgxvar.c (ft_var_apply_tuple): Fix range condition.
+diff --git a/src/truetype/ttgload.c b/src/truetype/ttgload.c
+index d1edd7e..e1acd69 100644
+--- a/src/truetype/ttgload.c
++++ b/src/truetype/ttgload.c
+@@ -900,25 +900,12 @@
+     if ( ((TT_Face)loader->face)->doblend )
+     {
+       /* Deltas apply to the unscaled data. */
+-      FT_Vector*  deltas;
+-      FT_Memory   memory = loader->face->memory;
+-      FT_Int      i;
+-
+-
+-      error = TT_Vary_Get_Glyph_Deltas( (TT_Face)(loader->face),
+-                                        loader->glyph_index,
+-                                        &deltas,
+-                                        (FT_UInt)n_points );
++      error = TT_Vary_Apply_Glyph_Deltas( (TT_Face)(loader->face),
++                                           loader->glyph_index,
++                                           outline,
++                                           (FT_UInt)n_points );
+       if ( error )
+         return error;
+-
+-      for ( i = 0; i < n_points; ++i )
+-      {
+-        outline->points[i].x += deltas[i].x;
+-        outline->points[i].y += deltas[i].y;
+-      }
+-
+-      FT_FREE( deltas );
+     }
+ 
+ #endif /* TT_CONFIG_OPTION_GX_VAR_SUPPORT */
+@@ -1429,10 +1416,6 @@
+     FT_GlyphLoader  gloader      = loader->gloader;
+     FT_Bool         opened_frame = 0;
+ 
+-#ifdef TT_CONFIG_OPTION_GX_VAR_SUPPORT
+-    FT_Vector*      deltas       = NULL;
+-#endif
+-
+ #ifdef FT_CONFIG_OPTION_INCREMENTAL
+     FT_StreamRec    inc_stream;
+     FT_Data         glyph_data;
+@@ -1571,26 +1554,47 @@
+ 
+       if ( ((TT_Face)(loader->face))->doblend )
+       {
+-        /* this must be done before scaling */
+-        FT_Memory  memory = loader->face->memory;
+-
++        /* a small outline structure with four elements for */
++        /* communication with `TT_Vary_Apply_Glyph_Deltas'  */
++        FT_Vector   points[4];
++        char        tags[4]     = { 1, 1, 1, 1 };
++        short       contours[4] = { 0, 1, 2, 3 };
++        FT_Outline  outline;
++
++
++        points[0].x = loader->pp1.x;
++        points[0].y = loader->pp1.y;
++        points[1].x = loader->pp2.x;
++        points[1].y = loader->pp2.y;
++
++        points[2].x = loader->pp3.x;
++        points[2].y = loader->pp3.y;
++        points[3].x = loader->pp4.x;
++        points[3].y = loader->pp4.y;
++
++        outline.n_points   = 4;
++        outline.n_contours = 4;
++        outline.points     = points;
++        outline.tags       = tags;
++        outline.contours   = contours;
+ 
+-        error = TT_Vary_Get_Glyph_Deltas( (TT_Face)(loader->face),
+-                                          glyph_index, &deltas, 4 );
++        /* this must be done before scaling */
++        error = TT_Vary_Apply_Glyph_Deltas( (TT_Face)(loader->face),
++                                             glyph_index,
++                                             &outline,
++                                             outline.n_points );
+         if ( error )
+           goto Exit;
+ 
+-        loader->pp1.x += deltas[0].x;
+-        loader->pp1.y += deltas[0].y;
+-        loader->pp2.x += deltas[1].x;
+-        loader->pp2.y += deltas[1].y;
+-
+-        loader->pp3.x += deltas[2].x;
+-        loader->pp3.y += deltas[2].y;
+-        loader->pp4.x += deltas[3].x;
+-        loader->pp4.y += deltas[3].y;
++        loader->pp1.x = points[0].x;
++        loader->pp1.y = points[0].y;
++        loader->pp2.x = points[1].x;
++        loader->pp2.y = points[1].y;
+ 
+-        FT_FREE( deltas );
++        loader->pp3.x = points[2].x;
++        loader->pp3.y = points[2].y;
++        loader->pp4.x = points[3].x;
++        loader->pp4.y = points[3].y;
+       }
+ 
+ #endif /* TT_CONFIG_OPTION_GX_VAR_SUPPORT */
+@@ -1677,45 +1681,104 @@
+       {
+         FT_UInt      i, limit;
+         FT_SubGlyph  subglyph;
+-        FT_Memory    memory = face->root.memory;
+ 
++        FT_Outline  outline;
++        FT_Vector*  points   = NULL;
++        char*       tags     = NULL;
++        short*      contours = NULL;
++
++        FT_Memory  memory = face->root.memory;
+ 
+-        /* this provides additional offsets */
+-        /* for each component's translation */
+ 
+-        if ( ( error = TT_Vary_Get_Glyph_Deltas(
++        limit = gloader->current.num_subglyphs;
++
++        /* construct an outline structure for              */
++        /* communication with `TT_Vary_Apply_Glyph_Deltas' */
++        outline.n_points   = gloader->current.num_subglyphs + 4;
++        outline.n_contours = outline.n_points;
++
++        if ( FT_NEW_ARRAY( points, outline.n_points )   ||
++             FT_NEW_ARRAY( tags, outline.n_points )     ||
++             FT_NEW_ARRAY( contours, outline.n_points ) )
++          goto Exit1;
++
++        subglyph = gloader->current.subglyphs + gloader->base.num_subglyphs;
++
++        for ( i = 0; i < limit; i++, subglyph++ )
++        {
++          /* applying deltas for anchor points doesn't make sense, */
++          /* but we don't have to specially check this since       */
++          /* unused delta values are zero anyways                  */
++          points[i].x = subglyph->arg1;
++          points[i].y = subglyph->arg2;
++          tags[i]     = 1;
++          contours[i] = i;
++        }
++
++        points[i].x = loader->pp1.x;
++        points[i].y = loader->pp1.y;
++        tags[i]     = 1;
++        contours[i] = i;
++
++        i++;
++        points[i].x = loader->pp2.x;
++        points[i].y = loader->pp2.y;
++        tags[i]     = 1;
++        contours[i] = i;
++
++        i++;
++        points[i].x = loader->pp3.x;
++        points[i].y = loader->pp3.y;
++        tags[i]     = 1;
++        contours[i] = i;
++
++        i++;
++        points[i].x = loader->pp4.x;
++        points[i].y = loader->pp4.y;
++        tags[i]     = 1;
++        contours[i] = i;
++
++        outline.points   = points;
++        outline.tags     = tags;
++        outline.contours = contours;
++
++        /* this call provides additional offsets */
++        /* for each component's translation      */
++        if ( ( error = TT_Vary_Apply_Glyph_Deltas(
+                          face,
+                          glyph_index,
+-                         &deltas,
+-                         gloader->current.num_subglyphs + 4 ) ) != 0 )
+-          goto Exit;
++                         &outline,
++                         outline.n_points ) ) != 0 )
++          goto Exit1;
+ 
+         subglyph = gloader->current.subglyphs + gloader->base.num_subglyphs;
+-        limit    = gloader->current.num_subglyphs;
+ 
+-        for ( i = 0; i < limit; ++i, ++subglyph )
++        for ( i = 0; i < limit; i++, subglyph++ )
+         {
+-          if ( subglyph->flags & ARGS_ARE_XY_VALUES )
+-          {
+-            /* XXX: overflow check for subglyph->{arg1,arg2}.   */
+-            /* deltas[i].{x,y} must be within signed 16-bit,    */
+-            /* but the restriction of summed delta is not clear */
+-            subglyph->arg1 += (FT_Int16)deltas[i].x;
+-            subglyph->arg2 += (FT_Int16)deltas[i].y;
+-          }
++          /* XXX: overflow check for subglyph->{arg1,arg2}.         */
++          /*      Deltas must be within signed 16-bit,              */
++          /*      but the restriction of summed deltas is not clear */
++          subglyph->arg1 = (FT_Int16)points[i].x;
++          subglyph->arg2 = (FT_Int16)points[i].y;
+         }
+ 
+-        loader->pp1.x += deltas[i + 0].x;
+-        loader->pp1.y += deltas[i + 0].y;
+-        loader->pp2.x += deltas[i + 1].x;
+-        loader->pp2.y += deltas[i + 1].y;
++        loader->pp1.x = points[i + 0].x;
++        loader->pp1.y = points[i + 0].y;
++        loader->pp2.x = points[i + 1].x;
++        loader->pp2.y = points[i + 1].y;
+ 
+-        loader->pp3.x += deltas[i + 2].x;
+-        loader->pp3.y += deltas[i + 2].y;
+-        loader->pp4.x += deltas[i + 3].x;
+-        loader->pp4.y += deltas[i + 3].y;
++        loader->pp3.x = points[i + 2].x;
++        loader->pp3.y = points[i + 2].y;
++        loader->pp4.x = points[i + 3].x;
++        loader->pp4.y = points[i + 3].y;
+ 
+-        FT_FREE( deltas );
++      Exit1:
++        FT_FREE( outline.points );
++        FT_FREE( outline.tags );
++        FT_FREE( outline.contours );
++
++        if ( error )
++          goto Exit;
+       }
+ 
+ #endif /* TT_CONFIG_OPTION_GX_VAR_SUPPORT */
+diff --git a/src/truetype/ttgxvar.c b/src/truetype/ttgxvar.c
+index 691307c..2b12483 100644
+--- a/src/truetype/ttgxvar.c
++++ b/src/truetype/ttgxvar.c
+@@ -1518,13 +1518,230 @@
+   }
+ 
+ 
++  /* Shift the original coordinates of all points between indices `p1' */
++  /* and `p2', using the same difference as given by index `ref'.      */
++
++  /* modeled after `af_iup_shift' */
++
++  static void
++  tt_delta_shift( int         p1,
++                  int         p2,
++                  int         ref,
++                  FT_Vector*  in_points,
++                  FT_Vector*  out_points )
++  {
++    int        p;
++    FT_Vector  delta;
++
++
++    delta.x = out_points[ref].x - in_points[ref].x;
++    delta.y = out_points[ref].y - in_points[ref].y;
++
++    if ( delta.x == 0 && delta.y == 0 )
++      return;
++
++    for ( p = p1; p < ref; p++ )
++    {
++      out_points[p].x += delta.x;
++      out_points[p].y += delta.y;
++    }
++
++    for ( p = ref + 1; p <= p2; p++ )
++    {
++      out_points[p].x += delta.x;
++      out_points[p].y += delta.y;
++    }
++  }
++
++
++  /* Interpolate the original coordinates of all points with indices */
++  /* between `p1' and `p2', using `ref1' and `ref2' as the reference */
++  /* point indices.                                                  */
++
++  /* modeled after `af_iup_interp', `_iup_worker_interpolate', and */
++  /* `Ins_IUP'                                                     */
++
++  static void
++  tt_delta_interpolate( int         p1,
++                        int         p2,
++                        int         ref1,
++                        int         ref2,
++                        FT_Vector*  in_points,
++                        FT_Vector*  out_points )
++  {
++    int  p, i;
++
++    FT_Pos  out, in1, in2, out1, out2, d1, d2;
++
++
++    if ( p1 > p2 )
++      return;
++
++    /* handle both horizontal and vertical coordinates */
++    for ( i = 0; i <= 1; i++ )
++    {
++      /* shift array pointers so that we can access `foo.y' as `foo.x' */
++      in_points  = (FT_Vector*)( (FT_Pos*)in_points + i );
++      out_points = (FT_Vector*)( (FT_Pos*)out_points + i );
++
++      if ( in_points[ref1].x > in_points[ref2].x )
++      {
++        p    = ref1;
++        ref1 = ref2;
++        ref2 = p;
++      }
++
++      in1  = in_points[ref1].x;
++      in2  = in_points[ref2].x;
++      out1 = out_points[ref1].x;
++      out2 = out_points[ref2].x;
++      d1   = out1 - in1;
++      d2   = out2 - in2;
++
++      if ( out1 == out2 || in1 == in2 )
++      {
++        for ( p = p1; p <= p2; p++ )
++        {
++          out = in_points[p].x;
++
++          if ( out <= in1 )
++            out += d1;
++          else if ( out >= in2 )
++            out += d2;
++          else
++            out = out1;
++
++          out_points[p].x = out;
++        }
++      }
++      else
++      {
++        FT_Fixed  scale = FT_DivFix( out2 - out1, in2 - in1 );
++
++
++        for ( p = p1; p <= p2; p++ )
++        {
++          out = in_points[p].x;
++
++          if ( out <= in1 )
++            out += d1;
++          else if ( out >= in2 )
++            out += d2;
++          else
++            out = out1 + FT_MulFix( out - in1, scale );
++
++          out_points[p].x = out;
++        }
++      }
++    }
++  }
++
++
++  /* Interpolate points without delta values, similar to */
++  /* the `IUP' hinting instruction.                      */
++
++  /* modeled after `Ins_IUP */
++
++  static void
++  tt_handle_deltas( FT_Outline*  outline,
++                    FT_Vector*   in_points,
++                    FT_Bool*     has_delta )
++  {
++    FT_Vector*  out_points;
++
++    FT_UInt  first_point;
++    FT_UInt  end_point;
++
++    FT_UInt  first_delta;
++    FT_UInt  cur_delta;
++
++    FT_UInt   point;
++    FT_Short  contour;
++
++
++    /* ignore empty outlines */
++    if ( !outline->n_contours )
++      return;
++
++    out_points = outline->points;
++
++    contour = 0;
++    point   = 0;
++
++    do
++    {
++      end_point   = outline->contours[contour];
++      first_point = point;
++
++      /* search first point that has a delta */
++      while ( point <= end_point && !has_delta[point] )
++        point++;
++
++      if ( point <= end_point )
++      {
++        first_delta = point;
++        cur_delta   = point;
++
++        point++;
++
++        while ( point <= end_point )
++        {
++          /* search next point that has a delta  */
++          /* and interpolate intermediate points */
++          if ( has_delta[point] )
++          {
++            tt_delta_interpolate( cur_delta + 1,
++                                  point - 1,
++                                  cur_delta,
++                                  point,
++                                  in_points,
++                                  out_points );
++            cur_delta = point;
++          }
++
++          point++;
++        }
++
++        /* shift contour if we only have a single delta */
++        if ( cur_delta == first_delta )
++          tt_delta_shift( first_point,
++                          end_point,
++                          cur_delta,
++                          in_points,
++                          out_points );
++        else
++        {
++          /* otherwise handle remaining points       */
++          /* at the end and beginning of the contour */
++          tt_delta_interpolate( cur_delta + 1,
++                                end_point,
++                                cur_delta,
++                                first_delta,
++                                in_points,
++                                out_points );
++
++          if ( first_delta > 0 )
++            tt_delta_interpolate( first_point,
++                                  first_delta - 1,
++                                  cur_delta,
++                                  first_delta,
++                                  in_points,
++                                  out_points );
++        }
++      }
++      contour++;
++
++    } while ( contour < outline->n_contours );
++  }
++
++
+   /*************************************************************************/
+   /*                                                                       */
+   /* <Function>                                                            */
+-  /*    TT_Vary_Get_Glyph_Deltas                                           */
++  /*    TT_Vary_Apply_Glyph_Deltas                                         */
+   /*                                                                       */
+   /* <Description>                                                         */
+-  /*    Load the appropriate deltas for the current glyph.                 */
++  /*    Apply the appropriate deltas to the current glyph.                 */
+   /*                                                                       */
+   /* <Input>                                                               */
+   /*    face        :: A handle to the target face object.                 */
+@@ -1534,22 +1751,24 @@
+   /*    n_points    :: The number of the points in the glyph, including    */
+   /*                   phantom points.                                     */
+   /*                                                                       */
+-  /* <Output>                                                              */
+-  /*    deltas      :: The array of points to change.                      */
++  /* <InOut>                                                               */
++  /*    outline     :: The outline to change.                              */
+   /*                                                                       */
+   /* <Return>                                                              */
+   /*    FreeType error code.  0 means success.                             */
+   /*                                                                       */
+   FT_LOCAL_DEF( FT_Error )
+-  TT_Vary_Get_Glyph_Deltas( TT_Face      face,
+-                            FT_UInt      glyph_index,
+-                            FT_Vector*  *deltas,
+-                            FT_UInt      n_points )
++  TT_Vary_Apply_Glyph_Deltas( TT_Face      face,
++                              FT_UInt      glyph_index,
++                              FT_Outline*  outline,
++                              FT_UInt      n_points )
+   {
+     FT_Stream   stream = face->root.stream;
+     FT_Memory   memory = stream->memory;
+     GX_Blend    blend  = face->blend;
+-    FT_Vector*  delta_xy = NULL;
++
++    FT_Vector*  points_org = NULL;
++    FT_Bool*    has_delta  = NULL;
+ 
+     FT_Error    error;
+     FT_ULong    glyph_start;
+@@ -1570,15 +1789,18 @@
+     if ( !face->doblend || blend == NULL )
+       return FT_THROW( Invalid_Argument );
+ 
+-    /* to be freed by the caller */
+-    if ( FT_NEW_ARRAY( delta_xy, n_points ) )
+-      goto Exit;
+-    *deltas = delta_xy;
+-
+     if ( glyph_index >= blend->gv_glyphcnt      ||
+          blend->glyphoffsets[glyph_index] ==
+            blend->glyphoffsets[glyph_index + 1] )
+-      return FT_Err_Ok;               /* no variation data for this glyph */
++    {
++      FT_TRACE2(( "TT_Vary_Apply_Glyph_Deltas:"
++                  " no variation data for this glyph\n" ));
++      return FT_Err_Ok;
++    }
++
++    if ( FT_NEW_ARRAY( points_org, n_points ) ||
++         FT_NEW_ARRAY( has_delta, n_points )  )
++      goto Fail1;
+ 
+     if ( FT_STREAM_SEEK( blend->glyphoffsets[glyph_index] )   ||
+          FT_FRAME_ENTER( blend->glyphoffsets[glyph_index + 1] -
+@@ -1610,6 +1832,8 @@
+       FT_Stream_SeekSet( stream, here );
+     }
+ 
++    FT_TRACE5(( "gvar: there are %d tuples:\n", tupleCount ));
++
+     for ( i = 0; i < ( tupleCount & GX_TC_TUPLE_COUNT_MASK ); i++ )
+     {
+       FT_UInt   tupleDataSize;
+@@ -1617,6 +1841,8 @@
+       FT_Fixed  apply;
+ 
+ 
++      FT_TRACE6(( "  tuple %d:\n", i ));
++
+       tupleDataSize = FT_GET_USHORT();
+       tupleIndex    = FT_GET_USHORT();
+ 
+@@ -1629,7 +1855,7 @@
+       else if ( ( tupleIndex & GX_TI_TUPLE_INDEX_MASK ) >= blend->tuplecount )
+       {
+         error = FT_THROW( Invalid_Table );
+-        goto Fail3;
++        goto Fail2;
+       }
+       else
+         FT_MEM_COPY(
+@@ -1684,24 +1910,101 @@
+ 
+       else if ( points == ALL_POINTS )
+       {
++#ifdef FT_DEBUG_LEVEL_TRACE
++        int  count = 0;
++#endif
++
++
++        FT_TRACE7(( "    point deltas:\n" ));
++
+         /* this means that there are deltas for every point in the glyph */
+         for ( j = 0; j < n_points; j++ )
+         {
+-          delta_xy[j].x += FT_MulFix( deltas_x[j], apply );
+-          delta_xy[j].y += FT_MulFix( deltas_y[j], apply );
++#ifdef FT_DEBUG_LEVEL_TRACE
++          FT_Vector  point_org = outline->points[j];
++#endif
++
++
++          outline->points[j].x += FT_MulFix( deltas_x[j], apply );
++          outline->points[j].y += FT_MulFix( deltas_y[j], apply );
++
++#ifdef FT_DEBUG_LEVEL_TRACE
++          if ( ( point_org.x != outline->points[j].x ) ||
++               ( point_org.y != outline->points[j].y ) )
++          {
++            FT_TRACE7(( "      %d: (%d, %d) -> (%d, %d)\n",
++                        j,
++                        point_org.x,
++                        point_org.y,
++                        outline->points[j].x,
++                        outline->points[j].y ));
++            count++;
++          }
++#endif
+         }
++
++#ifdef FT_DEBUG_LEVEL_TRACE
++        if ( !count )
++          FT_TRACE7(( "      none\n" ));
++#endif
+       }
+ 
+       else
+       {
++#ifdef FT_DEBUG_LEVEL_TRACE
++        int  count = 0;
++#endif
++
++
++        /* we have to interpolate the missing deltas similar to the */
++        /* IUP bytecode instruction                                 */
++        for ( j = 0; j < n_points; j++ )
++        {
++          points_org[j] = outline->points[j];
++          has_delta[j]  = FALSE;
++        }
++
+         for ( j = 0; j < point_count; j++ )
+         {
+-          if ( localpoints[j] >= n_points )
++          FT_UShort  idx = localpoints[j];
++
++
++          if ( idx >= n_points )
+             continue;
+ 
+-          delta_xy[localpoints[j]].x += FT_MulFix( deltas_x[j], apply );
+-          delta_xy[localpoints[j]].y += FT_MulFix( deltas_y[j], apply );
++          has_delta[idx] = TRUE;
++
++          outline->points[idx].x += FT_MulFix( deltas_x[j], apply );
++          outline->points[idx].y += FT_MulFix( deltas_y[j], apply );
+         }
++
++        /* no need to handle phantom points here,      */
++        /* since solitary points can't be interpolated */
++        tt_handle_deltas( outline,
++                          points_org,
++                          has_delta );
++
++#ifdef FT_DEBUG_LEVEL_TRACE
++        FT_TRACE7(( "    point deltas:\n" ));
++
++        for ( j = 0; j < n_points; j++)
++        {
++          if ( ( points_org[j].x != outline->points[j].x ) ||
++               ( points_org[j].y != outline->points[j].y ) )
++          {
++            FT_TRACE7(( "      %d: (%d, %d) -> (%d, %d)\n",
++                        j,
++                        points_org[j].x,
++                        points_org[j].y,
++                        outline->points[j].x,
++                        outline->points[j].y ));
++            count++;
++          }
++        }
++
++        if ( !count )
++          FT_TRACE7(( "      none\n" ));
++#endif
+       }
+ 
+       if ( localpoints != ALL_POINTS )
+@@ -1714,22 +2017,19 @@
+       FT_Stream_SeekSet( stream, here );
+     }
+ 
+-  Fail3:
++    FT_TRACE5(( "\n" ));
++
++  Fail2:
+     FT_FREE( tuple_coords );
+     FT_FREE( im_start_coords );
+     FT_FREE( im_end_coords );
+ 
+-  Fail2:
+     FT_FRAME_EXIT();
+ 
+   Fail1:
+-    if ( error )
+-    {
+-      FT_FREE( delta_xy );
+-      *deltas = NULL;
+-    }
++    FT_FREE( points_org );
++    FT_FREE( has_delta );
+ 
+-  Exit:
+     return error;
+   }
+ 
+diff --git a/src/truetype/ttgxvar.h b/src/truetype/ttgxvar.h
+index 9b69f7b..060d4d6 100644
+--- a/src/truetype/ttgxvar.h
++++ b/src/truetype/ttgxvar.h
+@@ -162,10 +162,10 @@ FT_BEGIN_HEADER
+ 
+ 
+   FT_LOCAL( FT_Error )
+-  TT_Vary_Get_Glyph_Deltas( TT_Face      face,
+-                            FT_UInt      glyph_index,
+-                            FT_Vector*  *deltas,
+-                            FT_UInt      n_points );
++  TT_Vary_Apply_Glyph_Deltas( TT_Face      face,
++                              FT_UInt      glyph_index,
++                              FT_Outline*  outline,
++                              FT_UInt      n_points );
+ 
+ 
+   FT_LOCAL( void )
+-- 
+2.4.2
+
+From 764ddcc16423455b72ec178d9a358d167b0d9601 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Sun, 31 May 2015 12:32:11 +0200
+Subject: [PATCH] Update `CHANGES' file.
+
+---
+ docs/CHANGES | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
+
+diff --git a/docs/CHANGES b/docs/CHANGES
+index e706e1f..e7fc67a 100644
+--- a/docs/CHANGES
++++ b/docs/CHANGES
+@@ -1,7 +1,7 @@
+ 
+ CHANGES BETWEEN 2.5.5 and 2.6
+ 
+-  II. IMPORTANT CHANGES
++  I. IMPORTANT CHANGES
+ 
+     - Behdad  Esfahbod contributed  code  for improved  thread-safety,
+       which results in the following model.
+@@ -38,13 +38,15 @@ CHANGES BETWEEN 2.5.5 and 2.6
+     - Fonts natively hinted for  ClearType are now supported, properly
+       handling selector index 3 of the INSTCTRL bytecode instruction.
+ 
++    - Major improvements to the GX TrueType variation font handling.
+ 
+-  III. MISCELLANEOUS
++
++  II. MISCELLANEOUS
+ 
+     - A new auto-hinter  property `warping' can switch on  and off the
+       warping code  if this  experimental feature  is compiled  in (by
+-      defining the  AF_CONFIG_OPTION_USE_WARPER  configuration option;
+-      by default  this option is  now enabled but  warping is switched
++      defining  the AF_CONFIG_OPTION_USE_WARPER  configuration option;
++      by default  this option is  now enabled but warping  is switched
+       off).
+ 
+       The AF_CONFIG_OPTION_USE_WARPER option itself is an old feature,
+@@ -80,11 +82,9 @@ CHANGES BETWEEN 2.5.5 and 2.6
+       renamed to  `FT_FONT_FORMATS_H' (the old name  `FT_XFREE86_H' is
+       retained for backwards compatibility).
+ 
+-    - Some improvements to the GX variation font handling.
+-
+     - Various improvements to the `ftgrid' demo program.
+ 
+-      . It  can now  display  GX  and  MM  fonts  while  interactively
++      . It  can  now  display  GX and  MM  fonts  while  interactively
+         manipulating the axes (with keys F2, F3, and F4).
+ 
+       . Anti-aliasing rendering  modes can now be  selected (with keys
+@@ -97,7 +97,8 @@ CHANGES BETWEEN 2.5.5 and 2.6
+       . New  command line option  `-u' makes  it output data  in utf-8
+         encoding.
+ 
+-    - The `ftmulti' demo program can now handle four MM or GX axes.
++    - The `ftmulti'  demo program can  now handle up  to six MM  or GX
++      axes.
+ 
+ 
+ ======================================================================
+-- 
+2.4.2
+
