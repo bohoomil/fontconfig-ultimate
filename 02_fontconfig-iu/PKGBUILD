@@ -7,7 +7,7 @@ pkgdesc="A library for configuring and customizing font access, optimized for fr
 url=('http://www.fontconfig.org/release/')
 license=('custom' 'MIT')
 pkgver=2.11.1
-pkgrel=26
+pkgrel=28
 _master_name=fontconfig-ultimate-master
 arch=('i686' 'x86_64')
 changelog=CHANGELOG
@@ -31,7 +31,7 @@ install=fontconfig-ultimate.install
 source=(http://www.fontconfig.org/release/${_basename}-${pkgver}.tar.bz2
         master.tar.gz::https://github.com/bohoomil/fontconfig-ultimate/archive/master.tar.gz)
 sha1sums=('08565feea5a4e6375f9d8a7435dac04e52620ff2'
-          'c467c14548e38722b8633b84d50211073008f8c0')
+          '973b8d3d0562e325f5c0585300529d4f2f9b0ba8')
 
 # a nice page to test font matching:
 # http://zipcon.net/~swhite/docs/computers/browsers/fonttest.html

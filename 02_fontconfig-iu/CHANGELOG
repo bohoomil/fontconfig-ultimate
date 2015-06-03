@@ -6,6 +6,20 @@ CHANGELOG
 ---------
 
 
+2015-06-01
+~~~~~~~~~~
+
+### fontconfig-infinality-ultimate, rev. 2.11.1-28
+
+* Arial: minor fixes.
+
+2015-04-28
+~~~~~~~~~~
+
+### fontconfig-infinality-ultimate, rev. 2.11.1-27
+
+* Fixed #86 (83-yes-bitmaps.conf wrong switch).
+
 2015-03-19
 ~~~~~~~~~~
 
