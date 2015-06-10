@@ -3,9 +3,9 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=freetype2-infinality-ultimate
-pkgver=2.5.5
-pkgrel=7
-_patchrel=2015.05.31
+pkgver=2.6
+pkgrel=1
+_patchrel=2015.06.08
 pkgdesc="TrueType font rendering library with Infinality patches and custom settings."
 arch=('i686' 'x86_64')
 changelog=CHANGELOG
@@ -17,22 +17,21 @@ conflicts=('freetype2' 'freetype2-infinality')
 provides=("freetype2=$pkgver" 'freetype2-infinality' 'freetype2-infinality-ultimate')
 backup=('etc/X11/xinit/xinitrc.d/infinality-settings.sh')
 install='infinality.install'
+#"02-upstream-${_patchrel}.patch"
 source=(http://downloads.sourceforge.net/sourceforge/freetype/freetype-${pkgver}.tar.bz2
         infinality-settings.sh
         "01-freetype-${pkgver}-enable-valid.patch"
-        "02-upstream-${_patchrel}.patch"
         "03-infinality-${pkgver}-${_patchrel}.patch")
-sha1sums=('7b7460ef51a8fdb17baae53c6658fc1ad000a1c2'
+sha1sums=('cd2b144205dd2c61693e2d861069367aa3dde1bc'
           'd09d96c10020772533a4280cec2425bcd1a81fa2'
           'abf7a8f726ad6359533651a8942636880febf9f6'
-          '26f2bcd9d259d70060c115025202c947d5ff3c23'
-          '359d1fbbf4a207041222cd34a47d44084e9a1056')
+          '83eb596775ab253aae97f1258d614cb561a2e47e')
 
 prepare() {
   cd "freetype-${pkgver}"
 
+           #"02-upstream-${_patchrel}.patch"
   patches=("01-freetype-${pkgver}-enable-valid.patch"
-           "02-upstream-${_patchrel}.patch"
            "03-infinality-${pkgver}-${_patchrel}.patch")
 
   # infinality & post release fixes
