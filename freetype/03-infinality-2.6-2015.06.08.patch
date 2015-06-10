@@ -4811,7 +4811,7 @@ diff --git a/src/truetype/ttinterp.c b/src/truetype/ttinterp.c
 index 31c7bfa..0275043 100644
 --- a/src/truetype/ttinterp.c
 +++ b/src/truetype/ttinterp.c
-@@ -5786,6 +5786,7 @@
+@@ -5811,6 +5811,7 @@
  
        if ( exc->ignore_x_mode                                 &&
             exc->GS.freeVector.x != 0                          &&
