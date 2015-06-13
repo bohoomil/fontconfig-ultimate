@@ -1,8 +1,8 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=otf-source-han-sans-kr-ibx
-pkgver=1.001
-pkgrel=2
+pkgver=1.003
+pkgrel=1
 depends=('fontconfig')
 pkgdesc="A set of Pan-CJK fonts designed to complement Source Sans Pro. Korean subset, OpenType/CFF (OTF) fonts."
 url="http://www.adobe.com/"
@@ -15,7 +15,7 @@ install=$pkgname.install
 source=("https://github.com/adobe-fonts/source-han-sans/archive/${pkgver}R.tar.gz"
         40-source-han-sans-kr.conf
         90-non-tt-source-han-sans-kr.conf)
-sha1sums=('26a72040896f4bdcc4a6ecaa64cd67a764d88aef'
+sha1sums=('494a464e71d20191e1660313f00dbc1f82e2896f'
           '67e8781b8bb9917d17594f7b2ff6c53cea0f499a'
           '672e4defaed9da4b4da4cda152e9b3c7ff89de40')
 
