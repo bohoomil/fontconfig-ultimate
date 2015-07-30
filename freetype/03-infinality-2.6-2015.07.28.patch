@@ -35,8 +35,8 @@ index d08a467..bc8e098 100644
    /* any of the patented opcodes and algorithms.  The patents related to   */
 diff --git a/include/config/ftoption.h b/include/config/ftoption.h
 index 34b71b2..187f87b 100644
---- a/include/config/ftoption.h
-+++ b/include/config/ftoption.h
+--- a/include/freetype/config/ftoption.h
++++ b/include/freetype/config/ftoption.h
 @@ -92,7 +92,7 @@ FT_BEGIN_HEADER
    /* This is done to allow FreeType clients to run unmodified, forcing     */
    /* them to display normal gray-level anti-aliased glyphs.                */
@@ -725,10 +725,10 @@ index 3620550..1da090f 100644
  
 +#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
 +#include <math.h>
-+#include "../../include/ftbitmap.h"
++#include "../../include/freetype/ftbitmap.h"
 +#include <strings.h>
 +#include "../autofit/aflatin.h"
-+#include "../../include/ftoutln.h"
++#include "../../include/freetype/ftoutln.h"
 +
 +#define verbose FALSE
 +#define STVALUES if (verbose) \
