@@ -9,7 +9,17 @@ CHANGELOG
 2015-06-08
 ~~~~~~~~~~
 
-### freetype2-infinality-ultimate, rev. 2.6
+### freetype2-infinality-ultimate, rev. 2.6-2
+
+* The code base was merged with the upstream changes up to 2015.07.28.
+* Minor changes in the Infinality patchset (modified location of freetype2 header files
+  introduced by the upstream).
+
+
+2015-06-08
+~~~~~~~~~~
+
+### freetype2-infinality-ultimate, rev. 2.6-1
 
 * Upstream version upgrade.
 
