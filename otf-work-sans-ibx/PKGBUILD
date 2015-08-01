@@ -1,0 +1,41 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=otf-work-sans-ibx
+pkgver=1.32
+pkgrel=1
+depends=('fontconfig')
+pkgdesc="Work Sans by Wei Huang is a typeface based loosely on early Grotesques. The family covers Adobe Latin 3 and provides extensive set of OpenType features."
+url="http://weiweihuanghuang.github.io/Work-Sans/"
+arch=('any')
+license=('custom:OFL')
+groups=('infinality-bundle-fonts-extra')
+source=("http://bohoomil.com/src/Work-Sans-${pkgver}_fixed.tar.bz2"{,.sig}
+        45-work-sans.conf
+        90-non-tt-work-sans.conf)
+install=${pkgname}.install
+sha1sums=('fddbf5c8482f5f789cc7b6a58cbc706279d35019'
+          'SKIP'
+          'cb42adf0568ce32b0740586238f9f45c8d15bb1b'
+          '7b10f7fbf027afe6de7de95b97943e338517144a')
+
+package() {
+  cd "${srcdir}/Work-Sans-${pkgver}"
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 'LICENSE.txt' \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 fonts/desktop/*.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 ../45-work-sans.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-work-sans.conf
+  install -m644 ../90-non-tt-work-sans.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-work-sans.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-work-sans.conf .
+  ln -s ../conf.avail/90-non-tt-work-sans.conf .
+}
