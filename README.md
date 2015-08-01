@@ -6,9 +6,6 @@
 
 Project's website: [bohoomil.com](http://bohoomil.com "bohoomil.com")
 
-<a href="http://flattr.com/thing/2210523/bohoomilfontconfig-ultimate-on-GitHub" target="_blank"><img src="http://api.flattr.com/button/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0" /></a>
-
-
 #### Quick installation instructions
 
 **I. If you are an Arch Linux user, or if you are using one of the Arch Linux derivatives,** you may want to use pre-compiled packages from the `[infinality-bundle]` repository I maintain. This is a recommended approach in a majority of cases as it gives access to the entire functionality offered by Infinality patches and the ultimate configuration without a typical post installation routine.
