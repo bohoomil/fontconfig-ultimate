@@ -4,7 +4,7 @@
 
 #### Font configuration files, patches, scripts and source packages (Infinality & friends)
 
-Project's website: [bohoomil.com](http://bohoomil.com "bohoomil.com")
+Project website: [bohoomil.com](http://bohoomil.com "bohoomil.com")
 
 #### Quick installation instructions
 
