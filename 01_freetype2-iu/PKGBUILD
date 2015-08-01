@@ -4,8 +4,8 @@
 
 pkgname=freetype2-infinality-ultimate
 pkgver=2.6
-pkgrel=1
-_patchrel=2015.06.08
+pkgrel=2
+_patchrel=2015.07.28
 pkgdesc="TrueType font rendering library with Infinality patches and custom settings."
 arch=('i686' 'x86_64')
 changelog=CHANGELOG
@@ -21,17 +21,20 @@ install='infinality.install'
 source=(http://downloads.sourceforge.net/sourceforge/freetype/freetype-${pkgver}.tar.bz2
         infinality-settings.sh
         "01-freetype-${pkgver}-enable-valid.patch"
+        "02-upstream-${_patchrel}.patch"
         "03-infinality-${pkgver}-${_patchrel}.patch")
 sha1sums=('cd2b144205dd2c61693e2d861069367aa3dde1bc'
           'd09d96c10020772533a4280cec2425bcd1a81fa2'
           'abf7a8f726ad6359533651a8942636880febf9f6'
-          '83eb596775ab253aae97f1258d614cb561a2e47e')
+          'd56223c67266b12ad647851cd578afd2ea981629'
+          'dd0b083ff9c1c48d97a3da1f80481d0d90c9c558')
 
 prepare() {
   cd "freetype-${pkgver}"
 
            #"02-upstream-${_patchrel}.patch"
   patches=("01-freetype-${pkgver}-enable-valid.patch"
+           "02-upstream-${_patchrel}.patch"
            "03-infinality-${pkgver}-${_patchrel}.patch")
 
   # infinality & post release fixes
