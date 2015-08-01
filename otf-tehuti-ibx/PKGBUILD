@@ -1,0 +1,40 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=otf-tehuti-ibx
+pkgver=1.0
+pkgrel=1
+depends=('fontconfig')
+pkgdesc="Tehuti is a modern font based predominantly off Electra, with touches from Palatino, Janson, and Goudy Oldstyle."
+url="http://www.fontsquirrel.com/fonts/tehuti"
+arch=('any')
+license=('custom:OFL')
+groups=('infinality-bundle-fonts-extra')
+source=(tehuti.zip::"http://www.fontsquirrel.com/fonts/download/tehuti"
+        45-tehuti.conf
+        90-non-tt-tehuti.conf)
+install=${pkgname}.install
+sha1sums=('4de24883abc8b9081055d8dc4effd03a21674ffe'
+          'b59f07923570683d316a8a1849d22df297e81935'
+          'adf2b46c586453c736e47975a4e88d534bd2727e')
+
+package() {
+  cd "${srcdir}"
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 'SIL Open Font License.txt' \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-tehuti.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-tehuti.conf
+  install -m644 90-non-tt-tehuti.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-tehuti.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-tehuti.conf .
+  ln -s ../conf.avail/90-non-tt-tehuti.conf .
+}
