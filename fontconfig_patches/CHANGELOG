@@ -6,6 +6,12 @@ CHANGELOG
 ---------
 
 
+2015-08-25
+~~~~~~~~~~
+
+* [PATCH] Fix an overflow when casting from double to int (Raziel-23).
+* Fix #81 (doublecmd-gtk2 fails at start with "Division by Zero").
+
 2015-06-01
 ~~~~~~~~~~
 
