@@ -7,7 +7,7 @@ pkgdesc="A library for configuring and customizing font access, optimized for fr
 url=('http://www.fontconfig.org/release/')
 license=('custom' 'MIT')
 pkgver=2.11.1
-pkgrel=28
+pkgrel=29
 _master_name=fontconfig-ultimate-master
 arch=('i686' 'x86_64')
 changelog=CHANGELOG
@@ -17,6 +17,7 @@ makedepends=('gperf' 'python2-lxml')
 options=('!libtool')
 provides=('fontconfig=$pkgver' 'fontconfig-infinality' 'fontconfig-infinality-ultimate')
 conflicts=('fontconfig' 'fontconfig-infinality' 'fontconfig-infinality-git' 'fontconfig-infinality-ultimate-git')
+replaces=('fontconfig-iu-comp')
 backup=('etc/fonts/fonts.conf'
         'etc/fonts/conf.avail.infinality/combi/30-metric-aliases-combi.conf'
         'etc/fonts/conf.avail.infinality/combi/37-repl-global-combi.conf'
@@ -31,7 +32,7 @@ install=fontconfig-ultimate.install
 source=(http://www.fontconfig.org/release/${_basename}-${pkgver}.tar.bz2
         master.tar.gz::https://github.com/bohoomil/fontconfig-ultimate/archive/master.tar.gz)
 sha1sums=('08565feea5a4e6375f9d8a7435dac04e52620ff2'
-          '973b8d3d0562e325f5c0585300529d4f2f9b0ba8')
+          '1dc3b737baa5687cebdd586b850c24b21d9c0d36')
 
 # a nice page to test font matching:
 # http://zipcon.net/~swhite/docs/computers/browsers/fonttest.html
