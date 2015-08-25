@@ -5,8 +5,14 @@ freetype2-infinality-ultimate
 CHANGELOG
 ---------
 
+2015-08-24
+~~~~~~~~~~
 
-2015-06-08
+* The code base was merged with the upstream changes up to 2015.08.24.
+* Build with _GNU_SOURCE for strcasestr and strcasecmp (goddesse).
+* Use freetype2's new header file macros where possible (goddesse).
+
+2015-07-28
 ~~~~~~~~~~
 
 ### freetype2-infinality-ultimate, rev. 2.6-2
