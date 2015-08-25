@@ -1,3 +1,9 @@
+From 52f9d79773b745e131f00c441fef927647834148 Mon Sep 17 00:00:00 2001
+From: Raziel-23 <venom23@runbox.com>
+Date: Sat, 15 Aug 2015 17:35:30 +0200
+Subject: [PATCH] Fix an overflow when casting from double to int
+
+---
 From 3cd573fc1fb67db75cd356cad3e901d24af1ce8a Mon Sep 17 00:00:00 2001
 From: Akira TAGOH <akira@tagoh.org>
 Date: Wed, 20 Nov 2013 18:44:59 +0900
