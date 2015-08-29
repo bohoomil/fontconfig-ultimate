@@ -1,0 +1,57 @@
+--- a/conf.d/Makefile.in	2015-08-28 03:27:41.000000000 +0200
++++ b/conf.d/Makefile.in	2015-08-28 03:59:54.739106416 +0200
+@@ -171,7 +171,7 @@ am__uninstall_files_from_dir = { \
+     || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
+          $(am__cd) "$$dir" && rm -f $$files; }; \
+   }
+-am__installdirs = "$(DESTDIR)$(configdir)" "$(DESTDIR)$(templatedir)"
++am__installdirs = "$(DESTDIR)$(templatedir)"
+ DATA = $(config_DATA) $(template_DATA)
+ am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
+ am__DIST_COMMON = $(srcdir)/Makefile.in README
+@@ -343,25 +343,8 @@ target_alias = @target_alias@
+ top_build_prefix = @top_build_prefix@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+-BUILT_SOURCES = README
+-DOC_SOURCES = README.in
+ DOC_FILES = $(DOC_SOURCES:.in=)
+-CONF_LINKS = \
+-	10-scale-bitmap-fonts.conf \
+-	20-unhint-small-vera.conf \
+-	30-urw-aliases.conf \
+-	30-metric-aliases.conf \
+-	40-nonlatin.conf \
+-	45-latin.conf \
+-	49-sansserif.conf \
+-	50-user.conf \
+-	51-local.conf \
+-	60-latin.conf \
+-	65-fonts-persian.conf \
+-	65-nonlatin.conf \
+-	69-unifont.conf \
+-	80-delicious.conf \
+-	90-synthetic.conf
++CONF_LINKS =
+ 
+ EXTRA_DIST = $(template_DATA) $(DOC_SOURCES)
+ CLEANFILES = $(DOC_FILES)
+@@ -522,7 +505,7 @@ check: $(BUILT_SOURCES)
+ 	$(MAKE) $(AM_MAKEFLAGS) check-am
+ all-am: Makefile $(DATA)
+ installdirs:
+-	for dir in "$(DESTDIR)$(configdir)" "$(DESTDIR)$(templatedir)"; do \
++	for dir in "$(DESTDIR)$(templatedir)"; do \
+ 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
+ 	done
+ install: $(BUILT_SOURCES)
+@@ -645,9 +628,6 @@ uninstall-am: uninstall-configDATA unins
+ .PRECIOUS: Makefile
+ 
+ 
+-README: $(srcdir)/README.in
+-	sed "s|\@TEMPLATEDIR\@|$(templatedir)|" $< > $@
+-
+ install-data-hook:
+ 	mkdir -p $(DESTDIR)$(configdir)
+ 	@(echo cd $(DESTDIR)$(configdir);			\
