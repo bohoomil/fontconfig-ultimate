@@ -1,5 +1,5 @@
---- a/oxygen-fonts-5.3.0/CMakeLists.txt	2015-05-06 02:14:32.822156477 +0200
-+++ b/oxygen-fonts-5.3.0/CMakeLists.txt	2015-05-06 02:22:03.142985121 +0200
+--- a/oxygen-fonts-5.4.1/CMakeLists.txt	2015-05-06 02:14:32.822156477 +0200
++++ b/oxygen-fonts-5.4.1/CMakeLists.txt	2015-05-06 02:22:03.142985121 +0200
 @@ -31,36 +31,5 @@ install(FILES
          DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
          COMPONENT Devel)
