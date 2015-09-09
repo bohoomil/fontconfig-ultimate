@@ -2,7 +2,7 @@
 
 pkgname=ttf-oxygen-ibx
 epoch=1
-pkgver=5.3.0
+pkgver=5.4.1
 pkgrel=1
 pkgdesc="The Oxygen typeface family is created as part of the KDE Project."
 url="http://kde.org/"
