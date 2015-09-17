@@ -1,3 +1,15 @@
+Doesn't include commit
+
+From ff7d64040411b895bf72e0cc7832b82b8fcb3e7d Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Sun, 13 Sep 2015 23:53:16 +0200
+Subject: [PATCH] Replace `mkinstalldirs' with AC_PROG_MKDIR_P.
+
+MKDIR_P isn't replaced properly and installation fails.
+
+
+-------------
+
 diff --git a/CMakeLists.txt b/CMakeLists.txt
 index 6631fde..edcb64e 100644
 --- a/CMakeLists.txt
@@ -73646,3 +73658,3535 @@ index 06f1861..36e3eb0 100644
        }
      }
  
+From 78b014031d626a57a087c5e60447705fa834b79d Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Tue, 25 Aug 2015 07:23:01 +0200
+Subject: [PATCH] [base] Improve kerning tracing and documentation.
+
+* src/base/ftobjs.c (FT_Get_Kerning): Emit tracing message if
+scaled-down kerning values differ.
+---
+ ChangeLog                   |  7 +++++++
+ include/freetype/freetype.h |  5 +++++
+ src/base/ftobjs.c           | 23 +++++++++++++++++++++--
+ 3 files changed, 33 insertions(+), 2 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 2fa7140..49db8b0 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,10 @@
++2015-08-25  Werner Lemberg  <wl@gnu.org>
++
++	[base] Improve kerning tracing and documentation.
++
++	* src/base/ftobjs.c (FT_Get_Kerning): Emit tracing message if
++	scaled-down kerning values differ.
++
+ 2015-08-18  Werner Lemberg  <wl@gnu.org>
+ 
+ 	[raster] Remove last remnants of `raster5' driver.
+diff --git a/include/freetype/freetype.h b/include/freetype/freetype.h
+index f3a9d6f..61b6a45 100644
+--- a/include/freetype/freetype.h
++++ b/include/freetype/freetype.h
+@@ -3041,6 +3041,11 @@ FT_BEGIN_HEADER
+   /*    FT_KERNING_UNSCALED :: Return the kerning vector in original font  */
+   /*                           units.                                      */
+   /*                                                                       */
++  /* <Note>                                                                */
++  /*    FT_KERNING_DEFAULT returns full pixel values; it also makes        */
++  /*    FreeType heuristically scale down kerning distances at small ppem  */
++  /*    values so that they don't become too big.                          */
++  /*                                                                       */
+   typedef enum  FT_Kerning_Mode_
+   {
+     FT_KERNING_DEFAULT  = 0,
+diff --git a/src/base/ftobjs.c b/src/base/ftobjs.c
+index 926ac0a..7092856 100644
+--- a/src/base/ftobjs.c
++++ b/src/base/ftobjs.c
+@@ -3073,18 +3073,37 @@
+ 
+           if ( kern_mode != FT_KERNING_UNFITTED )
+           {
++            FT_Pos  orig_x = akerning->x;
++            FT_Pos  orig_y = akerning->y;
++
++
+             /* we scale down kerning values for small ppem values */
+             /* to avoid that rounding makes them too big.         */
+             /* `25' has been determined heuristically.            */
+             if ( face->size->metrics.x_ppem < 25 )
+-              akerning->x = FT_MulDiv( akerning->x,
++              akerning->x = FT_MulDiv( orig_x,
+                                        face->size->metrics.x_ppem, 25 );
+             if ( face->size->metrics.y_ppem < 25 )
+-              akerning->y = FT_MulDiv( akerning->y,
++              akerning->y = FT_MulDiv( orig_y,
+                                        face->size->metrics.y_ppem, 25 );
+ 
+             akerning->x = FT_PIX_ROUND( akerning->x );
+             akerning->y = FT_PIX_ROUND( akerning->y );
++
++#ifdef FT_DEBUG_LEVEL_TRACE
++            {
++              FT_Pos  orig_x_rounded = FT_PIX_ROUND( orig_x );
++              FT_Pos  orig_y_rounded = FT_PIX_ROUND( orig_y );
++
++
++              if ( akerning->x != orig_x_rounded ||
++                   akerning->y != orig_y_rounded )
++                FT_TRACE5(( "FT_Get_Kerning: horizontal kerning"
++                            " (%d, %d) scaled down to (%d, %d) pixels\n",
++                            orig_x_rounded / 64, orig_y_rounded / 64,
++                            akerning->x / 64, akerning->y / 64 ));
++            }
++#endif
+           }
+         }
+       }
+-- 
+2.5.2
+
+From 633d8ed2c9d65a2f71c01ff813ee24ce58a8d0de Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Wed, 26 Aug 2015 06:18:47 +0200
+Subject: [PATCH] * builds/unix/configure.raw: Need harfbuzz >= 0.9.21
+ (#45828).
+
+---
+ ChangeLog                 | 4 ++++
+ builds/unix/configure.raw | 2 +-
+ 2 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 49db8b0..659cfc9 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,7 @@
++2015-08-26  Werner Lemberg  <wl@gnu.org>
++
++	* builds/unix/configure.raw: Need harfbuzz >= 0.9.21 (#45828).
++
+ 2015-08-25  Werner Lemberg  <wl@gnu.org>
+ 
+ 	[base] Improve kerning tracing and documentation.
+diff --git a/builds/unix/configure.raw b/builds/unix/configure.raw
+index 7768564..f09c0d7 100644
+--- a/builds/unix/configure.raw
++++ b/builds/unix/configure.raw
+@@ -460,7 +460,7 @@ AC_ARG_WITH([harfbuzz],
+ 
+ have_harfbuzz=no
+ if test x"$with_harfbuzz" = xyes -o x"$with_harfbuzz" = xauto; then
+-  harfbuzz_pkg="harfbuzz >= 0.9.19"
++  harfbuzz_pkg="harfbuzz >= 0.9.21"
+   have_harfbuzz_pkg=no
+ 
+   if test x"$HARFBUZZ_CFLAGS" = x -a x"$HARFBUZZ_LIBS" = x; then
+-- 
+2.5.2
+
+From 6ec0434ec9e36dd72d446b2b3dc4e1f56b962926 Mon Sep 17 00:00:00 2001
+From: Alexei Podtelezhnikov <apodtele@gmail.com>
+Date: Sun, 30 Aug 2015 22:50:48 -0400
+Subject: [PATCH] Minor refactoring.
+
+---
+ src/base/ftoutln.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/src/base/ftoutln.c b/src/base/ftoutln.c
+index ef66b3c..cab0245 100644
+--- a/src/base/ftoutln.c
++++ b/src/base/ftoutln.c
+@@ -942,8 +942,8 @@
+       l_in = 0;
+       last = outline->contours[c];
+ 
+-      /* Counter i cycles though the points; counter j advances only */
+-      /* if points are moved; anchor k marks the first moved point.  */
++      /* Counter j cycles though the points; counter i advances only  */
++      /* when points are moved; anchor k marks the first moved point. */
+       for ( i = last, j = first, k = -1;
+             j != i && i != k;
+             j = j < last ? j + 1 : first )
+@@ -953,6 +953,9 @@
+           out.x = points[j].x - points[i].x;
+           out.y = points[j].y - points[i].y;
+           l_out = FT_Vector_NormLen( &out );
++
++          if ( l_out == 0 )
++            continue;
+         }
+         else
+         {
+@@ -960,9 +963,6 @@
+           l_out = l_anchor;
+         }
+ 
+-        if ( l_out == 0 )
+-          continue;
+-
+         if ( l_in != 0 )
+         {
+           if ( k < 0 )
+-- 
+2.5.2
+
+From 0963526435b39080e7fc45610aee3b3e2e2383b0 Mon Sep 17 00:00:00 2001
+From: Alexei Podtelezhnikov <apodtele@gmail.com>
+Date: Mon, 31 Aug 2015 23:14:46 -0400
+Subject: [PATCH] Minor.
+
+---
+ src/truetype/ttinterp.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/truetype/ttinterp.c b/src/truetype/ttinterp.c
+index d00a0f8..ae2a82a 100644
+--- a/src/truetype/ttinterp.c
++++ b/src/truetype/ttinterp.c
+@@ -6495,8 +6495,6 @@
+     dx = exc->zp0.cur[b0].x - exc->zp1.cur[a0].x;
+     dy = exc->zp0.cur[b0].y - exc->zp1.cur[a0].y;
+ 
+-    exc->zp2.tags[point] |= FT_CURVE_TAG_TOUCH_BOTH;
+-
+     discriminant = FT_MulDiv( dax, -dby, 0x40 ) +
+                    FT_MulDiv( day, dbx, 0x40 );
+     dotproduct   = FT_MulDiv( dax, dbx, 0x40 ) +
+@@ -6533,6 +6531,8 @@
+                                 exc->zp0.cur[b0].y +
+                                 exc->zp0.cur[b1].y ) / 4;
+     }
++
++    exc->zp2.tags[point] |= FT_CURVE_TAG_TOUCH_BOTH;
+   }
+ 
+ 
+-- 
+2.5.2
+
+From 87c81f0460fad3af38fbfebcd7ee03ca1a41e4b6 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Sun, 30 Aug 2015 10:35:21 +0200
+Subject: [PATCH] [autofit] Make glyph style array use 16bit values.
+
+* include/freetype/ftautoh.h (FT_Prop_GlyphToScriptMap): Use
+`FT_UShort' for `map' field.
+
+* src/autofit/afglobal.c (af_face_globals_compute_style_coverage,
+af_face_globals_new), src/autofit/hbshim.c, src/autofit/hbshim.h
+(af_get_coverage): Use FT_UShort for `glyph_styles' array.
+
+* src/autofit/afglobal.h (AF_STYLE_UNASSIGNED, AF_DIGIT): Extend to
+16 bits.
+(AF_FaceGlobalsRec): Use `FT_UShort' for `glyph_styles' field.
+---
+ ChangeLog                  | 15 +++++++++++++++
+ include/freetype/ftautoh.h |  4 ++--
+ src/autofit/afglobal.c     | 18 ++++++++++--------
+ src/autofit/afglobal.h     |  6 +++---
+ src/autofit/hbshim.c       |  4 ++--
+ src/autofit/hbshim.h       |  2 +-
+ 6 files changed, 33 insertions(+), 16 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 659cfc9..5d27489 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,18 @@
++2015-08-30  Werner Lemberg  <wl@gnu.org>
++
++	[autofit] Make glyph style array use 16bit values.
++
++	* include/freetype/ftautoh.h (FT_Prop_GlyphToScriptMap): Use
++	`FT_UShort' for `map' field.
++
++	* src/autofit/afglobal.c (af_face_globals_compute_style_coverage,
++	af_face_globals_new), src/autofit/hbshim.c, src/autofit/hbshim.h
++	(af_get_coverage): Use FT_UShort for `glyph_styles' array.
++
++	* src/autofit/afglobal.h (AF_STYLE_UNASSIGNED, AF_DIGIT): Extend to
++	16 bits.
++	(AF_FaceGlobalsRec): Use `FT_UShort' for `glyph_styles' field.
++
+ 2015-08-26  Werner Lemberg  <wl@gnu.org>
+ 
+ 	* builds/unix/configure.raw: Need harfbuzz >= 0.9.21 (#45828).
+diff --git a/include/freetype/ftautoh.h b/include/freetype/ftautoh.h
+index cf7b76f..ab39c21 100644
+--- a/include/freetype/ftautoh.h
++++ b/include/freetype/ftautoh.h
+@@ -247,8 +247,8 @@ FT_BEGIN_HEADER
+    */
+   typedef struct  FT_Prop_GlyphToScriptMap_
+   {
+-    FT_Face   face;
+-    FT_Byte*  map;
++    FT_Face     face;
++    FT_UShort*  map;
+ 
+   } FT_Prop_GlyphToScriptMap;
+ 
+diff --git a/src/autofit/afglobal.c b/src/autofit/afglobal.c
+index 64b9293..d908370 100644
+--- a/src/autofit/afglobal.c
++++ b/src/autofit/afglobal.c
+@@ -135,16 +135,15 @@
+     FT_Error    error;
+     FT_Face     face        = globals->face;
+     FT_CharMap  old_charmap = face->charmap;
+-    FT_Byte*    gstyles     = globals->glyph_styles;
++    FT_UShort*  gstyles     = globals->glyph_styles;
+     FT_UInt     ss;
+     FT_UInt     i;
+     FT_UInt     dflt        = ~0U; /* a non-valid value */
+ 
+ 
+     /* the value AF_STYLE_UNASSIGNED means `uncovered glyph' */
+-    FT_MEM_SET( globals->glyph_styles,
+-                AF_STYLE_UNASSIGNED,
+-                globals->glyph_count );
++    for ( i = 0; i < (FT_UInt)globals->glyph_count; i++ )
++      gstyles[i] = AF_STYLE_UNASSIGNED;
+ 
+     error = FT_Select_Charmap( face, FT_ENCODING_UNICODE );
+     if ( error )
+@@ -193,7 +192,7 @@
+           if ( gindex != 0                             &&
+                gindex < (FT_ULong)globals->glyph_count &&
+                gstyles[gindex] == AF_STYLE_UNASSIGNED  )
+-            gstyles[gindex] = (FT_Byte)ss;
++            gstyles[gindex] = (FT_UShort)ss;
+ 
+           for (;;)
+           {
+@@ -204,7 +203,7 @@
+ 
+             if ( gindex < (FT_ULong)globals->glyph_count &&
+                  gstyles[gindex] == AF_STYLE_UNASSIGNED  )
+-              gstyles[gindex] = (FT_Byte)ss;
++              gstyles[gindex] = (FT_UShort)ss;
+           }
+         }
+       }
+@@ -314,14 +313,17 @@
+ 
+     memory = face->memory;
+ 
++    /* we allocate an AF_FaceGlobals structure together */
++    /* with the glyph_styles array                      */
+     if ( FT_ALLOC( globals,
+                    sizeof ( *globals ) +
+-                     (FT_ULong)face->num_glyphs * sizeof ( FT_Byte ) ) )
++                     (FT_ULong)face->num_glyphs * sizeof ( FT_UShort ) ) )
+       goto Exit;
+ 
+     globals->face         = face;
+     globals->glyph_count  = face->num_glyphs;
+-    globals->glyph_styles = (FT_Byte*)( globals + 1 );
++    /* right after the globals structure come the glyph styles */
++    globals->glyph_styles = (FT_UShort*)( globals + 1 );
+     globals->module       = module;
+ 
+ #ifdef FT_CONFIG_OPTION_USE_HARFBUZZ
+diff --git a/src/autofit/afglobal.h b/src/autofit/afglobal.h
+index 9bbb687..6cacd69 100644
+--- a/src/autofit/afglobal.h
++++ b/src/autofit/afglobal.h
+@@ -73,9 +73,9 @@ FT_BEGIN_HEADER
+   /* default script for OpenType; ignored if HarfBuzz isn't used */
+ #define AF_SCRIPT_DEFAULT    AF_SCRIPT_LATN
+   /* a bit mask indicating an uncovered glyph        */
+-#define AF_STYLE_UNASSIGNED  0x7F
++#define AF_STYLE_UNASSIGNED  0x7FFF
+   /* if this flag is set, we have an ASCII digit     */
+-#define AF_DIGIT             0x80
++#define AF_DIGIT             0x8000U
+ 
+   /* `increase-x-height' property */
+ #define AF_PROP_INCREASE_X_HEIGHT_MIN  6
+@@ -100,7 +100,7 @@ FT_BEGIN_HEADER
+   {
+     FT_Face          face;
+     FT_Long          glyph_count;    /* same as face->num_glyphs */
+-    FT_Byte*         glyph_styles;
++    FT_UShort*       glyph_styles;
+ 
+ #ifdef FT_CONFIG_OPTION_USE_HARFBUZZ
+     hb_font_t*       hb_font;
+diff --git a/src/autofit/hbshim.c b/src/autofit/hbshim.c
+index c9c1db0..692671e 100644
+--- a/src/autofit/hbshim.c
++++ b/src/autofit/hbshim.c
+@@ -98,7 +98,7 @@
+   FT_Error
+   af_get_coverage( AF_FaceGlobals  globals,
+                    AF_StyleClass   style_class,
+-                   FT_Byte*        gstyles )
++                   FT_UShort*      gstyles )
+   {
+     hb_face_t*  face;
+ 
+@@ -363,7 +363,7 @@
+         continue;
+ 
+       if ( gstyles[idx] == AF_STYLE_UNASSIGNED )
+-        gstyles[idx] = (FT_Byte)style_class->style;
++        gstyles[idx] = (FT_UShort)style_class->style;
+ #ifdef FT_DEBUG_LEVEL_TRACE
+       else
+         FT_TRACE4(( "*" ));
+diff --git a/src/autofit/hbshim.h b/src/autofit/hbshim.h
+index 5636ca6..3824941 100644
+--- a/src/autofit/hbshim.h
++++ b/src/autofit/hbshim.h
+@@ -38,7 +38,7 @@ FT_BEGIN_HEADER
+   FT_Error
+   af_get_coverage( AF_FaceGlobals  globals,
+                    AF_StyleClass   style_class,
+-                   FT_Byte*        gstyles );
++                   FT_UShort*      gstyles );
+ 
+   FT_Error
+   af_get_char_index( AF_StyleMetrics  metrics,
+-- 
+2.5.2
+
+From 40103a3af089857e553f39c3b9ce61a9ee38dd59 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Mon, 31 Aug 2015 08:51:52 +0200
+Subject: [PATCH] [autofit] Code clean-up.
+
+* src/autofit/afglobal.h (AF_STYLE_MASK): New macro.
+(AF_STYLE_UNASSIGNED): Use AF_STYLE_MASK for definition.
+
+* src/autofit/afglobal.c (af_face_globals_compute_style_coverage):
+Updated.
+---
+ ChangeLog              | 10 ++++++++++
+ src/autofit/afglobal.c |  6 +++---
+ src/autofit/afglobal.h |  8 ++++++--
+ 3 files changed, 19 insertions(+), 5 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 5d27489..84ae8fa 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,5 +1,15 @@
+ 2015-08-30  Werner Lemberg  <wl@gnu.org>
+ 
++	[autofit] Code clean-up.
++
++	* src/autofit/afglobal.h (AF_STYLE_MASK): New macro.
++	(AF_STYLE_UNASSIGNED): Use AF_STYLE_MASK for definition.
++
++	* src/autofit/afglobal.c (af_face_globals_compute_style_coverage):
++	Updated.
++
++2015-08-30  Werner Lemberg  <wl@gnu.org>
++
+ 	[autofit] Make glyph style array use 16bit values.
+ 
+ 	* include/freetype/ftautoh.h (FT_Prop_GlyphToScriptMap): Use
+diff --git a/src/autofit/afglobal.c b/src/autofit/afglobal.c
+index d908370..cd0e2ab 100644
+--- a/src/autofit/afglobal.c
++++ b/src/autofit/afglobal.c
+@@ -249,9 +249,9 @@
+ 
+       for ( nn = 0; nn < globals->glyph_count; nn++ )
+       {
+-        if ( ( gstyles[nn] & ~AF_DIGIT ) == AF_STYLE_UNASSIGNED )
++        if ( ( gstyles[nn] & AF_STYLE_MASK ) == AF_STYLE_UNASSIGNED )
+         {
+-          gstyles[nn] &= ~AF_STYLE_UNASSIGNED;
++          gstyles[nn] &= ~AF_STYLE_MASK;
+           gstyles[nn] |= globals->module->fallback_style;
+         }
+       }
+@@ -275,7 +275,7 @@
+ 
+       for ( idx = 0; idx < globals->glyph_count; idx++ )
+       {
+-        if ( ( gstyles[idx] & ~AF_DIGIT ) == style_class->style )
++        if ( ( gstyles[idx] & AF_STYLE_MASK ) == style_class->style )
+         {
+           if ( !( count % 10 ) )
+             FT_TRACE4(( " " ));
+diff --git a/src/autofit/afglobal.h b/src/autofit/afglobal.h
+index 6cacd69..284f6a0 100644
+--- a/src/autofit/afglobal.h
++++ b/src/autofit/afglobal.h
+@@ -72,8 +72,12 @@ FT_BEGIN_HEADER
+ #endif
+   /* default script for OpenType; ignored if HarfBuzz isn't used */
+ #define AF_SCRIPT_DEFAULT    AF_SCRIPT_LATN
+-  /* a bit mask indicating an uncovered glyph        */
+-#define AF_STYLE_UNASSIGNED  0x7FFF
++
++  /* a bit mask for TA_DIGIT */
++#define AF_STYLE_MASK        0x7FFF
++  /* an uncovered glyph      */
++#define AF_STYLE_UNASSIGNED  AF_STYLE_MASK
++
+   /* if this flag is set, we have an ASCII digit     */
+ #define AF_DIGIT             0x8000U
+ 
+-- 
+2.5.2
+
+From 8cbbcf6b985895b0dc4ce6a43afca85b36e8de24 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Thu, 3 Sep 2015 06:47:30 +0200
+Subject: [PATCH] [autofit] Pass glyph index to hinting function.
+
+No functionality change yet.
+
+* src/autofit/aftypes.h (AF_WritingSystem_ApplyHintsFunc): Pass
+glyph index.
+
+* src/autofit/afcjk.c, src/autofit/afcjk.h (af_cjk_hints_apply),
+src/autofit/afdummy.c (af_dummy_hints_apply), src/autofit/afindic.c
+(af_indic_hints_apply), src/autofit/aflatin.c
+(af_latin_hints_apply), src/autofit/aflatin2.c
+(af_latin2_hints_apply), src/autofit/afloader.c (af_loader_load_g):
+Updated.
+---
+ ChangeLog              | 16 ++++++++++++++++
+ src/autofit/afcjk.c    |  4 +++-
+ src/autofit/afcjk.h    |  3 ++-
+ src/autofit/afdummy.c  |  5 ++++-
+ src/autofit/afindic.c  |  5 +++--
+ src/autofit/aflatin.c  |  5 ++++-
+ src/autofit/aflatin2.c |  5 ++++-
+ src/autofit/afloader.c |  3 ++-
+ src/autofit/aftypes.h  |  3 ++-
+ 9 files changed, 40 insertions(+), 9 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 84ae8fa..c2e0c46 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,19 @@
++2015-09-03  Werner Lemberg  <wl@gnu.org>
++
++	[autofit] Pass glyph index to hinting function.
++
++	No functionality change yet.
++
++	* src/autofit/aftypes.h (AF_WritingSystem_ApplyHintsFunc): Pass
++	glyph index.
++
++	* src/autofit/afcjk.c, src/autofit/afcjk.h (af_cjk_hints_apply),
++	src/autofit/afdummy.c (af_dummy_hints_apply), src/autofit/afindic.c
++	(af_indic_hints_apply), src/autofit/aflatin.c
++	(af_latin_hints_apply), src/autofit/aflatin2.c
++	(af_latin2_hints_apply), src/autofit/afloader.c (af_loader_load_g):
++	Updated.
++
+ 2015-08-30  Werner Lemberg  <wl@gnu.org>
+ 
+ 	[autofit] Code clean-up.
+diff --git a/src/autofit/afcjk.c b/src/autofit/afcjk.c
+index 905408b..0ade4be 100644
+--- a/src/autofit/afcjk.c
++++ b/src/autofit/afcjk.c
+@@ -2181,7 +2181,8 @@
+   /* Apply the complete hinting algorithm to a CJK glyph. */
+ 
+   FT_LOCAL_DEF( FT_Error )
+-  af_cjk_hints_apply( AF_GlyphHints  hints,
++  af_cjk_hints_apply( FT_UInt        glyph_index,
++                      AF_GlyphHints  hints,
+                       FT_Outline*    outline,
+                       AF_CJKMetrics  metrics )
+   {
+@@ -2189,6 +2190,7 @@
+     int       dim;
+ 
+     FT_UNUSED( metrics );
++    FT_UNUSED( glyph_index );
+ 
+ 
+     error = af_glyph_hints_reload( hints, outline );
+diff --git a/src/autofit/afcjk.h b/src/autofit/afcjk.h
+index bfd11f2..e395e74 100644
+--- a/src/autofit/afcjk.h
++++ b/src/autofit/afcjk.h
+@@ -115,7 +115,8 @@ FT_BEGIN_HEADER
+                      AF_CJKMetrics  metrics );
+ 
+   FT_LOCAL( FT_Error )
+-  af_cjk_hints_apply( AF_GlyphHints  hints,
++  af_cjk_hints_apply( FT_UInt        glyph_index,
++                      AF_GlyphHints  hints,
+                       FT_Outline*    outline,
+                       AF_CJKMetrics  metrics );
+ 
+diff --git a/src/autofit/afdummy.c b/src/autofit/afdummy.c
+index 03ca25f..18dd301 100644
+--- a/src/autofit/afdummy.c
++++ b/src/autofit/afdummy.c
+@@ -38,11 +38,14 @@
+ 
+ 
+   static FT_Error
+-  af_dummy_hints_apply( AF_GlyphHints  hints,
++  af_dummy_hints_apply( FT_UInt        glyph_index,
++                        AF_GlyphHints  hints,
+                         FT_Outline*    outline )
+   {
+     FT_Error  error;
+ 
++    FT_UNUSED( glyph_index );
++
+ 
+     error = af_glyph_hints_reload( hints, outline );
+     if ( !error )
+diff --git a/src/autofit/afindic.c b/src/autofit/afindic.c
+index 7412cd1..05b6bdd 100644
+--- a/src/autofit/afindic.c
++++ b/src/autofit/afindic.c
+@@ -79,12 +79,13 @@
+ 
+ 
+   static FT_Error
+-  af_indic_hints_apply( AF_GlyphHints  hints,
++  af_indic_hints_apply( FT_UInt        glyph_index,
++                        AF_GlyphHints  hints,
+                         FT_Outline*    outline,
+                         AF_CJKMetrics  metrics )
+   {
+     /* use CJK routines */
+-    return af_cjk_hints_apply( hints, outline, metrics );
++    return af_cjk_hints_apply( glyph_index, hints, outline, metrics );
+   }
+ 
+ 
+diff --git a/src/autofit/aflatin.c b/src/autofit/aflatin.c
+index 3065895..ae2c46d 100644
+--- a/src/autofit/aflatin.c
++++ b/src/autofit/aflatin.c
+@@ -2836,7 +2836,8 @@
+   /* Apply the complete hinting algorithm to a latin glyph. */
+ 
+   static FT_Error
+-  af_latin_hints_apply( AF_GlyphHints    hints,
++  af_latin_hints_apply( FT_UInt          glyph_index,
++                        AF_GlyphHints    hints,
+                         FT_Outline*      outline,
+                         AF_LatinMetrics  metrics )
+   {
+@@ -2845,6 +2846,8 @@
+ 
+     AF_LatinAxis  axis;
+ 
++    FT_UNUSED( glyph_index );
++
+ 
+     error = af_glyph_hints_reload( hints, outline );
+     if ( error )
+diff --git a/src/autofit/aflatin2.c b/src/autofit/aflatin2.c
+index ac9f933..0380ffc 100644
+--- a/src/autofit/aflatin2.c
++++ b/src/autofit/aflatin2.c
+@@ -2300,13 +2300,16 @@
+ 
+ 
+   static FT_Error
+-  af_latin2_hints_apply( AF_GlyphHints    hints,
++  af_latin2_hints_apply( FT_UInt          glyph_index,
++                         AF_GlyphHints    hints,
+                          FT_Outline*      outline,
+                          AF_LatinMetrics  metrics )
+   {
+     FT_Error  error;
+     int       dim;
+ 
++    FT_UNUSED( glyph_index );
++
+ 
+     error = af_glyph_hints_reload( hints, outline );
+     if ( error )
+diff --git a/src/autofit/afloader.c b/src/autofit/afloader.c
+index 7c2fa7c..722ffd3 100644
+--- a/src/autofit/afloader.c
++++ b/src/autofit/afloader.c
+@@ -150,7 +150,8 @@
+ 
+ 
+         if ( writing_system_class->style_hints_apply )
+-          writing_system_class->style_hints_apply( hints,
++          writing_system_class->style_hints_apply( glyph_index,
++                                                   hints,
+                                                    &gloader->base.outline,
+                                                    metrics );
+       }
+diff --git a/src/autofit/aftypes.h b/src/autofit/aftypes.h
+index fdf7978..d6b1bf7 100644
+--- a/src/autofit/aftypes.h
++++ b/src/autofit/aftypes.h
+@@ -217,7 +217,8 @@ extern void*  _af_debug_hints;
+                                      AF_StyleMetrics  metrics );
+ 
+   typedef void
+-  (*AF_WritingSystem_ApplyHintsFunc)( AF_GlyphHints    hints,
++  (*AF_WritingSystem_ApplyHintsFunc)( FT_UInt          glyph_index,
++                                      AF_GlyphHints    hints,
+                                       FT_Outline*      outline,
+                                       AF_StyleMetrics  metrics );
+ 
+-- 
+2.5.2
+
+From 696b712691400aae977f0f12a66bb0b02503797a Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Fri, 4 Sep 2015 10:10:59 +0200
+Subject: [PATCH] [autofit] Redesign code ranges (1/2).
+
+This patch introduces auxiliary code ranges that identify no-base
+characters; they refer to glyphs of a script that should be hinted
+without alignments to blue zones (mostly diacritics).
+
+It also splits off ranges for fallback scripts that handle subscript
+and superscript characters not covered by OpenType features.  For
+example, this greatly helps improve the hinting of various phonetic
+alphabets, which contain a large amount characters that look like
+superscript glyphs.
+
+Finally, code ranges are updated to Unicode 8.0, and enclosed
+characters are removed in general since they normally look better if
+they stay unhinted.
+
+* src/autofit/afranges.c (af_latn_uniranges): Updated to Unicode
+8.0.
+Split off superscript-like and subscript-like glyphs into...
+
+(af_latb_uniranges, af_latp_uniranges): ... these two new arrays.
+
+(af_xxxx_nobase_uniranges): New arrays that hold no-base characters
+of the corresponding character ranges.
+---
+ ChangeLog              |  27 ++++
+ src/autofit/afranges.c | 362 +++++++++++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 375 insertions(+), 14 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index c2e0c46..b87bf74 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,30 @@
++2015-09-04  Werner Lemberg  <wl@gnu.org>
++
++	[autofit] Redesign code ranges (1/2).
++
++	This patch introduces auxiliary code ranges that identify no-base
++	characters; they refer to glyphs of a script that should be hinted
++	without alignments to blue zones (mostly diacritics).
++
++	It also splits off ranges for fallback scripts that handle subscript
++	and superscript characters not covered by OpenType features.  For
++	example, this greatly helps improve the hinting of various phonetic
++	alphabets, which contain a large amount characters that look like
++	superscript glyphs.
++
++	Finally, code ranges are updated to Unicode 8.0, and enclosed
++	characters are removed in general since they normally look better if
++	they stay unhinted.
++
++	* src/autofit/afranges.c (af_latn_uniranges): Updated to Unicode
++	8.0.
++	Split off superscript-like and subscript-like glyphs into...
++
++	(af_latb_uniranges, af_latp_uniranges): ... these two new arrays.
++
++	(af_xxxx_nobase_uniranges): New arrays that hold no-base characters
++	of the corresponding character ranges.
++
+ 2015-09-03  Werner Lemberg  <wl@gnu.org>
+ 
+ 	[autofit] Pass glyph index to hinting function.
+diff --git a/src/autofit/afranges.c b/src/autofit/afranges.c
+index c1e0afb..f6b1019 100644
+--- a/src/autofit/afranges.c
++++ b/src/autofit/afranges.c
+@@ -18,6 +18,43 @@
+ 
+ #include "afranges.h"
+ 
++  /*
++   * The algorithm for assigning properties and styles to the `glyph_styles'
++   * array is as follows (cf. the implementation in
++   * `af_face_globals_compute_style_coverage').
++   *
++   *   Walk over all scripts (as listed in `afscript.h').
++   *
++   *   For a given script, walk over all styles (as listed in `afstyles.h').
++   *   The order of styles is important and should be as follows.
++   *
++   *   - First come styles based on OpenType features (small caps, for
++   *     example).  Since features rely on glyph indices, thus completely
++   *     bypassing character codes, no properties are assigned.
++   *
++   *   - Next comes the default style, using the character ranges as defined
++   *     below.  This also assigns properties.
++   *
++   *   Note that there also exist fallback scripts, mainly covering
++   *   superscript and subscript glyphs of a script that are not present as
++   *   OpenType features.  Fallback scripts are defined below, also
++   *   assigning properties; they are applied after the corresponding
++   *   script.
++   *
++   */
++
++
++  /* XXX Check base character ranges again:                        */
++  /*     Right now, they are quickly derived by visual inspection. */
++  /*     I can imagine that fine-tuning is necessary.              */
++
++  /* for the auto-hinter, a `no-base character' is something that should */
++  /* not be affected by blue zones, regardless of whether this is a      */
++  /* spacing or no-spacing glyph                                         */
++
++  /* the `ta_xxxx_nobase_uniranges' ranges must be strict subsets */
++  /* of the corresponding `ta_xxxx_uniranges' ranges              */
++
+ 
+   const AF_Script_UniRangeRec  af_arab_uniranges[] =
+   {
+@@ -30,6 +67,30 @@
+     AF_UNIRANGE_REC(       0UL,       0UL )
+   };
+ 
++  const AF_Script_UniRangeRec  af_arab_nobase_uniranges[] =
++  {
++    AF_UNIRANGE_REC(  0x0600UL,  0x0605UL ),
++    AF_UNIRANGE_REC(  0x0610UL,  0x061AUL ),
++    AF_UNIRANGE_REC(  0x064BUL,  0x065FUL ),
++    AF_UNIRANGE_REC(  0x0670UL,  0x0670UL ),
++    AF_UNIRANGE_REC(  0x06D6UL,  0x06DCUL ),
++    AF_UNIRANGE_REC(  0x06DFUL,  0x06E4UL ),
++    AF_UNIRANGE_REC(  0x06E7UL,  0x06E8UL ),
++    AF_UNIRANGE_REC(  0x06EAUL,  0x06EDUL ),
++    AF_UNIRANGE_REC(  0x08E3UL,  0x08FFUL ),
++    AF_UNIRANGE_REC(  0xFBB2UL,  0xFBC1UL ),
++    AF_UNIRANGE_REC(  0xFE70UL,  0xFE70UL ),
++    AF_UNIRANGE_REC(  0xFE72UL,  0xFE72UL ),
++    AF_UNIRANGE_REC(  0xFE74UL,  0xFE74UL ),
++    AF_UNIRANGE_REC(  0xFE76UL,  0xFE76UL ),
++    AF_UNIRANGE_REC(  0xFE78UL,  0xFE78UL ),
++    AF_UNIRANGE_REC(  0xFE7AUL,  0xFE7AUL ),
++    AF_UNIRANGE_REC(  0xFE7CUL,  0xFE7CUL ),
++    AF_UNIRANGE_REC(  0xFE7EUL,  0xFE7EUL ),
++    AF_UNIRANGE_REC(       0UL,       0UL )
++  };
++
++
+   const AF_Script_UniRangeRec  af_cyrl_uniranges[] =
+   {
+     AF_UNIRANGE_REC(  0x0400UL,  0x04FFUL ),  /* Cyrillic            */
+@@ -39,23 +100,48 @@
+     AF_UNIRANGE_REC(       0UL,       0UL )
+   };
+ 
++  const AF_Script_UniRangeRec  af_cyrl_nobase_uniranges[] =
++  {
++    AF_UNIRANGE_REC(  0x0483UL,  0x0489UL ),
++    AF_UNIRANGE_REC(  0x2DE0UL,  0x2DFFUL ),
++    AF_UNIRANGE_REC(  0xA66FUL,  0xA67FUL ),
++    AF_UNIRANGE_REC(  0xA69EUL,  0xA69FUL ),
++    AF_UNIRANGE_REC(       0UL,       0UL )
++  };
++
++
+   /* there are some characters in the Devanagari Unicode block that are    */
+   /* generic to Indic scripts; we omit them so that their presence doesn't */
+   /* trigger Devanagari                                                    */
+ 
+   const AF_Script_UniRangeRec  af_deva_uniranges[] =
+   {
+-    AF_UNIRANGE_REC(  0x0900UL,  0x093BUL ),  /* Devanagari       */
++    AF_UNIRANGE_REC(  0x0900UL,  0x093BUL ),  /* Devanagari          */
+     /* omitting U+093C nukta */
+     AF_UNIRANGE_REC(  0x093DUL,  0x0950UL ),
+     /* omitting U+0951 udatta, U+0952 anudatta */
+     AF_UNIRANGE_REC(  0x0953UL,  0x0963UL ),
+     /* omitting U+0964 danda, U+0965 double danda */
+     AF_UNIRANGE_REC(  0x0966UL,  0x097FUL ),
+-    AF_UNIRANGE_REC(  0x20B9UL,  0x20B9UL ),  /* (new) Rupee sign */
++    AF_UNIRANGE_REC(  0x20B9UL,  0x20B9UL ),  /* (new) Rupee sign    */
++    AF_UNIRANGE_REC(  0xA8E0UL,  0xA8FFUL ),  /* Devanagari Extended */
++    AF_UNIRANGE_REC(       0UL,       0UL )
++  };
++
++  const AF_Script_UniRangeRec  af_deva_nobase_uniranges[] =
++  {
++    AF_UNIRANGE_REC(  0x0900UL,  0x0902UL ),
++    AF_UNIRANGE_REC(  0x093AUL,  0x093AUL ),
++    AF_UNIRANGE_REC(  0x093CUL,  0x093CUL ),
++    AF_UNIRANGE_REC(  0x0941UL,  0x0948UL ),
++    AF_UNIRANGE_REC(  0x094DUL,  0x094DUL ),
++    AF_UNIRANGE_REC(  0x0951UL,  0x0957UL ),
++    AF_UNIRANGE_REC(  0x0962UL,  0x0963UL ),
++    AF_UNIRANGE_REC(  0xA8E0UL,  0xA8F1UL ),
+     AF_UNIRANGE_REC(       0UL,       0UL )
+   };
+ 
++
+   const AF_Script_UniRangeRec  af_grek_uniranges[] =
+   {
+     AF_UNIRANGE_REC(  0x0370UL,  0x03FFUL ),  /* Greek and Coptic */
+@@ -63,6 +149,19 @@
+     AF_UNIRANGE_REC(       0UL,       0UL )
+   };
+ 
++  const AF_Script_UniRangeRec  af_grek_nobase_uniranges[] =
++  {
++    AF_UNIRANGE_REC(  0x037AUL,  0x037AUL ),
++    AF_UNIRANGE_REC(  0x0384UL,  0x0385UL ),
++    AF_UNIRANGE_REC(  0x1FBDUL,  0x1FC1UL ),
++    AF_UNIRANGE_REC(  0x1FCDUL,  0x1FCFUL ),
++    AF_UNIRANGE_REC(  0x1FDDUL,  0x1FDFUL ),
++    AF_UNIRANGE_REC(  0x1FEDUL,  0x1FEFUL ),
++    AF_UNIRANGE_REC(  0x1FFDUL,  0x1FFEUL ),
++    AF_UNIRANGE_REC(       0UL,       0UL )
++  };
++
++
+   const AF_Script_UniRangeRec  af_hebr_uniranges[] =
+   {
+     AF_UNIRANGE_REC(  0x0590UL,  0x05FFUL ),  /* Hebrew                          */
+@@ -70,51 +169,156 @@
+     AF_UNIRANGE_REC(       0UL,       0UL )
+   };
+ 
++  const AF_Script_UniRangeRec  af_hebr_nobase_uniranges[] =
++  {
++    AF_UNIRANGE_REC(  0x0591UL,  0x05BFUL ),
++    AF_UNIRANGE_REC(  0x05C1UL,  0x05C2UL ),
++    AF_UNIRANGE_REC(  0x05C4UL,  0x05C5UL ),
++    AF_UNIRANGE_REC(  0x05C7UL,  0x05C7UL ),
++    AF_UNIRANGE_REC(  0xFB1EUL,  0xFB1EUL ),
++    AF_UNIRANGE_REC(       0UL,       0UL )
++  };
++
++
+   const AF_Script_UniRangeRec  af_latn_uniranges[] =
+   {
+     AF_UNIRANGE_REC(  0x0020UL,  0x007FUL ),  /* Basic Latin (no control chars)         */
+-    AF_UNIRANGE_REC(  0x00A0UL,  0x00FFUL ),  /* Latin-1 Supplement (no control chars)  */
++    AF_UNIRANGE_REC(  0x00A0UL,  0x00A9UL ),  /* Latin-1 Supplement (no control chars)  */
++    AF_UNIRANGE_REC(  0x00ABUL,  0x00B1UL ),
++    AF_UNIRANGE_REC(  0x00B4UL,  0x00B8UL ),
++    AF_UNIRANGE_REC(  0x00BBUL,  0x00FFUL ),
+     AF_UNIRANGE_REC(  0x0100UL,  0x017FUL ),  /* Latin Extended-A                       */
+     AF_UNIRANGE_REC(  0x0180UL,  0x024FUL ),  /* Latin Extended-B                       */
+     AF_UNIRANGE_REC(  0x0250UL,  0x02AFUL ),  /* IPA Extensions                         */
+-    AF_UNIRANGE_REC(  0x02B0UL,  0x02FFUL ),  /* Spacing Modifier Letters               */
++    AF_UNIRANGE_REC(  0x02B9UL,  0x02DFUL ),  /* Spacing Modifier Letters               */
++    AF_UNIRANGE_REC(  0x02E5UL,  0x02FFUL ),
+     AF_UNIRANGE_REC(  0x0300UL,  0x036FUL ),  /* Combining Diacritical Marks            */
+-    AF_UNIRANGE_REC(  0x1D00UL,  0x1D7FUL ),  /* Phonetic Extensions                    */
+-    AF_UNIRANGE_REC(  0x1D80UL,  0x1DBFUL ),  /* Phonetic Extensions Supplement         */
++    AF_UNIRANGE_REC(  0x1AB0UL,  0x1ABEUL ),  /* Combining Diacritical Marks Extended   */
++    AF_UNIRANGE_REC(  0x1D00UL,  0x1D2BUL ),  /* Phonetic Extensions                    */
++    AF_UNIRANGE_REC(  0x1D6BUL,  0x1D77UL ),
++    AF_UNIRANGE_REC(  0x1D79UL,  0x1D7FUL ),
++    AF_UNIRANGE_REC(  0x1D80UL,  0x1D9AUL ),  /* Phonetic Extensions Supplement         */
+     AF_UNIRANGE_REC(  0x1DC0UL,  0x1DFFUL ),  /* Combining Diacritical Marks Supplement */
+     AF_UNIRANGE_REC(  0x1E00UL,  0x1EFFUL ),  /* Latin Extended Additional              */
+     AF_UNIRANGE_REC(  0x2000UL,  0x206FUL ),  /* General Punctuation                    */
+-    AF_UNIRANGE_REC(  0x2070UL,  0x209FUL ),  /* Superscripts and Subscripts            */
+     AF_UNIRANGE_REC(  0x20A0UL,  0x20B8UL ),  /* Currency Symbols ...                   */
+     AF_UNIRANGE_REC(  0x20BAUL,  0x20CFUL ),  /* ... except new Rupee sign              */
+     AF_UNIRANGE_REC(  0x2150UL,  0x218FUL ),  /* Number Forms                           */
+-    AF_UNIRANGE_REC(  0x2460UL,  0x24FFUL ),  /* Enclosed Alphanumerics                 */
+-    AF_UNIRANGE_REC(  0x2C60UL,  0x2C7FUL ),  /* Latin Extended-C                       */
++    AF_UNIRANGE_REC(  0x2C60UL,  0x2C7BUL ),  /* Latin Extended-C                       */
++    AF_UNIRANGE_REC(  0x2C7EUL,  0x2C7FUL ),
+     AF_UNIRANGE_REC(  0x2E00UL,  0x2E7FUL ),  /* Supplemental Punctuation               */
+-    AF_UNIRANGE_REC(  0xA720UL,  0xA7FFUL ),  /* Latin Extended-D                       */
++    AF_UNIRANGE_REC(  0xA720UL,  0xA76FUL ),  /* Latin Extended-D                       */
++    AF_UNIRANGE_REC(  0xA771UL,  0xA7F7UL ),
++    AF_UNIRANGE_REC(  0xA7FAUL,  0xA7FFUL ),
++    AF_UNIRANGE_REC(  0xAB30UL,  0xAB5BUL ),  /* Latin Extended-E                       */
++    AF_UNIRANGE_REC(  0xAB60UL,  0xAB6FUL ),
+     AF_UNIRANGE_REC(  0xFB00UL,  0xFB06UL ),  /* Alphab. Present. Forms (Latin Ligs)    */
+     AF_UNIRANGE_REC( 0x1D400UL, 0x1D7FFUL ),  /* Mathematical Alphanumeric Symbols      */
+-    AF_UNIRANGE_REC( 0x1F100UL, 0x1F1FFUL ),  /* Enclosed Alphanumeric Supplement       */
+     AF_UNIRANGE_REC(       0UL,       0UL )
+   };
+ 
++  const AF_Script_UniRangeRec  af_latn_nobase_uniranges[] =
++  {
++    AF_UNIRANGE_REC(  0x005EUL,  0x0060UL ),
++    AF_UNIRANGE_REC(  0x007EUL,  0x007EUL ),
++    AF_UNIRANGE_REC(  0x00A8UL,  0x00A9UL ),
++    AF_UNIRANGE_REC(  0x00AEUL,  0x00B0UL ),
++    AF_UNIRANGE_REC(  0x00B4UL,  0x00B4UL ),
++    AF_UNIRANGE_REC(  0x00B8UL,  0x00B8UL ),
++    AF_UNIRANGE_REC(  0x00BCUL,  0x00BEUL ),
++    AF_UNIRANGE_REC(  0x02B9UL,  0x02DFUL ),
++    AF_UNIRANGE_REC(  0x02E5UL,  0x02FFUL ),
++    AF_UNIRANGE_REC(  0x0300UL,  0x036FUL ),
++    AF_UNIRANGE_REC(  0x1AB0UL,  0x1ABEUL ),
++    AF_UNIRANGE_REC(  0x1DC0UL,  0x1DFFUL ),
++    AF_UNIRANGE_REC(  0x2017UL,  0x2017UL ),
++    AF_UNIRANGE_REC(  0x203EUL,  0x203EUL ),
++    AF_UNIRANGE_REC(  0xA788UL,  0xA788UL ),
++    AF_UNIRANGE_REC(  0xA7F8UL,  0xA7FAUL ),
++    AF_UNIRANGE_REC(       0UL,       0UL )
++  };
++
++
++  const AF_Script_UniRangeRec af_latb_uniranges[] =
++  {
++    AF_UNIRANGE_REC(  0x1D62UL,  0x1D6AUL ),
++    AF_UNIRANGE_REC(  0x2080UL,  0x209CUL ),
++    AF_UNIRANGE_REC(  0x2C7CUL,  0x2C7CUL ),
++    AF_UNIRANGE_REC(       0UL,       0UL )
++  };
++
++  const AF_Script_UniRangeRec af_latb_nobase_uniranges[] =
++  {
++    AF_UNIRANGE_REC( 0UL, 0UL )
++  };
++
++
++  const AF_Script_UniRangeRec af_latp_uniranges[] =
++  {
++    AF_UNIRANGE_REC(  0x00AAUL,  0x00AAUL ),
++    AF_UNIRANGE_REC(  0x00B2UL,  0x00B3UL ),
++    AF_UNIRANGE_REC(  0x00B9UL,  0x00BAUL ),
++    AF_UNIRANGE_REC(  0x02B0UL,  0x02B8UL ),
++    AF_UNIRANGE_REC(  0x02E0UL,  0x02E4UL ),
++    AF_UNIRANGE_REC(  0x1D2CUL,  0x1D61UL ),
++    AF_UNIRANGE_REC(  0x1D78UL,  0x1D78UL ),
++    AF_UNIRANGE_REC(  0x1D9BUL,  0x1DBFUL ),
++    AF_UNIRANGE_REC(  0x2070UL,  0x207FUL ),
++    AF_UNIRANGE_REC(  0x2C7DUL,  0x2C7DUL ),
++    AF_UNIRANGE_REC(  0xA770UL,  0xA770UL ),
++    AF_UNIRANGE_REC(  0xA7F8UL,  0xA7F9UL ),
++    AF_UNIRANGE_REC(  0xAB5CUL,  0xAB5FUL ),
++    AF_UNIRANGE_REC(       0UL,       0UL )
++  };
++
++  const AF_Script_UniRangeRec af_latp_nobase_uniranges[] =
++  {
++    AF_UNIRANGE_REC( 0UL, 0UL )
++  };
++
++
+   const AF_Script_UniRangeRec  af_none_uniranges[] =
+   {
+     AF_UNIRANGE_REC( 0UL, 0UL )
+   };
+ 
++  const AF_Script_UniRangeRec  af_none_nobase_uniranges[] =
++  {
++    AF_UNIRANGE_REC( 0UL, 0UL )
++  };
++
++
+   const AF_Script_UniRangeRec  af_telu_uniranges[] =
+   {
+     AF_UNIRANGE_REC(  0x0C00UL,  0x0C7FUL ),  /* Telugu */
+     AF_UNIRANGE_REC(       0UL,       0UL )
+   };
+ 
++  const AF_Script_UniRangeRec  af_telu_nobase_uniranges[] =
++  {
++    AF_UNIRANGE_REC(  0x0C00UL,  0x0C00UL ),
++    AF_UNIRANGE_REC(  0x0C3EUL,  0x0C40UL ),
++    AF_UNIRANGE_REC(  0x0C46UL,  0x0C56UL ),
++    AF_UNIRANGE_REC(  0x0C62UL,  0x0C63UL ),
++    AF_UNIRANGE_REC(       0UL,       0UL )
++  };
++
++
+   const AF_Script_UniRangeRec  af_thai_uniranges[] =
+   {
+     AF_UNIRANGE_REC(  0x0E00UL,  0x0E7FUL ),  /* Thai */
+     AF_UNIRANGE_REC(       0UL,       0UL )
+   };
+ 
++  const AF_Script_UniRangeRec  af_thai_nobase_uniranges[] =
++  {
++    AF_UNIRANGE_REC(  0x0E31UL,  0x0E31UL ),
++    AF_UNIRANGE_REC(  0x0E34UL,  0x0E3AUL ),
++    AF_UNIRANGE_REC(  0x0E47UL,  0x0E4EUL ),
++    AF_UNIRANGE_REC(       0UL,       0UL )
++  };
++
++
+ #ifdef AF_CONFIG_OPTION_INDIC
+ 
+   const AF_Script_UniRangeRec  af_beng_uniranges[] =
+@@ -123,72 +327,197 @@
+     AF_UNIRANGE_REC(       0UL,       0UL )
+   };
+ 
++  const AF_Script_UniRangeRec  af_beng_nobase_uniranges[] =
++  {
++    AF_UNIRANGE_REC(  0x0981UL,  0x0981UL ),
++    AF_UNIRANGE_REC(  0x09BCUL,  0x09BCUL ),
++    AF_UNIRANGE_REC(  0x09C1UL,  0x09C4UL ),
++    AF_UNIRANGE_REC(  0x09CDUL,  0x09CDUL ),
++    AF_UNIRANGE_REC(  0x09E2UL,  0x09E3UL ),
++    AF_UNIRANGE_REC(       0UL,       0UL )
++  };
++
++
+   const AF_Script_UniRangeRec  af_gujr_uniranges[] =
+   {
+     AF_UNIRANGE_REC(  0x0A80UL,  0x0AFFUL ),  /* Gujarati */
+     AF_UNIRANGE_REC(       0UL,       0UL )
+   };
+ 
++  const AF_Script_UniRangeRec  af_gujr_nobase_uniranges[] =
++  {
++    AF_UNIRANGE_REC(  0x0A81UL,  0x0A82UL ),
++    AF_UNIRANGE_REC(  0x0ABCUL,  0x0ABCUL ),
++    AF_UNIRANGE_REC(  0x0AC1UL,  0x0AC8UL ),
++    AF_UNIRANGE_REC(  0x0ACDUL,  0x0ACDUL ),
++    AF_UNIRANGE_REC(  0x0AE2UL,  0x0AE3UL ),
++    AF_UNIRANGE_REC(       0UL,       0UL )
++  };
++
++
+   const AF_Script_UniRangeRec  af_guru_uniranges[] =
+   {
+     AF_UNIRANGE_REC(  0x0A00UL,  0x0A7FUL ),  /* Gurmukhi */
+     AF_UNIRANGE_REC(       0UL,       0UL )
+   };
+ 
++  const AF_Script_UniRangeRec  af_guru_nobase_uniranges[] =
++  {
++    AF_UNIRANGE_REC(  0x0A01UL,  0x0A02UL ),
++    AF_UNIRANGE_REC(  0x0A3CUL,  0x0A3EUL ),
++    AF_UNIRANGE_REC(  0x0A41UL,  0x0A51UL ),
++    AF_UNIRANGE_REC(  0x0A70UL,  0x0A71UL ),
++    AF_UNIRANGE_REC(  0x0A75UL,  0x0A75UL ),
++    AF_UNIRANGE_REC(       0UL,       0UL )
++  };
++
++
+   const AF_Script_UniRangeRec  af_knda_uniranges[] =
+   {
+     AF_UNIRANGE_REC(  0x0C80UL,  0x0CFFUL ),  /* Kannada */
+     AF_UNIRANGE_REC(       0UL,       0UL )
+   };
+ 
++  const AF_Script_UniRangeRec  af_knda_nobase_uniranges[] =
++  {
++    AF_UNIRANGE_REC(  0x0C81UL,  0x0C81UL ),
++    AF_UNIRANGE_REC(  0x0CBCUL,  0x0CBCUL ),
++    AF_UNIRANGE_REC(  0x0CBFUL,  0x0CBFUL ),
++    AF_UNIRANGE_REC(  0x0CC6UL,  0x0CC6UL ),
++    AF_UNIRANGE_REC(  0x0CCCUL,  0x0CCDUL ),
++    AF_UNIRANGE_REC(  0x0CE2UL,  0x0CE3UL ),
++    AF_UNIRANGE_REC(       0UL,       0UL )
++  };
++
++
+   const AF_Script_UniRangeRec  af_limb_uniranges[] =
+   {
+     AF_UNIRANGE_REC(  0x1900UL,  0x194FUL ),  /* Limbu */
+     AF_UNIRANGE_REC(       0UL,       0UL )
+   };
+ 
++  const AF_Script_UniRangeRec  af_limb_nobase_uniranges[] =
++  {
++    AF_UNIRANGE_REC(  0x1920UL,  0x1922UL ),
++    AF_UNIRANGE_REC(  0x1927UL,  0x1934UL ),
++    AF_UNIRANGE_REC(  0x1937UL,  0x193BUL ),
++    AF_UNIRANGE_REC(       0UL,       0UL )
++  };
++
++
+   const AF_Script_UniRangeRec  af_mlym_uniranges[] =
+   {
+     AF_UNIRANGE_REC(  0x0D00UL,  0x0D7FUL ),  /* Malayalam */
+     AF_UNIRANGE_REC(       0UL,       0UL )
+   };
+ 
++  const AF_Script_UniRangeRec  af_mlym_nobase_uniranges[] =
++  {
++    AF_UNIRANGE_REC(  0x0D01UL,  0x0D01UL ),
++    AF_UNIRANGE_REC(  0x0D4DUL,  0x0D4EUL ),
++    AF_UNIRANGE_REC(  0x0D62UL,  0x0D63UL ),
++    AF_UNIRANGE_REC(       0UL,       0UL )
++  };
++
++
+   const AF_Script_UniRangeRec  af_orya_uniranges[] =
+   {
+     AF_UNIRANGE_REC(  0x0B00UL,  0x0B7FUL ),  /* Oriya */
+     AF_UNIRANGE_REC(       0UL,       0UL )
+   };
+ 
++  const AF_Script_UniRangeRec  af_orya_nobase_uniranges[] =
++  {
++    AF_UNIRANGE_REC(  0x0B01UL,  0x0B02UL ),
++    AF_UNIRANGE_REC(  0x0B3CUL,  0x0B3CUL ),
++    AF_UNIRANGE_REC(  0x0B3FUL,  0x0B3FUL ),
++    AF_UNIRANGE_REC(  0x0B41UL,  0x0B44UL ),
++    AF_UNIRANGE_REC(  0x0B4DUL,  0x0B56UL ),
++    AF_UNIRANGE_REC(  0x0B62UL,  0x0B63UL ),
++    AF_UNIRANGE_REC(       0UL,       0UL )
++  };
++
++
+   const AF_Script_UniRangeRec  af_sinh_uniranges[] =
+   {
+     AF_UNIRANGE_REC(  0x0D80UL,  0x0DFFUL ),  /* Sinhala */
+     AF_UNIRANGE_REC(       0UL,       0UL )
+   };
+ 
++  const AF_Script_UniRangeRec  af_sinh_nobase_uniranges[] =
++  {
++    AF_UNIRANGE_REC(  0x0DCAUL,  0x0DCAUL ),
++    AF_UNIRANGE_REC(  0x0DD2UL,  0x0DD6UL ),
++    AF_UNIRANGE_REC(       0UL,       0UL )
++  };
++
++
+   const AF_Script_UniRangeRec  af_sund_uniranges[] =
+   {
+-    AF_UNIRANGE_REC(  0x1B80UL,  0x1BBFUL ),  /* Sundanese */
++    AF_UNIRANGE_REC(  0x1B80UL,  0x1BBFUL ),  /* Sundanese            */
++    AF_UNIRANGE_REC(  0x1CC0UL,  0x1CCFUL ),  /* Sundanese Supplement */
+     AF_UNIRANGE_REC(       0UL,       0UL )
+   };
+ 
++  const AF_Script_UniRangeRec  af_sund_nobase_uniranges[] =
++  {
++    AF_UNIRANGE_REC(  0x1B80UL,  0x1B82UL ),
++    AF_UNIRANGE_REC(  0x1BA1UL,  0x1BADUL ),
++    AF_UNIRANGE_REC(       0UL,       0UL )
++  };
++
++
+   const AF_Script_UniRangeRec  af_sylo_uniranges[] =
+   {
+     AF_UNIRANGE_REC(  0xA800UL,  0xA82FUL ),  /* Syloti Nagri */
+     AF_UNIRANGE_REC(       0UL,       0UL )
+   };
+ 
++  const AF_Script_UniRangeRec  af_sylo_nobase_uniranges[] =
++  {
++    AF_UNIRANGE_REC(  0xA802UL,  0xA802UL ),
++    AF_UNIRANGE_REC(  0xA806UL,  0xA806UL ),
++    AF_UNIRANGE_REC(  0xA80BUL,  0xA80BUL ),
++    AF_UNIRANGE_REC(  0xA825UL,  0xA826UL ),
++    AF_UNIRANGE_REC(       0UL,       0UL )
++  };
++
++
+   const AF_Script_UniRangeRec  af_taml_uniranges[] =
+   {
+     AF_UNIRANGE_REC(  0x0B80UL,  0x0BFFUL ),  /* Tamil */
+     AF_UNIRANGE_REC(       0UL,       0UL )
+   };
+ 
++  const AF_Script_UniRangeRec  af_taml_nobase_uniranges[] =
++  {
++    AF_UNIRANGE_REC(  0x0B82UL,  0x0B82UL ),
++    AF_UNIRANGE_REC(  0x0BC0UL,  0x0BC2UL ),
++    AF_UNIRANGE_REC(  0x0BCDUL,  0x0BCDUL ),
++    AF_UNIRANGE_REC(       0UL,       0UL )
++  };
++
++
+   const AF_Script_UniRangeRec  af_tibt_uniranges[] =
+   {
+     AF_UNIRANGE_REC(  0x0F00UL,  0x0FFFUL ),  /* Tibetan */
+     AF_UNIRANGE_REC(       0UL,       0UL )
+   };
+ 
++  const AF_Script_UniRangeRec  af_tibt_nobase_uniranges[] =
++  {
++    AF_UNIRANGE_REC(  0x0F18UL,  0x0F19UL ),
++    AF_UNIRANGE_REC(  0x0F35UL,  0x0F35UL ),
++    AF_UNIRANGE_REC(  0x0F37UL,  0x0F37UL ),
++    AF_UNIRANGE_REC(  0x0F39UL,  0x0F39UL ),
++    AF_UNIRANGE_REC(  0x0F3EUL,  0x0F3FUL ),
++    AF_UNIRANGE_REC(  0x0F71UL,  0x0F7EUL ),
++    AF_UNIRANGE_REC(  0x0F80UL,  0x0F84UL ),
++    AF_UNIRANGE_REC(  0x0F86UL,  0x0F87UL ),
++    AF_UNIRANGE_REC(  0x0F8DUL,  0x0FBCUL ),
++    AF_UNIRANGE_REC(       0UL,       0UL )
++  };
++
+ #endif /* !AF_CONFIG_OPTION_INDIC */
+ 
+ #ifdef AF_CONFIG_OPTION_CJK
+@@ -210,7 +539,6 @@
+     AF_UNIRANGE_REC(  0x31A0UL,  0x31BFUL ),  /* Bopomofo Extended                       */
+     AF_UNIRANGE_REC(  0x31C0UL,  0x31EFUL ),  /* CJK Strokes                             */
+     AF_UNIRANGE_REC(  0x31F0UL,  0x31FFUL ),  /* Katakana Phonetic Extensions            */
+-    AF_UNIRANGE_REC(  0x3200UL,  0x32FFUL ),  /* Enclosed CJK Letters and Months         */
+     AF_UNIRANGE_REC(  0x3300UL,  0x33FFUL ),  /* CJK Compatibility                       */
+     AF_UNIRANGE_REC(  0x3400UL,  0x4DBFUL ),  /* CJK Unified Ideographs Extension A      */
+     AF_UNIRANGE_REC(  0x4DC0UL,  0x4DFFUL ),  /* Yijing Hexagram Symbols                 */
+@@ -224,7 +552,6 @@
+     AF_UNIRANGE_REC(  0xFF00UL,  0xFFEFUL ),  /* Halfwidth and Fullwidth Forms           */
+     AF_UNIRANGE_REC( 0x1B000UL, 0x1B0FFUL ),  /* Kana Supplement                         */
+     AF_UNIRANGE_REC( 0x1D300UL, 0x1D35FUL ),  /* Tai Xuan Hing Symbols                   */
+-    AF_UNIRANGE_REC( 0x1F200UL, 0x1F2FFUL ),  /* Enclosed Ideographic Supplement         */
+     AF_UNIRANGE_REC( 0x20000UL, 0x2A6DFUL ),  /* CJK Unified Ideographs Extension B      */
+     AF_UNIRANGE_REC( 0x2A700UL, 0x2B73FUL ),  /* CJK Unified Ideographs Extension C      */
+     AF_UNIRANGE_REC( 0x2B740UL, 0x2B81FUL ),  /* CJK Unified Ideographs Extension D      */
+@@ -232,6 +559,13 @@
+     AF_UNIRANGE_REC(       0UL,       0UL )
+   };
+ 
++  const AF_Script_UniRangeRec  af_hani_nobase_uniranges[] =
++  {
++    AF_UNIRANGE_REC(  0x302AUL,  0x302FUL ),
++    AF_UNIRANGE_REC(  0x3190UL,  0x319FUL ),
++    AF_UNIRANGE_REC(       0UL,       0UL )
++  };
++
+ #endif /* !AF_CONFIG_OPTION_CJK */
+ 
+ /* END */
+-- 
+2.5.2
+
+From d3cba0ed30bedaca23a2f4aab2d28d2afae7e087 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Fri, 4 Sep 2015 10:28:53 +0200
+Subject: [PATCH] [autofit] Redesign code ranges (2/2).
+
+This commit adds two fallback scripts (`latb', `latp') and
+implements support for the no-base character ranges introduced in
+the previous commit.
+
+* src/autofit/aftypes.h (AF_ScriptClassRec): Add
+`script_uni_nobase_ranges' field.
+(AF_DEFINE_SCRIPT_CLASS): Updated.
+
+* src/autofit/afscript.h, src/autofit/afstyles.h: Add `latb' and
+`latp' fallback scripts.
+
+* src/autofit/afblue.dat: Add blue zones for Latin subscript and
+superscript fallback scripts.
+
+* src/autofit/afblue.c, src/autofit/afblue.h: Regenerated.
+
+* src/autofit/afglobal.h (AF_NOBASE): New style flag for no-base
+characters.
+(AF_STYLE_MASK): Updated.
+
+* src/autofit/afglobal.c (SCRIPT): Updated.
+(af_face_globals_compute_style_coverage): Handle new style flag.
+
+* src/autofit/aflatin.c (af_latin_hints_apply): Handle new style
+flag.
+
+* src/autofit/afranges.h (SCRIPT): Use it to export no-base ranges.
+---
+ ChangeLog              | 32 ++++++++++++++++++++++++++++++++
+ src/autofit/afblue.c   | 36 ++++++++++++++++++++++++++++++++++++
+ src/autofit/afblue.dat | 45 +++++++++++++++++++++++++++++++++++++++++++++
+ src/autofit/afblue.h   | 38 +++++++++++++++++++++++++-------------
+ src/autofit/afglobal.c | 40 +++++++++++++++++++++++++++++++++++-----
+ src/autofit/afglobal.h |  8 +++++---
+ src/autofit/aflatin.c  |  6 +++---
+ src/autofit/afranges.h |  6 ++++++
+ src/autofit/afscript.h | 18 ++++++++++++++++--
+ src/autofit/afstyles.h | 27 ++++++++++++++++++++++-----
+ src/autofit/aftypes.h  | 23 +++++++++++++++--------
+ 11 files changed, 240 insertions(+), 39 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index b87bf74..977473a 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,5 +1,37 @@
+ 2015-09-04  Werner Lemberg  <wl@gnu.org>
+ 
++	[autofit] Redesign code ranges (2/2).
++
++	This commit adds two fallback scripts (`latb', `latp') and
++	implements support for the no-base character ranges introduced in
++	the previous commit.
++
++	* src/autofit/aftypes.h (AF_ScriptClassRec): Add
++	`script_uni_nobase_ranges' field.
++	(AF_DEFINE_SCRIPT_CLASS): Updated.
++
++	* src/autofit/afscript.h, src/autofit/afstyles.h: Add `latb' and
++	`latp' fallback scripts.
++
++	* src/autofit/afblue.dat: Add blue zones for Latin subscript and
++	superscript fallback scripts.
++
++	* src/autofit/afblue.c, src/autofit/afblue.h: Regenerated.
++
++	* src/autofit/afglobal.h (AF_NOBASE): New style flag for no-base
++	characters.
++	(AF_STYLE_MASK): Updated.
++
++	* src/autofit/afglobal.c (SCRIPT): Updated.
++	(af_face_globals_compute_style_coverage): Handle new style flag.
++
++	* src/autofit/aflatin.c (af_latin_hints_apply): Handle new style
++	flag.
++
++	* src/autofit/afranges.h (SCRIPT): Use it to export no-base ranges.
++
++2015-09-04  Werner Lemberg  <wl@gnu.org>
++
+ 	[autofit] Redesign code ranges (1/2).
+ 
+ 	This patch introduces auxiliary code ranges that identify no-base
+diff --git a/src/autofit/afblue.c b/src/autofit/afblue.c
+index 62da0f2..437fa65 100644
+--- a/src/autofit/afblue.c
++++ b/src/autofit/afblue.c
+@@ -74,6 +74,26 @@
+     '\0',
+     'p', 'q', 'g', 'j', 'y',  /* pqgjy */
+     '\0',
++    '\xE2', '\x82', '\x80', '\xE2', '\x82', '\x83', '\xE2', '\x82', '\x85', '\xE2', '\x82', '\x87', '\xE2', '\x82', '\x88',  /* ₀₃₅₇₈ */
++    '\0',
++    '\xE2', '\x82', '\x80', '\xE2', '\x82', '\x81', '\xE2', '\x82', '\x82', '\xE2', '\x82', '\x83', '\xE2', '\x82', '\x88',  /* ₀₁₂₃₈ */
++    '\0',
++    '\xE1', '\xB5', '\xA2', '\xE2', '\xB1', '\xBC', '\xE2', '\x82', '\x95', '\xE2', '\x82', '\x96', '\xE2', '\x82', '\x97',  /* ᵢⱼₕₖₗ */
++    '\0',
++    '\xE2', '\x82', '\x90', '\xE2', '\x82', '\x91', '\xE2', '\x82', '\x92', '\xE2', '\x82', '\x93', '\xE2', '\x82', '\x99', '\xE2', '\x82', '\x9B', '\xE1', '\xB5', '\xA5', '\xE1', '\xB5', '\xA4', '\xE1', '\xB5', '\xA3',  /* ₐₑₒₓₙₛᵥᵤᵣ */
++    '\0',
++    '\xE1', '\xB5', '\xA6', '\xE1', '\xB5', '\xA7', '\xE1', '\xB5', '\xA8', '\xE1', '\xB5', '\xA9', '\xE2', '\x82', '\x9A',  /* ᵦᵧᵨᵩₚ */
++    '\0',
++    '\xE2', '\x81', '\xB0', '\xC2', '\xB3', '\xE2', '\x81', '\xB5', '\xE2', '\x81', '\xB7', '\xE1', '\xB5', '\x80', '\xE1', '\xB4', '\xB4', '\xE1', '\xB4', '\xB1', '\xE1', '\xB4', '\xBC',  /* ⁰³⁵⁷ᵀᴴᴱᴼ */
++    '\0',
++    '\xE2', '\x81', '\xB0', '\xC2', '\xB9', '\xC2', '\xB2', '\xC2', '\xB3', '\xE1', '\xB4', '\xB1', '\xE1', '\xB4', '\xB8', '\xE1', '\xB4', '\xBC', '\xE1', '\xB5', '\x81',  /* ⁰¹²³ᴱᴸᴼᵁ */
++    '\0',
++    '\xE1', '\xB5', '\x87', '\xE1', '\xB5', '\x88', '\xE1', '\xB5', '\x8F', '\xCA', '\xB0', '\xCA', '\xB2', '\xE1', '\xB6', '\xA0', '\xE2', '\x81', '\xB1',  /* ᵇᵈᵏʰʲᶠⁱ */
++    '\0',
++    '\xE1', '\xB5', '\x89', '\xE1', '\xB5', '\x92', '\xCA', '\xB3', '\xCB', '\xA2', '\xCB', '\xA3', '\xE1', '\xB6', '\x9C', '\xE1', '\xB6', '\xBB',  /* ᵉᵒʳˢˣᶜᶻ */
++    '\0',
++    '\xE1', '\xB5', '\x96', '\xCA', '\xB8', '\xE1', '\xB5', '\x8D',  /* ᵖʸᵍ */
++    '\0',
+     '\xE0', '\xB0', '\x87', '\xE0', '\xB0', '\x8C', '\xE0', '\xB0', '\x99', '\xE0', '\xB0', '\x9E', '\xE0', '\xB0', '\xA3', '\xE0', '\xB0', '\xB1', '\xE0', '\xB1', '\xAF',  /* ఇ ఌ ఙ ఞ ణ ఱ ౯ */
+     '\0',
+     '\xE0', '\xB0', '\x85', '\xE0', '\xB0', '\x95', '\xE0', '\xB0', '\x9A', '\xE0', '\xB0', '\xB0', '\xE0', '\xB0', '\xBD', '\xE0', '\xB1', '\xA8', '\xE0', '\xB1', '\xAC',  /* అ క చ ర ఽ ౨ ౬ */
+@@ -181,6 +201,22 @@
+     { AF_BLUE_STRING_LATIN_SMALL,           0                                 },
+     { AF_BLUE_STRING_LATIN_SMALL_DESCENDER, 0                                 },
+     { AF_BLUE_STRING_MAX,                   0                                 },
++    { AF_BLUE_STRING_LATIN_SUBS_CAPITAL_TOP,     AF_BLUE_PROPERTY_LATIN_TOP        },
++    { AF_BLUE_STRING_LATIN_SUBS_CAPITAL_BOTTOM,  0                                 },
++    { AF_BLUE_STRING_LATIN_SUBS_SMALL_F_TOP,     AF_BLUE_PROPERTY_LATIN_TOP        },
++    { AF_BLUE_STRING_LATIN_SUBS_SMALL,           AF_BLUE_PROPERTY_LATIN_TOP      |
++                                                 AF_BLUE_PROPERTY_LATIN_X_HEIGHT   },
++    { AF_BLUE_STRING_LATIN_SUBS_SMALL,           0                                 },
++    { AF_BLUE_STRING_LATIN_SUBS_SMALL_DESCENDER, 0                                 },
++    { AF_BLUE_STRING_MAX,                        0                                 },
++    { AF_BLUE_STRING_LATIN_SUPS_CAPITAL_TOP,     AF_BLUE_PROPERTY_LATIN_TOP        },
++    { AF_BLUE_STRING_LATIN_SUPS_CAPITAL_BOTTOM,  0                                 },
++    { AF_BLUE_STRING_LATIN_SUPS_SMALL_F_TOP,     AF_BLUE_PROPERTY_LATIN_TOP        },
++    { AF_BLUE_STRING_LATIN_SUPS_SMALL,           AF_BLUE_PROPERTY_LATIN_TOP      |
++                                                 AF_BLUE_PROPERTY_LATIN_X_HEIGHT   },
++    { AF_BLUE_STRING_LATIN_SUPS_SMALL,           0                                 },
++    { AF_BLUE_STRING_LATIN_SUPS_SMALL_DESCENDER, 0                                 },
++    { AF_BLUE_STRING_MAX,                        0                                 },
+     { AF_BLUE_STRING_TELUGU_TOP,    AF_BLUE_PROPERTY_LATIN_TOP },
+     { AF_BLUE_STRING_TELUGU_BOTTOM, 0                          },
+     { AF_BLUE_STRING_MAX,           0                          },
+diff --git a/src/autofit/afblue.dat b/src/autofit/afblue.dat
+index 8facfec..aadef92 100644
+--- a/src/autofit/afblue.dat
++++ b/src/autofit/afblue.dat
+@@ -131,6 +131,31 @@ AF_BLUE_STRING_ENUM AF_BLUE_STRINGS_ARRAY AF_BLUE_STRING_MAX_LEN:
+   AF_BLUE_STRING_LATIN_SMALL_DESCENDER
+     "pqgjy"
+ 
++  // we assume that both the subscript and superscript ranges
++  // don't contain oldstyle digits (actually, most fonts probably
++  // have digits only in those ranges)
++  AF_BLUE_STRING_LATIN_SUBS_CAPITAL_TOP
++    "₀₃₅₇₈"
++  AF_BLUE_STRING_LATIN_SUBS_CAPITAL_BOTTOM
++    "₀₁₂₃₈"
++  AF_BLUE_STRING_LATIN_SUBS_SMALL_F_TOP
++    "ᵢⱼₕₖₗ"
++  AF_BLUE_STRING_LATIN_SUBS_SMALL
++    "ₐₑₒₓₙₛᵥᵤᵣ"
++  AF_BLUE_STRING_LATIN_SUBS_SMALL_DESCENDER
++    "ᵦᵧᵨᵩₚ"
++
++  AF_BLUE_STRING_LATIN_SUPS_CAPITAL_TOP
++    "⁰³⁵⁷ᵀᴴᴱᴼ"
++  AF_BLUE_STRING_LATIN_SUPS_CAPITAL_BOTTOM
++    "⁰¹²³ᴱᴸᴼᵁ"
++  AF_BLUE_STRING_LATIN_SUPS_SMALL_F_TOP
++    "ᵇᵈᵏʰʲᶠⁱ"
++  AF_BLUE_STRING_LATIN_SUPS_SMALL
++    "ᵉᵒʳˢˣᶜᶻ"
++  AF_BLUE_STRING_LATIN_SUPS_SMALL_DESCENDER
++    "ᵖʸᵍ"
++
+   // we separate the letters with spaces to avoid ligatures;
+   // this is just for convenience to simplify reading
+   AF_BLUE_STRING_TELUGU_TOP
+@@ -347,6 +372,26 @@ AF_BLUE_STRINGSET_ENUM AF_BLUE_STRINGSETS_ARRAY AF_BLUE_STRINGSET_MAX_LEN:
+     { AF_BLUE_STRING_LATIN_SMALL_DESCENDER, 0                                 }
+     { AF_BLUE_STRING_MAX,                   0                                 }
+ 
++  AF_BLUE_STRINGSET_LATB
++    { AF_BLUE_STRING_LATIN_SUBS_CAPITAL_TOP,     AF_BLUE_PROPERTY_LATIN_TOP        }
++    { AF_BLUE_STRING_LATIN_SUBS_CAPITAL_BOTTOM,  0                                 }
++    { AF_BLUE_STRING_LATIN_SUBS_SMALL_F_TOP,     AF_BLUE_PROPERTY_LATIN_TOP        }
++    { AF_BLUE_STRING_LATIN_SUBS_SMALL,           AF_BLUE_PROPERTY_LATIN_TOP      |
++                                                 AF_BLUE_PROPERTY_LATIN_X_HEIGHT   }
++    { AF_BLUE_STRING_LATIN_SUBS_SMALL,           0                                 }
++    { AF_BLUE_STRING_LATIN_SUBS_SMALL_DESCENDER, 0                                 }
++    { AF_BLUE_STRING_MAX,                        0                                 }
++
++  AF_BLUE_STRINGSET_LATP
++    { AF_BLUE_STRING_LATIN_SUPS_CAPITAL_TOP,     AF_BLUE_PROPERTY_LATIN_TOP        }
++    { AF_BLUE_STRING_LATIN_SUPS_CAPITAL_BOTTOM,  0                                 }
++    { AF_BLUE_STRING_LATIN_SUPS_SMALL_F_TOP,     AF_BLUE_PROPERTY_LATIN_TOP        }
++    { AF_BLUE_STRING_LATIN_SUPS_SMALL,           AF_BLUE_PROPERTY_LATIN_TOP      |
++                                                 AF_BLUE_PROPERTY_LATIN_X_HEIGHT   }
++    { AF_BLUE_STRING_LATIN_SUPS_SMALL,           0                                 }
++    { AF_BLUE_STRING_LATIN_SUPS_SMALL_DESCENDER, 0                                 }
++    { AF_BLUE_STRING_MAX,                        0                                 }
++
+   AF_BLUE_STRINGSET_TELU
+     { AF_BLUE_STRING_TELUGU_TOP,    AF_BLUE_PROPERTY_LATIN_TOP }
+     { AF_BLUE_STRING_TELUGU_BOTTOM, 0                          }
+diff --git a/src/autofit/afblue.h b/src/autofit/afblue.h
+index 2080e31..18b4361 100644
+--- a/src/autofit/afblue.h
++++ b/src/autofit/afblue.h
+@@ -98,16 +98,26 @@ FT_BEGIN_HEADER
+     AF_BLUE_STRING_LATIN_SMALL_F_TOP = 301,
+     AF_BLUE_STRING_LATIN_SMALL = 309,
+     AF_BLUE_STRING_LATIN_SMALL_DESCENDER = 317,
+-    AF_BLUE_STRING_TELUGU_TOP = 323,
+-    AF_BLUE_STRING_TELUGU_BOTTOM = 345,
+-    AF_BLUE_STRING_THAI_TOP = 367,
+-    AF_BLUE_STRING_THAI_BOTTOM = 386,
+-    AF_BLUE_STRING_THAI_ASCENDER = 408,
+-    AF_BLUE_STRING_THAI_LARGE_ASCENDER = 418,
+-    AF_BLUE_STRING_THAI_DESCENDER = 428,
+-    AF_BLUE_STRING_THAI_LARGE_DESCENDER = 441,
+-    AF_BLUE_STRING_THAI_DIGIT_TOP = 448,
+-    af_blue_1_1 = 457,
++    AF_BLUE_STRING_LATIN_SUBS_CAPITAL_TOP = 323,
++    AF_BLUE_STRING_LATIN_SUBS_CAPITAL_BOTTOM = 339,
++    AF_BLUE_STRING_LATIN_SUBS_SMALL_F_TOP = 355,
++    AF_BLUE_STRING_LATIN_SUBS_SMALL = 371,
++    AF_BLUE_STRING_LATIN_SUBS_SMALL_DESCENDER = 399,
++    AF_BLUE_STRING_LATIN_SUPS_CAPITAL_TOP = 415,
++    AF_BLUE_STRING_LATIN_SUPS_CAPITAL_BOTTOM = 439,
++    AF_BLUE_STRING_LATIN_SUPS_SMALL_F_TOP = 461,
++    AF_BLUE_STRING_LATIN_SUPS_SMALL = 481,
++    AF_BLUE_STRING_LATIN_SUPS_SMALL_DESCENDER = 500,
++    AF_BLUE_STRING_TELUGU_TOP = 509,
++    AF_BLUE_STRING_TELUGU_BOTTOM = 531,
++    AF_BLUE_STRING_THAI_TOP = 553,
++    AF_BLUE_STRING_THAI_BOTTOM = 572,
++    AF_BLUE_STRING_THAI_ASCENDER = 594,
++    AF_BLUE_STRING_THAI_LARGE_ASCENDER = 604,
++    AF_BLUE_STRING_THAI_DESCENDER = 614,
++    AF_BLUE_STRING_THAI_LARGE_DESCENDER = 627,
++    AF_BLUE_STRING_THAI_DIGIT_TOP = 634,
++    af_blue_1_1 = 643,
+ #ifdef AF_CONFIG_OPTION_CJK
+     AF_BLUE_STRING_CJK_TOP = af_blue_1_1 + 1,
+     AF_BLUE_STRING_CJK_BOTTOM = af_blue_1_1 + 153,
+@@ -171,9 +181,11 @@ FT_BEGIN_HEADER
+     AF_BLUE_STRINGSET_GREK = 16,
+     AF_BLUE_STRINGSET_HEBR = 23,
+     AF_BLUE_STRINGSET_LATN = 27,
+-    AF_BLUE_STRINGSET_TELU = 34,
+-    AF_BLUE_STRINGSET_THAI = 37,
+-    af_blue_2_1 = 45,
++    AF_BLUE_STRINGSET_LATB = 34,
++    AF_BLUE_STRINGSET_LATP = 41,
++    AF_BLUE_STRINGSET_TELU = 48,
++    AF_BLUE_STRINGSET_THAI = 51,
++    af_blue_2_1 = 59,
+ #ifdef AF_CONFIG_OPTION_CJK
+     AF_BLUE_STRINGSET_HANI = af_blue_2_1 + 0,
+     af_blue_2_1_1 = af_blue_2_1 + 2,
+diff --git a/src/autofit/afglobal.c b/src/autofit/afglobal.c
+index cd0e2ab..c1cc276 100644
+--- a/src/autofit/afglobal.c
++++ b/src/autofit/afglobal.c
+@@ -47,6 +47,7 @@
+             af_ ## s ## _script_class,      \
+             AF_SCRIPT_ ## S,                \
+             af_ ## s ## _uniranges,         \
++            af_ ## s ## _nobase_uniranges,  \
+             sc1, sc2, sc3 )
+ 
+ #include "afscript.h"
+@@ -189,9 +190,9 @@
+ 
+           gindex = FT_Get_Char_Index( face, charcode );
+ 
+-          if ( gindex != 0                             &&
+-               gindex < (FT_ULong)globals->glyph_count &&
+-               gstyles[gindex] == AF_STYLE_UNASSIGNED  )
++          if ( gindex != 0                                                &&
++               gindex < (FT_ULong)globals->glyph_count                    &&
++               ( gstyles[gindex] & AF_STYLE_MASK ) == AF_STYLE_UNASSIGNED )
+             gstyles[gindex] = (FT_UShort)ss;
+ 
+           for (;;)
+@@ -201,11 +202,40 @@
+             if ( gindex == 0 || charcode > range->last )
+               break;
+ 
+-            if ( gindex < (FT_ULong)globals->glyph_count &&
+-                 gstyles[gindex] == AF_STYLE_UNASSIGNED  )
++            if ( gindex < (FT_ULong)globals->glyph_count                    &&
++                 ( gstyles[gindex] & AF_STYLE_MASK ) == AF_STYLE_UNASSIGNED )
+               gstyles[gindex] = (FT_UShort)ss;
+           }
+         }
++
++        /* do the same for the script's no-base characters */
++        for ( range = script_class->script_uni_nobase_ranges;
++              range->first != 0;
++              range++ )
++        {
++          FT_ULong  charcode = range->first;
++          FT_UInt   gindex;
++
++
++          gindex = FT_Get_Char_Index( face, charcode );
++
++          if ( gindex != 0                                          &&
++               gindex < (FT_ULong)globals->glyph_count              &&
++               ( gstyles[gindex] & AF_STYLE_MASK ) == (FT_UShort)ss )
++            gstyles[gindex] |= AF_NOBASE;
++
++          for (;;)
++          {
++            charcode = FT_Get_Next_Char( face, charcode, &gindex );
++
++            if ( gindex == 0 || charcode > range->last )
++              break;
++
++            if ( gindex < (FT_ULong)globals->glyph_count              &&
++                 ( gstyles[gindex] & AF_STYLE_MASK ) == (FT_UShort)ss )
++              gstyles[gindex] |= AF_NOBASE;
++          }
++        }
+       }
+       else
+       {
+diff --git a/src/autofit/afglobal.h b/src/autofit/afglobal.h
+index 284f6a0..8189f48 100644
+--- a/src/autofit/afglobal.h
++++ b/src/autofit/afglobal.h
+@@ -73,13 +73,15 @@ FT_BEGIN_HEADER
+   /* default script for OpenType; ignored if HarfBuzz isn't used */
+ #define AF_SCRIPT_DEFAULT    AF_SCRIPT_LATN
+ 
+-  /* a bit mask for TA_DIGIT */
+-#define AF_STYLE_MASK        0x7FFF
++  /* a bit mask for AF_DIGIT and AF_NOBASE */
++#define AF_STYLE_MASK        0x3FFF
+   /* an uncovered glyph      */
+ #define AF_STYLE_UNASSIGNED  AF_STYLE_MASK
+ 
+-  /* if this flag is set, we have an ASCII digit     */
++  /* if this flag is set, we have an ASCII digit   */
+ #define AF_DIGIT             0x8000U
++  /* if this flag is set, we have a no-base character */
++#define AF_NOBASE            0x4000U
+ 
+   /* `increase-x-height' property */
+ #define AF_PROP_INCREASE_X_HEIGHT_MIN  6
+diff --git a/src/autofit/aflatin.c b/src/autofit/aflatin.c
+index ae2c46d..954da07 100644
+--- a/src/autofit/aflatin.c
++++ b/src/autofit/aflatin.c
+@@ -2846,8 +2846,6 @@
+ 
+     AF_LatinAxis  axis;
+ 
+-    FT_UNUSED( glyph_index );
+-
+ 
+     error = af_glyph_hints_reload( hints, outline );
+     if ( error )
+@@ -2881,7 +2879,9 @@
+       if ( error )
+         goto Exit;
+ 
+-      af_latin_hints_compute_blue_edges( hints, metrics );
++      /* apply blue zones to base characters only */
++      if ( !( metrics->root.globals->glyph_styles[glyph_index] & AF_NOBASE ) )
++        af_latin_hints_compute_blue_edges( hints, metrics );
+     }
+ 
+     /* grid-fit the outline */
+diff --git a/src/autofit/afranges.h b/src/autofit/afranges.h
+index 7c78ab0..38e40cd 100644
+--- a/src/autofit/afranges.h
++++ b/src/autofit/afranges.h
+@@ -31,6 +31,12 @@ FT_BEGIN_HEADER
+ 
+ #include "afscript.h"
+ 
++#undef  SCRIPT
++#define SCRIPT( s, S, d, h, sc1, sc2, sc3 )                                    \
++          extern const AF_Script_UniRangeRec  af_ ## s ## _nobase_uniranges[];
++
++#include "afscript.h"
++
+  /* */
+ 
+ FT_END_HEADER
+diff --git a/src/autofit/afscript.h b/src/autofit/afscript.h
+index dfcc830..8ef5f0e 100644
+--- a/src/autofit/afscript.h
++++ b/src/autofit/afscript.h
+@@ -25,6 +25,10 @@
+   /* by a description string.  Then comes the corresponding HarfBuzz  */
+   /* script name tag, followed by a string of standard characters (to */
+   /* derive the standard width and height of stems).                  */
++  /*                                                                  */
++  /* Note that fallback scripts only have a default style, thus we    */
++  /* use `HB_SCRIPT_INVALID' as the HarfBuzz script name tag for      */
++  /* them.                                                            */
+ 
+   SCRIPT( arab, ARAB,
+           "Arabic",
+@@ -34,7 +38,7 @@
+   SCRIPT( cyrl, CYRL,
+           "Cyrillic",
+           HB_SCRIPT_CYRILLIC,
+-          0x43E, 0x41E, 0x0 ) /* оО */
++          0x43E, 0x41E, 0x0 ) /* о О */
+ 
+   SCRIPT( deva, DEVA,
+           "Devanagari",
+@@ -44,7 +48,7 @@
+   SCRIPT( grek, GREK,
+           "Greek",
+           HB_SCRIPT_GREEK,
+-          0x3BF, 0x39F, 0x0 ) /* οΟ */
++          0x3BF, 0x39F, 0x0 ) /* ο Ο */
+ 
+   SCRIPT( hebr, HEBR,
+           "Hebrew",
+@@ -56,6 +60,16 @@
+           HB_SCRIPT_LATIN,
+           'o', 'O', '0' )
+ 
++  SCRIPT( latb, LATB,
++          "Latin Subscript Fallback",
++          HB_SCRIPT_INVALID,
++          0x2092, 0x2080, 0x0 ) /* ₒ ₀ */
++
++  SCRIPT( latp, LATP,
++          "Latin Superscript Fallback",
++          HB_SCRIPT_INVALID,
++          0x1D52, 0x1D3C, 0x2070 ) /* ᵒ ᴼ ⁰ */
++
+   SCRIPT( none, NONE,
+           "no script",
+           HB_SCRIPT_INVALID,
+diff --git a/src/autofit/afstyles.h b/src/autofit/afstyles.h
+index bfd5bb9..42f5d2f 100644
+--- a/src/autofit/afstyles.h
++++ b/src/autofit/afstyles.h
+@@ -27,7 +27,9 @@
+   /* coverage.                                                     */
+   /*                                                               */
+   /* Note that styles using `AF_COVERAGE_DEFAULT' should always    */
+-  /* come after styles with other coverages.                       */
++  /* come after styles with other coverages.  Also note that       */
++  /* fallback scripts only use `AF_COVERAGE_DEFAULT' for its       */
++  /* style.                                                        */
+   /*                                                               */
+   /* Example:                                                      */
+   /*                                                               */
+@@ -90,6 +92,13 @@
+ 
+   META_STYLE_LATIN( cyrl, CYRL, "Cyrillic" )
+ 
++  STYLE( deva_dflt, DEVA_DFLT,
++         "Devanagari default style",
++         AF_WRITING_SYSTEM_LATIN,
++         AF_SCRIPT_DEVA,
++         AF_BLUE_STRINGSET_DEVA,
++         AF_COVERAGE_DEFAULT )
++
+   META_STYLE_LATIN( grek, GREK, "Greek" )
+ 
+   STYLE( hebr_dflt, HEBR_DFLT,
+@@ -98,13 +107,21 @@
+          AF_SCRIPT_HEBR,
+          AF_BLUE_STRINGSET_HEBR,
+          AF_COVERAGE_DEFAULT )
++
+   META_STYLE_LATIN( latn, LATN, "Latin" )
+ 
+-  STYLE( deva_dflt, DEVA_DFLT,
+-         "Devanagari default style",
++  STYLE( latb_dflt, LATB_DFLT,
++         "Latin subscript fallback default style",
+          AF_WRITING_SYSTEM_LATIN,
+-         AF_SCRIPT_DEVA,
+-         AF_BLUE_STRINGSET_DEVA,
++         AF_SCRIPT_LATB,
++         AF_BLUE_STRINGSET_LATB,
++         AF_COVERAGE_DEFAULT )
++
++  STYLE( latp_dflt, LATP_DFLT,
++         "Latin superscript fallback default style",
++         AF_WRITING_SYSTEM_LATIN,
++         AF_SCRIPT_LATP,
++         AF_BLUE_STRINGSET_LATP,
+          AF_COVERAGE_DEFAULT )
+ 
+ #ifdef FT_OPTION_AUTOFIT2
+diff --git a/src/autofit/aftypes.h b/src/autofit/aftypes.h
+index d6b1bf7..54fa37f 100644
+--- a/src/autofit/aftypes.h
++++ b/src/autofit/aftypes.h
+@@ -294,8 +294,9 @@ extern void*  _af_debug_hints;
+   /*************************************************************************/
+ 
+   /*
+-   *  Each script is associated with a set of Unicode ranges that gets used
+-   *  to test whether the font face supports the script.
++   *  Each script is associated with two sets of Unicode ranges to test
++   *  whether the font face supports the script, and which no-base characters
++   *  the script contains.
+    *
+    *  We use four-letter script tags from the OpenType specification,
+    *  extended by `NONE', which indicates `no script'.
+@@ -332,7 +333,9 @@ extern void*  _af_debug_hints;
+   {
+     AF_Script  script;
+ 
+-    AF_Script_UniRange  script_uni_ranges; /* last must be { 0, 0 }        */
++    /* last element in the ranges must be { 0, 0 } */
++    AF_Script_UniRange  script_uni_ranges;
++    AF_Script_UniRange  script_uni_nobase_ranges;
+ 
+     FT_UInt32  standard_char1;             /* for default width and height */
+     FT_UInt32  standard_char2;             /* ditto                        */
+@@ -512,6 +515,7 @@ extern void*  _af_debug_hints;
+           script_class,                   \
+           script,                         \
+           ranges,                         \
++          nobase_ranges,                  \
+           std_char1,                      \
+           std_char2,                      \
+           std_char3 )                     \
+@@ -520,6 +524,7 @@ extern void*  _af_debug_hints;
+   {                                       \
+     script,                               \
+     ranges,                               \
++    nobase_ranges,                        \
+     std_char1,                            \
+     std_char2,                            \
+     std_char3                             \
+@@ -586,17 +591,19 @@ extern void*  _af_debug_hints;
+           script_class,                                    \
+           script_,                                         \
+           ranges,                                          \
++          nobase_ranges,                                   \
+           std_char1,                                       \
+           std_char2,                                       \
+           std_char3 )                                      \
+   FT_LOCAL_DEF( void )                                     \
+   FT_Init_Class_ ## script_class( AF_ScriptClassRec*  ac ) \
+   {                                                        \
+-    ac->script            = script_;                       \
+-    ac->script_uni_ranges = ranges;                        \
+-    ac->standard_char1    = std_char1;                     \
+-    ac->standard_char2    = std_char2;                     \
+-    ac->standard_char3    = std_char3;                     \
++    ac->script                   = script_;                \
++    ac->script_uni_ranges        = ranges;                 \
++    ac->script_uni_nobase_ranges = nobase_ranges;          \
++    ac->standard_char1           = std_char1;              \
++    ac->standard_char2           = std_char2;              \
++    ac->standard_char3           = std_char3;              \
+   }
+ 
+ 
+-- 
+2.5.2
+
+From a9f6f04e5671dc5c8961bc89ab343406259dd3cd Mon Sep 17 00:00:00 2001
+From: Alexei Podtelezhnikov <apodtele@gmail.com>
+Date: Fri, 4 Sep 2015 22:28:13 -0400
+Subject: [PATCH] [autofit] Missing piece.
+
+---
+ src/autofit/hbshim.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/autofit/hbshim.c b/src/autofit/hbshim.c
+index 692671e..7a45059 100644
+--- a/src/autofit/hbshim.c
++++ b/src/autofit/hbshim.c
+@@ -509,7 +509,7 @@
+   FT_Error
+   af_get_coverage( AF_FaceGlobals  globals,
+                    AF_StyleClass   style_class,
+-                   FT_Byte*        gstyles )
++                   FT_UShort*      gstyles )
+   {
+     FT_UNUSED( globals );
+     FT_UNUSED( style_class );
+-- 
+2.5.2
+
+From 5a6dc87240905f0e55568678e0fbf93a51242051 Mon Sep 17 00:00:00 2001
+From: Alexei Podtelezhnikov <apodtele@gmail.com>
+Date: Fri, 4 Sep 2015 23:14:46 -0400
+Subject: [PATCH] [raster,smooth] Microoptimizations.
+
+* src/raster/ftraster.c (Insert_Y_Turn, Finalize_Profile_Table,
+Beziier_Up, ): Use do-while loops.
+
+* src/smooth/ftgrays.c (gray_render_scanline, gray_render_line,
+gray_convert_glyph): Ditto.
+---
+ ChangeLog             | 10 ++++++++++
+ src/raster/ftraster.c | 14 ++++++--------
+ src/smooth/ftgrays.c  | 12 ++++++------
+ 3 files changed, 22 insertions(+), 14 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 977473a..a6e6db3 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,13 @@
++2015-09-04  Alexei Podtelezhnikov  <apodtele@gmail.com>
++
++	[raster,smooth] Microoptimizations.
++
++	* src/raster/ftraster.c (Insert_Y_Turn, Finalize_Profile_Table,
++	Beziier_Up, ): Use do-while loops.
++
++	* src/smooth/ftgrays.c (gray_render_scanline, gray_render_line,
++	gray_convert_glyph): Ditto.
++
+ 2015-09-04  Werner Lemberg  <wl@gnu.org>
+ 
+ 	[autofit] Redesign code ranges (2/2).
+diff --git a/src/raster/ftraster.c b/src/raster/ftraster.c
+index 8e9c794..1c51f91 100644
+--- a/src/raster/ftraster.c
++++ b/src/raster/ftraster.c
+@@ -801,15 +801,14 @@
+ 
+     /* if it is <, simply insert it, ignore if == */
+     if ( n >= 0 && y > y_turns[n] )
+-      while ( n >= 0 )
++      do
+       {
+         Int  y2 = (Int)y_turns[n];
+ 
+ 
+         y_turns[n] = y;
+         y = y2;
+-        n--;
+-      }
++      } while ( --n >= 0 );
+ 
+     if ( n < 0 )
+     {
+@@ -850,7 +849,7 @@
+ 
+     if ( n > 1 && p )
+     {
+-      while ( n > 0 )
++      do
+       {
+         Int  bottom, top;
+ 
+@@ -878,8 +877,7 @@
+           return FAILURE;
+ 
+         p = p->link;
+-        n--;
+-      }
++      } while ( --n );
+     }
+     else
+       ras.fProfile = NULL;
+@@ -1250,7 +1248,7 @@
+ 
+     start_arc = arc;
+ 
+-    while ( arc >= start_arc && e <= e2 )
++    do
+     {
+       ras.joint = FALSE;
+ 
+@@ -1283,7 +1281,7 @@
+         }
+         arc -= degree;
+       }
+-    }
++    } while ( arc >= start_arc && e <= e2 );
+ 
+   Fin:
+     ras.top  = top;
+diff --git a/src/smooth/ftgrays.c b/src/smooth/ftgrays.c
+index a9317e9..e4559b9 100644
+--- a/src/smooth/ftgrays.c
++++ b/src/smooth/ftgrays.c
+@@ -758,7 +758,7 @@ typedef ptrdiff_t  FT_PtrDist;
+ 
+       mod -= (int)dx;
+ 
+-      while ( ex1 != ex2 )
++      do
+       {
+         delta = lift;
+         mod  += rem;
+@@ -773,7 +773,7 @@ typedef ptrdiff_t  FT_PtrDist;
+         y1        += delta;
+         ex1       += incr;
+         gray_set_cell( RAS_VAR_ ex1, ey );
+-      }
++      } while ( ex1 != ex2 );
+     }
+ 
+     delta      = y2 - y1;
+@@ -896,7 +896,7 @@ typedef ptrdiff_t  FT_PtrDist;
+       FT_DIV_MOD( int, p, dy, lift, rem );
+       mod -= (int)dy;
+ 
+-      while ( ey1 != ey2 )
++      do
+       {
+         delta = lift;
+         mod  += rem;
+@@ -914,7 +914,7 @@ typedef ptrdiff_t  FT_PtrDist;
+ 
+         ey1 += incr;
+         gray_set_cell( RAS_VAR_ TRUNC( x ), ey1 );
+-      }
++      } while ( ey1 != ey2 );
+     }
+ 
+     gray_render_scanline( RAS_VAR_ ey1, x,
+@@ -1847,7 +1847,7 @@ typedef ptrdiff_t  FT_PtrDist;
+       bands[0].max = max;
+       band         = bands;
+ 
+-      while ( band >= bands )
++      do
+       {
+         TPos  bottom, top, middle;
+         int   error;
+@@ -1923,7 +1923,7 @@ typedef ptrdiff_t  FT_PtrDist;
+         band[0].min = middle;
+         band[0].max = top;
+         band++;
+-      }
++      } while ( band >= bands );
+     }
+ 
+     if ( ras.band_shoot > 8 && ras.band_size > 16 )
+-- 
+2.5.2
+
+From b002f6882dbf184f353bee39db152a56d4b528d8 Mon Sep 17 00:00:00 2001
+From: Alexei Podtelezhnikov <apodtele@gmail.com>
+Date: Mon, 7 Sep 2015 13:47:36 -0400
+Subject: [PATCH] * src/smooth/ftgrays.c (gray_render_line): Simplify clipping.
+
+---
+ ChangeLog            |  4 ++++
+ src/smooth/ftgrays.c | 17 +++--------------
+ 2 files changed, 7 insertions(+), 14 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index a6e6db3..b4c306c 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,7 @@
++2015-09-07  Alexei Podtelezhnikov  <apodtele@gmail.com>
++
++	* src/smooth/ftgrays.c (gray_render_line): Simplify clipping.
++
+ 2015-09-04  Alexei Podtelezhnikov  <apodtele@gmail.com>
+ 
+ 	[raster,smooth] Microoptimizations.
+diff --git a/src/smooth/ftgrays.c b/src/smooth/ftgrays.c
+index e4559b9..b6b0230 100644
+--- a/src/smooth/ftgrays.c
++++ b/src/smooth/ftgrays.c
+@@ -805,20 +805,9 @@ typedef ptrdiff_t  FT_PtrDist;
+     dy = to_y - ras.y;
+ 
+     /* perform vertical clipping */
+-    {
+-      TCoord  min, max;
+-
+-
+-      min = ey1;
+-      max = ey2;
+-      if ( ey1 > ey2 )
+-      {
+-        min = ey2;
+-        max = ey1;
+-      }
+-      if ( min >= ras.max_ey || max < ras.min_ey )
+-        goto End;
+-    }
++    if ( ( ey1 >= ras.max_ey && ey2 >= ras.max_ey ) ||
++         ( ey1 <  ras.min_ey && ey2 <  ras.min_ey ) )
++      goto End;
+ 
+     /* everything is on a single scanline */
+     if ( ey1 == ey2 )
+-- 
+2.5.2
+
+From 5578199a6808aaa5cd9f2a7792f99fa9767422dc Mon Sep 17 00:00:00 2001
+From: Wojciech Mamrak <wmamrak@gmail.com>
+Date: Wed, 9 Sep 2015 07:52:17 +0200
+Subject: [PATCH] Minor documentation corrections.
+
+---
+ include/freetype/freetype.h | 17 ++++++++++-------
+ include/freetype/fttrigon.h |  4 ++--
+ 2 files changed, 12 insertions(+), 9 deletions(-)
+
+diff --git a/include/freetype/freetype.h b/include/freetype/freetype.h
+index 61b6a45..fb1254b 100644
+--- a/include/freetype/freetype.h
++++ b/include/freetype/freetype.h
+@@ -3032,11 +3032,13 @@ FT_BEGIN_HEADER
+   /*    @FT_Get_Kerning.                                                   */
+   /*                                                                       */
+   /* <Values>                                                              */
+-  /*    FT_KERNING_DEFAULT  :: Return scaled and grid-fitted kerning       */
+-  /*                           distances (value is~0).                     */
++  /*    FT_KERNING_DEFAULT  :: Return grid-fitted kerning distances in     */
++  /*                           pixels (value is~0).  Whether they are      */
++  /*                           scaled depends on @FT_LOAD_NO_SCALE.        */
+   /*                                                                       */
+-  /*    FT_KERNING_UNFITTED :: Return scaled but un-grid-fitted kerning    */
+-  /*                           distances.                                  */
++  /*    FT_KERNING_UNFITTED :: Return un-grid-fitted kerning distances in  */
++  /*                           26.6 fractional pixels.  Whether they are   */
++  /*                           scaled depends on @FT_LOAD_NO_SCALE.        */
+   /*                                                                       */
+   /*    FT_KERNING_UNSCALED :: Return the kerning vector in original font  */
+   /*                           units.                                      */
+@@ -3082,9 +3084,10 @@ FT_BEGIN_HEADER
+   /*                   kerning vector.                                     */
+   /*                                                                       */
+   /* <Output>                                                              */
+-  /*    akerning    :: The kerning vector.  This is either in font units   */
+-  /*                   or in pixels (26.6 format) for scalable formats,    */
+-  /*                   and in pixels for fixed-sizes formats.              */
++  /*    akerning    :: The kerning vector.  This is either in font units,  */
++  /*                   fractional pixels (26.6 format), or pixels for      */
++  /*                   scalable formats, and in pixels for fixed-sizes     */
++  /*                   formats.                                            */
+   /*                                                                       */
+   /* <Return>                                                              */
+   /*    FreeType error code.  0~means success.                             */
+diff --git a/include/freetype/fttrigon.h b/include/freetype/fttrigon.h
+index 3d821ba..485ec51 100644
+--- a/include/freetype/fttrigon.h
++++ b/include/freetype/fttrigon.h
+@@ -225,8 +225,8 @@ FT_BEGIN_HEADER
+    *
+    * @description:
+    *   Return the unit vector corresponding to a given angle.  After the
+-   *   call, the value of `vec.x' will be `sin(angle)', and the value of
+-   *   `vec.y' will be `cos(angle)'.
++   *   call, the value of `vec.x' will be `cos(angle)', and the value of
++   *   `vec.y' will be `sin(angle)'.
+    *
+    *   This function is useful to retrieve both the sinus and cosinus of a
+    *   given angle quickly.
+-- 
+2.5.2
+
+From 822acb025291e9a767c6408c765d4066c009a1c9 Mon Sep 17 00:00:00 2001
+From: Wojciech Mamrak <wmamrak@gmail.com>
+Date: Wed, 9 Sep 2015 07:59:10 +0200
+Subject: [PATCH] * src/base/ftcalc.c (FT_CeilFix, FT_FloorFix): Normalize.
+
+This commit makes the functions behave as expected, this is,
+rounding towards plus or minus infinity.
+---
+ ChangeLog                   | 7 +++++++
+ include/freetype/freetype.h | 7 ++++---
+ src/base/ftcalc.c           | 6 ++----
+ 3 files changed, 13 insertions(+), 7 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index b4c306c..4e226c1 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,10 @@
++2015-09-09  Wojciech Mamrak  <wmamrak@gmail.com>
++
++	* src/base/ftcalc.c (FT_CeilFix, FT_FloorFix): Normalize.
++
++	This commit makes the functions behave as expected, this is,
++	rounding towards plus or minus infinity.
++
+ 2015-09-07  Alexei Podtelezhnikov  <apodtele@gmail.com>
+ 
+ 	* src/smooth/ftgrays.c (gray_render_line): Simplify clipping.
+diff --git a/include/freetype/freetype.h b/include/freetype/freetype.h
+index fb1254b..aafbdfd 100644
+--- a/include/freetype/freetype.h
++++ b/include/freetype/freetype.h
+@@ -3955,7 +3955,8 @@ FT_BEGIN_HEADER
+   /*    a :: The number to be rounded.                                     */
+   /*                                                                       */
+   /* <Return>                                                              */
+-  /*    The result of `(a + 0x8000) & -0x10000'.                           */
++  /*    `a' rounded to nearest 16.16 fixed integer, halfway cases away     */
++  /*    from zero.                                                         */
+   /*                                                                       */
+   FT_EXPORT( FT_Fixed )
+   FT_RoundFix( FT_Fixed  a );
+@@ -3974,7 +3975,7 @@ FT_BEGIN_HEADER
+   /*    a :: The number for which the ceiling function is to be computed.  */
+   /*                                                                       */
+   /* <Return>                                                              */
+-  /*    The result of `(a + 0x10000 - 1) & -0x10000'.                      */
++  /*    `a' rounded towards plus infinity.                                 */
+   /*                                                                       */
+   FT_EXPORT( FT_Fixed )
+   FT_CeilFix( FT_Fixed  a );
+@@ -3993,7 +3994,7 @@ FT_BEGIN_HEADER
+   /*    a :: The number for which the floor function is to be computed.    */
+   /*                                                                       */
+   /* <Return>                                                              */
+-  /*    The result of `a & -0x10000'.                                      */
++  /*    `a' rounded towards minus infinity.                                */
+   /*                                                                       */
+   FT_EXPORT( FT_Fixed )
+   FT_FloorFix( FT_Fixed  a );
+diff --git a/src/base/ftcalc.c b/src/base/ftcalc.c
+index 01aead5..edb27fd 100644
+--- a/src/base/ftcalc.c
++++ b/src/base/ftcalc.c
+@@ -96,8 +96,7 @@
+   FT_EXPORT_DEF( FT_Fixed )
+   FT_CeilFix( FT_Fixed  a )
+   {
+-    return a >= 0 ?   ( a + 0xFFFFL ) & ~0xFFFFL
+-                  : -((-a + 0xFFFFL ) & ~0xFFFFL );
++    return ( a + 0xFFFFL ) & ~0xFFFFL;
+   }
+ 
+ 
+@@ -106,8 +105,7 @@
+   FT_EXPORT_DEF( FT_Fixed )
+   FT_FloorFix( FT_Fixed  a )
+   {
+-    return a >= 0 ?   a & ~0xFFFFL
+-                  : -((-a) & ~0xFFFFL );
++    return a & ~0xFFFFL;
+   }
+ 
+ #ifndef FT_MSB
+-- 
+2.5.2
+
+From 4d406e39078dcc5ed23ebf039a21db0bc6b24403 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Wed, 9 Sep 2015 08:02:47 +0200
+Subject: [PATCH] Update `CHANGES' file.
+
+---
+ docs/CHANGES | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/docs/CHANGES b/docs/CHANGES
+index ec417c6..36a33ee 100644
+--- a/docs/CHANGES
++++ b/docs/CHANGES
+@@ -51,10 +51,20 @@ CHANGES BETWEEN 2.6 and 2.6.1
+ 
+     - The auto-hinter's Arabic script support has been enhanced.
+ 
++    - Superscript-like and  subscript-like glyphs  as used  by various
++      phonetic alphabets like the IPA  are now better supported by the
++      auto-hinter.
++
+     - The TrueType bytecode interpreter now runs slightly faster.
+ 
+     - Improved support for builds with cmake.
+ 
++    - The  function  `FT_CeilFix'  now   always  rounds  towards  plus
++      infinity.
++
++    - The  function  `FT_FloorFix'  now always  rounds  towards  minus
++      infinity.
++
+ 
+ ======================================================================
+ 
+-- 
+2.5.2
+
+From 09948e426e95a486017913158a46ac570cc7a91a Mon Sep 17 00:00:00 2001
+From: Alexei Podtelezhnikov <apodtele@gmail.com>
+Date: Wed, 9 Sep 2015 21:30:15 -0400
+Subject: [PATCH] * src/base/ftcalc.c (FT_RoundFix): Improve.
+
+---
+ ChangeLog         | 4 ++++
+ src/base/ftcalc.c | 3 +--
+ 2 files changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 4e226c1..8071971 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,7 @@
++2015-09-09  Alexei Podtelezhnikov  <apodtele@gmail.com>
++
++	* src/base/ftcalc.c (FT_RoundFix): Improve.
++
+ 2015-09-09  Wojciech Mamrak  <wmamrak@gmail.com>
+ 
+ 	* src/base/ftcalc.c (FT_CeilFix, FT_FloorFix): Normalize.
+diff --git a/src/base/ftcalc.c b/src/base/ftcalc.c
+index edb27fd..dbddeda 100644
+--- a/src/base/ftcalc.c
++++ b/src/base/ftcalc.c
+@@ -86,8 +86,7 @@
+   FT_EXPORT_DEF( FT_Fixed )
+   FT_RoundFix( FT_Fixed  a )
+   {
+-    return a >= 0 ?   ( a + 0x8000L ) & ~0xFFFFL
+-                  : -((-a + 0x8000L ) & ~0xFFFFL );
++    return ( a + 0x8000L - ( a < 0 ) ) & ~0xFFFFL;
+   }
+ 
+ 
+-- 
+2.5.2
+
+From e5a27a7596684eea63190d51551165eea5d20717 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Thu, 10 Sep 2015 07:44:11 +0200
+Subject: [PATCH] [docmaker] Allow `-' in bold and italic markup.
+
+* src/tools/docmaker/sources.py (re_italic, re_bold): Adjust
+accordingly.
+---
+ ChangeLog                     | 7 +++++++
+ src/tools/docmaker/sources.py | 7 ++++---
+ 2 files changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 8071971..73a7a41 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,10 @@
++2015-09-10  Werner Lemberg  <wl@gnu.org>
++
++	[docmaker] Allow `-' in bold and italic markup.
++
++	* src/tools/docmaker/sources.py (re_italic, re_bold): Adjust
++	accordingly.
++
+ 2015-09-09  Alexei Podtelezhnikov  <apodtele@gmail.com>
+ 
+ 	* src/base/ftcalc.c (FT_RoundFix): Improve.
+diff --git a/src/tools/docmaker/sources.py b/src/tools/docmaker/sources.py
+index 0cf21ce..be38132 100644
+--- a/src/tools/docmaker/sources.py
++++ b/src/tools/docmaker/sources.py
+@@ -150,10 +150,11 @@ re_crossref = re.compile( r'@((?:\w|-)*)(.*)' )    #  @foo
+ # Group 1 is the markup, group 2 the rest of the line.
+ #
+ # Note that the markup is limited to words consisting of letters, digits,
+-# the character `_', or an apostrophe (but not as the first character).
++# the characters `_' and `-', or an apostrophe (but not as the first
++# character).
+ #
+-re_italic = re.compile( r"_(\w(?:\w|')*)_(.*)" )     #  _italic_
+-re_bold   = re.compile( r"\*(\w(?:\w|')*)\*(.*)" )   #  *bold*
++re_italic = re.compile( r"_((?:\w|-)(?:\w|'|-)*)_(.*)" )     #  _italic_
++re_bold   = re.compile( r"\*((?:\w|-)(?:\w|'|-)*)\*(.*)" )   #  *bold*
+ 
+ #
+ # This regular expression code to identify an URL has been taken from
+-- 
+2.5.2
+
+From b6eef5ae7bc5fd3a07f237c8f609d12dd4084130 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Thu, 10 Sep 2015 07:44:48 +0200
+Subject: [PATCH] Better document various TrueType hinting modes.
+
+Text based on private communication with Greg Hitchcock and added to the
+repository with his permission.
+---
+ include/freetype/ftttdrv.h | 77 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 77 insertions(+)
+
+diff --git a/include/freetype/ftttdrv.h b/include/freetype/ftttdrv.h
+index f56040b..dc0081a 100644
+--- a/include/freetype/ftttdrv.h
++++ b/include/freetype/ftttdrv.h
+@@ -52,6 +52,83 @@ FT_BEGIN_HEADER
+    *
+    *   The TrueType driver's module name is `truetype'.
+    *
++   *   We start with a list of definitions, kindly provided by Greg
++   *   Hitchcock.
++   *
++   *   _Bi-Level_ _Rendering_
++   *
++   *   Monochromatic rendering, exclusively used in the early days of
++   *   TrueType by both Apple and Microsoft.  Microsoft's GDI interface
++   *   supported hinting of the right-side bearing point, such that the
++   *   advance width could be non-linear.  Most often this was done to
++   *   achieve some level of glyph symmetry.  To enable reasonable
++   *   performance (e.g., not having to run hinting on all glyphs just to
++   *   get the widths) there was a bit in the head table indicating if the
++   *   side bearing was hinted, and additional tables, `hdmx' and `LTSH', to
++   *   cache hinting widths across multiple sizes and device aspect ratios.
++   *
++   *   _Font_ _Smoothing_
++   *
++   *   Microsoft's GDI implementation of anti-aliasing.  Not traditional
++   *   anti-aliasing as the outlines were hinted before the sampling.  The
++   *   widths matched the bi-level rendering.
++   *
++   *   _ClearType_ _Rendering_
++   *
++   *   Technique that uses physical subpixels to improve rendering on LCD
++   *   (and other) displays.  Because of the higher resolution, many methods
++   *   of improving symmetry in glyphs through hinting the right-side
++   *   bearing were no longer necessary.  This lead to what GDI calls
++   *   `natural widths' ClearType, see
++   *   http://www.beatstamm.com/typography/RTRCh4.htm#Sec21.  Since hinting
++   *   has extra resolution, most non-linearity went away, but it is still
++   *   possible for hints to change the advance widths in this mode.
++   *
++   *   _ClearType_ _Compatible_ _Widths_
++   *
++   *   One of the earliest challenges with ClearType was allowing the
++   *   implementation in GDI to be selected without requiring all UI and
++   *   documents to reflow.  To address this, a compatible method of
++   *   rendering ClearType was added where the font hints are executed once
++   *   to determine the width in bi-level rendering, and then re-run in
++   *   ClearType, with the difference in widths being absorbed in the font
++   *   hints for ClearType (mostly in the white space of hints); see
++   *   http://www.beatstamm.com/typography/RTRCh4.htm#Sec20.  Somewhat by
++   *   definition, compatible width ClearType allows for non-linear widths,
++   *   but only when the bi-level version has non-linear widths.
++   *
++   *   _ClearType_ _Subpixel_ _Positioning_
++   *
++   *   One of the nice benefits of ClearType is the ability to more crisply
++   *   display fractional widths; unfortunately, the GDI model of integer
++   *   bitmaps did not support this.  However, the WPF and Direct Write
++   *   frameworks do support fractional widths.  DWrite calls this `natural
++   *   mode', not to be confused with GDI's `natural widths'.  Subpixel
++   *   positioning, in the current implementation of Direct Write,
++   *   unfortunately does not support hinted advance widths, see
++   *   http://www.beatstamm.com/typography/RTRCh4.htm#Sec22.  Note that the
++   *   TrueType interpreter fully allows the advance width to be adjusted in
++   *   this mode, just the DWrite client will ignore those changes.
++   *
++   *   _ClearType_ _Backwards_ _Compatibility_
++   *
++   *   This is a set of exceptions made in the TrueType interpreter to
++   *   minimize hinting techniques that were problematic with the extra
++   *   resolution of ClearType; see
++   *   http://www.beatstamm.com/typography/RTRCh4.htm#Sec1 and
++   *   http://www.microsoft.com/typography/cleartype/truetypecleartype.aspx.
++   *   This technique is not to be confused with ClearType compatible
++   *   widths.  ClearType backwards compatibility has no direct impact on
++   *   changing advance widths, but there might be an indirect impact on
++   *   disabling some deltas.  This could be worked around in backwards
++   *   compatibility mode.
++   *
++   *   _Native_ _ClearType_ _Mode_
++   *
++   *   (Not to be confused with `natural widths'.)  This mode removes all
++   *   the exceptions in the TrueType interpreter when running with
++   *   ClearType.  Any issues on widths would still apply, though.
++   *
+    */
+ 
+ 
+-- 
+2.5.2
+
+From 23423bc6f998fe715306cfc52a436b3f24824f02 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Fri, 11 Sep 2015 08:28:27 +0200
+Subject: [PATCH] [type42] Fix endless loop (#45920).
+
+* src/type42/t42parse.c (t42_parse_encoding): Synchronize with
+type1's `parse_encoding'.
+---
+ ChangeLog             |  7 +++++++
+ src/type42/t42parse.c | 17 ++++++++++++-----
+ 2 files changed, 19 insertions(+), 5 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 73a7a41..804a7b8 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,10 @@
++2015-09-11  Werner Lemberg  <wl@gnu.org>
++
++	[type42] Fix endless loop (#45920).
++
++	* src/type42/t42parse.c (t42_parse_encoding): Synchronize with
++	type1's `parse_encoding'.
++
+ 2015-09-10  Werner Lemberg  <wl@gnu.org>
+ 
+ 	[docmaker] Allow `-' in bold and italic markup.
+diff --git a/src/type42/t42parse.c b/src/type42/t42parse.c
+index fadbf21..f7d5eb6 100644
+--- a/src/type42/t42parse.c
++++ b/src/type42/t42parse.c
+@@ -414,6 +414,13 @@
+           {
+             charcode = (FT_Int)T1_ToInt( parser );
+             T1_Skip_Spaces( parser );
++
++            /* protect against invalid charcode */
++            if ( cur == parser->root.cursor )
++            {
++              parser->root.error = FT_THROW( Unknown_File_Format );
++              return;
++            }
+           }
+ 
+           cur = parser->root.cursor;
+@@ -448,10 +455,10 @@
+             /* immediates-only mode we would get an infinite loop if   */
+             /* we don't do anything here.                              */
+             /*                                                         */
+-            /* This encoding array is not valid according to the type1 */
+-            /* specification (it might be an encoding for a CID type1  */
+-            /* font, however), so we conclude that this font is NOT a  */
+-            /* type1 font.                                             */
++            /* This encoding array is not valid according to the       */
++            /* type42 specification (it might be an encoding for a CID */
++            /* type42 font, however), so we conclude that this font is */
++            /* NOT a type42 font.                                      */
+             parser->root.error = FT_THROW( Unknown_File_Format );
+             return;
+           }
+@@ -487,7 +494,7 @@
+         face->type1.encoding_type = T1_ENCODING_TYPE_ISOLATIN1;
+ 
+       else
+-        parser->root.error = FT_THROW( Ignore );
++        parser->root.error = FT_ERR( Ignore );
+     }
+   }
+ 
+-- 
+2.5.2
+
+From 19b82cfbed2a269b0aae92f6dff3d40c3adccd3d Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Fri, 11 Sep 2015 20:25:32 +0200
+Subject: [PATCH] [base] Avoid crash while tracing `load_mac_face'.
+
+Reported in Savannah bug #45919.
+
+* src/base/ftobjs.c (load_mac_face): Honour FT_OPEN_MEMORY while
+tracing.
+---
+ ChangeLog         | 9 +++++++++
+ src/base/ftobjs.c | 6 +++++-
+ 2 files changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 804a7b8..1241306 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,5 +1,14 @@
+ 2015-09-11  Werner Lemberg  <wl@gnu.org>
+ 
++	[base] Avoid crash while tracing `load_mac_face'.
++
++	Reported in Savannah bug #45919.
++
++	* src/base/ftobjs.c (load_mac_face): Honour FT_OPEN_MEMORY while
++	tracing.
++
++2015-09-11  Werner Lemberg  <wl@gnu.org>
++
+ 	[type42] Fix endless loop (#45920).
+ 
+ 	* src/type42/t42parse.c (t42_parse_encoding): Synchronize with
+diff --git a/src/base/ftobjs.c b/src/base/ftobjs.c
+index 7092856..3a41ac0 100644
+--- a/src/base/ftobjs.c
++++ b/src/base/ftobjs.c
+@@ -2037,7 +2037,11 @@
+ #undef  FT_COMPONENT
+ #define FT_COMPONENT  trace_raccess
+ 
+-      FT_TRACE3(( "Try as dfont: %s ...", args->pathname ));
++#ifdef FT_DEBUG_LEVEL_TRACE
++      FT_TRACE3(( "Try as dfont: " ));
++      if ( !( args->flags & FT_OPEN_MEMORY ) )
++        FT_TRACE3(( "%s ...", args->pathname ));
++#endif
+ 
+       error = IsMacResource( library, stream, 0, face_index, aface );
+ 
+-- 
+2.5.2
+
+From db5a4a9ae7b0048f033361744421da8569642f73 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Sat, 12 Sep 2015 08:32:55 +0200
+Subject: [PATCH] [psaux] Fix potential buffer overflow (#45922).
+
+* src/psaux/psobjs.c (ps_parser_skip_PS_token): If a token is
+enclosed in balanced expressions, ensure that the cursor position
+doesn't get larger than the current limit.
+---
+ ChangeLog          | 8 ++++++++
+ src/psaux/psobjs.c | 3 +++
+ 2 files changed, 11 insertions(+)
+
+diff --git a/ChangeLog b/ChangeLog
+index 1241306..c185380 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,5 +1,13 @@
+ 2015-09-11  Werner Lemberg  <wl@gnu.org>
+ 
++	[psaux] Fix potential buffer overflow (#45922).
++
++	* src/psaux/psobjs.c (ps_parser_skip_PS_token): If a token is
++	enclosed in balanced expressions, ensure that the cursor position
++	doesn't get larger than the current limit.
++
++2015-09-11  Werner Lemberg  <wl@gnu.org>
++
+ 	[base] Avoid crash while tracing `load_mac_face'.
+ 
+ 	Reported in Savannah bug #45919.
+diff --git a/src/psaux/psobjs.c b/src/psaux/psobjs.c
+index c7cbc67..54eabe2 100644
+--- a/src/psaux/psobjs.c
++++ b/src/psaux/psobjs.c
+@@ -594,6 +594,9 @@
+       error = FT_THROW( Invalid_File_Format );
+     }
+ 
++    if ( cur > limit )
++      cur = limit;
++
+     parser->error  = error;
+     parser->cursor = cur;
+   }
+-- 
+2.5.2
+
+From e40e8b33a1e925c7f9db57bedac4014f57481232 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Sun, 13 Sep 2015 08:05:50 +0200
+Subject: [PATCH] [gzip] Fix access of small compressed files (#45937).
+
+* src/gzip/ftgzip.c (ft_gzip_stream_close): Avoid memory leak.
+
+(ft_gzip_get_uncompressed_file): Correct byte order while reading
+unsigned long value.  Without this change, the whole optimization of
+accessing small files in `FT_Stream_OpenGzip' is never executed!  As
+a consequence, access to PCF files in general (which are normally
+small files) should be much improved now as originally intended.
+---
+ ChangeLog         | 12 ++++++++++++
+ src/gzip/ftgzip.c |  7 +++++--
+ 2 files changed, 17 insertions(+), 2 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index c185380..3618f24 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,15 @@
++2015-09-13  Werner Lemberg  <wl@gnu.org>
++
++	[gzip] Fix access of small compressed files (#45937).
++
++	* src/gzip/ftgzip.c (ft_gzip_stream_close): Avoid memory leak.
++
++	(ft_gzip_get_uncompressed_file): Correct byte order while reading
++	unsigned long value.  Without this change, the whole optimization of
++	accessing small files in `FT_Stream_OpenGzip' is never executed!  As
++	a consequence, access to PCF files in general (which are normally
++	small files) should be much improved now as originally intended.
++
+ 2015-09-11  Werner Lemberg  <wl@gnu.org>
+ 
+ 	[psaux] Fix potential buffer overflow (#45922).
+diff --git a/src/gzip/ftgzip.c b/src/gzip/ftgzip.c
+index 879eb88..be9c122 100644
+--- a/src/gzip/ftgzip.c
++++ b/src/gzip/ftgzip.c
+@@ -557,6 +557,9 @@
+ 
+       stream->descriptor.pointer = NULL;
+     }
++
++    if ( !stream->read )
++      FT_FREE( stream->base );
+   }
+ 
+ 
+@@ -584,7 +587,7 @@
+     old_pos = stream->pos;
+     if ( !FT_Stream_Seek( stream, stream->size - 4 ) )
+     {
+-      result = FT_Stream_ReadULong( stream, &error );
++      result = FT_Stream_ReadULongLE( stream, &error );
+       if ( error )
+         result = 0;
+ 
+@@ -685,7 +688,7 @@
+ 
+     stream->size  = 0x7FFFFFFFL;  /* don't know the real size! */
+     stream->pos   = 0;
+-    stream->base  = 0;
++    stream->base  = NULL;
+     stream->read  = ft_gzip_stream_io;
+     stream->close = ft_gzip_stream_close;
+ 
+-- 
+2.5.2
+
+From e3058617f384cb6709f3878f753fa17aca9e3a30 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Sun, 13 Sep 2015 08:41:43 +0200
+Subject: [PATCH] [type1] Fix potential buffer overflow (#45923).
+
+* src/type1/t1parse.c (T1_Get_Private_Dict): Assure `cur' doesn't
+point to end of file buffer.
+---
+ ChangeLog           | 7 +++++++
+ src/type1/t1parse.c | 9 +++++++++
+ 2 files changed, 16 insertions(+)
+
+diff --git a/ChangeLog b/ChangeLog
+index 3618f24..47cfcf3 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,5 +1,12 @@
+ 2015-09-13  Werner Lemberg  <wl@gnu.org>
+ 
++	[type1] Fix potential buffer overflow (#45923).
++
++	* src/type1/t1parse.c (T1_Get_Private_Dict): Assure `cur' doesn't
++	point to end of file buffer.
++
++2015-09-13  Werner Lemberg  <wl@gnu.org>
++
+ 	[gzip] Fix access of small compressed files (#45937).
+ 
+ 	* src/gzip/ftgzip.c (ft_gzip_stream_close): Avoid memory leak.
+diff --git a/src/type1/t1parse.c b/src/type1/t1parse.c
+index c73b2b2..d8d4df2 100644
+--- a/src/type1/t1parse.c
++++ b/src/type1/t1parse.c
+@@ -389,6 +389,15 @@
+ 
+       cur   = limit;
+       limit = parser->base_dict + parser->base_len;
++
++      if ( cur >= limit )
++      {
++        FT_ERROR(( "T1_Get_Private_Dict:"
++                   " premature end in private dictionary\n" ));
++        error = FT_THROW( Invalid_File_Format );
++        goto Exit;
++      }
++
+       goto Again;
+ 
+       /* now determine where to write the _encrypted_ binary private  */
+-- 
+2.5.2
+
+From 3df92aa04cf7c537ac9b3f64a8e03168db10c60a Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Sun, 13 Sep 2015 09:21:52 +0200
+Subject: [PATCH] [winfonts] Check alignment shift count for resource data
+ (#45938).
+
+* src/winfonts/winfnt.c (fnt_face_get_dll_font): Implement it.
+---
+ ChangeLog             |  6 ++++++
+ src/winfonts/winfnt.c | 15 +++++++++++++++
+ 2 files changed, 21 insertions(+)
+
+diff --git a/ChangeLog b/ChangeLog
+index 47cfcf3..14e3ae1 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,5 +1,11 @@
+ 2015-09-13  Werner Lemberg  <wl@gnu.org>
+ 
++	[winfonts] Check alignment shift count for resource data (#45938).
++
++	* src/winfonts/winfnt.c (fnt_face_get_dll_font): Implement it.
++
++2015-09-13  Werner Lemberg  <wl@gnu.org>
++
+ 	[type1] Fix potential buffer overflow (#45923).
+ 
+ 	* src/type1/t1parse.c (T1_Get_Private_Dict): Assure `cur' doesn't
+diff --git a/src/winfonts/winfnt.c b/src/winfonts/winfnt.c
+index 36e3eb0..4bfa55a 100644
+--- a/src/winfonts/winfnt.c
++++ b/src/winfonts/winfnt.c
+@@ -320,6 +320,21 @@
+ 
+         size_shift = FT_GET_USHORT_LE();
+ 
++        /* Microsoft's specification of the executable-file header format */
++        /* for `New Executable' (NE) doesn't give a limit for the         */
++        /* alignment shift count; however, in 1985, the year of the       */
++        /* specification release, only 32bit values were supported, thus  */
++        /* anything larger than 16 doesn't make sense in general, given   */
++        /* that file offsets are 16bit values, shifted by the alignment   */
++        /* shift count                                                    */
++        if ( size_shift > 16 )
++        {
++          FT_TRACE2(( "invalid alignment shift count for resource data\n" ));
++          error = FT_THROW( Invalid_File_Format );
++          goto Exit;
++        }
++
++
+         for (;;)
+         {
+           FT_UShort  type_id, count;
+-- 
+2.5.2
+
+From 7962a15d64c876870ca0ae435ea2467d9be268d9 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Mon, 14 Sep 2015 00:38:26 +0200
+Subject: [PATCH] [type1] Fix another potential buffer overflow (#45955).
+
+* src/type1/t1parse (T1_Get_Private_Dict): Assure that check for
+`eexec' doesn't exceed `limit'.
+---
+ ChangeLog           |  7 +++++++
+ src/type1/t1parse.c | 18 ++++++++++++------
+ 2 files changed, 19 insertions(+), 6 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 35bc86d..be16ae0 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,10 @@
++2015-09-14  Werner Lemberg  <wl@gnu.org>
++
++	[type1] Fix another potential buffer overflow (#45955).
++
++	* src/type1/t1parse (T1_Get_Private_Dict): Assure that check for
++	`eexec' doesn't exceed `limit'.
++
+ 2015-09-13  Werner Lemberg  <wl@gnu.org>
+ 
+ 	Replace `mkinstalldirs' with AC_PROG_MKDIR_P.
+diff --git a/src/type1/t1parse.c b/src/type1/t1parse.c
+index d8d4df2..0b68502 100644
+--- a/src/type1/t1parse.c
++++ b/src/type1/t1parse.c
+@@ -334,7 +334,6 @@
+       /* first of all, look at the `eexec' keyword */
+       FT_Byte*    cur   = parser->base_dict;
+       FT_Byte*    limit = cur + parser->base_len;
+-      FT_Byte     c;
+       FT_Pointer  pos_lf;
+       FT_Bool     test_cr;
+ 
+@@ -342,9 +341,9 @@
+     Again:
+       for (;;)
+       {
+-        c = cur[0];
+-        if ( c == 'e' && cur + 9 < limit )  /* 9 = 5 letters for `eexec' + */
+-                                            /* whitespace + 4 chars        */
++        if ( cur[0] == 'e'   &&
++             cur + 9 < limit )      /* 9 = 5 letters for `eexec' + */
++                                    /* whitespace + 4 chars        */
+         {
+           if ( cur[1] == 'e' &&
+                cur[2] == 'x' &&
+@@ -374,8 +373,15 @@
+ 
+       while ( cur < limit )
+       {
+-        if ( *cur == 'e' && ft_strncmp( (char*)cur, "eexec", 5 ) == 0 )
+-          goto Found;
++        if ( cur[0] == 'e'   &&
++             cur + 5 < limit )
++        {
++          if ( cur[1] == 'e' &&
++               cur[2] == 'x' &&
++               cur[3] == 'e' &&
++               cur[4] == 'c' )
++            goto Found;
++        }
+ 
+         T1_Skip_PS_Token( parser );
+         if ( parser->root.error )
+-- 
+2.5.2
+
+From 3ea0d2c65a931e721aaf732c17765968bfe755d2 Mon Sep 17 00:00:00 2001
+From: Alexei Podtelezhnikov <apodtele@gmail.com>
+Date: Sun, 13 Sep 2015 23:19:34 -0400
+Subject: [PATCH] * src/base/ftcalc.c (FT_MulFix) [FT_LONG64]: Improve.
+
+---
+ ChangeLog         |  4 ++++
+ src/base/ftcalc.c | 18 +++---------------
+ 2 files changed, 7 insertions(+), 15 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index be16ae0..cd4fe58 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,7 @@
++2015-09-14  Alexei Podtelezhnikov  <apodtele@gmail.com>
++
++	* src/base/ftcalc.c (FT_MulFix) [FT_LONG64]: Improve.
++
+ 2015-09-14  Werner Lemberg  <wl@gnu.org>
+ 
+ 	[type1] Fix another potential buffer overflow (#45955).
+diff --git a/src/base/ftcalc.c b/src/base/ftcalc.c
+index dbddeda..619a08b 100644
+--- a/src/base/ftcalc.c
++++ b/src/base/ftcalc.c
+@@ -237,22 +237,10 @@
+ 
+ #else
+ 
+-    FT_Int     s = 1;
+-    FT_UInt64  a, b, c;
+-    FT_Long    c_;
+-
+-
+-    FT_MOVE_SIGN( a_, s );
+-    FT_MOVE_SIGN( b_, s );
+-
+-    a = (FT_UInt64)a_;
+-    b = (FT_UInt64)b_;
+-
+-    c = ( a * b + 0x8000UL ) >> 16;
+-
+-    c_ = (FT_Long)c;
++    FT_Int64  ab = (FT_Int64)a_ * (FT_Int64)b_;
+ 
+-    return s < 0 ? -c_ : c_;
++    /* this requires arithmetic right shift of signed numbers */
++    return (FT_Long)( ( ab + 0x8000L - ( ab < 0 ) ) >> 16 );
+ 
+ #endif /* FT_MULFIX_ASSEMBLER */
+   }
+-- 
+2.5.2
+
+From 581c7e2a510ed09b1401af8d9b7ed5eb329a954b Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Tue, 15 Sep 2015 06:49:06 +0200
+Subject: [PATCH] [type1, type42] Check encoding array size (#45961).
+
+* src/type1/t1load.c (parse_encoding), src/type42/t42parse.c
+(t42_parse_encoding): Do it.
+---
+ ChangeLog             | 7 +++++++
+ src/type1/t1load.c    | 9 +++++++++
+ src/type42/t42parse.c | 9 +++++++++
+ 3 files changed, 25 insertions(+)
+
+diff --git a/ChangeLog b/ChangeLog
+index cd4fe58..a69a1a4 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,10 @@
++2015-09-15  Werner Lemberg  <wl@gnu.org>
++
++	[type1, type42] Check encoding array size (#45961).
++
++	* src/type1/t1load.c (parse_encoding), src/type42/t42parse.c
++	(t42_parse_encoding): Do it.
++
+ 2015-09-14  Alexei Podtelezhnikov  <apodtele@gmail.com>
+ 
+ 	* src/base/ftcalc.c (FT_MulFix) [FT_LONG64]: Improve.
+diff --git a/src/type1/t1load.c b/src/type1/t1load.c
+index 630f057..4d065f8 100644
+--- a/src/type1/t1load.c
++++ b/src/type1/t1load.c
+@@ -1192,6 +1192,15 @@
+       else
+         count = (FT_Int)T1_ToInt( parser );
+ 
++      /* only composite fonts (which we don't support) */
++      /* can have larger values                        */
++      if ( count > 256 )
++      {
++        FT_ERROR(( "parse_encoding: invalid encoding array size\n" ));
++        parser->root.error = FT_THROW( Invalid_File_Format );
++        return;
++      }
++
+       T1_Skip_Spaces( parser );
+       if ( parser->root.cursor >= limit )
+         return;
+diff --git a/src/type42/t42parse.c b/src/type42/t42parse.c
+index f7d5eb6..ae062da 100644
+--- a/src/type42/t42parse.c
++++ b/src/type42/t42parse.c
+@@ -332,6 +332,15 @@
+       else
+         count = (FT_Int)T1_ToInt( parser );
+ 
++      /* only composite fonts (which we don't support) */
++      /* can have larger values                        */
++      if ( count > 256 )
++      {
++        FT_ERROR(( "t42_parse_encoding: invalid encoding array size\n" ));
++        parser->root.error = FT_THROW( Invalid_File_Format );
++        return;
++      }
++
+       T1_Skip_Spaces( parser );
+       if ( parser->root.cursor >= limit )
+         return;
+-- 
+2.5.2
+
+From 577daf1c306ebc479a50813efa7cd1c669a82d1a Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Tue, 15 Sep 2015 07:10:16 +0200
+Subject: [PATCH] * src/pcf/pcfread.c (pcf_load_font): Fix integer overflow
+ (#45964).
+
+---
+ ChangeLog         | 4 ++++
+ src/pcf/pcfread.c | 3 +--
+ 2 files changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index a69a1a4..bf71948 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,5 +1,9 @@
+ 2015-09-15  Werner Lemberg  <wl@gnu.org>
+ 
++	* src/pcf/pcfread.c (pcf_load_font): Fix integer overflow (#45964).
++
++2015-09-15  Werner Lemberg  <wl@gnu.org>
++
+ 	[type1, type42] Check encoding array size (#45961).
+ 
+ 	* src/type1/t1load.c (parse_encoding), src/type42/t42parse.c
+diff --git a/src/pcf/pcfread.c b/src/pcf/pcfread.c
+index 039af33..9da7e75 100644
+--- a/src/pcf/pcfread.c
++++ b/src/pcf/pcfread.c
+@@ -1287,8 +1287,7 @@ THE SOFTWARE.
+         prop = pcf_find_property( face, "POINT_SIZE" );
+         if ( prop )
+           /* convert from 722.7 decipoints to 72 points per inch */
+-          bsize->size =
+-            (FT_Pos)( ( prop->value.l * 64 * 7200 + 36135L ) / 72270L );
++          bsize->size = FT_MulDiv( prop->value.l, 64 * 7200, 72270L );
+ 
+         prop = pcf_find_property( face, "PIXEL_SIZE" );
+         if ( prop )
+-- 
+2.5.2
+
+From 7f0f40116daac4e9a8c11b8f3026fe0c07bdb901 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Tue, 15 Sep 2015 07:23:53 +0200
+Subject: [PATCH] [truetype] Fix integer type (#45965).
+
+* src/truetype/ttobjs.c (tt_synth_sfnt_checksum): Implement it.
+---
+ ChangeLog             | 6 ++++++
+ src/truetype/ttobjs.c | 6 +++---
+ 2 files changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index bf71948..ec9e8d0 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,5 +1,11 @@
+ 2015-09-15  Werner Lemberg  <wl@gnu.org>
+ 
++	[truetype] Fix integer type (#45965).
++
++	* src/truetype/ttobjs.c (tt_synth_sfnt_checksum): Implement it.
++
++2015-09-15  Werner Lemberg  <wl@gnu.org>
++
+ 	* src/pcf/pcfread.c (pcf_load_font): Fix integer overflow (#45964).
+ 
+ 2015-09-15  Werner Lemberg  <wl@gnu.org>
+diff --git a/src/truetype/ttobjs.c b/src/truetype/ttobjs.c
+index af44259..6060d6f 100644
+--- a/src/truetype/ttobjs.c
++++ b/src/truetype/ttobjs.c
+@@ -191,7 +191,7 @@
+   {
+     FT_Error   error;
+     FT_UInt32  checksum = 0;
+-    int        i;
++    FT_UInt    i;
+ 
+ 
+     if ( FT_FRAME_ENTER( length ) )
+@@ -200,8 +200,8 @@
+     for ( ; length > 3; length -= 4 )
+       checksum += (FT_UInt32)FT_GET_ULONG();
+ 
+-    for ( i = 3; length > 0; length --, i-- )
+-      checksum += (FT_UInt32)( FT_GET_BYTE() << ( i * 8 ) );
++    for ( i = 3; length > 0; length--, i-- )
++      checksum += (FT_UInt32)FT_GET_BYTE() << ( i * 8 );
+ 
+     FT_FRAME_EXIT();
+ 
+-- 
+2.5.2
+
+From 19cb1127d4a2520126477382f35b489b48530b7e Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Tue, 15 Sep 2015 08:52:36 +0200
+Subject: [PATCH] [type1, type42] Fix memory leaks (#45966).
+
+* src/type1/t1load.c (parse_blend_axis_types): Handle multiple axis
+names.
+(parse_blend_design_map): Allow only a single design map.
+(parse_encoding): Handle multiple encoding vectors.
+
+* src/type42/t42parse.c (t42_parse_encoding): Handle multiple
+encoding vectors.
+---
+ ChangeLog             | 12 ++++++++++++
+ src/type1/t1load.c    | 24 ++++++++++++++++++++++++
+ src/type42/t42parse.c |  8 ++++++++
+ 3 files changed, 44 insertions(+)
+
+diff --git a/ChangeLog b/ChangeLog
+index ec9e8d0..0c689c0 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,5 +1,17 @@
+ 2015-09-15  Werner Lemberg  <wl@gnu.org>
+ 
++	[type1, type42] Fix memory leaks (#45966).
++
++	* src/type1/t1load.c (parse_blend_axis_types): Handle multiple axis
++	names.
++	(parse_blend_design_map): Allow only a single design map.
++	(parse_encoding): Handle multiple encoding vectors.
++
++	* src/type42/t42parse.c (t42_parse_encoding): Handle multiple
++	encoding vectors.
++
++2015-09-15  Werner Lemberg  <wl@gnu.org>
++
+ 	[truetype] Fix integer type (#45965).
+ 
+ 	* src/truetype/ttobjs.c (tt_synth_sfnt_checksum): Implement it.
+diff --git a/src/type1/t1load.c b/src/type1/t1load.c
+index 4d065f8..479cb7a 100644
+--- a/src/type1/t1load.c
++++ b/src/type1/t1load.c
+@@ -615,6 +615,15 @@
+         goto Exit;
+       }
+ 
++      name = (FT_Byte*)blend->axis_names[n];
++      if ( name )
++      {
++        FT_TRACE0(( "parse_blend_axis_types:"
++                    " overwriting axis name `%s' with `%*.s'\n",
++                    name, len, token->start ));
++        FT_FREE( name );
++      }
++
+       if ( FT_ALLOC( blend->axis_names[n], len + 1 ) )
+         goto Exit;
+ 
+@@ -787,6 +796,13 @@
+         goto Exit;
+       }
+ 
++      if ( map->design_points )
++      {
++        FT_ERROR(( "parse_blend_design_map: duplicate table\n" ));
++        error = FT_THROW( Invalid_File_Format );
++        goto Exit;
++      }
++
+       /* allocate design map data */
+       if ( FT_NEW_ARRAY( map->design_points, num_points * 2 ) )
+         goto Exit;
+@@ -1205,6 +1221,14 @@
+       if ( parser->root.cursor >= limit )
+         return;
+ 
++      /* PostScript happily allows overwriting of encoding arrays */
++      if ( encode->char_index )
++      {
++        FT_FREE( encode->char_index );
++        FT_FREE( encode->char_name );
++        T1_Release_Table( char_table );
++      }
++
+       /* we use a T1_Table to store our charnames */
+       loader->num_chars = encode->num_chars = count;
+       if ( FT_NEW_ARRAY( encode->char_index, count )     ||
+diff --git a/src/type42/t42parse.c b/src/type42/t42parse.c
+index ae062da..ee77d86 100644
+--- a/src/type42/t42parse.c
++++ b/src/type42/t42parse.c
+@@ -345,6 +345,14 @@
+       if ( parser->root.cursor >= limit )
+         return;
+ 
++      /* PostScript happily allows overwriting of encoding arrays */
++      if ( encode->char_index )
++      {
++        FT_FREE( encode->char_index );
++        FT_FREE( encode->char_name );
++        T1_Release_Table( char_table );
++      }
++
+       /* we use a T1_Table to store our charnames */
+       loader->num_chars = encode->num_chars = count;
+       if ( FT_NEW_ARRAY( encode->char_index, count )     ||
+-- 
+2.5.2
+
+From bd0438a461d352590ae20e2516cfc14cf582d6ad Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Wed, 16 Sep 2015 18:05:43 +0200
+Subject: [PATCH] Minor fixes for some clang warnings.
+
+* src/base/ftoutln.c (FT_Outline_EmboldenXY): Cast, possible missing
+initialization.
+
+* src/truetype/ttgload.c (TT_Process_Composite_Component): Cast.
+---
+ ChangeLog              | 9 +++++++++
+ src/base/ftoutln.c     | 4 ++--
+ src/truetype/ttgload.c | 8 +++++---
+ 3 files changed, 16 insertions(+), 5 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 0c689c0..19f0926 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,12 @@
++2015-09-16  Werner Lemberg  <wl@gnu.org>
++
++	Minor fixes for some clang warnings.
++
++	* src/base/ftoutln.c (FT_Outline_EmboldenXY): Cast, possible missing
++	initialization.
++
++	* src/truetype/ttgload.c (TT_Process_Composite_Component): Cast.
++
+ 2015-09-15  Werner Lemberg  <wl@gnu.org>
+ 
+ 	[type1, type42] Fix memory leaks (#45966).
+diff --git a/src/base/ftoutln.c b/src/base/ftoutln.c
+index cab0245..35cc9f5 100644
+--- a/src/base/ftoutln.c
++++ b/src/base/ftoutln.c
+@@ -935,7 +935,7 @@
+     for ( c = 0; c < outline->n_contours; c++ )
+     {
+       FT_Vector  in, out, anchor, shift;
+-      FT_Fixed   l_in, l_out, l_anchor, l, q, d;
++      FT_Fixed   l_in, l_out, l_anchor = 0, l, q, d;
+       FT_Int     i, j, k;
+ 
+ 
+@@ -952,7 +952,7 @@
+         {
+           out.x = points[j].x - points[i].x;
+           out.y = points[j].y - points[i].y;
+-          l_out = FT_Vector_NormLen( &out );
++          l_out = (FT_Fixed)FT_Vector_NormLen( &out );
+ 
+           if ( l_out == 0 )
+             continue;
+diff --git a/src/truetype/ttgload.c b/src/truetype/ttgload.c
+index 61951b4..a322d31 100644
+--- a/src/truetype/ttgload.c
++++ b/src/truetype/ttgload.c
+@@ -998,14 +998,16 @@
+                                   FT_UInt      start_point,
+                                   FT_UInt      num_base_points )
+   {
+-    FT_GlyphLoader  gloader    = loader->gloader;
++    FT_GlyphLoader  gloader = loader->gloader;
+     FT_Outline      current;
+     FT_Bool         have_scale;
+     FT_Pos          x, y;
+ 
+ 
+-    current.points   = gloader->base.outline.points + num_base_points;
+-    current.n_points = gloader->base.outline.n_points - num_base_points;
++    current.points   = gloader->base.outline.points +
++                         num_base_points;
++    current.n_points = gloader->base.outline.n_points -
++                         (short)num_base_points;
+ 
+     have_scale = FT_BOOL( subglyph->flags & ( WE_HAVE_A_SCALE     |
+                                               WE_HAVE_AN_XY_SCALE |
+-- 
+2.5.2
+
+From 9db9adda0f15ab9eb53a4f393887d8c567ee9d67 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Thu, 17 Sep 2015 13:42:59 +0200
+Subject: [PATCH] [pcf] Use FT_ABS for some property values (#45893).
+
+* src/pcf/pcfread.c (pcf_load_font): Take absolute values for
+AVERAGE_WIDTH, POINT_SIZE, PIXEL_SIZE, RESOLUTION_X, and
+RESOLUTION_Y.  In tracing mode, add warnings.
+---
+ ChangeLog         |  8 ++++++++
+ src/pcf/pcfread.c | 46 ++++++++++++++++++++++++++++++++++++++++------
+ 2 files changed, 48 insertions(+), 6 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 19f0926..9a2d130 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,11 @@
++2015-09-17  Werner Lemberg  <wl@gnu.org>
++
++	[pcf] Use FT_ABS for some property values (#45893).
++
++	* src/pcf/pcfread.c (pcf_load_font): Take absolute values for
++	AVERAGE_WIDTH, POINT_SIZE, PIXEL_SIZE, RESOLUTION_X, and
++	RESOLUTION_Y.  In tracing mode, add warnings.
++
+ 2015-09-16  Werner Lemberg  <wl@gnu.org>
+ 
+ 	Minor fixes for some clang warnings.
+diff --git a/src/pcf/pcfread.c b/src/pcf/pcfread.c
+index 9da7e75..a17b62e 100644
+--- a/src/pcf/pcfread.c
++++ b/src/pcf/pcfread.c
+@@ -1278,28 +1278,62 @@ THE SOFTWARE.
+         bsize->height = (FT_Short)( face->accel.fontAscent +
+                                     face->accel.fontDescent );
+ 
++        /* for simplicity, we take absolute values of integer properties */
++
+         prop = pcf_find_property( face, "AVERAGE_WIDTH" );
+         if ( prop )
+-          bsize->width = (FT_Short)( ( prop->value.l + 5 ) / 10 );
++        {
++#ifdef FT_DEBUG_LEVEL_TRACE
++          if ( prop->value.l < 0 )
++            FT_TRACE0(( "pcf_load_font: negative average width\n" ));
++#endif
++          bsize->width = (FT_Short)( ( FT_ABS( prop->value.l ) + 5 ) / 10 );
++        }
+         else
+-          bsize->width = (FT_Short)( bsize->height * 2/3 );
++          bsize->width = (FT_Short)( bsize->height * 2 / 3 );
+ 
+         prop = pcf_find_property( face, "POINT_SIZE" );
+         if ( prop )
++        {
++#ifdef FT_DEBUG_LEVEL_TRACE
++          if ( prop->value.l < 0 )
++            FT_TRACE0(( "pcf_load_font: negative point size\n" ));
++#endif
+           /* convert from 722.7 decipoints to 72 points per inch */
+-          bsize->size = FT_MulDiv( prop->value.l, 64 * 7200, 72270L );
++          bsize->size = FT_MulDiv( FT_ABS( prop->value.l ),
++                                   64 * 7200,
++                                   72270L );
++        }
+ 
+         prop = pcf_find_property( face, "PIXEL_SIZE" );
+         if ( prop )
+-          bsize->y_ppem = (FT_Short)prop->value.l << 6;
++        {
++#ifdef FT_DEBUG_LEVEL_TRACE
++          if ( prop->value.l < 0 )
++            FT_TRACE0(( "pcf_load_font: negative pixel size\n" ));
++#endif
++          bsize->y_ppem = (FT_Short)FT_ABS( prop->value.l ) << 6;
++        }
+ 
+         prop = pcf_find_property( face, "RESOLUTION_X" );
+         if ( prop )
+-          resolution_x = (FT_Short)prop->value.l;
++        {
++#ifdef FT_DEBUG_LEVEL_TRACE
++          if ( prop->value.l < 0 )
++            FT_TRACE0(( "pcf_load_font: negative X resolution\n" ));
++#endif
++          resolution_x = (FT_Short)FT_ABS( prop->value.l );
++        }
+ 
+         prop = pcf_find_property( face, "RESOLUTION_Y" );
+         if ( prop )
+-          resolution_y = (FT_Short)prop->value.l;
++        {
++#ifdef FT_DEBUG_LEVEL_TRACE
++          if ( prop->value.l < 0 )
++            FT_TRACE0(( "pcf_load_font: negative Y resolution\n" ));
++#endif
++          resolution_y = (FT_Short)FT_ABS( prop->value.l );
++        }
+ 
+         if ( bsize->y_ppem == 0 )
+         {
+-- 
+2.5.2
+
+From c838c4f7b50e20010e6a014b8f92fdc080950184 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Thu, 17 Sep 2015 16:22:40 +0200
+Subject: [PATCH] [pcf] Fix integer overflows (#45985).
+
+* src/pcf/pcfread.c (pcf_load_font): Use FT_MulDiv.
+---
+ ChangeLog         | 6 ++++++
+ src/pcf/pcfread.c | 8 +++++---
+ 2 files changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 9a2d130..d4f859b 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,5 +1,11 @@
+ 2015-09-17  Werner Lemberg  <wl@gnu.org>
+ 
++	[pcf] Fix integer overflows (#45985).
++
++	* src/pcf/pcfread.c (pcf_load_font): Use FT_MulDiv.
++
++2015-09-17  Werner Lemberg  <wl@gnu.org>
++
+ 	[pcf] Use FT_ABS for some property values (#45893).
+ 
+ 	* src/pcf/pcfread.c (pcf_load_font): Take absolute values for
+diff --git a/src/pcf/pcfread.c b/src/pcf/pcfread.c
+index a17b62e..9d8d794 100644
+--- a/src/pcf/pcfread.c
++++ b/src/pcf/pcfread.c
+@@ -1290,7 +1290,7 @@ THE SOFTWARE.
+           bsize->width = (FT_Short)( ( FT_ABS( prop->value.l ) + 5 ) / 10 );
+         }
+         else
+-          bsize->width = (FT_Short)( bsize->height * 2 / 3 );
++          bsize->width = (FT_Short)FT_MulDiv( bsize->height, 2, 3 );
+ 
+         prop = pcf_find_property( face, "POINT_SIZE" );
+         if ( prop )
+@@ -1339,10 +1339,12 @@ THE SOFTWARE.
+         {
+           bsize->y_ppem = bsize->size;
+           if ( resolution_y )
+-            bsize->y_ppem = bsize->y_ppem * resolution_y / 72;
++            bsize->y_ppem = FT_MulDiv( bsize->y_ppem, resolution_y, 72 );
+         }
+         if ( resolution_x && resolution_y )
+-          bsize->x_ppem = bsize->y_ppem * resolution_x / resolution_y;
++          bsize->x_ppem = FT_MulDiv( bsize->y_ppem,
++                                     resolution_x,
++                                     resolution_y );
+         else
+           bsize->x_ppem = bsize->y_ppem;
+       }
+-- 
+2.5.2
+
+From 7d364b7e51982ebe926c4148c752e0758c4dd2ed Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Thu, 17 Sep 2015 16:31:58 +0200
+Subject: [PATCH] [psaux] Improve tracing message.
+
+* src/psaux/psobjs.c (ps_parser_load_field) <T1_FIELD_TYPE_MM_BBOX>:
+Handle plural correctly.
+---
+ ChangeLog          | 7 +++++++
+ src/psaux/psobjs.c | 4 ++--
+ 2 files changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index d4f859b..8bad3b5 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,5 +1,12 @@
+ 2015-09-17  Werner Lemberg  <wl@gnu.org>
+ 
++	[psaux] Improve tracing message.
++
++	* src/psaux/psobjs.c (ps_parser_load_field) <T1_FIELD_TYPE_MM_BBOX>:
++	Handle plural correctly.
++
++2015-09-17  Werner Lemberg  <wl@gnu.org>
++
+ 	[pcf] Fix integer overflows (#45985).
+ 
+ 	* src/pcf/pcfread.c (pcf_load_font): Use FT_MulDiv.
+diff --git a/src/psaux/psobjs.c b/src/psaux/psobjs.c
+index 54eabe2..1852998 100644
+--- a/src/psaux/psobjs.c
++++ b/src/psaux/psobjs.c
+@@ -1232,10 +1232,10 @@
+             if ( result < 0 || (FT_UInt)result < max_objects )
+             {
+               FT_ERROR(( "ps_parser_load_field:"
+-                         " expected %d integers in the %s subarray\n"
++                         " expected %d integer%s in the %s subarray\n"
+                          "                     "
+                          " of /FontBBox in the /Blend dictionary\n",
+-                         max_objects,
++                         max_objects, max_objects > 1 ? "s" : "",
+                          i == 0 ? "first"
+                                 : ( i == 1 ? "second"
+                                            : ( i == 2 ? "third"
+-- 
+2.5.2
+

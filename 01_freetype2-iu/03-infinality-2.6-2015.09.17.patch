@@ -82,10 +82,8 @@ index 4970945..3df05be 100644
    /* If you define TT_CONFIG_OPTION_UNPATENTED_HINTING, a special version  */
    /* of the TrueType bytecode interpreter is used that doesn't implement   */
    /* any of the patented opcodes and algorithms.  The patents related to   */
-diff --git a/src/autofit/aflatin.c b/src/autofit/aflatin.c
-index 3065895..214c217 100644
---- a/src/autofit/aflatin.c
-+++ b/src/autofit/aflatin.c
+--- a/src/autofit/aflatin.c	2015-09-16 13:34:10.119916568 +0200
++++ b/src/autofit/aflatin.c	2015-09-16 13:34:41.346774140 +0200
 @@ -24,6 +24,7 @@
  #include "afpic.h"
  #include "aflatin.h"
@@ -209,8 +207,8 @@ index 3065895..214c217 100644
 +    FT_Int           infinality_dist = 0;
 +    FT_UInt          autohint_snap_stem_height = 0;
 +    FT_UInt          checked_autohint_snap_stem_height = 0;
- 
- 
++
++
 +    if ( checked_autohint_snap_stem_height == 0 )
 +    {
 +      char *autohint_snap_stem_height_env = 
@@ -219,7 +217,7 @@ index 3065895..214c217 100644
 +      {
 +        sscanf ( autohint_snap_stem_height_env, "%u",
 +                 &autohint_snap_stem_height );
-+
+ 
 +        if ( autohint_snap_stem_height > 100 )
 +          autohint_snap_stem_height = 100;
 +        else if ( autohint_snap_stem_height < 0 )
@@ -227,7 +225,7 @@ index 3065895..214c217 100644
 +      }
 +      checked_autohint_snap_stem_height = 1;
 +    }
-+
+ 
 +    if ( autohint_snap_stem_height == 0 )
 +#endif /* FT_CONFIG_OPTION_INFINALITY_PATCHSET */
      if ( !AF_LATIN_HINTS_DO_STEM_ADJUST( hints ) ||
@@ -245,8 +243,7 @@ index 3065895..214c217 100644
 +    {
 +      infinality_dist = af_latin_snap_width( axis->widths, 
 +                                             axis->width_count, dist );
- 
--    if ( (  vertical && !AF_LATIN_HINTS_DO_VERT_SNAP( hints ) ) ||
++
 +      if ( metrics->root.scaler.face->size->metrics.x_ppem > 9 &&
 +           axis->width_count > 0                               &&
 +           abs( axis->widths[0].cur - infinality_dist ) < 32   &&
@@ -301,7 +298,8 @@ index 3065895..214c217 100644
 +              ( ( vertical && !AF_LATIN_HINTS_DO_VERT_SNAP( hints ) )  ||
 +                ( !vertical && !AF_LATIN_HINTS_DO_HORZ_SNAP( hints ) ) ) )
 +#else
-+
+ 
+-    if ( (  vertical && !AF_LATIN_HINTS_DO_VERT_SNAP( hints ) ) ||
 +    if ( ( vertical && !AF_LATIN_HINTS_DO_VERT_SNAP( hints ) ) ||
           ( !vertical && !AF_LATIN_HINTS_DO_HORZ_SNAP( hints ) ) )
 +#endif /* FT_CONFIG_OPTION_INFINALITY_PATCHSET */
@@ -372,7 +370,7 @@ index 3065895..214c217 100644
  
      stem_edge->pos = base_edge->pos + fitted_width;
  
-@@ -2844,8 +3014,32 @@
+@@ -2845,8 +3015,32 @@
      int       dim;
  
      AF_LatinAxis  axis;
@@ -406,7 +404,7 @@ index 3065895..214c217 100644
      error = af_glyph_hints_reload( hints, outline );
      if ( error )
        goto Exit;
-@@ -2913,7 +3107,11 @@
+@@ -2916,7 +3110,11 @@
      }
  
      af_glyph_hints_save( hints, outline );
