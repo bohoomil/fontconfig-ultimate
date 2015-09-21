@@ -1,7 +1,7 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=ttf-iosevka-ibx
-pkgver=0.0.11
+pkgver=0.1.12
 pkgrel=1
 depends=('fontconfig')
 pkgdesc="A programmer's typeface."
@@ -10,16 +10,15 @@ arch=('any')
 groups=('infinality-bundle-fonts-extra')
 license=('custom:OFL')
 install=$pkgname.install
-source=("http://bohoomil.com/src/iosevka.tar.bz2"{,.sig}
+source=("https://github.com/be5invis/Iosevka/archive/v${pkgver}.tar.gz"
         45-iosevka.conf
         90-tt-iosevka.conf)
-sha1sums=('502f825bec127ab95365d3fca41caf210655af33'
-          'SKIP'
+sha1sums=('98fb03214969af87b2b5d1503f8123910ce75e7a'
           '56b9b68799d3945428c5d30958b03898c878eb18'
           '83159b5d820db037c81d10eb75e61f927f4f6fe1')
 
 package(){
-  cd "${srcdir}"/iosevka
+  cd "${srcdir}/Iosevka-${pkgver}"
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
