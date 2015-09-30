@@ -82,8 +82,8 @@ index 4970945..3df05be 100644
    /* If you define TT_CONFIG_OPTION_UNPATENTED_HINTING, a special version  */
    /* of the TrueType bytecode interpreter is used that doesn't implement   */
    /* any of the patented opcodes and algorithms.  The patents related to   */
---- a/src/autofit/aflatin.c	2015-09-16 13:34:10.119916568 +0200
-+++ b/src/autofit/aflatin.c	2015-09-16 13:34:41.346774140 +0200
+--- a/src/autofit/aflatin.c	2015-09-30 08:34:31.862814496 +0200
++++ b/src/autofit/aflatin.c	2015-09-30 08:35:00.876292462 +0200
 @@ -24,6 +24,7 @@
  #include "afpic.h"
  #include "aflatin.h"
@@ -160,7 +160,7 @@ index 4970945..3df05be 100644
        if ( blue )
        {
          FT_Pos   scaled;
-@@ -1056,7 +1091,13 @@
+@@ -1059,7 +1094,13 @@
  
          /* a blue zone is only active if it is less than 3/4 pixels tall */
          dist = FT_MulFix( blue->ref.org - blue->shoot.org, scale );
@@ -174,7 +174,7 @@ index 4970945..3df05be 100644
          {
  #if 0
            FT_Pos  delta1;
-@@ -1107,7 +1148,12 @@
+@@ -1110,7 +1151,12 @@
              delta2 = -delta2;
  
            blue->ref.fit   = FT_PIX_ROUND( blue->ref.cur );
@@ -187,7 +187,7 @@ index 4970945..3df05be 100644
  
  #endif
  
-@@ -1945,7 +1991,10 @@
+@@ -1948,7 +1994,10 @@
                dist = edge->fpos - blue->shoot.org;
                if ( dist < 0 )
                  dist = -dist;
@@ -199,7 +199,7 @@ index 4970945..3df05be 100644
                dist = FT_MulFix( dist, scale );
                if ( dist < best_dist )
                {
-@@ -2120,8 +2169,31 @@
+@@ -2123,8 +2172,31 @@
      FT_Pos           dist     = width;
      FT_Int           sign     = 0;
      FT_Int           vertical = ( dim == AF_DIMENSION_VERT );
@@ -231,7 +231,7 @@ index 4970945..3df05be 100644
      if ( !AF_LATIN_HINTS_DO_STEM_ADJUST( hints ) ||
           axis->extra_light                       )
        return width;
-@@ -2131,9 +2203,73 @@
+@@ -2134,9 +2206,73 @@
        dist = -width;
        sign = 1;
      }
@@ -306,7 +306,7 @@ index 4970945..3df05be 100644
      {
        /* smooth hinting process: very lightly quantize the stem width */
  
-@@ -2193,6 +2329,9 @@
+@@ -2196,6 +2332,9 @@
        }
      }
      else
@@ -316,7 +316,7 @@ index 4970945..3df05be 100644
      {
        /* strong hinting process: snap the stem width to integer pixels */
  
-@@ -2200,7 +2339,10 @@
+@@ -2203,7 +2342,10 @@
  
  
        dist = af_latin_snap_width( axis->widths, axis->width_count, dist );
@@ -328,7 +328,7 @@ index 4970945..3df05be 100644
        if ( vertical )
        {
          /* in the case of vertical hinting, always round */
-@@ -2263,6 +2405,32 @@
+@@ -2266,6 +2408,32 @@
      }
  
    Done_Width:
@@ -361,7 +361,7 @@ index 4970945..3df05be 100644
      if ( sign )
        dist = -dist;
  
-@@ -2284,6 +2452,8 @@
+@@ -2287,6 +2455,8 @@
                                                          base_edge->flags,
                                                          stem_edge->flags );
  
@@ -370,7 +370,7 @@ index 4970945..3df05be 100644
  
      stem_edge->pos = base_edge->pos + fitted_width;
  
-@@ -2845,8 +3015,32 @@
+@@ -2848,8 +3018,32 @@
      int       dim;
  
      AF_LatinAxis  axis;
@@ -404,7 +404,7 @@ index 4970945..3df05be 100644
      error = af_glyph_hints_reload( hints, outline );
      if ( error )
        goto Exit;
-@@ -2916,7 +3110,11 @@
+@@ -2919,7 +3113,11 @@
      }
  
      af_glyph_hints_save( hints, outline );
