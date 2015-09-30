@@ -77190,3 +77190,2356 @@ index 54eabe2..1852998 100644
 -- 
 2.5.2
 
+From 4942c2bb7240136bc299a9fc7c375e58eb37f417 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Thu, 17 Sep 2015 17:56:53 +0200
+Subject: [PATCH] [psaux] Fix memory leak (#45986).
+
+* src/psaux/psobjs.c (ps_parser_load_field) <T1_FIELD_TYPE_MM_BBOX>:
+Free `temp' in case of error.
+---
+ ChangeLog          | 7 +++++++
+ src/psaux/psobjs.c | 2 ++
+ 2 files changed, 9 insertions(+)
+
+diff --git a/ChangeLog b/ChangeLog
+index 8bad3b5..6e90f76 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,5 +1,12 @@
+ 2015-09-17  Werner Lemberg  <wl@gnu.org>
+ 
++	[psaux] Fix memory leak (#45986).
++
++	* src/psaux/psobjs.c (ps_parser_load_field) <T1_FIELD_TYPE_MM_BBOX>:
++	Free `temp' in case of error.
++
++2015-09-17  Werner Lemberg  <wl@gnu.org>
++
+ 	[psaux] Improve tracing message.
+ 
+ 	* src/psaux/psobjs.c (ps_parser_load_field) <T1_FIELD_TYPE_MM_BBOX>:
+diff --git a/src/psaux/psobjs.c b/src/psaux/psobjs.c
+index 1852998..1d3c7e6 100644
+--- a/src/psaux/psobjs.c
++++ b/src/psaux/psobjs.c
+@@ -1241,6 +1241,8 @@
+                                            : ( i == 2 ? "third"
+                                                       : "fourth" ) ) ));
+               error = FT_THROW( Invalid_File_Format );
++
++              FT_FREE( temp );
+               goto Exit;
+             }
+ 
+-- 
+2.6.0
+
+From f28c95c4a40842795fb159bff56b5be9fee867cd Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Thu, 17 Sep 2015 19:30:26 +0200
+Subject: [PATCH] [type42] Fix memory leak (#45989).
+
+* src/type42/t42parse.c (t42_parse_charstrings): Allow only a single
+`CharStrings' array.
+---
+ ChangeLog             | 7 +++++++
+ src/type42/t42parse.c | 9 +++++++++
+ 2 files changed, 16 insertions(+)
+
+diff --git a/ChangeLog b/ChangeLog
+index 6e90f76..511c8cc 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,5 +1,12 @@
+ 2015-09-17  Werner Lemberg  <wl@gnu.org>
+ 
++	[type42] Fix memory leak (#45989).
++
++	* src/type42/t42parse.c (t42_parse_charstrings): Allow only a single
++	`CharStrings' array.
++
++2015-09-17  Werner Lemberg  <wl@gnu.org>
++
+ 	[psaux] Fix memory leak (#45986).
+ 
+ 	* src/psaux/psobjs.c (ps_parser_load_field) <T1_FIELD_TYPE_MM_BBOX>:
+diff --git a/src/type42/t42parse.c b/src/type42/t42parse.c
+index ee77d86..003b63e 100644
+--- a/src/type42/t42parse.c
++++ b/src/type42/t42parse.c
+@@ -841,6 +841,15 @@
+ 
+     /* initialize tables */
+ 
++    /* contrary to Type1, we disallow multiple CharStrings arrays */
++    if ( swap_table->init )
++    {
++      FT_ERROR(( "t42_parse_charstrings:"
++                 " only one CharStrings array allowed\n" ));
++      error = FT_THROW( Invalid_File_Format );
++      goto Fail;
++    }
++
+     error = psaux->ps_table_funcs->init( code_table,
+                                          loader->num_glyphs,
+                                          memory );
+-- 
+2.6.0
+
+From cb7a5122e15d3013bd51cfedc8e5d723b6e2e33c Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Sat, 19 Sep 2015 07:58:03 +0200
+Subject: [PATCH] [pcf] Improve `FT_ABS' fix from 2015-09-17 (#45999).
+
+* src/pcf/pcfread.c (pcf_load_font): Do first the cast to FT_Short,
+then take the absolute value.
+Also apply FT_ABS to `height'.
+---
+ ChangeLog         |  8 ++++++++
+ src/pcf/pcfread.c | 19 ++++++++++++-------
+ 2 files changed, 20 insertions(+), 7 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 511c8cc..6d41da6 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,11 @@
++2015-09-19  Werner Lemberg  <wl@gnu.org>
++
++	[pcf] Improve `FT_ABS' fix from 2015-09-17 (#45999).
++
++	* src/pcf/pcfread.c (pcf_load_font): Do first the cast to FT_Short,
++	then take the absolute value.
++	Also apply FT_ABS to `height'.
++
+ 2015-09-17  Werner Lemberg  <wl@gnu.org>
+ 
+ 	[type42] Fix memory leak (#45989).
+diff --git a/src/pcf/pcfread.c b/src/pcf/pcfread.c
+index 9d8d794..afa1480 100644
+--- a/src/pcf/pcfread.c
++++ b/src/pcf/pcfread.c
+@@ -1272,13 +1272,18 @@ THE SOFTWARE.
+ 
+         FT_MEM_ZERO( bsize, sizeof ( FT_Bitmap_Size ) );
+ 
++        /* for simplicity, we take absolute values of integer properties */
++
+ #if 0
+         bsize->height = face->accel.maxbounds.ascent << 6;
+ #endif
+-        bsize->height = (FT_Short)( face->accel.fontAscent +
+-                                    face->accel.fontDescent );
+ 
+-        /* for simplicity, we take absolute values of integer properties */
++#ifdef FT_DEBUG_LEVEL_TRACE
++        if ( face->accel.fontAscent + face->accel.fontDescent < 0 )
++          FT_TRACE0(( "pcf_load_font: negative height\n" ));
++#endif
++        bsize->height = FT_ABS( (FT_Short)( face->accel.fontAscent +
++                                            face->accel.fontDescent ) );
+ 
+         prop = pcf_find_property( face, "AVERAGE_WIDTH" );
+         if ( prop )
+@@ -1287,7 +1292,7 @@ THE SOFTWARE.
+           if ( prop->value.l < 0 )
+             FT_TRACE0(( "pcf_load_font: negative average width\n" ));
+ #endif
+-          bsize->width = (FT_Short)( ( FT_ABS( prop->value.l ) + 5 ) / 10 );
++          bsize->width = FT_ABS( (FT_Short)( ( prop->value.l ) + 5 ) / 10 );
+         }
+         else
+           bsize->width = (FT_Short)FT_MulDiv( bsize->height, 2, 3 );
+@@ -1312,7 +1317,7 @@ THE SOFTWARE.
+           if ( prop->value.l < 0 )
+             FT_TRACE0(( "pcf_load_font: negative pixel size\n" ));
+ #endif
+-          bsize->y_ppem = (FT_Short)FT_ABS( prop->value.l ) << 6;
++          bsize->y_ppem = FT_ABS( (FT_Short)prop->value.l ) << 6;
+         }
+ 
+         prop = pcf_find_property( face, "RESOLUTION_X" );
+@@ -1322,7 +1327,7 @@ THE SOFTWARE.
+           if ( prop->value.l < 0 )
+             FT_TRACE0(( "pcf_load_font: negative X resolution\n" ));
+ #endif
+-          resolution_x = (FT_Short)FT_ABS( prop->value.l );
++          resolution_x = FT_ABS( (FT_Short)prop->value.l );
+         }
+ 
+         prop = pcf_find_property( face, "RESOLUTION_Y" );
+@@ -1332,7 +1337,7 @@ THE SOFTWARE.
+           if ( prop->value.l < 0 )
+             FT_TRACE0(( "pcf_load_font: negative Y resolution\n" ));
+ #endif
+-          resolution_y = (FT_Short)FT_ABS( prop->value.l );
++          resolution_y = FT_ABS( (FT_Short)prop->value.l );
+         }
+ 
+         if ( bsize->y_ppem == 0 )
+-- 
+2.6.0
+
+From 730b6d7468327f918472b7780c159d688c68590c Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Sat, 19 Sep 2015 12:41:12 +0200
+Subject: [PATCH] [sfnt] Improve handling of invalid SFNT table entries
+ (#45987).
+
+This patch fixes weaknesses in function `tt_face_load_font_dir'.
+
+- It incorrectly assumed that valid tables are always at the
+  beginning.  As a consequence, some valid tables after invalid
+  entries (which are ignored) were never seen.
+
+- Duplicate table entries (this is, having the same tag) were not
+  rejected.
+
+- The number of valid tables was sometimes too large, leading to
+  access of invalid tables.
+
+* src/sfnt/ttload.c (check_table_dir): Add argument to return number
+of valid tables.
+Add another tracing message.
+(tt_face_load_font_dir): Only allocate table array for valid
+entries as returned by `check_table_dir'.
+Reject duplicate tables and adjust number of valid tables
+accordingly.
+---
+ ChangeLog         |  24 +++++++++++
+ src/sfnt/ttload.c | 117 ++++++++++++++++++++++++++++++++++--------------------
+ 2 files changed, 99 insertions(+), 42 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 6d41da6..92b5b9b 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,5 +1,29 @@
+ 2015-09-19  Werner Lemberg  <wl@gnu.org>
+ 
++	[sfnt] Improve handling of invalid SFNT table entries (#45987).
++
++	This patch fixes weaknesses in function `tt_face_load_font_dir'.
++
++	- It incorrectly assumed that valid tables are always at the
++	  beginning.  As a consequence, some valid tables after invalid
++	  entries (which are ignored) were never seen.
++
++	- Duplicate table entries (this is, having the same tag) were not
++	  rejected.
++
++	- The number of valid tables was sometimes too large, leading to
++	  access of invalid tables.
++
++	* src/sfnt/ttload.c (check_table_dir): Add argument to return number
++	of valid tables.
++	Add another tracing message.
++	(tt_face_load_font_dir): Only allocate table array for valid
++	entries as returned by `check_table_dir'.
++	Reject duplicate tables and adjust number of valid tables
++	accordingly.
++
++2015-09-19  Werner Lemberg  <wl@gnu.org>
++
+ 	[pcf] Improve `FT_ABS' fix from 2015-09-17 (#45999).
+ 
+ 	* src/pcf/pcfread.c (pcf_load_font): Do first the cast to FT_Short,
+diff --git a/src/sfnt/ttload.c b/src/sfnt/ttload.c
+index ad2975d..c1bd7f0 100644
+--- a/src/sfnt/ttload.c
++++ b/src/sfnt/ttload.c
+@@ -151,7 +151,8 @@
+ 
+   /* Here, we                                                         */
+   /*                                                                  */
+-  /* - check that `num_tables' is valid (and adjust it if necessary)  */
++  /* - check that `num_tables' is valid (and adjust it if necessary); */
++  /*   also return the number of valid table entries                  */
+   /*                                                                  */
+   /* - look for a `head' table, check its size, and parse it to check */
+   /*   whether its `magic' field is correctly set                     */
+@@ -167,7 +168,8 @@
+   /*                                                                  */
+   static FT_Error
+   check_table_dir( SFNT_Header  sfnt,
+-                   FT_Stream    stream )
++                   FT_Stream    stream,
++                   FT_UShort*   valid )
+   {
+     FT_Error   error;
+     FT_UShort  nn, valid_entries = 0;
+@@ -209,7 +211,10 @@
+       /* we ignore invalid tables */
+ 
+       if ( table.Offset > stream->size )
++      {
++        FT_TRACE2(( "check_table_dir: table entry %d invalid\n", nn ));
+         continue;
++      }
+       else if ( table.Length > stream->size - table.Offset )
+       {
+         /* Some tables have such a simple structure that clipping its     */
+@@ -273,11 +278,11 @@
+         has_meta = 1;
+     }
+ 
+-    sfnt->num_tables = valid_entries;
++    *valid = valid_entries;
+ 
+-    if ( sfnt->num_tables == 0 )
++    if ( !valid_entries )
+     {
+-      FT_TRACE2(( "check_table_dir: no tables found\n" ));
++      FT_TRACE2(( "check_table_dir: no valid tables found\n" ));
+       error = FT_THROW( Unknown_File_Format );
+       goto Exit;
+     }
+@@ -333,8 +338,7 @@
+     SFNT_HeaderRec  sfnt;
+     FT_Error        error;
+     FT_Memory       memory = stream->memory;
+-    TT_TableRec*    entry;
+-    FT_Int          nn;
++    FT_UShort       nn, valid_entries;
+ 
+     static const FT_Frame_Field  offset_table_fields[] =
+     {
+@@ -375,85 +379,114 @@
+     if ( sfnt.format_tag != TTAG_OTTO )
+     {
+       /* check first */
+-      error = check_table_dir( &sfnt, stream );
++      error = check_table_dir( &sfnt, stream, &valid_entries );
+       if ( error )
+       {
+         FT_TRACE2(( "tt_face_load_font_dir:"
+                     " invalid table directory for TrueType\n" ));
+-
+         goto Exit;
+       }
+     }
++    else
++      valid_entries = sfnt.num_tables;
+ 
+-    face->num_tables = sfnt.num_tables;
++    face->num_tables = valid_entries;
+     face->format_tag = sfnt.format_tag;
+ 
+     if ( FT_QNEW_ARRAY( face->dir_tables, face->num_tables ) )
+       goto Exit;
+ 
+-    if ( FT_STREAM_SEEK( sfnt.offset + 12 )       ||
+-         FT_FRAME_ENTER( face->num_tables * 16L ) )
++    if ( FT_STREAM_SEEK( sfnt.offset + 12 )      ||
++         FT_FRAME_ENTER( sfnt.num_tables * 16L ) )
+       goto Exit;
+ 
+-    entry = face->dir_tables;
+-
+     FT_TRACE2(( "\n"
+                 "  tag    offset    length   checksum\n"
+                 "  ----------------------------------\n" ));
+ 
++    valid_entries = 0;
+     for ( nn = 0; nn < sfnt.num_tables; nn++ )
+     {
+-      entry->Tag      = FT_GET_TAG4();
+-      entry->CheckSum = FT_GET_ULONG();
+-      entry->Offset   = FT_GET_ULONG();
+-      entry->Length   = FT_GET_ULONG();
++      TT_TableRec  entry;
++      FT_UShort    i;
++      FT_Bool      duplicate;
++
++
++      entry.Tag      = FT_GET_TAG4();
++      entry.CheckSum = FT_GET_ULONG();
++      entry.Offset   = FT_GET_ULONG();
++      entry.Length   = FT_GET_ULONG();
+ 
+       /* ignore invalid tables that can't be sanitized */
+ 
+-      if ( entry->Offset > stream->size )
++      if ( entry.Offset > stream->size )
+         continue;
+-      else if ( entry->Length > stream->size - entry->Offset )
++      else if ( entry.Length > stream->size - entry.Offset )
+       {
+-        if ( entry->Tag == TTAG_hmtx ||
+-             entry->Tag == TTAG_vmtx )
++        if ( entry.Tag == TTAG_hmtx ||
++             entry.Tag == TTAG_vmtx )
+         {
+ #ifdef FT_DEBUG_LEVEL_TRACE
+-          FT_ULong  old_length = entry->Length;
++          FT_ULong  old_length = entry.Length;
+ #endif
+ 
+ 
+           /* make metrics table length a multiple of 4 */
+-          entry->Length = ( stream->size - entry->Offset ) & ~3U;
++          entry.Length = ( stream->size - entry.Offset ) & ~3U;
+ 
+           FT_TRACE2(( "  %c%c%c%c  %08lx  %08lx  %08lx"
+-                      " (sanitized; original length %08lx)\n",
+-                      (FT_Char)( entry->Tag >> 24 ),
+-                      (FT_Char)( entry->Tag >> 16 ),
+-                      (FT_Char)( entry->Tag >> 8  ),
+-                      (FT_Char)( entry->Tag       ),
+-                      entry->Offset,
+-                      entry->Length,
+-                      entry->CheckSum,
++                      " (sanitized; original length %08lx)",
++                      (FT_Char)( entry.Tag >> 24 ),
++                      (FT_Char)( entry.Tag >> 16 ),
++                      (FT_Char)( entry.Tag >> 8  ),
++                      (FT_Char)( entry.Tag       ),
++                      entry.Offset,
++                      entry.Length,
++                      entry.CheckSum,
+                       old_length ));
+-          entry++;
+         }
+         else
+           continue;
+       }
++#ifdef FT_DEBUG_LEVEL_TRACE
++      else
++        FT_TRACE2(( "  %c%c%c%c  %08lx  %08lx  %08lx",
++                    (FT_Char)( entry.Tag >> 24 ),
++                    (FT_Char)( entry.Tag >> 16 ),
++                    (FT_Char)( entry.Tag >> 8  ),
++                    (FT_Char)( entry.Tag       ),
++                    entry.Offset,
++                    entry.Length,
++                    entry.CheckSum ));
++#endif
++
++      /* ignore duplicate tables – the first one wins */
++      duplicate = 0;
++      for ( i = 0; i < valid_entries; i++ )
++      {
++        if ( face->dir_tables[i].Tag == entry.Tag )
++        {
++          duplicate = 1;
++          break;
++        }
++      }
++      if ( duplicate )
++      {
++        FT_TRACE2(( "  (duplicate, ignored)\n" ));
++        continue;
++      }
+       else
+       {
+-        FT_TRACE2(( "  %c%c%c%c  %08lx  %08lx  %08lx\n",
+-                    (FT_Char)( entry->Tag >> 24 ),
+-                    (FT_Char)( entry->Tag >> 16 ),
+-                    (FT_Char)( entry->Tag >> 8  ),
+-                    (FT_Char)( entry->Tag       ),
+-                    entry->Offset,
+-                    entry->Length,
+-                    entry->CheckSum ));
+-        entry++;
++        FT_TRACE2(( "\n" ));
++
++        /* we finally have a valid entry */
++        face->dir_tables[valid_entries++] = entry;
+       }
+     }
+ 
++    /* final adjustment to number of tables */
++    face->num_tables = valid_entries;
++
+     FT_FRAME_EXIT();
+ 
+     FT_TRACE2(( "table directory loaded\n\n" ));
+-- 
+2.6.0
+
+From e982f5b78a7d113a40e0c579cae7d96487e94216 Mon Sep 17 00:00:00 2001
+From: suzuki toshiya <mpsuzuki@hiroshima-u.ac.jp>
+Date: Mon, 21 Sep 2015 23:07:22 +0900
+Subject: [PATCH] [base] Check too long POST and sfnt resource (#45919).
+
+* src/base/ftbase.h (FT_MAC_RFORK_MAX_LEN): Maximum length
+of the resource fork for Mac OS.  The resource fork larger
+than 16 MB can be written but could not be handled
+correctly, at least in Carbon routine.
+See https://support.microsoft.com/en-us/kb/130437
+
+* src/base/ftobjs.c (Mac_Read_POST_Resource): No need `0x'
+for `%p' formatter.
+
+* src/base/ftbase.c (Mac_Read_POST_Resource): Check the
+fragment and total size of the concatenated POST resource
+before buffer allocation.
+(Mac_Read_sfnt_Resource): Check the declared size of
+sfnt resource before buffer allocation.
+
+* src/base/ftmac.c (read_lwfn, FT_New_Face_From_SFNT):
+Check the total resource size before buffer allocation.
+---
+ ChangeLog         | 22 ++++++++++++++++++++++
+ src/base/ftbase.h |  5 +++++
+ src/base/ftmac.c  |  9 +++++++--
+ src/base/ftobjs.c | 20 ++++++++++++--------
+ 4 files changed, 46 insertions(+), 10 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 92b5b9b..c120afd 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,25 @@
++2015-09-21  suzuki toshiya  <mpsuzuki@hiroshima-u.ac.jp>
++
++	[base] Check too long POST and sfnt resource (#45919). 
++
++	* src/base/ftbase.h (FT_MAC_RFORK_MAX_LEN): Maximum length
++	of the resource fork for Mac OS.  The resource fork larger
++	than 16 MB can be written but could not be handled
++	correctly, at least in Carbon routine.
++	See https://support.microsoft.com/en-us/kb/130437
++
++	* src/base/ftobjs.c (Mac_Read_POST_Resource): No need `0x'
++	for `%p' formatter.
++
++	* src/base/ftbase.c (Mac_Read_POST_Resource): Check the
++	fragment and total size of the concatenated POST resource
++	before buffer allocation.
++	(Mac_Read_sfnt_Resource): Check the declared size of
++	sfnt resource before buffer allocation.
++
++	* src/base/ftmac.c (read_lwfn, FT_New_Face_From_SFNT):
++	Check the total resource size before buffer allocation.
++
+ 2015-09-19  Werner Lemberg  <wl@gnu.org>
+ 
+ 	[sfnt] Improve handling of invalid SFNT table entries (#45987).
+diff --git a/src/base/ftbase.h b/src/base/ftbase.h
+index cb57f96..0bd9e65 100644
+--- a/src/base/ftbase.h
++++ b/src/base/ftbase.h
+@@ -27,6 +27,11 @@
+ FT_BEGIN_HEADER
+ 
+ 
++/* MacOS resource fork cannot exceed 16 MB at least for Carbon code */
++/* see https://support.microsoft.com/en-us/kb/130437                */
++#define FT_MAC_RFORK_MAX_LEN  0x00FFFFFFUL
++
++
+   /* Assume the stream is sfnt-wrapped PS Type1 or sfnt-wrapped CID-keyed */
+   /* font, and try to load a face specified by the face_index.            */
+   FT_LOCAL( FT_Error )
+diff --git a/src/base/ftmac.c b/src/base/ftmac.c
+index 446a23a..8463190 100644
+--- a/src/base/ftmac.c
++++ b/src/base/ftmac.c
+@@ -621,8 +621,8 @@
+       total_size += GetHandleSize( post_data ) - 2;
+       last_code = code;
+ 
+-      /* detect integer overflows */
+-      if ( total_size < old_total_size )
++      /* detect resource fork overflow */
++      if ( FT_MAC_RFORK_MAX_LEN < total_size )
+       {
+         error = FT_THROW( Array_Too_Large );
+         goto Error;
+@@ -747,6 +747,11 @@
+       return FT_THROW( Invalid_Handle );
+ 
+     sfnt_size = (FT_ULong)GetHandleSize( sfnt );
++
++    /* detect resource fork overflow */
++    if ( FT_MAC_RFORK_MAX_LEN < sfnt_size )
++      return FT_THROW( Array_Too_Large );
++
+     if ( FT_ALLOC( sfnt_data, (FT_Long)sfnt_size ) )
+     {
+       ReleaseResource( sfnt );
+diff --git a/src/base/ftobjs.c b/src/base/ftobjs.c
+index 3a41ac0..b465a45 100644
+--- a/src/base/ftobjs.c
++++ b/src/base/ftobjs.c
+@@ -1586,12 +1586,14 @@
+       /* FT2 allocator takes signed long buffer length,
+        * too large value causing overflow should be checked
+        */
+-      FT_TRACE4(( "                 POST fragment #%d: length=0x%08x\n",
+-                  i, temp));
+-      if ( 0x7FFFFFFFUL < temp || pfb_len + temp + 6 < pfb_len )
++      FT_TRACE4(( "                 POST fragment #%d: length=0x%08x"
++                  " total pfb_len=0x%08x\n",
++                  i, temp, pfb_len + temp + 6));
++      if ( FT_MAC_RFORK_MAX_LEN < temp               ||
++           FT_MAC_RFORK_MAX_LEN - temp < pfb_len + 6 )
+       {
+-        FT_TRACE2(( "             too long fragment length makes"
+-                    " pfb_len confused: temp=0x%08x\n", temp ));
++        FT_TRACE2(( "             MacOS resource length cannot exceed"
++                    " 0x%08x\n", FT_MAC_RFORK_MAX_LEN ));
+         error = FT_THROW( Invalid_Offset );
+         goto Exit;
+       }
+@@ -1664,7 +1666,7 @@
+       else
+       {
+         FT_TRACE3(( "    Write POST fragment #%d header (4-byte) to buffer"
+-                    " 0x%p + 0x%08x\n", i, pfb_data, pfb_lenpos ));
++                    " %p + 0x%08x\n", i, pfb_data, pfb_lenpos ));
+         if ( pfb_lenpos + 3 > pfb_len + 2 )
+           goto Exit2;
+         pfb_data[pfb_lenpos    ] = (FT_Byte)( len );
+@@ -1676,7 +1678,7 @@
+           break;
+ 
+         FT_TRACE3(( "    Write POST fragment #%d header (6-byte) to buffer"
+-                    " 0x%p + 0x%08x\n", i, pfb_data, pfb_pos ));
++                    " %p + 0x%08x\n", i, pfb_data, pfb_pos ));
+         if ( pfb_pos + 6 > pfb_len + 2 )
+           goto Exit2;
+         pfb_data[pfb_pos++] = 0x80;
+@@ -1696,7 +1698,7 @@
+         goto Exit2;
+ 
+       FT_TRACE3(( "    Load POST fragment #%d (%d byte) to buffer"
+-                  " 0x%p + 0x%08x\n", i, rlen, pfb_data, pfb_pos ));
++                  " %p + 0x%08x\n", i, rlen, pfb_data, pfb_pos ));
+       error = FT_Stream_Read( stream, (FT_Byte *)pfb_data + pfb_pos, rlen );
+       if ( error )
+         goto Exit2;
+@@ -1774,6 +1776,8 @@
+       goto Exit;
+     if ( rlen == -1 )
+       return FT_THROW( Cannot_Open_Resource );
++    if ( rlen > FT_MAC_RFORK_MAX_LEN )
++      return FT_THROW( Invalid_Offset );
+ 
+     error = open_face_PS_from_sfnt_stream( library,
+                                            stream,
+-- 
+2.6.0
+
+From cbdf13e5ca5c501e30f036a5f34e8370d878483a Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Thu, 24 Sep 2015 12:14:38 +0200
+Subject: [PATCH] Formatting, documentation improvements.
+
+---
+ src/sfnt/ttcmap.c | 37 +++++++++++++++++++------------------
+ 1 file changed, 19 insertions(+), 18 deletions(-)
+
+diff --git a/src/sfnt/ttcmap.c b/src/sfnt/ttcmap.c
+index 815ee7c..e91bcee 100644
+--- a/src/sfnt/ttcmap.c
++++ b/src/sfnt/ttcmap.c
+@@ -199,7 +199,7 @@
+   /*****                          FORMAT 2                             *****/
+   /*****                                                               *****/
+   /***** This is used for certain CJK encodings that encode text in a  *****/
+-  /***** mixed 8/16 bits encoding along the following lines:           *****/
++  /***** mixed 8/16 bits encoding along the following lines.           *****/
+   /*****                                                               *****/
+   /***** * Certain byte values correspond to an 8-bit character code   *****/
+   /*****   (typically in the range 0..127 for ASCII compatibility).    *****/
+@@ -209,19 +209,19 @@
+   /*****   second byte of a 2-byte character).                         *****/
+   /*****                                                               *****/
+   /***** The following charmap lookup and iteration functions all      *****/
+-  /***** assume that the value "charcode" correspond to following:     *****/
++  /***** assume that the value `charcode' fulfills the following.      *****/
+   /*****                                                               *****/
+-  /*****   - For one byte characters, "charcode" is simply the         *****/
++  /*****   - For one byte characters, `charcode' is simply the         *****/
+   /*****     character code.                                           *****/
+   /*****                                                               *****/
+-  /*****   - For two byte characters, "charcode" is the 2-byte         *****/
+-  /*****     character code in big endian format.  More exactly:       *****/
++  /*****   - For two byte characters, `charcode' is the 2-byte         *****/
++  /*****     character code in big endian format.  More precisely:     *****/
+   /*****                                                               *****/
+   /*****       (charcode >> 8)    is the first byte value              *****/
+   /*****       (charcode & 0xFF)  is the second byte value             *****/
+   /*****                                                               *****/
+-  /***** Note that not all values of "charcode" are valid according    *****/
+-  /***** to these rules, and the function moderately check the         *****/
++  /***** Note that not all values of `charcode' are valid according    *****/
++  /***** to these rules, and the function moderately checks the        *****/
+   /***** arguments.                                                    *****/
+   /*****                                                               *****/
+   /*************************************************************************/
+@@ -249,7 +249,7 @@
+   /* table, i.e., it is the corresponding sub-header index multiplied      */
+   /* by 8.                                                                 */
+   /*                                                                       */
+-  /* Each sub-header has the following format:                             */
++  /* Each sub-header has the following format.                             */
+   /*                                                                       */
+   /*   NAME        OFFSET      TYPE            DESCRIPTION                 */
+   /*                                                                       */
+@@ -264,11 +264,11 @@
+   /* according to the specification.                                       */
+   /*                                                                       */
+   /* If a character code is contained within a given sub-header, then      */
+-  /* mapping it to a glyph index is done as follows:                       */
++  /* mapping it to a glyph index is done as follows.                       */
+   /*                                                                       */
+   /* * The value of `offset' is read.  This is a _byte_ distance from the  */
+   /*   location of the `offset' field itself into a slice of the           */
+-  /*   `glyph_ids' table.  Let's call it `slice' (it is a USHORT[] too).   */
++  /*   `glyph_ids' table.  Let's call it `slice' (it is a USHORT[], too).  */
+   /*                                                                       */
+   /* * The value `slice[char.lo - first]' is read.  If it is 0, there is   */
+   /*   no glyph for the charcode.  Otherwise, the value of `delta' is      */
+@@ -326,7 +326,7 @@
+     FT_ASSERT( p == table + 518 );
+ 
+     subs      = p;
+-    glyph_ids = subs + (max_subs + 1) * 8;
++    glyph_ids = subs + ( max_subs + 1 ) * 8;
+     if ( glyph_ids > valid->limit )
+       FT_INVALID_TOO_SHORT;
+ 
+@@ -436,6 +436,7 @@
+       }
+       result = sub;
+     }
++
+   Exit:
+     return result;
+   }
+@@ -475,6 +476,7 @@
+           result = (FT_UInt)( (FT_Int)idx + delta ) & 0xFFFFU;
+       }
+     }
++
+     return result;
+   }
+ 
+@@ -973,7 +975,7 @@
+           /* segment if it contains only a single character.     */
+           /*                                                     */
+           /* We thus omit the test here, delaying it to the      */
+-          /* routines which actually access the cmap.            */
++          /* routines that actually access the cmap.             */
+           else if ( n != num_segs - 1                       ||
+                     !( start == 0xFFFFU && end == 0xFFFFU ) )
+           {
+@@ -1310,7 +1312,6 @@
+ 
+       /* if `charcode' is not in any segment, then `mid' is */
+       /* the segment nearest to `charcode'                  */
+-      /*                                                    */
+ 
+       if ( charcode > end )
+       {
+@@ -1443,7 +1444,7 @@
+   /*                                                                       */
+   /*   NAME        OFFSET          TYPE             DESCRIPTION            */
+   /*                                                                       */
+-  /*   format       0              USHORT           must be 4              */
++  /*   format       0              USHORT           must be 6              */
+   /*   length       2              USHORT           table length in bytes  */
+   /*   language     4              USHORT           Mac language code      */
+   /*                                                                       */
+@@ -1511,6 +1512,7 @@
+       p += 2 * idx;
+       result = TT_PEEK_USHORT( p );
+     }
++
+     return result;
+   }
+ 
+@@ -1602,7 +1604,7 @@
+   /*****                                                               *****/
+   /***** The purpose of this format is to easily map UTF-16 text to    *****/
+   /***** glyph indices.  Basically, the `char_code' must be in one of  *****/
+-  /***** the following formats:                                        *****/
++  /***** the following formats.                                        *****/
+   /*****                                                               *****/
+   /*****   - A 16-bit value that isn't part of the Unicode Surrogates  *****/
+   /*****     Area (i.e. U+D800-U+DFFF).                                *****/
+@@ -1615,7 +1617,7 @@
+   /***** The `is32' table embedded in the charmap indicates whether a  *****/
+   /***** given 16-bit value is in the surrogates area or not.          *****/
+   /*****                                                               *****/
+-  /***** So, for any given `char_code', we can assert the following:   *****/
++  /***** So, for any given `char_code', we can assert the following.   *****/
+   /*****                                                               *****/
+   /*****   If `char_hi == 0' then we must have `is32[char_lo] == 0'.   *****/
+   /*****                                                               *****/
+@@ -2230,7 +2232,6 @@
+ 
+       /* if `char_code' is not in any group, then `mid' is */
+       /* the group nearest to `char_code'                  */
+-      /*                                                   */
+ 
+       if ( char_code > end )
+       {
+@@ -2485,7 +2486,7 @@
+ 
+         if ( gindex )
+         {
+-          cmap->cur_charcode = char_code;;
++          cmap->cur_charcode = char_code;
+           cmap->cur_gindex   = gindex;
+           cmap->cur_group    = n;
+ 
+-- 
+2.6.0
+
+From c409eb18aeeab8545d6ac7bfb03d1199743d99b8 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Thu, 24 Sep 2015 12:39:38 +0200
+Subject: [PATCH] [base, sfnt] Better checks for invalid cmaps (1/2).
+
+* src/base/ftobjs.c (FT_Get_Char_Index): Don't return out-of-bounds
+glyph indices.
+(FT_Get_First_Char): Updated.
+
+* src/sfnt/ttcmap.c (tt_cmap6_char_next): Don't return character
+codes greater than 0xFFFF.
+
+(tt_cmap8_char_index): Avoid integer overflow in computation of
+glyph index.
+(tt_cmap8_char_next): Avoid integer overflows in computation of
+both next character code and glyph index.
+
+(tt_cmap10_char_index): Fix unsigned integer logic.
+(tt_cmap10_char_next): Avoid integer overflow in computation of
+next character code.
+
+(tt_cmap12_next): Avoid integer overflows in computation of both
+next character code and glyph index.
+(tt_cmap12_char_map_binary): Ditto.
+(tt_cmap12_char_next): Simplify.
+
+(tt_cmap13_char_map_binary): Avoid integer overflow in computation
+of next character code.
+(tt_cmap13_char_next): Simplify.
+---
+ ChangeLog         |  29 +++++++++++
+ src/base/ftobjs.c |   6 ++-
+ src/sfnt/ttcmap.c | 140 ++++++++++++++++++++++++++++++++++++++----------------
+ 3 files changed, 133 insertions(+), 42 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index c120afd..d60579d 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,32 @@
++2015-09-23  Werner Lemberg  <wl@gnu.org>
++
++	[base, sfnt] Better checks for invalid cmaps (1/2).
++
++	* src/base/ftobjs.c (FT_Get_Char_Index): Don't return out-of-bounds
++	glyph indices.
++	(FT_Get_First_Char): Updated.
++
++	* src/sfnt/ttcmap.c (tt_cmap6_char_next): Don't return character
++	codes greater than 0xFFFF.
++
++	(tt_cmap8_char_index): Avoid integer overflow in computation of
++	glyph index.
++	(tt_cmap8_char_next): Avoid integer overflows in computation of
++	both next character code and glyph index.
++
++	(tt_cmap10_char_index): Fix unsigned integer logic.
++	(tt_cmap10_char_next): Avoid integer overflow in computation of
++	next character code.
++
++	(tt_cmap12_next): Avoid integer overflows in computation of both
++	next character code and glyph index.
++	(tt_cmap12_char_map_binary): Ditto.
++	(tt_cmap12_char_next): Simplify.
++
++	(tt_cmap13_char_map_binary): Avoid integer overflow in computation
++	of next character code.
++	(tt_cmap13_char_next): Simplify.
++
+ 2015-09-21  suzuki toshiya  <mpsuzuki@hiroshima-u.ac.jp>
+ 
+ 	[base] Check too long POST and sfnt resource (#45919). 
+diff --git a/src/base/ftobjs.c b/src/base/ftobjs.c
+index b465a45..f58f715 100644
+--- a/src/base/ftobjs.c
++++ b/src/base/ftobjs.c
+@@ -3382,8 +3382,12 @@
+         FT_TRACE1(( "FT_Get_Char_Index: too large charcode" ));
+         FT_TRACE1(( " 0x%x is truncated\n", charcode ));
+       }
++
+       result = cmap->clazz->char_index( cmap, (FT_UInt32)charcode );
++      if ( result >= (FT_UInt)face->num_glyphs )
++        result = 0;
+     }
++
+     return result;
+   }
+ 
+@@ -3402,7 +3406,7 @@
+     if ( face && face->charmap && face->num_glyphs )
+     {
+       gindex = FT_Get_Char_Index( face, 0 );
+-      if ( gindex == 0 || gindex >= (FT_UInt)face->num_glyphs )
++      if ( gindex == 0 )
+         result = FT_Get_Next_Char( face, 0, &gindex );
+     }
+ 
+diff --git a/src/sfnt/ttcmap.c b/src/sfnt/ttcmap.c
+index e91bcee..3d10d7a 100644
+--- a/src/sfnt/ttcmap.c
++++ b/src/sfnt/ttcmap.c
+@@ -51,6 +51,13 @@
+ #define TT_NEXT_ULONG   FT_NEXT_ULONG
+ 
+ 
++  /* Too large glyph index return values are caught in `FT_Get_Char_Index' */
++  /* and `FT_Get_Next_Char' (the latter calls the internal `next' function */
++  /* again in this case).  To mark character code return values as invalid */
++  /* it is sufficient to set the corresponding glyph index return value to */
++  /* zero.                                                                 */
++
++
+   FT_CALLBACK_DEF( FT_Error )
+   tt_cmap_init( TT_CMap   cmap,
+                 FT_Byte*  table )
+@@ -1533,7 +1540,7 @@
+ 
+ 
+     if ( char_code >= 0x10000UL )
+-      goto Exit;
++      return 0;
+ 
+     if ( char_code < start )
+       char_code = start;
+@@ -1549,10 +1556,13 @@
+         result = char_code;
+         break;
+       }
++
++      if ( char_code >= 0xFFFFU )
++        return 0;
++
+       char_code++;
+     }
+ 
+-  Exit:
+     *pchar_code = result;
+     return gindex;
+   }
+@@ -1772,7 +1782,10 @@
+ 
+       if ( char_code <= end )
+       {
+-        result = (FT_UInt)( start_id + char_code - start );
++        if ( start_id > 0xFFFFFFFFUL - ( char_code - start ) )
++          return 0;
++
++        result = (FT_UInt)( start_id + ( char_code - start ) );
+         break;
+       }
+     }
+@@ -1785,7 +1798,7 @@
+                       FT_UInt32  *pchar_code )
+   {
+     FT_UInt32  result     = 0;
+-    FT_UInt32  char_code  = *pchar_code + 1;
++    FT_UInt32  char_code;
+     FT_UInt    gindex     = 0;
+     FT_Byte*   table      = cmap->data;
+     FT_Byte*   p          = table + 8204;
+@@ -1793,6 +1806,11 @@
+     FT_UInt32  start, end, start_id;
+ 
+ 
++    if ( *pchar_code >= 0xFFFFFFFFUL )
++      return 0;
++
++    char_code = *pchar_code + 1;
++
+     p = table + 8208;
+ 
+     for ( ; num_groups > 0; num_groups-- )
+@@ -1804,18 +1822,30 @@
+       if ( char_code < start )
+         char_code = start;
+ 
++    Again:
+       if ( char_code <= end )
+       {
+-        gindex = (FT_UInt)( char_code - start + start_id );
+-        if ( gindex != 0 )
++        /* ignore invalid group */
++        if ( start_id > 0xFFFFFFFFUL - ( char_code - start ) )
++          continue;
++
++        gindex = (FT_UInt)( start_id + ( char_code - start ) );
++
++        /* does first element of group point to `.notdef' glyph? */
++        if ( gindex == 0 )
+         {
+-          result = char_code;
+-          goto Exit;
++          if ( char_code >= 0xFFFFFFFFUL )
++            break;
++
++          char_code++;
++          goto Again;
+         }
++
++        result = char_code;
++        break;
+       }
+     }
+ 
+-  Exit:
+     *pchar_code = result;
+     return gindex;
+   }
+@@ -1932,14 +1962,20 @@
+     FT_Byte*   p      = table + 12;
+     FT_UInt32  start  = TT_NEXT_ULONG( p );
+     FT_UInt32  count  = TT_NEXT_ULONG( p );
+-    FT_UInt32  idx    = (FT_ULong)( char_code - start );
++    FT_UInt32  idx;
+ 
+ 
++    if ( char_code < start )
++      return 0;
++
++    idx = char_code - start;
++
+     if ( idx < count )
+     {
+       p     += 2 * idx;
+       result = TT_PEEK_USHORT( p );
+     }
++
+     return result;
+   }
+ 
+@@ -1949,7 +1985,7 @@
+                        FT_UInt32  *pchar_code )
+   {
+     FT_Byte*   table     = cmap->data;
+-    FT_UInt32  char_code = *pchar_code + 1;
++    FT_UInt32  char_code;
+     FT_UInt    gindex    = 0;
+     FT_Byte*   p         = table + 12;
+     FT_UInt32  start     = TT_NEXT_ULONG( p );
+@@ -1957,10 +1993,15 @@
+     FT_UInt32  idx;
+ 
+ 
++    if ( *pchar_code >= 0xFFFFFFFFUL )
++      return 0;
++
++    char_code = *pchar_code + 1;
++
+     if ( char_code < start )
+       char_code = start;
+ 
+-    idx = (FT_UInt32)( char_code - start );
++    idx = char_code - start;
+     p  += 2 * idx;
+ 
+     for ( ; idx < count; idx++ )
+@@ -1968,6 +2009,10 @@
+       gindex = TT_NEXT_USHORT( p );
+       if ( gindex != 0 )
+         break;
++
++      if ( char_code >= 0xFFFFFFFFUL )
++        return 0;
++
+       char_code++;
+     }
+ 
+@@ -2157,18 +2202,30 @@
+       if ( char_code < start )
+         char_code = start;
+ 
+-      for ( ; char_code <= end; char_code++ )
++    Again:
++      if ( char_code <= end )
+       {
+-        gindex = (FT_UInt)( start_id + char_code - start );
++        /* ignore invalid group */
++        if ( start_id > 0xFFFFFFFFUL - ( char_code - start ) )
++          continue;
+ 
+-        if ( gindex )
++        gindex = (FT_UInt)( start_id + ( char_code - start ) );
++
++        /* does first element of group point to `.notdef' glyph? */
++        if ( gindex == 0 )
+         {
+-          cmap->cur_charcode = char_code;;
+-          cmap->cur_gindex   = gindex;
+-          cmap->cur_group    = n;
++          if ( char_code >= 0xFFFFFFFFUL )
++            goto Fail;
+ 
+-          return;
++          char_code++;
++          goto Again;
+         }
++
++        cmap->cur_charcode = char_code;
++        cmap->cur_gindex   = gindex;
++        cmap->cur_group    = n;
++
++        return;
+       }
+     }
+ 
+@@ -2198,7 +2255,12 @@
+     end = 0xFFFFFFFFUL;
+ 
+     if ( next )
++    {
++      if ( char_code >= 0xFFFFFFFFUL )
++        return 0;
++
+       char_code++;
++    }
+ 
+     min = 0;
+     max = num_groups;
+@@ -2219,8 +2281,12 @@
+       else
+       {
+         start_id = TT_PEEK_ULONG( p );
+-        gindex = (FT_UInt)( start_id + char_code - start );
+ 
++        /* reject invalid glyph index */
++        if ( start_id > 0xFFFFFFFFUL - ( char_code - start ) )
++          gindex = 0;
++        else
++          gindex = (FT_UInt)( start_id + ( char_code - start ) );
+         break;
+       }
+     }
+@@ -2254,8 +2320,7 @@
+       else
+         cmap12->cur_gindex = gindex;
+ 
+-      if ( gindex )
+-        *pchar_code = cmap12->cur_charcode;
++      *pchar_code = cmap12->cur_charcode;
+     }
+ 
+     return gindex;
+@@ -2275,11 +2340,8 @@
+                        FT_UInt32  *pchar_code )
+   {
+     TT_CMap12  cmap12 = (TT_CMap12)cmap;
+-    FT_ULong   gindex;
+-
++    FT_UInt    gindex;
+ 
+-    if ( cmap12->cur_charcode >= 0xFFFFFFFFUL )
+-      return 0;
+ 
+     /* no need to search */
+     if ( cmap12->valid && cmap12->cur_charcode == *pchar_code )
+@@ -2287,11 +2349,8 @@
+       tt_cmap12_next( cmap12 );
+       if ( cmap12->valid )
+       {
+-        gindex = cmap12->cur_gindex;
+-
+-        /* XXX: check cur_charcode overflow is expected */
+-        if ( gindex )
+-          *pchar_code = (FT_UInt32)cmap12->cur_charcode;
++        gindex      = cmap12->cur_gindex;
++        *pchar_code = (FT_UInt32)cmap12->cur_charcode;
+       }
+       else
+         gindex = 0;
+@@ -2299,8 +2358,7 @@
+     else
+       gindex = tt_cmap12_char_map_binary( cmap, pchar_code, 1 );
+ 
+-    /* XXX: check gindex overflow is expected */
+-    return (FT_UInt32)gindex;
++    return gindex;
+   }
+ 
+ 
+@@ -2521,7 +2579,12 @@
+     end = 0xFFFFFFFFUL;
+ 
+     if ( next )
++    {
++      if ( char_code >= 0xFFFFFFFFUL )
++        return 0;
++
+       char_code++;
++    }
+ 
+     min = 0;
+     max = num_groups;
+@@ -2576,8 +2639,7 @@
+       else
+         cmap13->cur_gindex = gindex;
+ 
+-      if ( gindex )
+-        *pchar_code = cmap13->cur_charcode;
++      *pchar_code = cmap13->cur_charcode;
+     }
+ 
+     return gindex;
+@@ -2600,18 +2662,14 @@
+     FT_UInt    gindex;
+ 
+ 
+-    if ( cmap13->cur_charcode >= 0xFFFFFFFFUL )
+-      return 0;
+-
+     /* no need to search */
+     if ( cmap13->valid && cmap13->cur_charcode == *pchar_code )
+     {
+       tt_cmap13_next( cmap13 );
+       if ( cmap13->valid )
+       {
+-        gindex = cmap13->cur_gindex;
+-        if ( gindex )
+-          *pchar_code = cmap13->cur_charcode;
++        gindex      = cmap13->cur_gindex;
++        *pchar_code = cmap13->cur_charcode;
+       }
+       else
+         gindex = 0;
+-- 
+2.6.0
+
+From 5339c75ee6d71fc15a86f2946d3189003359c37d Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Thu, 24 Sep 2015 13:39:44 +0200
+Subject: [PATCH] [sfnt] Better checks for invalid cmaps (2/2) (#46019).
+
+While the current code in `FT_Get_Next_Char' correctly rejects
+out-of-bounds glyph indices, it can be extremely slow for malformed
+cmaps that use 32bit values.  This commit tries to improve that.
+
+* src/sfnt/ttcmap.c (tt_cmap8_char_next, tt_cmap12_next,
+tt_cmap12_char_map_binary, tt_cmap13_next,
+tt_cmap13_char_map_binary): Reject glyph indices larger than or
+equal to the number of glyphs.
+---
+ ChangeLog                                     | 13 +++++++++++++
+ include/freetype/freetype.h                   |  7 +++++++
+ include/freetype/internal/services/svttcmap.h |  5 +++--
+ src/sfnt/ttcmap.c                             | 23 ++++++++++++++++++++++-
+ 4 files changed, 45 insertions(+), 3 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index d60579d..1cc65ba 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,5 +1,18 @@
+ 2015-09-23  Werner Lemberg  <wl@gnu.org>
+ 
++	[sfnt] Better checks for invalid cmaps (2/2) (#46019).
++
++	While the current code in `FT_Get_Next_Char' correctly rejects
++	out-of-bounds glyph indices, it can be extremely slow for malformed
++	cmaps that use 32bit values.  This commit tries to improve that.
++
++	* src/sfnt/ttcmap.c (tt_cmap8_char_next, tt_cmap12_next,
++	tt_cmap12_char_map_binary, tt_cmap13_next,
++	tt_cmap13_char_map_binary): Reject glyph indices larger than or
++	equal to the number of glyphs.
++
++2015-09-23  Werner Lemberg  <wl@gnu.org>
++
+ 	[base, sfnt] Better checks for invalid cmaps (1/2).
+ 
+ 	* src/base/ftobjs.c (FT_Get_Char_Index): Don't return out-of-bounds
+diff --git a/include/freetype/freetype.h b/include/freetype/freetype.h
+index aafbdfd..68aa269 100644
+--- a/include/freetype/freetype.h
++++ b/include/freetype/freetype.h
+@@ -3372,6 +3372,13 @@ FT_BEGIN_HEADER
+   /*      }                                                                */
+   /*    }                                                                  */
+   /*                                                                       */
++  /*    Be aware that character codes can have values up to 0xFFFFFFFF;    */
++  /*    this might happen for non-Unicode or malformed cmaps.  However,    */
++  /*    even with regular Unicode encoding, so-called `last resort fonts'  */
++  /*    (using SFNT cmap format 13, see function @FT_Get_CMap_Format)      */
++  /*    normally have entries for all Unicode characters up to 0x1FFFFF,   */
++  /*    which can cause *a lot* of iterations.                             */
++  /*                                                                       */
+   /*    Note that `*agindex' is set to~0 if the charmap is empty.  The     */
+   /*    result itself can be~0 in two cases: if the charmap is empty or    */
+   /*    if the value~0 is the first valid character code.                  */
+diff --git a/include/freetype/internal/services/svttcmap.h b/include/freetype/internal/services/svttcmap.h
+index 4351a9a..cd95b9a 100644
+--- a/include/freetype/internal/services/svttcmap.h
++++ b/include/freetype/internal/services/svttcmap.h
+@@ -48,11 +48,12 @@ FT_BEGIN_HEADER
+   /*      `ttnameid.h'.                                                    */
+   /*                                                                       */
+   /*    format ::                                                          */
+-  /*      The cmap format.  OpenType 1.5 defines the formats 0 (byte       */
++  /*      The cmap format.  OpenType 1.6 defines the formats 0 (byte       */
+   /*      encoding table), 2~(high-byte mapping through table), 4~(segment */
+   /*      mapping to delta values), 6~(trimmed table mapping), 8~(mixed    */
+   /*      16-bit and 32-bit coverage), 10~(trimmed array), 12~(segmented   */
+-  /*      coverage), and 14 (Unicode Variation Sequences).                 */
++  /*      coverage), 13~(last resort font), and 14 (Unicode Variation      */
++  /*      Sequences).                                                      */
+   /*                                                                       */
+   typedef struct  TT_CMapInfo_
+   {
+diff --git a/src/sfnt/ttcmap.c b/src/sfnt/ttcmap.c
+index 3d10d7a..6acba73 100644
+--- a/src/sfnt/ttcmap.c
++++ b/src/sfnt/ttcmap.c
+@@ -1797,6 +1797,7 @@
+   tt_cmap8_char_next( TT_CMap     cmap,
+                       FT_UInt32  *pchar_code )
+   {
++    FT_Face    face       = cmap->cmap.charmap.face;
+     FT_UInt32  result     = 0;
+     FT_UInt32  char_code;
+     FT_UInt    gindex     = 0;
+@@ -1841,6 +1842,11 @@
+           goto Again;
+         }
+ 
++        /* if `gindex' is invalid, the remaining values */
++        /* in this group are invalid, too               */
++        if ( gindex >= (FT_UInt)face->num_glyphs )
++          continue;
++
+         result = char_code;
+         break;
+       }
+@@ -2181,6 +2187,7 @@
+   static void
+   tt_cmap12_next( TT_CMap12  cmap )
+   {
++    FT_Face   face = cmap->cmap.cmap.charmap.face;
+     FT_Byte*  p;
+     FT_ULong  start, end, start_id, char_code;
+     FT_ULong  n;
+@@ -2221,6 +2228,11 @@
+           goto Again;
+         }
+ 
++        /* if `gindex' is invalid, the remaining values */
++        /* in this group are invalid, too               */
++        if ( gindex >= (FT_UInt)face->num_glyphs )
++          continue;
++
+         cmap->cur_charcode = char_code;
+         cmap->cur_gindex   = gindex;
+         cmap->cur_group    = n;
+@@ -2293,6 +2305,7 @@
+ 
+     if ( next )
+     {
++      FT_Face    face   = cmap->cmap.charmap.face;
+       TT_CMap12  cmap12 = (TT_CMap12)cmap;
+ 
+ 
+@@ -2310,6 +2323,9 @@
+       cmap12->cur_charcode = char_code;
+       cmap12->cur_group    = mid;
+ 
++      if ( gindex >= (FT_UInt)face->num_glyphs )
++        gindex = 0;
++
+       if ( !gindex )
+       {
+         tt_cmap12_next( cmap12 );
+@@ -2517,6 +2533,7 @@
+   static void
+   tt_cmap13_next( TT_CMap13  cmap )
+   {
++    FT_Face   face = cmap->cmap.cmap.charmap.face;
+     FT_Byte*  p;
+     FT_ULong  start, end, glyph_id, char_code;
+     FT_ULong  n;
+@@ -2542,7 +2559,7 @@
+       {
+         gindex = (FT_UInt)glyph_id;
+ 
+-        if ( gindex )
++        if ( gindex && gindex < (FT_UInt)face->num_glyphs )
+         {
+           cmap->cur_charcode = char_code;
+           cmap->cur_gindex   = gindex;
+@@ -2612,6 +2629,7 @@
+ 
+     if ( next )
+     {
++      FT_Face    face   = cmap->cmap.charmap.face;
+       TT_CMap13  cmap13 = (TT_CMap13)cmap;
+ 
+ 
+@@ -2629,6 +2647,9 @@
+       cmap13->cur_charcode = char_code;
+       cmap13->cur_group    = mid;
+ 
++      if ( gindex >= (FT_UInt)face->num_glyphs )
++        gindex = 0;
++
+       if ( !gindex )
+       {
+         tt_cmap13_next( cmap13 );
+-- 
+2.6.0
+
+From 2439c515a79fe05ebc9d1a91d94b21ff716524a7 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Fri, 25 Sep 2015 16:54:28 +0200
+Subject: [PATCH] [type1] Protect against invalid number of glyphs (#46029).
+
+* src/type1/t1load.c (parse_charstrings): Check number of
+`CharStrings' dictionary entries against size of data stream.
+---
+ ChangeLog          |  7 +++++++
+ src/type1/t1load.c | 11 ++++++++++-
+ 2 files changed, 17 insertions(+), 1 deletion(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 1cc65ba..e54092d 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,10 @@
++2015-09-25  Werner Lemberg  <wl@gnu.org>
++
++	[type1] Protect against invalid number of glyphs (#46029).
++
++	* src/type1/t1load.c (parse_charstrings): Check number of
++	`CharStrings' dictionary entries against size of data stream.
++
+ 2015-09-23  Werner Lemberg  <wl@gnu.org>
+ 
+ 	[sfnt] Better checks for invalid cmaps (2/2) (#46019).
+diff --git a/src/type1/t1load.c b/src/type1/t1load.c
+index 479cb7a..dbf4eaf 100644
+--- a/src/type1/t1load.c
++++ b/src/type1/t1load.c
+@@ -1541,7 +1541,7 @@
+ 
+     PSAux_Service  psaux        = (PSAux_Service)face->psaux;
+ 
+-    FT_Byte*       cur;
++    FT_Byte*       cur          = parser->root.cursor;
+     FT_Byte*       limit        = parser->root.limit;
+     FT_Int         n, num_glyphs;
+     FT_Int         notdef_index = 0;
+@@ -1555,6 +1555,15 @@
+       goto Fail;
+     }
+ 
++    /* we certainly need more than 8 bytes per glyph */
++    if ( num_glyphs > ( limit - cur ) >> 3 )
++    {
++      FT_TRACE0(( "parse_charstrings: adjusting number of glyphs"
++                  " (from %d to %d)\n",
++                  num_glyphs, ( limit - cur ) >> 3 ));
++      num_glyphs = ( limit - cur ) >> 3;
++    }
++
+     /* some fonts like Optima-Oblique not only define the /CharStrings */
+     /* array but access it also                                        */
+     if ( num_glyphs == 0 || parser->root.error )
+-- 
+2.6.0
+
+From d7f456ee176eee33f7ee42d704d464cc784667b0 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Sat, 26 Sep 2015 08:37:14 +0200
+Subject: [PATCH] Formatting, minor comment corrections.
+
+---
+ ChangeLog         | 27 +++++++++++++--------------
+ src/base/ftbase.h |  4 ++--
+ 2 files changed, 15 insertions(+), 16 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index e54092d..5732e45 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -49,25 +49,24 @@
+ 
+ 2015-09-21  suzuki toshiya  <mpsuzuki@hiroshima-u.ac.jp>
+ 
+-	[base] Check too long POST and sfnt resource (#45919). 
++	[base] Check too long POST and sfnt resource (#45919).
+ 
+-	* src/base/ftbase.h (FT_MAC_RFORK_MAX_LEN): Maximum length
+-	of the resource fork for Mac OS.  The resource fork larger
+-	than 16 MB can be written but could not be handled
+-	correctly, at least in Carbon routine.
+-	See https://support.microsoft.com/en-us/kb/130437
++	* src/base/ftbase.h (FT_MAC_RFORK_MAX_LEN): Maximum length of the
++	resource fork for Mac OS.  Resource forks larger than 16 MB can be
++	written but can't be handled correctly, at least in Carbon routine.
++	See https://support.microsoft.com/en-us/kb/130437.
+ 
+-	* src/base/ftobjs.c (Mac_Read_POST_Resource): No need `0x'
+-	for `%p' formatter.
++	* src/base/ftobjs.c (Mac_Read_POST_Resource): No need to use `0x'
++	prefix for `%p' formatter.
+ 
+-	* src/base/ftbase.c (Mac_Read_POST_Resource): Check the
+-	fragment and total size of the concatenated POST resource
++	* src/base/ftbase.c (Mac_Read_POST_Resource): Check the fragment and
++	total size of the concatenated POST resource before buffer
++	allocation.
++	(Mac_Read_sfnt_Resource): Check the declared size of sfnt resource
+ 	before buffer allocation.
+-	(Mac_Read_sfnt_Resource): Check the declared size of
+-	sfnt resource before buffer allocation.
+ 
+-	* src/base/ftmac.c (read_lwfn, FT_New_Face_From_SFNT):
+-	Check the total resource size before buffer allocation.
++	* src/base/ftmac.c (read_lwfn, FT_New_Face_From_SFNT): Check the
++	total resource size before buffer allocation.
+ 
+ 2015-09-19  Werner Lemberg  <wl@gnu.org>
+ 
+diff --git a/src/base/ftbase.h b/src/base/ftbase.h
+index 0bd9e65..e37fefa 100644
+--- a/src/base/ftbase.h
++++ b/src/base/ftbase.h
+@@ -27,8 +27,8 @@
+ FT_BEGIN_HEADER
+ 
+ 
+-/* MacOS resource fork cannot exceed 16 MB at least for Carbon code */
+-/* see https://support.microsoft.com/en-us/kb/130437                */
++  /* MacOS resource fork cannot exceed 16MB at least for Carbon code; */
++  /* see https://support.microsoft.com/en-us/kb/130437                */
+ #define FT_MAC_RFORK_MAX_LEN  0x00FFFFFFUL
+ 
+ 
+-- 
+2.6.0
+
+From d57f227121ef8e31872a5e7cfe2d10a46c81db46 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Sat, 26 Sep 2015 08:44:26 +0200
+Subject: [PATCH] * src/base/ftobjs.c (Mac_Read_sfnt_Resource): Add cast.
+
+---
+ ChangeLog         | 4 ++++
+ src/base/ftobjs.c | 2 +-
+ 2 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 5732e45..9e9c7bb 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,7 @@
++2015-09-26  Werner Lemberg  <wl@gnu.org>
++
++	* src/base/ftobjs.c (Mac_Read_sfnt_Resource): Add cast.
++
+ 2015-09-25  Werner Lemberg  <wl@gnu.org>
+ 
+ 	[type1] Protect against invalid number of glyphs (#46029).
+diff --git a/src/base/ftobjs.c b/src/base/ftobjs.c
+index f58f715..5d28252 100644
+--- a/src/base/ftobjs.c
++++ b/src/base/ftobjs.c
+@@ -1776,7 +1776,7 @@
+       goto Exit;
+     if ( rlen == -1 )
+       return FT_THROW( Cannot_Open_Resource );
+-    if ( rlen > FT_MAC_RFORK_MAX_LEN )
++    if ( (FT_ULong)rlen > FT_MAC_RFORK_MAX_LEN )
+       return FT_THROW( Invalid_Offset );
+ 
+     error = open_face_PS_from_sfnt_stream( library,
+-- 
+2.6.0
+
+From 265ade8e807819e6a3f93671df1382c56ba50f85 Mon Sep 17 00:00:00 2001
+From: Hin-Tak Leung <htl10@users.sourceforge.net>
+Date: Sat, 26 Sep 2015 14:51:30 +0200
+Subject: [PATCH] Add new FT_LOAD_COMPUTE_METRICS load flag.
+
+* include/freetype/freetype.h (FT_LOAD_COMPUTE_METRICS): New macro.
+* src/truetype/ttgload.c (compute_glyph_metrics): Usage.
+---
+ ChangeLog                   |  7 +++++++
+ include/freetype/freetype.h | 11 +++++++++++
+ src/truetype/ttgload.c      |  6 ++++--
+ 3 files changed, 22 insertions(+), 2 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 9e9c7bb..2551813 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,10 @@
++2015-09-26  Hin-Tak Leung  <htl10@users.sourceforge.net>
++
++	Add new FT_LOAD_COMPUTE_METRICS load flag.
++
++	* include/freetype/freetype.h (FT_LOAD_COMPUTE_METRICS): New macro.
++	* src/truetype/ttgload.c (compute_glyph_metrics): Usage.
++
+ 2015-09-26  Werner Lemberg  <wl@gnu.org>
+ 
+ 	* src/base/ftobjs.c (Mac_Read_sfnt_Resource): Add cast.
+diff --git a/include/freetype/freetype.h b/include/freetype/freetype.h
+index 68aa269..ceb1591 100644
+--- a/include/freetype/freetype.h
++++ b/include/freetype/freetype.h
+@@ -2743,6 +2743,16 @@ FT_BEGIN_HEADER
+    *     bitmaps transparently.  Those bitmaps will be in the
+    *     @FT_PIXEL_MODE_GRAY format.
+    *
++   *   FT_LOAD_COMPUTE_METRICS ::
++   *     This flag sets computing glyph metrics without the use of bundled
++   *     metrics tables (for example, the `hdmx' table in TrueType fonts).
++   *     Well-behaving fonts have optimized bundled metrics and these should
++   *     be used.  This flag is mainly used by font validating or font
++   *     editing applications, which need to ignore, verify, or edit those
++   *     tables.
++   *
++   *     Currently, this flag is only implemented for TrueType fonts.
++   *
+    *   FT_LOAD_CROP_BITMAP ::
+    *     Ignored.  Deprecated.
+    *
+@@ -2788,6 +2798,7 @@ FT_BEGIN_HEADER
+ #define FT_LOAD_NO_AUTOHINT                  ( 1L << 15 )
+   /* Bits 16..19 are used by `FT_LOAD_TARGET_' */
+ #define FT_LOAD_COLOR                        ( 1L << 20 )
++#define FT_LOAD_COMPUTE_METRICS              ( 1L << 21 )
+ 
+   /* */
+ 
+diff --git a/src/truetype/ttgload.c b/src/truetype/ttgload.c
+index a322d31..a792ad4 100644
+--- a/src/truetype/ttgload.c
++++ b/src/truetype/ttgload.c
+@@ -1936,8 +1936,10 @@
+     glyph->metrics.horiAdvance  = loader->pp2.x - loader->pp1.x;
+ 
+     /* adjust advance width to the value contained in the hdmx table */
+-    if ( !face->postscript.isFixedPitch  &&
+-         IS_HINTED( loader->load_flags ) )
++    /* unless FT_LOAD_COMPUTE_METRICS is set                         */
++    if ( !face->postscript.isFixedPitch                    &&
++         IS_HINTED( loader->load_flags )                   &&
++         !( loader->load_flags & FT_LOAD_COMPUTE_METRICS ) )
+     {
+       FT_Byte*  widthp;
+ 
+-- 
+2.6.0
+
+From b8398720556ae561d568361f73733978b7730db7 Mon Sep 17 00:00:00 2001
+From: Hin-Tak Leung <htl10@users.sourceforge.net>
+Date: Wed, 9 Sep 2015 18:56:46 +0100
+Subject: [PATCH] Stray character in ChangeLog.21.
+
+Signed-off-by: Hin-Tak Leung <htl10@users.sourceforge.net>
+---
+ ChangeLog.21 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ChangeLog.21 b/ChangeLog.21
+index a6f8be7..5ee9909 100644
+--- a/ChangeLog.21
++++ b/ChangeLog.21
+@@ -1868,7 +1868,7 @@
+ 	(LITTLE_ENDIAN_USHORT, LITTLE_ENDIAN_UINT): New macros.
+ 	(T1_Read_PFM): New function.
+ 	(T1_Read_Metrics): New higher-level function to be used instead of
+-	T1Read_AFM.
++	T1_Read_AFM.
+ 	Update all callers.
+ 
+ 2004-07-31  Werner Lemberg  <wl@gnu.org>
+-- 
+2.6.0
+
+From 4187753970107f5892df78dad87968ab2ffb1b28 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Sat, 26 Sep 2015 15:19:54 +0200
+Subject: [PATCH] [bzip2, gzip, lzw] Harmonize function signatures with
+ prototype.
+
+Suggested by Hin-Tak Leung.
+
+* src/bzip2/ftbzip2.c (ft_bzip2_stream_io), src/gzip/ftgzip.c
+(ft_gzip_stream_io), src/lzw/ftlzw.c (ft_lzw_stream_io): Do it.
+---
+ ChangeLog           |  9 +++++++++
+ src/bzip2/ftbzip2.c | 12 ++++++------
+ src/gzip/ftgzip.c   | 12 ++++++------
+ src/lzw/ftlzw.c     | 12 ++++++------
+ 4 files changed, 27 insertions(+), 18 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 2551813..4665692 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,12 @@
++2015-09-26  Werner Lemberg  <wl@gnu.org>
++
++	[bzip2, gzip, lzw] Harmonize function signatures with prototype.
++
++	Suggested by Hin-Tak Leung.
++
++	* src/bzip2/ftbzip2.c (ft_bzip2_stream_io), src/gzip/ftgzip.c
++	(ft_gzip_stream_io), src/lzw/ftlzw.c (ft_lzw_stream_io): Do it.
++
+ 2015-09-26  Hin-Tak Leung  <htl10@users.sourceforge.net>
+ 
+ 	Add new FT_LOAD_COMPUTE_METRICS load flag.
+diff --git a/src/bzip2/ftbzip2.c b/src/bzip2/ftbzip2.c
+index 4dfc9c8..86f8be8 100644
+--- a/src/bzip2/ftbzip2.c
++++ b/src/bzip2/ftbzip2.c
+@@ -437,16 +437,16 @@
+   }
+ 
+ 
+-  static FT_ULong
+-  ft_bzip2_stream_io( FT_Stream  stream,
+-                      FT_ULong   pos,
+-                      FT_Byte*   buffer,
+-                      FT_ULong   count )
++  static unsigned long
++  ft_bzip2_stream_io( FT_Stream       stream,
++                      unsigned long   offset,
++                      unsigned char*  buffer,
++                      unsigned long   count )
+   {
+     FT_BZip2File  zip = (FT_BZip2File)stream->descriptor.pointer;
+ 
+ 
+-    return ft_bzip2_file_io( zip, pos, buffer, count );
++    return ft_bzip2_file_io( zip, offset, buffer, count );
+   }
+ 
+ 
+diff --git a/src/gzip/ftgzip.c b/src/gzip/ftgzip.c
+index be9c122..452768b 100644
+--- a/src/gzip/ftgzip.c
++++ b/src/gzip/ftgzip.c
+@@ -563,16 +563,16 @@
+   }
+ 
+ 
+-  static FT_ULong
+-  ft_gzip_stream_io( FT_Stream  stream,
+-                     FT_ULong   pos,
+-                     FT_Byte*   buffer,
+-                     FT_ULong   count )
++  static unsigned long
++  ft_gzip_stream_io( FT_Stream       stream,
++                     unsigned long   offset,
++                     unsigned char*  buffer,
++                     unsigned long   count )
+   {
+     FT_GZipFile  zip = (FT_GZipFile)stream->descriptor.pointer;
+ 
+ 
+-    return ft_gzip_file_io( zip, pos, buffer, count );
++    return ft_gzip_file_io( zip, offset, buffer, count );
+   }
+ 
+ 
+diff --git a/src/lzw/ftlzw.c b/src/lzw/ftlzw.c
+index 5664ff9..2f4e3b0 100644
+--- a/src/lzw/ftlzw.c
++++ b/src/lzw/ftlzw.c
+@@ -330,16 +330,16 @@
+   }
+ 
+ 
+-  static FT_ULong
+-  ft_lzw_stream_io( FT_Stream  stream,
+-                    FT_ULong   pos,
+-                    FT_Byte*   buffer,
+-                    FT_ULong   count )
++  static unsigned long
++  ft_lzw_stream_io( FT_Stream       stream,
++                    unsigned long   offset,
++                    unsigned char*  buffer,
++                    unsigned long   count )
+   {
+     FT_LZWFile  zip = (FT_LZWFile)stream->descriptor.pointer;
+ 
+ 
+-    return ft_lzw_file_io( zip, pos, buffer, count );
++    return ft_lzw_file_io( zip, offset, buffer, count );
+   }
+ 
+ 
+-- 
+2.6.0
+
+From 19188a9a190ff6469601b23db07d4984393acd1a Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Sat, 26 Sep 2015 16:57:17 +0200
+Subject: [PATCH] [autofit] Minor tracing improvement.
+
+* src/autofit/aflatin.c (af_latin_metrics_scale_dim): Don't emit
+blue zones header line if there are no blue zones.
+---
+ ChangeLog             | 7 +++++++
+ src/autofit/aflatin.c | 7 +++++--
+ 2 files changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 4665692..b7d4e32 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,5 +1,12 @@
+ 2015-09-26  Werner Lemberg  <wl@gnu.org>
+ 
++	[autofit] Minor tracing improvement.
++
++	* src/autofit/aflatin.c (af_latin_metrics_scale_dim): Don't emit
++	blue zones header line if there are no blue zones.
++
++2015-09-26  Werner Lemberg  <wl@gnu.org>
++
+ 	[bzip2, gzip, lzw] Harmonize function signatures with prototype.
+ 
+ 	Suggested by Hin-Tak Leung.
+diff --git a/src/autofit/aflatin.c b/src/autofit/aflatin.c
+index 954da07..5ccd313 100644
+--- a/src/autofit/aflatin.c
++++ b/src/autofit/aflatin.c
+@@ -1038,8 +1038,11 @@
+ 
+     if ( dim == AF_DIMENSION_VERT )
+     {
+-      FT_TRACE5(( "blue zones (style `%s')\n",
+-                  af_style_names[metrics->root.style_class->style] ));
++#ifdef FT_DEBUG_LEVEL_TRACE
++      if ( axis->blue_count )
++        FT_TRACE5(( "blue zones (style `%s')\n",
++                    af_style_names[metrics->root.style_class->style] ));
++#endif
+ 
+       /* scale the blue zones */
+       for ( nn = 0; nn < axis->blue_count; nn++ )
+-- 
+2.6.0
+
+From d8a44ff9323e7e3524686fd07d7defe7469a8b88 Mon Sep 17 00:00:00 2001
+From: Alexei Podtelezhnikov <apodtele@gmail.com>
+Date: Sat, 26 Sep 2015 22:33:55 -0400
+Subject: [PATCH] Remove unused macro.
+
+---
+ src/smooth/ftgrays.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/src/smooth/ftgrays.c b/src/smooth/ftgrays.c
+index b6b0230..0244716 100644
+--- a/src/smooth/ftgrays.c
++++ b/src/smooth/ftgrays.c
+@@ -317,7 +317,6 @@ typedef ptrdiff_t  FT_PtrDist;
+ #undef SCALED
+ 
+ #define ONE_PIXEL       ( 1L << PIXEL_BITS )
+-#define PIXEL_MASK      ( -1L << PIXEL_BITS )
+ #define TRUNC( x )      ( (TCoord)( (x) >> PIXEL_BITS ) )
+ #define SUBPIXELS( x )  ( (TPos)(x) << PIXEL_BITS )
+ #define FLOOR( x )      ( (x) & -ONE_PIXEL )
+-- 
+2.6.0
+
+From 3dffe8ef16e88ea38f0fe908f5787bda8a462e6f Mon Sep 17 00:00:00 2001
+From: Alexei Podtelezhnikov <apodtele@gmail.com>
+Date: Sun, 27 Sep 2015 11:30:17 -0400
+Subject: [PATCH] Add ChangeLog entry.
+
+---
+ ChangeLog | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/ChangeLog b/ChangeLog
+index b7d4e32..7150091 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,7 @@
++2015-09-26  Alexei Podtelezhnikov  <apodtele@gmail.com>
++
++	* src/smooth/ftgrays.c (PIXEL_MASK): Remove unused macro.
++
+ 2015-09-26  Werner Lemberg  <wl@gnu.org>
+ 
+ 	[autofit] Minor tracing improvement.
+-- 
+2.6.0
+
+From 8a05d250dfa49a2b47372b4400b1e2c0b242f528 Mon Sep 17 00:00:00 2001
+From: suzuki toshiya <mpsuzuki@hiroshima-u.ac.jp>
+Date: Mon, 28 Sep 2015 01:40:21 +0900
+Subject: [PATCH] [mac] Fix buffer size calculation for LWFN font.
+
+* src/base/ftmac.c (read_lwfn): Cast post_size to FT_ULong
+to prevent confused copy by too large chunk size.
+---
+ ChangeLog        | 7 +++++++
+ src/base/ftmac.c | 2 +-
+ 2 files changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 7150091..6d0941e 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,10 @@
++2015-09-27  suzuki toshiya  <mpsuzuki@hiroshima-u.ac.jp>
++
++	[mac] Fix buffer size calculation for LWFN font.
++
++	* src/base/ftmac.c (read_lwfn): Cast post_size to FT_ULong
++	to prevent confused copy by too large chunk size.
++
+ 2015-09-26  Alexei Podtelezhnikov  <apodtele@gmail.com>
+ 
+ 	* src/smooth/ftgrays.c (PIXEL_MASK): Remove unused macro.
+diff --git a/src/base/ftmac.c b/src/base/ftmac.c
+index 8463190..114bbb6 100644
+--- a/src/base/ftmac.c
++++ b/src/base/ftmac.c
+@@ -618,7 +618,7 @@
+           total_size += 6; /* code + 4 bytes chunk length */
+       }
+ 
+-      total_size += GetHandleSize( post_data ) - 2;
++      total_size += (FT_ULong)GetHandleSize( post_data ) - 2;
+       last_code = code;
+ 
+       /* detect resource fork overflow */
+-- 
+2.6.0
+
+From fb5268cf7b062b91012df7cb864ffaeee642163b Mon Sep 17 00:00:00 2001
+From: suzuki toshiya <mpsuzuki@hiroshima-u.ac.jp>
+Date: Mon, 28 Sep 2015 02:01:43 +0900
+Subject: [PATCH] [base] Fix a leak by broken sfnt-PS or resource fork
+ (#46028).
+
+open_face_from_buffer() frees passed buffer if valid font
+is not found.  But if copying to the buffer is failed,
+the allocated buffer should be freed within the caller.
+
+* src/base/ftobjs.c (open_face_PS_from_sfnt_stream): Free
+the buffer `sfnt_ps' if an error caused before calling
+open_face_from_buffer().
+(Mac_Read_sfnt_Resource): Free the buffer `sfnt_data' if
+an error caused before calling open_face_from_buffer();
+---
+ ChangeLog         | 14 ++++++++++++++
+ src/base/ftobjs.c |  8 ++++++--
+ 2 files changed, 20 insertions(+), 2 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 6d0941e..9012473 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,4 +1,18 @@
+ 2015-09-27  suzuki toshiya  <mpsuzuki@hiroshima-u.ac.jp>
++ 
++	[base] Fix a leak by broken sfnt-PS or resource fork (#46028).
++
++	open_face_from_buffer() frees passed buffer if valid font
++	is not found.  But if copying to the buffer is failed,
++	the allocated buffer should be freed within the caller.
++
++	* src/base/ftobjs.c (open_face_PS_from_sfnt_stream): Free
++	the buffer `sfnt_ps' if an error caused before calling
++	open_face_from_buffer().
++	(Mac_Read_sfnt_Resource): Free the buffer `sfnt_data' if
++	an error caused before calling open_face_from_buffer();
++
++2015-09-27  suzuki toshiya  <mpsuzuki@hiroshima-u.ac.jp>
+ 
+ 	[mac] Fix buffer size calculation for LWFN font.
+ 
+diff --git a/src/base/ftobjs.c b/src/base/ftobjs.c
+index 5d28252..f0c2e77 100644
+--- a/src/base/ftobjs.c
++++ b/src/base/ftobjs.c
+@@ -1516,8 +1516,10 @@
+       goto Exit;
+ 
+     error = FT_Stream_Read( stream, (FT_Byte *)sfnt_ps, length );
+-    if ( error )
++    if ( error ) {
++      FT_FREE( sfnt_ps );
+       goto Exit;
++    }
+ 
+     error = open_face_from_buffer( library,
+                                    sfnt_ps,
+@@ -1794,8 +1796,10 @@
+     if ( FT_ALLOC( sfnt_data, rlen ) )
+       return error;
+     error = FT_Stream_Read( stream, (FT_Byte *)sfnt_data, (FT_ULong)rlen );
+-    if ( error )
++    if ( error ) {
++      FT_FREE( sfnt_data );
+       goto Exit;
++    }
+ 
+     is_cff = rlen > 4 && !ft_memcmp( sfnt_data, "OTTO", 4 );
+     error = open_face_from_buffer( library,
+-- 
+2.6.0
+
+From a3046567bc805de5d751c0e7f097038395037a2d Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Mon, 28 Sep 2015 09:45:56 +0200
+Subject: [PATCH] [autofit] Add support for Lao script.
+
+Thanks to Danh Hong <danhhong@gmail.com> for guidance with blue zone
+characters!
+
+* src/autofit/afblue.dat: Add blue zone data for Lao.
+
+* src/autofit/afblue.c, src/autofit/afblue.h: Regenerated.
+
+* src/autofit/afscript.h: Add Lao standard characters.
+
+* src/autofit/afranges.c: Add Lao data.
+
+* src/autofit/afstyles.h: Add Lao data.
+---
+ ChangeLog              | 17 +++++++++++++
+ src/autofit/afblue.c   | 17 +++++++++++++
+ src/autofit/afblue.dat | 20 +++++++++++++++
+ src/autofit/afblue.h   | 68 +++++++++++++++++++++++++++-----------------------
+ src/autofit/afranges.c | 15 +++++++++++
+ src/autofit/afscript.h |  6 +++++
+ src/autofit/afstyles.h |  7 ++++++
+ 7 files changed, 119 insertions(+), 31 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 9012473..e294f20 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,20 @@
++2015-09-28  Werner Lemberg  <wl@gnu.org>
++
++	[autofit] Add support for Lao script.
++
++	Thanks to Danh Hong <danhhong@gmail.com> for guidance with blue zone
++	characters!
++
++	* src/autofit/afblue.dat: Add blue zone data for Lao.
++
++	* src/autofit/afblue.c, src/autofit/afblue.h: Regenerated.
++
++	* src/autofit/afscript.h: Add Lao standard characters.
++
++	* src/autofit/afranges.c: Add Lao data.
++
++	* src/autofit/afstyles.h: Add Lao data.
++
+ 2015-09-27  suzuki toshiya  <mpsuzuki@hiroshima-u.ac.jp>
+  
+ 	[base] Fix a leak by broken sfnt-PS or resource fork (#46028).
+diff --git a/src/autofit/afblue.c b/src/autofit/afblue.c
+index 437fa65..b871e0c 100644
+--- a/src/autofit/afblue.c
++++ b/src/autofit/afblue.c
+@@ -64,6 +64,16 @@
+     '\0',
+     '\xD7', '\xA7', '\xD7', '\x9A', '\xD7', '\x9F', '\xD7', '\xA3', '\xD7', '\xA5',  /* קךןףץ */
+     '\0',
++    '\xE0', '\xBA', '\xB2', '\xE0', '\xBA', '\x94', '\xE0', '\xBA', '\xAD', '\xE0', '\xBA', '\xA1', '\xE0', '\xBA', '\xA5', '\xE0', '\xBA', '\xA7', '\xE0', '\xBA', '\xA3', '\xE0', '\xBA', '\x87',  /* າ ດ ອ ມ ລ ວ ຣ ງ */
++    '\0',
++    '\xE0', '\xBA', '\xB2', '\xE0', '\xBA', '\xAD', '\xE0', '\xBA', '\x9A', '\xE0', '\xBA', '\x8D', '\xE0', '\xBA', '\xA3', '\xE0', '\xBA', '\xAE', '\xE0', '\xBA', '\xA7', '\xE0', '\xBA', '\xA2',  /* າ ອ ບ ຍ ຣ ຮ ວ ຢ */
++    '\0',
++    '\xE0', '\xBA', '\x9B', '\xE0', '\xBA', '\xA2', '\xE0', '\xBA', '\x9F', '\xE0', '\xBA', '\x9D',  /* ປ ຢ ຟ ຝ */
++    '\0',
++    '\xE0', '\xBB', '\x82', '\xE0', '\xBB', '\x84', '\xE0', '\xBB', '\x83',  /* ໂ ໄ ໃ */
++    '\0',
++    '\xE0', '\xBA', '\x87', '\xE0', '\xBA', '\x8A', '\xE0', '\xBA', '\x96', '\xE0', '\xBA', '\xBD', '\xE0', '\xBB', '\x86', '\xE0', '\xBA', '\xAF',  /* ງ ຊ ຖ ຽ ໆ ຯ */
++    '\0',
+     'T', 'H', 'E', 'Z', 'O', 'C', 'Q', 'S',  /* THEZOCQS */
+     '\0',
+     'H', 'E', 'Z', 'L', 'O', 'C', 'U', 'S',  /* HEZLOCUS */
+@@ -193,6 +203,13 @@
+     { AF_BLUE_STRING_HEBREW_BOTTOM,    0                             },
+     { AF_BLUE_STRING_HEBREW_DESCENDER, 0                             },
+     { AF_BLUE_STRING_MAX,              0                             },
++    { AF_BLUE_STRING_LAO_TOP,             AF_BLUE_PROPERTY_LATIN_TOP      |
++                                          AF_BLUE_PROPERTY_LATIN_X_HEIGHT   },
++    { AF_BLUE_STRING_LAO_BOTTOM,          0                                 },
++    { AF_BLUE_STRING_LAO_ASCENDER,        AF_BLUE_PROPERTY_LATIN_TOP        },
++    { AF_BLUE_STRING_LAO_LARGE_ASCENDER,  AF_BLUE_PROPERTY_LATIN_TOP        },
++    { AF_BLUE_STRING_LAO_DESCENDER,       0                                 },
++    { AF_BLUE_STRING_MAX,                 0                                 },
+     { AF_BLUE_STRING_LATIN_CAPITAL_TOP,     AF_BLUE_PROPERTY_LATIN_TOP        },
+     { AF_BLUE_STRING_LATIN_CAPITAL_BOTTOM,  0                                 },
+     { AF_BLUE_STRING_LATIN_SMALL_F_TOP,     AF_BLUE_PROPERTY_LATIN_TOP        },
+diff --git a/src/autofit/afblue.dat b/src/autofit/afblue.dat
+index aadef92..1b52378 100644
+--- a/src/autofit/afblue.dat
++++ b/src/autofit/afblue.dat
+@@ -120,6 +120,17 @@ AF_BLUE_STRING_ENUM AF_BLUE_STRINGS_ARRAY AF_BLUE_STRING_MAX_LEN:
+   AF_BLUE_STRING_HEBREW_DESCENDER
+     "קךןףץ"
+ 
++  AF_BLUE_STRING_LAO_TOP
++    "າ ດ ອ ມ ລ ວ ຣ ງ"
++  AF_BLUE_STRING_LAO_BOTTOM
++    "າ ອ ບ ຍ ຣ ຮ ວ ຢ"
++  AF_BLUE_STRING_LAO_ASCENDER
++    "ປ ຢ ຟ ຝ"
++  AF_BLUE_STRING_LAO_LARGE_ASCENDER
++    "ໂ ໄ ໃ"
++  AF_BLUE_STRING_LAO_DESCENDER
++    "ງ ຊ ຖ ຽ ໆ ຯ"
++
+   AF_BLUE_STRING_LATIN_CAPITAL_TOP
+     "THEZOCQS"
+   AF_BLUE_STRING_LATIN_CAPITAL_BOTTOM
+@@ -362,6 +373,15 @@ AF_BLUE_STRINGSET_ENUM AF_BLUE_STRINGSETS_ARRAY AF_BLUE_STRINGSET_MAX_LEN:
+     { AF_BLUE_STRING_HEBREW_DESCENDER, 0                             }
+     { AF_BLUE_STRING_MAX,              0                             }
+ 
++  AF_BLUE_STRINGSET_LAO
++    { AF_BLUE_STRING_LAO_TOP,             AF_BLUE_PROPERTY_LATIN_TOP      |
++                                          AF_BLUE_PROPERTY_LATIN_X_HEIGHT   }
++    { AF_BLUE_STRING_LAO_BOTTOM,          0                                 }
++    { AF_BLUE_STRING_LAO_ASCENDER,        AF_BLUE_PROPERTY_LATIN_TOP        }
++    { AF_BLUE_STRING_LAO_LARGE_ASCENDER,  AF_BLUE_PROPERTY_LATIN_TOP        }
++    { AF_BLUE_STRING_LAO_DESCENDER,       0                                 }
++    { AF_BLUE_STRING_MAX,                 0                                 }
++
+   AF_BLUE_STRINGSET_LATN
+     { AF_BLUE_STRING_LATIN_CAPITAL_TOP,     AF_BLUE_PROPERTY_LATIN_TOP        }
+     { AF_BLUE_STRING_LATIN_CAPITAL_BOTTOM,  0                                 }
+diff --git a/src/autofit/afblue.h b/src/autofit/afblue.h
+index 18b4361..c26a9c7 100644
+--- a/src/autofit/afblue.h
++++ b/src/autofit/afblue.h
+@@ -93,31 +93,36 @@ FT_BEGIN_HEADER
+     AF_BLUE_STRING_HEBREW_TOP = 242,
+     AF_BLUE_STRING_HEBREW_BOTTOM = 259,
+     AF_BLUE_STRING_HEBREW_DESCENDER = 272,
+-    AF_BLUE_STRING_LATIN_CAPITAL_TOP = 283,
+-    AF_BLUE_STRING_LATIN_CAPITAL_BOTTOM = 292,
+-    AF_BLUE_STRING_LATIN_SMALL_F_TOP = 301,
+-    AF_BLUE_STRING_LATIN_SMALL = 309,
+-    AF_BLUE_STRING_LATIN_SMALL_DESCENDER = 317,
+-    AF_BLUE_STRING_LATIN_SUBS_CAPITAL_TOP = 323,
+-    AF_BLUE_STRING_LATIN_SUBS_CAPITAL_BOTTOM = 339,
+-    AF_BLUE_STRING_LATIN_SUBS_SMALL_F_TOP = 355,
+-    AF_BLUE_STRING_LATIN_SUBS_SMALL = 371,
+-    AF_BLUE_STRING_LATIN_SUBS_SMALL_DESCENDER = 399,
+-    AF_BLUE_STRING_LATIN_SUPS_CAPITAL_TOP = 415,
+-    AF_BLUE_STRING_LATIN_SUPS_CAPITAL_BOTTOM = 439,
+-    AF_BLUE_STRING_LATIN_SUPS_SMALL_F_TOP = 461,
+-    AF_BLUE_STRING_LATIN_SUPS_SMALL = 481,
+-    AF_BLUE_STRING_LATIN_SUPS_SMALL_DESCENDER = 500,
+-    AF_BLUE_STRING_TELUGU_TOP = 509,
+-    AF_BLUE_STRING_TELUGU_BOTTOM = 531,
+-    AF_BLUE_STRING_THAI_TOP = 553,
+-    AF_BLUE_STRING_THAI_BOTTOM = 572,
+-    AF_BLUE_STRING_THAI_ASCENDER = 594,
+-    AF_BLUE_STRING_THAI_LARGE_ASCENDER = 604,
+-    AF_BLUE_STRING_THAI_DESCENDER = 614,
+-    AF_BLUE_STRING_THAI_LARGE_DESCENDER = 627,
+-    AF_BLUE_STRING_THAI_DIGIT_TOP = 634,
+-    af_blue_1_1 = 643,
++    AF_BLUE_STRING_LAO_TOP = 283,
++    AF_BLUE_STRING_LAO_BOTTOM = 308,
++    AF_BLUE_STRING_LAO_ASCENDER = 333,
++    AF_BLUE_STRING_LAO_LARGE_ASCENDER = 346,
++    AF_BLUE_STRING_LAO_DESCENDER = 356,
++    AF_BLUE_STRING_LATIN_CAPITAL_TOP = 375,
++    AF_BLUE_STRING_LATIN_CAPITAL_BOTTOM = 384,
++    AF_BLUE_STRING_LATIN_SMALL_F_TOP = 393,
++    AF_BLUE_STRING_LATIN_SMALL = 401,
++    AF_BLUE_STRING_LATIN_SMALL_DESCENDER = 409,
++    AF_BLUE_STRING_LATIN_SUBS_CAPITAL_TOP = 415,
++    AF_BLUE_STRING_LATIN_SUBS_CAPITAL_BOTTOM = 431,
++    AF_BLUE_STRING_LATIN_SUBS_SMALL_F_TOP = 447,
++    AF_BLUE_STRING_LATIN_SUBS_SMALL = 463,
++    AF_BLUE_STRING_LATIN_SUBS_SMALL_DESCENDER = 491,
++    AF_BLUE_STRING_LATIN_SUPS_CAPITAL_TOP = 507,
++    AF_BLUE_STRING_LATIN_SUPS_CAPITAL_BOTTOM = 531,
++    AF_BLUE_STRING_LATIN_SUPS_SMALL_F_TOP = 553,
++    AF_BLUE_STRING_LATIN_SUPS_SMALL = 573,
++    AF_BLUE_STRING_LATIN_SUPS_SMALL_DESCENDER = 592,
++    AF_BLUE_STRING_TELUGU_TOP = 601,
++    AF_BLUE_STRING_TELUGU_BOTTOM = 623,
++    AF_BLUE_STRING_THAI_TOP = 645,
++    AF_BLUE_STRING_THAI_BOTTOM = 664,
++    AF_BLUE_STRING_THAI_ASCENDER = 686,
++    AF_BLUE_STRING_THAI_LARGE_ASCENDER = 696,
++    AF_BLUE_STRING_THAI_DESCENDER = 706,
++    AF_BLUE_STRING_THAI_LARGE_DESCENDER = 719,
++    AF_BLUE_STRING_THAI_DIGIT_TOP = 726,
++    af_blue_1_1 = 735,
+ #ifdef AF_CONFIG_OPTION_CJK
+     AF_BLUE_STRING_CJK_TOP = af_blue_1_1 + 1,
+     AF_BLUE_STRING_CJK_BOTTOM = af_blue_1_1 + 153,
+@@ -180,12 +185,13 @@ FT_BEGIN_HEADER
+     AF_BLUE_STRINGSET_DEVA = 10,
+     AF_BLUE_STRINGSET_GREK = 16,
+     AF_BLUE_STRINGSET_HEBR = 23,
+-    AF_BLUE_STRINGSET_LATN = 27,
+-    AF_BLUE_STRINGSET_LATB = 34,
+-    AF_BLUE_STRINGSET_LATP = 41,
+-    AF_BLUE_STRINGSET_TELU = 48,
+-    AF_BLUE_STRINGSET_THAI = 51,
+-    af_blue_2_1 = 59,
++    AF_BLUE_STRINGSET_LAO = 27,
++    AF_BLUE_STRINGSET_LATN = 33,
++    AF_BLUE_STRINGSET_LATB = 40,
++    AF_BLUE_STRINGSET_LATP = 47,
++    AF_BLUE_STRINGSET_TELU = 54,
++    AF_BLUE_STRINGSET_THAI = 57,
++    af_blue_2_1 = 65,
+ #ifdef AF_CONFIG_OPTION_CJK
+     AF_BLUE_STRINGSET_HANI = af_blue_2_1 + 0,
+     af_blue_2_1_1 = af_blue_2_1 + 2,
+diff --git a/src/autofit/afranges.c b/src/autofit/afranges.c
+index f6b1019..1470ed5 100644
+--- a/src/autofit/afranges.c
++++ b/src/autofit/afranges.c
+@@ -180,6 +180,21 @@
+   };
+ 
+ 
++  const AF_Script_UniRangeRec  af_lao_uniranges[] =
++  {
++    AF_UNIRANGE_REC(  0x0E80UL,  0x0EFFUL ),  /* Lao */
++    AF_UNIRANGE_REC(       0UL,       0UL )
++  };
++
++  const AF_Script_UniRangeRec  af_lao_nobase_uniranges[] =
++  {
++    AF_UNIRANGE_REC(  0x0EB1UL,  0x0EB1UL ),
++    AF_UNIRANGE_REC(  0x0EB4UL,  0x0EBCUL ),
++    AF_UNIRANGE_REC(  0x0EC8UL,  0x0ECDUL ),
++    AF_UNIRANGE_REC(       0UL,       0UL )
++  };
++
++
+   const AF_Script_UniRangeRec  af_latn_uniranges[] =
+   {
+     AF_UNIRANGE_REC(  0x0020UL,  0x007FUL ),  /* Basic Latin (no control chars)         */
+diff --git a/src/autofit/afscript.h b/src/autofit/afscript.h
+index 8ef5f0e..b92e84f 100644
+--- a/src/autofit/afscript.h
++++ b/src/autofit/afscript.h
+@@ -55,6 +55,12 @@
+           HB_SCRIPT_HEBREW,
+           0x5DD, 0x0, 0x0 ) /* ם */
+ 
++  /* only digit zero has a simple shape in the Lao script */
++  SCRIPT( lao, LAO,
++          "Lao",
++          HB_SCRIPT_LAO,
++          0xED0, 0x0, 0x0 ) /* ໐ */
++
+   SCRIPT( latn, LATN,
+           "Latin",
+           HB_SCRIPT_LATIN,
+diff --git a/src/autofit/afstyles.h b/src/autofit/afstyles.h
+index 42f5d2f..87663c9 100644
+--- a/src/autofit/afstyles.h
++++ b/src/autofit/afstyles.h
+@@ -108,6 +108,13 @@
+          AF_BLUE_STRINGSET_HEBR,
+          AF_COVERAGE_DEFAULT )
+ 
++  STYLE( lao_dflt, LAO_DFLT,
++         "Lao default style",
++         AF_WRITING_SYSTEM_LATIN,
++         AF_SCRIPT_LAO,
++         AF_BLUE_STRINGSET_LAO,
++         AF_COVERAGE_DEFAULT )
++
+   META_STYLE_LATIN( latn, LATN, "Latin" )
+ 
+   STYLE( latb_dflt, LATB_DFLT,
+-- 
+2.6.0
+
+From 483007fcd94a8f2e85ab5329642abb8bc936bb23 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Tue, 29 Sep 2015 11:22:15 +0200
+Subject: [PATCH] [pshinter] Avoid harmless overflow (#45984).
+
+* src/pshinter/pshglob.c (psh_blues_set_zones): Fix it.
+---
+ ChangeLog              | 6 ++++++
+ src/pshinter/pshglob.c | 2 +-
+ 2 files changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index e294f20..021a34a 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,9 @@
++2015-09-29  Werner Lemberg  <wl@gnu.org>
++
++	[pshinter] Avoid harmless overflow (#45984).
++
++	* src/pshinter/pshglob.c (psh_blues_set_zones): Fix it.
++
+ 2015-09-28  Werner Lemberg  <wl@gnu.org>
+ 
+ 	[autofit] Add support for Lao script.
+diff --git a/src/pshinter/pshglob.c b/src/pshinter/pshglob.c
+index 6723b71..4616bdc 100644
+--- a/src/pshinter/pshglob.c
++++ b/src/pshinter/pshglob.c
+@@ -339,7 +339,7 @@
+             bot   = zone[1].org_bottom;
+             delta = bot - top;
+ 
+-            if ( delta < 2 * fuzz )
++            if ( delta / 2 < fuzz )
+               zone[0].org_top = zone[1].org_bottom = top + delta / 2;
+             else
+             {
+-- 
+2.6.0
+
+From 52aad9dfc6568b7eafefead5b49bad7e61f7938c Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Tue, 29 Sep 2015 12:38:11 +0200
+Subject: [PATCH] [raster] Minor style fix.
+
+---
+ src/raster/ftraster.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/raster/ftraster.c b/src/raster/ftraster.c
+index 1c51f91..e4bab98 100644
+--- a/src/raster/ftraster.c
++++ b/src/raster/ftraster.c
+@@ -2114,7 +2114,7 @@
+     while ( current )
+     {
+       current->X       = *current->offset;
+-      current->offset += current->flags & Flow_Up ? 1 : -1;
++      current->offset += ( current->flags & Flow_Up ) ? 1 : -1;
+       current->height--;
+       current = current->link;
+     }
+-- 
+2.6.0
+
