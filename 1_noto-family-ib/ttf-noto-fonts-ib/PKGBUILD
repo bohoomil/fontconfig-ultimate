@@ -1,0 +1,111 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=ttf-noto-fonts-ib
+_pkgcr=ttf-noto-fonts-cros-ib
+_pkgsa=ttf-noto-fonts-sans-ib
+_pkgse=ttf-noto-fonts-serif-ib
+_pkgver=2015-09-29
+pkgver=${_pkgver//-}
+pkgrel=1
+pkgdesc="Google Noto fonts."
+depends=(fontconfig)
+url="http://www.google.com/get/noto/"
+arch=(any)
+groups=(infinality-bundle-fonts)
+conflicts=(ttf-noto ttf-noto-svn ttf-google-webfonts-git noto-fonts ttf-croscore-fonts-ibx ttf-noto-sans-ib ttf-noto-serif-ib)
+replaces=(ttf-croscore-fonts-ibx ttf-noto-sans-ib ttf-noto-serif-ib)
+provides=(noto-fonts)
+license=(Apache)
+install=$pkgname.install
+source=("https://github.com/googlei18n/noto-fonts/archive/v$_pkgver-license-adobe.tar.gz"
+        "http://bohoomil.com/src/noto-sans-multi-fixed.tar.xz"{,.sig}
+        40-noto-arabic.conf
+        45-noto-cros.conf
+        45-noto-sans.conf
+        45-noto-serif.conf
+        90-tt-noto-cros.conf
+        90-tt-noto-sans.conf
+        90-tt-noto-serif.conf)
+sha1sums=('3e4ce66b114d87c05433f2dbdfabf50f8231ce14'
+          '60a128658a8dd6ee8620444772751a09c1b4e916'
+          'SKIP'
+          'ddc0ebd5149fe3195d0a36c511c024686b185588'
+          '23410520226bc33f24a7b0ce315fd3f42aa13bee'
+          '5b4f0c63c79a463d4c09cc0659ae881086d6f4ef'
+          'e20c836813721d8bf53e07f6fced4a4639a3c238'
+          '6baec77ed28c068996566f0287652ca165c703ee'
+          '5b1e54e19105e78ae18a90e44e464d5c1fd08c7d'
+          '017ca1ca6f041035c2dbaa2c7b8d36725e881534')
+
+package() {
+  cd "noto-fonts-$_pkgver-license-adobe/hinted"
+
+  # Arimo, Cousine, Tinos
+  _cr=(Arimo-Bold.ttf Arimo-BoldItalic.ttf Arimo-Italic.ttf Arimo-Regular.ttf Cousine-Bold.ttf Cousine-BoldItalic.ttf Cousine-Italic.ttf Cousine-Regular.ttf Tinos-Bold.ttf Tinos-BoldItalic.ttf Tinos-Italic.ttf Tinos-Regular.ttf)
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${_pkgcr}"
+
+  for fnt in "${_cr[@]}"; do
+    install -m644 "$fnt" "${pkgdir}"/usr/share/fonts/"${_pkgcr}"
+  done
+
+  # Noto Sans
+  _sans=(NotoKufiArabic-Bold.ttf NotoKufiArabic-Regular.ttf NotoNaskhArabic-Bold.ttf NotoNaskhArabic-Regular.ttf NotoNaskhArabicUI-Bold.ttf NotoNaskhArabicUI-Regular.ttf NotoSans-Bold.ttf NotoSans-BoldItalic.ttf NotoSans-Italic.ttf NotoSans-Regular.ttf NotoSansArmenian-Bold.ttf NotoSansArmenian-Regular.ttf NotoSansBengali-Bold.ttf NotoSansBengali-Regular.ttf NotoSansBengaliUI-Bold.ttf NotoSansBengaliUI-Regular.ttf NotoSansDevanagari-Bold.ttf NotoSansDevanagari-Regular.ttf NotoSansDevanagariUI-Bold.ttf NotoSansDevanagariUI-Regular.ttf NotoSansEthiopic-Bold.ttf NotoSansEthiopic-Regular.ttf NotoSansGeorgian-Bold.ttf NotoSansGeorgian-Regular.ttf NotoSansGujarati-Bold.ttf NotoSansGujarati-Regular.ttf NotoSansGujaratiUI-Bold.ttf NotoSansGujaratiUI-Regular.ttf NotoSansGurmukhi-Bold.ttf NotoSansGurmukhi-Regular.ttf NotoSansGurmukhiUI-Bold.ttf NotoSansGurmukhiUI-Regular.ttf NotoSansHebrew-Bold.ttf NotoSansHebrew-Regular.ttf NotoSansKannada-Bold.ttf NotoSansKannada-Regular.ttf NotoSansKannadaUI-Bold.ttf NotoSansKannadaUI-Regular.ttf NotoSansKhmerUI-Bold.ttf NotoSansKhmerUI-Regular.ttf NotoSansLao-Bold.ttf NotoSansLao-Regular.ttf NotoSansLaoUI-Bold.ttf NotoSansLaoUI-Regular.ttf NotoSansMalayalam-Bold.ttf NotoSansMalayalam-Regular.ttf NotoSansMalayalamUI-Bold.ttf NotoSansMalayalamUI-Regular.ttf NotoSansMyanmar-Bold.ttf NotoSansMyanmar-Regular.ttf NotoSansMyanmarUI-Bold.ttf NotoSansMyanmarUI-Regular.ttf NotoSansOriya-Bold.ttf NotoSansOriya-Regular.ttf NotoSansOriyaUI-Bold.ttf NotoSansOriyaUI-Regular.ttf NotoSansSinhala-Bold.ttf NotoSansSinhala-Regular.ttf NotoSansTamil-Bold.ttf NotoSansTamil-Regular.ttf NotoSansTamilUI-Bold.ttf NotoSansTamilUI-Regular.ttf NotoSansTelugu-Bold.ttf NotoSansTelugu-Regular.ttf NotoSansTeluguUI-Bold.ttf NotoSansTeluguUI-Regular.ttf NotoSansThaana-Bold.ttf NotoSansThaana-Regular.ttf NotoSansThai-Bold.ttf NotoSansThai-Regular.ttf NotoSansThaiUI-Bold.ttf NotoSansThaiUI-Regular.ttf NotoSansTibetan-Bold.ttf NotoSansTibetan-Regular.ttf NotoSansUI-Bold.ttf NotoSansUI-BoldItalic.ttf NotoSansUI-Italic.ttf NotoSansUI-Regular.ttf)
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${_pkgsa}"
+
+  for fnt in "${_sans[@]}"; do
+    install -m644 "$fnt" "${pkgdir}"/usr/share/fonts/"${_pkgsa}"
+  done
+
+  # Noto Serif
+  _serif=(NotoSerif-Bold.ttf NotoSerif-BoldItalic.ttf NotoSerif-Italic.ttf NotoSerif-Regular.ttf NotoSerifArmenian-Bold.ttf NotoSerifArmenian-Regular.ttf NotoSerifGeorgian-Bold.ttf NotoSerifGeorgian-Regular.ttf NotoSerifKhmer-Bold.ttf NotoSerifKhmer-Regular.ttf NotoSerifLao-Bold.ttf NotoSerifLao-Regular.ttf NotoSerifThai-Bold.ttf NotoSerifThai-Regular.ttf)
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${_pkgse}"
+
+  for fnt in "${_serif[@]}"; do
+    install -m644 "$fnt" "${pkgdir}"/usr/share/fonts/"${_pkgse}"
+  done
+
+  # License
+  install -m755 -d "${pkgdir}/usr/share/licenses/$pkgname"
+  install -m644 ../LICENSE \
+    "${pkgdir}/usr/share/licenses/$pkgname/LICENSE"
+
+  cd "${srcdir}"
+
+  # fixed faces
+  _fixed=(NotoSansCham-Bold_fixed.ttf NotoSansCham-Regular_fixed.ttf NotoSansKhmer-Bold_fixed.ttf NotoSansKhmer-Regular_fixed.ttf)
+
+  for fnt in "${_fixed[@]}"; do
+    install -m644 "$fnt" "${pkgdir}"/usr/share/fonts/"${_pkgsa}"
+  done
+
+
+  # fontconfig templates
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m644 40-noto-arabic.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/40-noto-arabic.conf
+  install -m644 45-noto-cros.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-noto-cros.conf
+  install -m644 45-noto-sans.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-noto-sans.conf
+  install -m644 45-noto-serif.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-noto-serif.conf
+  install -m644 90-tt-noto-cros.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-noto-cros.conf
+  install -m644 90-tt-noto-sans.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-noto-sans.conf
+  install -m644 90-tt-noto-serif.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-noto-serif.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/40-noto-arabic.conf .
+  ln -s ../conf.avail/45-noto-cros.conf .
+  ln -s ../conf.avail/45-noto-sans.conf .
+  ln -s ../conf.avail/45-noto-serif.conf .
+  ln -s ../conf.avail/90-tt-noto-cros.conf .
+  ln -s ../conf.avail/90-tt-noto-sans.conf .
+  ln -s ../conf.avail/90-tt-noto-serif.conf .
+}

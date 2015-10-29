@@ -1,0 +1,65 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=noto-fonts-cjk-ib
+pkgname=('ttf-noto-fonts-cjk-ib' 'otf-noto-fonts-cjk-ib' 'otf-noto-fonts-cjk-mono-ib')
+pkgver=1.004
+pkgrel=1
+pkgdesc="Google Noto CJK fonts."
+arch=(any)
+url="https://www.google.com/get/noto/"
+license=(custom:SIL)
+install=$pkgname.install
+source=("https://github.com/googlei18n/noto-cjk/archive/v$pkgver.tar.gz")
+sha256sums=('835a42755c1e8d6a4a406f32609da1f0fa7f9674d05760f0be658d9d6f4ab71c')
+
+package_ttf-noto-fonts-cjk-ib() {
+  pkgdesc="Google Noto CJK fonts (basic ttc collection)."
+  depends=(fontconfig)
+  conflicts=(ttf-noto-cjk otf-noto-cjk otf-noto-japanese otf-noto-korean otf-noto-simplified-chinese otf-noto-traditional-chinese noto-fonts-cjk otf-noto-fonts-cjk-ib)
+  provides=(noto-fonts-cjk)
+  install=$pkgname.install
+
+  cd "noto-cjk-${pkgver}"
+
+  install -m755 -d "${pkgdir}/usr/share/fonts/${pkgname}"
+  install -m644 *.ttc "${pkgdir}/usr/share/fonts/${pkgname}"
+
+  # License
+  install -m755 -d "${pkgdir}/usr/share/licenses/$pkgname"
+  install -m644 LICENSE \
+    "${pkgdir}/usr/share/licenses/$pkgname/LICENSE"
+}
+
+package_otf-noto-fonts-cjk-ib() {
+  pkgdesc="Google Noto CJK fonts (extended OpenType collection)."
+  depends=(fontconfig)
+  conflicts=(ttf-noto-cjk otf-noto-cjk otf-noto-japanese otf-noto-korean otf-noto-simplified-chinese otf-noto-traditional-chinese noto-fonts-cjk ttf-noto-fonts-cjk-ib)
+  provides=(noto-fonts-cjk)
+  install=$pkgname.install
+
+  cd "noto-cjk-${pkgver}"
+
+  install -m755 -d "${pkgdir}/usr/share/fonts/${pkgname}"
+  install -m644 NotoSansCJK*.otf "${pkgdir}/usr/share/fonts/${pkgname}"
+
+  # License
+  install -m755 -d "${pkgdir}/usr/share/licenses/$pkgname"
+  install -m644 LICENSE \
+    "${pkgdir}/usr/share/licenses/$pkgname/LICENSE"
+}
+
+package_otf-noto-fonts-cjk-mono-ib() {
+  pkgdesc="Google Noto CJK fonts (mono OpenType collection)."
+  depends=(fontconfig)
+  install=$pkgname.install
+
+  cd "noto-cjk-${pkgver}"
+
+  install -m755 -d "${pkgdir}/usr/share/fonts/${pkgname}"
+  install -m644 NotoSansMonoCJK*.otf "${pkgdir}/usr/share/fonts/${pkgname}"
+
+  # License
+  install -m755 -d "${pkgdir}/usr/share/licenses/$pkgname"
+  install -m644 LICENSE \
+    "${pkgdir}/usr/share/licenses/$pkgname/LICENSE"
+}
