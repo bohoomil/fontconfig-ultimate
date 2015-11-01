@@ -5,7 +5,7 @@
 
 _name=cairo
 pkgname=lib32-$_name-infinality-ultimate
-pkgver=1.14.2
+pkgver=1.14.4
 pkgrel=1
 groups=('infinality-bundle')
 pkgdesc="Cairo vector graphics library with respect-fontconfig and Ubuntu patches (32-bit, infinality-bundle)"
@@ -16,7 +16,7 @@ license=('LGPL' 'MPL')
 makedepends=('gcc-multilib' 'lib32-gtk2' 'lib32-mesa-libgl')
 depends=('lib32-libpng' 'lib32-libxext' 'lib32-libxrender'
          'lib32-fontconfig-infinality-ultimate'  'lib32-pixman'
-         'lib32-glib2' 'lib32-mesa' 'lib32-libgl'
+         'lib32-glib2' 'lib32-mesa' 'lib32-libgl' 'lib32-librsvg'
          $_name-infinality-ultimate)
 provides=("lib32-cairo=$pkgver")
 conflicts=('lib32-cairo' 'lib32-cairo-ubuntu')
@@ -25,7 +25,7 @@ source=(http://cairographics.org/releases/cairo-$pkgver.tar.xz
         cairo-respect-fontconfig_pb.patch
         cairo-server-side-gradients.patch
         cairo-webkit-html5-fix.patch)
-sha1sums=('c8da68aa66ca0855b5d0ff552766d3e8679e1d24'
+sha1sums=('5b44471e7c328f96de6830baf8ea65030de797f9'
           'd8ffcb4c4745f7e61671109362a80a872ac989d3'
           '72ecf2dda8462e1588512de257ccbe18642d507f'
           '5bff494f52a16114f4cf6d04bfb0b9d7c4e9da23')
