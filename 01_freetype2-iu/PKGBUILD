@@ -3,9 +3,9 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=freetype2-infinality-ultimate
-pkgver=2.6.1
-pkgrel=2
-_patchrel=2015.11.08
+pkgver=2.6.2
+pkgrel=1
+_patchrel=2015.11.28
 pkgdesc="TrueType font rendering library with Infinality patches and custom settings."
 arch=('i686' 'x86_64')
 changelog=CHANGELOG
@@ -15,26 +15,28 @@ url="http://freetype.sourceforge.net"
 depends=('zlib' 'bzip2' 'sh' 'xorg-xrdb' 'libpng' 'harfbuzz')
 conflicts=('freetype2' 'freetype2-infinality')
 provides=("freetype2=$pkgver" 'freetype2-infinality' 'freetype2-infinality-ultimate')
-backup=('etc/X11/xinit/xinitrc.d/infinality-settings.sh')
 install='infinality.install'
-#"02-upstream-${_patchrel}.patch"
 source=(http://downloads.sourceforge.net/sourceforge/freetype/freetype-${pkgver}.tar.bz2
-        infinality-settings.sh
         "01-freetype-${pkgver}-enable-valid.patch"
-        "02-upstream-${_patchrel}.patch"
-        "03-infinality-${pkgver}-${_patchrel}.patch")
-sha1sums=('393447fbf64c107b20a1ccc9e9a9a52f39786ae0'
-          'd09d96c10020772533a4280cec2425bcd1a81fa2'
+        "03-infinality-${pkgver}-${_patchrel}.patch"
+         xft-settings.sh
+         infinality-settings.sh
+         infinality-settings-generic)
+        #"02-upstream-${_patchrel}.patch"
+
+sha1sums=('29c22b85b77cb22cf95c13e7062e21f39fe6b17a'
           'abf7a8f726ad6359533651a8942636880febf9f6'
-          '2eb2d5655781248e7cb1d1492dc575b991f7b46e'
-          '4b8052aef5209ed82f9c5a60c89d284f3e871f45')
+          '9b0c0062144da8786ba3115feb64b1636c13e65b'
+          'a1859f2eacae2046a9ef705ac2bcc4bdf4fd9717'
+          '5624c40049a73f8c75d01537212b4c7040f1761f'
+          '4d219670cb9641b649f6ba0f2a799006f7c3c3c5')
 
 prepare() {
   cd "freetype-${pkgver}"
 
   patches=("01-freetype-${pkgver}-enable-valid.patch"
-           "02-upstream-${_patchrel}.patch"
            "03-infinality-${pkgver}-${_patchrel}.patch")
+           #"02-upstream-${_patchrel}.patch"
 
   # infinality & post release fixes
   for patch in "${patches[@]}"; do
@@ -65,11 +67,14 @@ package() {
 
   make DESTDIR="${pkgdir}" install
 
-  # freetype2 runtime settings
+  # freetype2 xft & runtime settings
   install -m755 -d "${pkgdir}/etc/X11/xinit/xinitrc.d"
-  install -m755 "${srcdir}/infinality-settings.sh" \
-    "${pkgdir}/etc/X11/xinit/xinitrc.d/infinality-settings.sh"
+  install -m755 "${srcdir}/xft-settings.sh" \
+    "${pkgdir}/etc/X11/xinit/xinitrc.d/xft-settings.sh"
 
-  sed -i "1i #!/bin/bash\n" \
-    "${pkgdir}/etc/X11/xinit/xinitrc.d/infinality-settings.sh"
+  install -m755 -d "${pkgdir}/usr/share/doc/freetype2-infinality-ultimate"
+  install -m755 "${srcdir}/infinality-settings.sh" \
+    "${pkgdir}/usr/share/doc/freetype2-infinality-ultimate/infinality-settings.sh"
+  install -m644 "${srcdir}/infinality-settings-generic" \
+    "${pkgdir}/usr/share/doc/freetype2-infinality-ultimate/infinality-settings-generic"
 }
