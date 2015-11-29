@@ -5,9 +5,9 @@
 
 _pkgbasename=freetype2
 pkgname=lib32-$_pkgbasename-infinality-ultimate
-pkgver=2.6.1
-pkgrel=2
-_patchrel=2015.11.08
+pkgver=2.6.2
+pkgrel=1
+_patchrel=2015.11.28
 pkgdesc="TrueType font rendering library with Infinality patches and custom settings by bohoomil (32-bit, infinality-bundle)."
 arch=(x86_64)
 license=('GPL' 'MIT')
@@ -21,20 +21,18 @@ provides=('lib32-freetype2' 'lib32-freetype2-infinality')
 options=('!libtool')
 source=(http://downloads.sourceforge.net/sourceforge/freetype/freetype-${pkgver}.tar.bz2
         "01-freetype-${pkgver}-enable-valid.patch"
-        "02-upstream-${_patchrel}.patch"
         "03-infinality-${pkgver}-${_patchrel}.patch")
-sha1sums=('393447fbf64c107b20a1ccc9e9a9a52f39786ae0'
+        #"02-upstream-${_patchrel}.patch"
+sha1sums=('29c22b85b77cb22cf95c13e7062e21f39fe6b17a'
           'abf7a8f726ad6359533651a8942636880febf9f6'
-          '2eb2d5655781248e7cb1d1492dc575b991f7b46e'
-          '4b8052aef5209ed82f9c5a60c89d284f3e871f45')
+          '9b0c0062144da8786ba3115feb64b1636c13e65b')
 
 prepare() {
   cd "freetype-${pkgver}"
 
   patches=("01-freetype-${pkgver}-enable-valid.patch"
-           "02-upstream-${_patchrel}.patch"
            "03-infinality-${pkgver}-${_patchrel}.patch")
-
+           #"02-upstream-${_patchrel}.patch"
 
   # infinality & post release fixes
   for patch in "${patches[@]}"; do
