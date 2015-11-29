@@ -6,6 +6,22 @@ CHANGELOG
 ---------
 
 
+2015-11-28
+~~~~~~~~~~
+
+* Upstream `freetype2` version upgrade 2.6.2.
+* Infinality patch set was rewritten and optimized for speed (by mviikki16).
+  Default rendering style is hard coded now and set to `ultimate3`.
+* New `xft-settings.sh` was split from the original `infinality-settings.sh` script.
+* New `infinality-settings.sh` is now optional and offers more rendering styles and
+  new methods of customization.
+
+2015-11-10
+~~~~~~~~~~
+
+* Reverting buggy upstream changes to working condition.
+* The code base was merged with the upstream changes up to 2015.11.10.
+
 2015-11-08
 ~~~~~~~~~~
 
