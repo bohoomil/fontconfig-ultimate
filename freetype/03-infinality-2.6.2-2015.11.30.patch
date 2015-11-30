@@ -1,7 +1,3 @@
-infinality patch by mviikki16
-
------------------------
-
 diff --git a/builds/freetype.mk b/builds/freetype.mk
 index 1cc7e29..c73ae68 100644
 --- a/builds/freetype.mk
@@ -415,10 +411,10 @@ index 253dfb7..59d2d17 100644
  #include "ftmac.c"
 diff --git a/src/base/ftinf.c b/src/base/ftinf.c
 new file mode 100644
-index 0000000..5389dde
+index 0000000..b683f17
 --- /dev/null
 +++ b/src/base/ftinf.c
-@@ -0,0 +1,808 @@
+@@ -0,0 +1,810 @@
 +#include <stdlib.h>
 +#include "ftinf.h"
 +#define true  1
@@ -467,7 +463,8 @@ index 0000000..5389dde
 +        .brightness=0,
 +        .chromeos_style_sharpening_strength=0,
 +        .contrast=0,
-+        .filter_params={on, 11, 22, 38, 22, 11},
++        /*.filter_params={on, 11, 22, 38, 22, 11},*/
++        .filter_params={on, 8, 24, 56, 24, 8},
 +        .fringe_filter_strength=0,
 +        .gamma_correction={0, 100},
 +        .grayscale_filter_strength=0,
@@ -477,26 +474,6 @@ index 0000000..5389dde
 +        .use_known_settings_on_selected_fonts=true,
 +        .use_various_tweaks=true,
 +        .windows_style_sharpening_strength=0
-+    },
-+    /* WINDOWSXP */
-+    {
-+        .autohint_horizontal_stem_darken_strength=10,
-+        .autohint_increase_glyph_heights=false,
-+        .autohint_snap_stem_height=100,
-+        .autohint_vertical_stem_darken_strength=25,
-+        .brightness=10,
-+        .chromeos_style_sharpening_strength=0,
-+        .contrast=20,
-+        .filter_params={on, 6, 25, 44, 25, 6},
-+        .fringe_filter_strength=100,
-+        .gamma_correction={1000, 120},
-+        .grayscale_filter_strength=0,
-+        .stem_alignment_strength=15,
-+        .stem_fitting_strength=15,
-+        .stem_snapping_sliding_scale=30,
-+        .use_known_settings_on_selected_fonts=true,
-+        .use_various_tweaks=true,
-+        .windows_style_sharpening_strength=65,
 +    },
 +    /* OSX */
 +    {
@@ -521,6 +498,26 @@ index 0000000..5389dde
 +        .use_known_settings_on_selected_fonts=false,
 +        .use_various_tweaks=false,
 +        .windows_style_sharpening_strength=0,
++    },
++    /* WINDOWSXP */
++    {
++        .autohint_horizontal_stem_darken_strength=10,
++        .autohint_increase_glyph_heights=false,
++        .autohint_snap_stem_height=100,
++        .autohint_vertical_stem_darken_strength=25,
++        .brightness=10,
++        .chromeos_style_sharpening_strength=0,
++        .contrast=20,
++        .filter_params={on, 6, 25, 44, 25, 6},
++        .fringe_filter_strength=100,
++        .gamma_correction={1000, 120},
++        .grayscale_filter_strength=0,
++        .stem_alignment_strength=15,
++        .stem_fitting_strength=15,
++        .stem_snapping_sliding_scale=30,
++        .use_known_settings_on_selected_fonts=true,
++        .use_various_tweaks=true,
++        .windows_style_sharpening_strength=65,
 +    },
 +    /* INFINALITY */
 +    {
@@ -614,7 +611,7 @@ index 0000000..5389dde
 +    }
 +};
 +
-+const ftinf_t *ftinf=_inf+INF_ULTIMATE3; /* INF_ULTIMATE3 */
++const ftinf_t *ftinf;
 +/* environment based settings */
 +ftinf_t _env;
 +
@@ -1063,7 +1060,8 @@ index 0000000..5389dde
 +            ftinf=_inf+INF_ULTIMATE2;
 +            goto done;
 +        }
-+        if( strcasecmp(s, "ultimate3" )==0 ){
++        if( strcasecmp(s, "ultimate3" )==0
++            || strcasecmp(s, "ultimate" )==0 ){
 +            ftinf=_inf+INF_ULTIMATE3;
 +            goto done;
 +        }
@@ -1086,7 +1084,7 @@ index 0000000..5389dde
 +    if( ftinf )
 +        _env=ftinf[0];      /* copy defaults */
 +    else
-+        _env=_inf[INF_PUSH];
++        _env=_inf[INF_ULTIMATE3];
 +
 +    /* check if custom environment values are set and update with them */
 +    s=getenv( "INFINALITY_FT_AUTOHINT_INCREASE_GLYPH_HEIGHTS" );
@@ -1139,8 +1137,8 @@ index 0000000..5389dde
 +    if( s ) sscanf( s, "%d", &_env.bold_embolden_y_value );
 +    s=getenv( "INFINALITY_FT_FILTER_PARAMS" );
 +    if( s ) {
-+        float *f=_env.filter_params;
-+        if( sscanf( s, "%f %f %f %f %f", f+1, f+2, f+3, f+4, f+5 )==5 )
++        int *f=_env.filter_params;
++        if( sscanf( s, "%d %d %d %d %d", f+1, f+2, f+3, f+4, f+5 )==5 )
 +            f[0]=on;
 +        else
 +            f[0]=off;           /* FIXME: put a warning? */
@@ -1229,7 +1227,7 @@ index 0000000..5389dde
 +}
 diff --git a/src/base/ftinf.h b/src/base/ftinf.h
 new file mode 100644
-index 0000000..c9610d5
+index 0000000..109aa61
 --- /dev/null
 +++ b/src/base/ftinf.h
 @@ -0,0 +1,80 @@
@@ -1269,7 +1267,7 @@ index 0000000..c9610d5
 +    int brightness;
 +    int chromeos_style_sharpening_strength;
 +    int contrast;
-+    float filter_params[6];     /* 1st one used as existence flag */
++    int filter_params[6];       /* 1st one used as existence flag */
 +    int fringe_filter_strength;
 +    float gamma_correction[2];
 +    int global_embolden_x_value;
@@ -1716,58 +1714,56 @@ index b65a91d..54c06f9 100644
    }
  
 diff --git a/src/base/ftlcdfil.c b/src/base/ftlcdfil.c
-index b50383c..0ccc49b 100644
+index 5ee7e0a..9c9e9e4 100644
 --- a/src/base/ftlcdfil.c
 +++ b/src/base/ftlcdfil.c
-@@ -22,6 +22,10 @@
+@@ -22,7 +22,10 @@
  #include FT_LCD_FILTER_H
  #include FT_IMAGE_H
  #include FT_INTERNAL_OBJECTS_H
+-
 +#include <math.h>
 +#include <string.h>
 +#include <strings.h>
 +#include "ftinf.h"
  
- 
  #ifdef FT_CONFIG_OPTION_SUBPIXEL_RENDERING
-@@ -305,11 +309,40 @@
+ 
+@@ -305,11 +308,36 @@
    FT_Library_SetLcdFilter( FT_Library    library,
                             FT_LcdFilter  filter )
    {
 -    static const FT_Byte  default_filter[5] =
-+    /*static const FT_Byte  default_filter[5] =*/
-+    static FT_Byte  default_filter[5] =
-                             { 0x08, 0x4d, 0x56, 0x4d, 0x08 };
+-                            { 0x08, 0x4d, 0x56, 0x4d, 0x08 };
      static const FT_Byte  light_filter[5] =
                              { 0x00, 0x55, 0x56, 0x55, 0x00 };
 -
-+#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
-+    if( ftinf )
++#ifndef FT_CONFIG_OPTION_INFINALITY_PATCHSET
++    static const FT_Byte  default_filter[5] =
++                            { 0x08, 0x4d, 0x56, 0x4d, 0x08 };
++#else
++    FT_Byte default_filter[5];
++    if( ftinf && ftinf->filter_params[0] )
 +    {
-+        const float *f=ftinf->filter_params;
-+        if ( f[0] )
-+        {
-+            if ( f[1] + f[2] + f[3] + f[4] + f[5] > 5.0f )
-+            {
-+                /* Assume we were given integers instead of floats */
-+                /* 0 to 100 */
-+                default_filter[0] = (FT_Byte) ( f[1] * 2.55f + 0.5f );
-+                default_filter[1] = (FT_Byte) ( f[2] * 2.55f + 0.5f );
-+                default_filter[2] = (FT_Byte) ( f[3] * 2.55f + 0.5f );
-+                default_filter[3] = (FT_Byte) ( f[4] * 2.55f + 0.5f );
-+                default_filter[4] = (FT_Byte) ( f[5] * 2.55f + 0.5f );
-+            }
-+            else
-+            {
-+                /* Assume we were given floating point values */
-+                /* 0 to 1.0 */
-+                default_filter[0] = (FT_Byte) ( f[1] * 255.0f + 0.5f );
-+                default_filter[1] = (FT_Byte) ( f[2] * 255.0f + 0.5f );
-+                default_filter[2] = (FT_Byte) ( f[3] * 255.0f + 0.5f );
-+                default_filter[3] = (FT_Byte) ( f[4] * 255.0f + 0.5f );
-+                default_filter[4] = (FT_Byte) ( f[5] * 255.0f + 0.5f );
-+            }
-+        }
++        const int *f=ftinf->filter_params;
++        /* Assume we were given integers [0-100] get them to [0-255] */
++        int val; /* 2611=2.55*1024 */
++        val=(f[1]*2611+512)>>10; if( val > 255 ) val=255;
++        default_filter[0] = (FT_Byte) val;
++        val=(f[2]*2611+512)>>10; if( val > 255 ) val=255;
++        default_filter[1] = (FT_Byte) val;
++        val=(f[3]*2611+512)>>10; if( val > 255 ) val=255;
++        default_filter[2] = (FT_Byte) val;
++        val=(f[4]*2611+512)>>10; if( val > 255 ) val=255;
++        default_filter[3] = (FT_Byte) val;
++        val=(f[5]*2611+512)>>10; if( val > 255 ) val=255;
++        default_filter[4] = (FT_Byte) val;
++    } else {
++        default_filter[0]=0x08;
++        default_filter[1]=0x4d;
++        default_filter[2]=0x56;
++        default_filter[3]=0x4d;
++        default_filter[4]=0x08;
 +    }
 +#endif
  

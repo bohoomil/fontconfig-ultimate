@@ -6,6 +6,12 @@ CHANGELOG
 ---------
 
 
+2015-11-30
+~~~~~~~~~~
+
+* `freetype2` code was updated with recent upstream commit.
+* Fixed reported issues with the new Infinality functionality.
+
 2015-11-28
 ~~~~~~~~~~
 
