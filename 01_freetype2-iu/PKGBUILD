@@ -4,8 +4,8 @@
 
 pkgname=freetype2-infinality-ultimate
 pkgver=2.6.2
-pkgrel=1
-_patchrel=2015.11.28
+pkgrel=2
+_patchrel=2015.11.30
 pkgdesc="TrueType font rendering library with Infinality patches and custom settings."
 arch=('i686' 'x86_64')
 changelog=CHANGELOG
@@ -18,15 +18,16 @@ provides=("freetype2=$pkgver" 'freetype2-infinality' 'freetype2-infinality-ultim
 install='infinality.install'
 source=(http://downloads.sourceforge.net/sourceforge/freetype/freetype-${pkgver}.tar.bz2
         "01-freetype-${pkgver}-enable-valid.patch"
+        "02-upstream-${_patchrel}.patch"
         "03-infinality-${pkgver}-${_patchrel}.patch"
          xft-settings.sh
          infinality-settings.sh
          infinality-settings-generic)
-        #"02-upstream-${_patchrel}.patch"
 
 sha1sums=('29c22b85b77cb22cf95c13e7062e21f39fe6b17a'
           'abf7a8f726ad6359533651a8942636880febf9f6'
-          '9b0c0062144da8786ba3115feb64b1636c13e65b'
+          '6955004727ab7132aba542604f80a0e8f9e56c30'
+          '71d8af762952403883fd13e0aff68d9c6dc0fdd1'
           'a1859f2eacae2046a9ef705ac2bcc4bdf4fd9717'
           '5624c40049a73f8c75d01537212b4c7040f1761f'
           '4d219670cb9641b649f6ba0f2a799006f7c3c3c5')
@@ -35,8 +36,8 @@ prepare() {
   cd "freetype-${pkgver}"
 
   patches=("01-freetype-${pkgver}-enable-valid.patch"
+           "02-upstream-${_patchrel}.patch"
            "03-infinality-${pkgver}-${_patchrel}.patch")
-           #"02-upstream-${_patchrel}.patch"
 
   # infinality & post release fixes
   for patch in "${patches[@]}"; do
@@ -67,7 +68,7 @@ package() {
 
   make DESTDIR="${pkgdir}" install
 
-  # freetype2 xft & runtime settings
+  # freetype2 runtime settings
   install -m755 -d "${pkgdir}/etc/X11/xinit/xinitrc.d"
   install -m755 "${srcdir}/xft-settings.sh" \
     "${pkgdir}/etc/X11/xinit/xinitrc.d/xft-settings.sh"
@@ -75,6 +76,6 @@ package() {
   install -m755 -d "${pkgdir}/usr/share/doc/freetype2-infinality-ultimate"
   install -m755 "${srcdir}/infinality-settings.sh" \
     "${pkgdir}/usr/share/doc/freetype2-infinality-ultimate/infinality-settings.sh"
-  install -m644 "${srcdir}/infinality-settings-generic" \
+  install -m755 "${srcdir}/infinality-settings-generic" \
     "${pkgdir}/usr/share/doc/freetype2-infinality-ultimate/infinality-settings-generic"
 }
