@@ -33,7 +33,7 @@
 ### and set its name as the value.
 
 
-#INFINALITY_FT="ultimate3"
+#export INFINALITY_FT="ultimate3"
 
 
 ### 2. Additionally, the chosen style can be adjusted by setting custom
