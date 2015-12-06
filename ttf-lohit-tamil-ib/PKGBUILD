@@ -3,36 +3,38 @@
 pkgname=ttf-lohit-tamil-ib
 _src_pkg_1=lohit-tamil-ttf
 _src_pkg_2=lohit-tamil-classical-ttf
-pkgver=2.5.3
-pkgrel=5
+pkgver=2.91.1+2.5.3clss
+_pkgver1=2.91.1
+_pkgver2=2.5.3
+pkgrel=1
 depends=('fontconfig')
-pkgdesc="Lohit Tamil fonts."
+pkgdesc="Lohit Tamil and Tamil Classical fonts."
 url="https://fedorahosted.org/lohit/"
 arch=('any')
 conflicts=('lohit-fonts')
 groups=('infinality-bundle-fonts')
 license=('custom:OFL')
 install=$pkgname.install
-source=("https://fedorahosted.org/releases/l/o/lohit/${_src_pkg_1}-${pkgver}.tar.gz"
-        "https://fedorahosted.org/releases/l/o/lohit/${_src_pkg_2}-${pkgver}.tar.gz"
+source=("https://fedorahosted.org/releases/l/o/lohit/${_src_pkg_1}-${_pkgver1}.tar.gz"
+        "https://fedorahosted.org/releases/l/o/lohit/${_src_pkg_2}-${_pkgver2}.tar.gz"
         40-lohit-tamil.conf
         66-lohit-tamil.conf
         90-tt-lohit-tamil.conf)
-sha1sums=('6e2f24dd49b31618108989bdb8d61db769ceae48'
+sha1sums=('e414bb4e48a45f4c6b1e4af4ab3546036dda747a'
           'eec360e6d7d85818932b84e04f431e9da5f79bd7'
           '1c88f2ca79793ab22670778914dc92eef63fd8b9'
           'd22d0aaf30dd7b1a6e5bdccfad50f7629f289930'
           'c1b9f730ea11a6548421a10095b35df9e0ecd0cb')
 
 package(){
-  cd "${srcdir}"/"${_src_pkg_1}-${pkgver}"
+  cd "${srcdir}"/"${_src_pkg_1}-${_pkgver1}"
   install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
   install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  cd "${srcdir}"/"${_src_pkg_2}-${pkgver}"
+  cd "${srcdir}"/"${_src_pkg_2}-${_pkgver2}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
   install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
