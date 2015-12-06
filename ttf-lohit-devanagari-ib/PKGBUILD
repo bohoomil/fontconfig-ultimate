@@ -2,8 +2,8 @@
 
 pkgname=ttf-lohit-devanagari-ib
 _src_pkg=lohit-devanagari-ttf
-pkgver=2.94.0
-pkgrel=5
+pkgver=2.95.1
+pkgrel=1
 depends=('fontconfig')
 pkgdesc="Lohit Devanagari font."
 url="https://fedorahosted.org/lohit/"
@@ -16,7 +16,7 @@ source=("https://fedorahosted.org/releases/l/o/lohit/${_src_pkg}-${pkgver}.tar.g
         40-lohit-devanagari.conf
         66-lohit-devanagari.conf
         90-tt-lohit-devanagari.conf)
-sha1sums=('4804f810215d60ec5334b7192ee965f39bfdac38'
+sha1sums=('99d2bf29920622e558a2dfaa6f3abe84c268833e'
           'ec03746a621de6456c0a412f392f762a3bea92e1'
           '2682411eefea9016663af2028196c22f89a18513'
           '3bd004a6eefef9eae20dbf2d2cb2d65e816ead30')
