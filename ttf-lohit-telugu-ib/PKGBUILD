@@ -2,8 +2,8 @@
 
 pkgname=ttf-lohit-telugu-ib
 _src_pkg=lohit-telugu-ttf
-pkgver=2.5.3
-pkgrel=5
+pkgver=2.5.4
+pkgrel=1
 depends=('fontconfig')
 pkgdesc="Lohit Telugu font."
 url="https://fedorahosted.org/lohit/"
@@ -16,7 +16,7 @@ source=("https://fedorahosted.org/releases/l/o/lohit/${_src_pkg}-${pkgver}.tar.g
         40-lohit-telugu.conf
         66-lohit-telugu.conf
         90-tt-lohit-telugu.conf)
-sha1sums=('96b095b24a6d85ac02ff47eba87d106eddbade07'
+sha1sums=('b732a861153ef31c454edf6a1004c145ef2ccc44'
           '009a51c80da4c5d2369109da041bbf81c7de4969'
           '8257519146ff9a6a0755584a787626f989570ad2'
           'bcf23f0977605586d397e09299f49301757797c6')
