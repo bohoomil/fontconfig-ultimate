@@ -1,0 +1,128 @@
+diff --git a/src/input.cc b/src/input.cc
+index c751e4c..3e51762 100644
+--- a/src/input.cc
++++ b/src/input.cc
+@@ -25,6 +25,7 @@
+ #include <stdlib.h> /* declares exit() */
+ #include <string.h> /* declares strncpy(), strchr() */
+ #include <limits.h> /* defines UCHAR_MAX etc. */
++#include <ctype.h>
+ #include "options.h"
+ #include "getline.h"
+ 
+@@ -753,6 +754,7 @@ Input::read_input ()
+     Keyword_List **list_tail = &_head;
+     const char *delimiters = option.get_delimiters ();
+     unsigned int lineno = keywords_lineno;
++    unsigned int lineinc=1;
+     bool charset_dependent = false;
+     for (const char *line = keywords; line < keywords_end; )
+       {
+@@ -780,7 +782,38 @@ Input::read_input ()
+             const char *keyword;
+             size_t keyword_length;
+             const char *rest;
+-
++            int single_line_struct=1;
++            if (line[0] == '{' ){ // check if we have tagged structures defined
++                const char *ptr=line+1;
++                while( isspace(ptr[0]) && ptr < line_end ) ++ptr;
++                if( ptr[0]=='.' ){ // field tag start
++                    const char *tname=option.get_slot_name();
++                    const char *tptr=tname;
++                    ++ptr;
++                    while( tptr[0] && ptr<line_end && tptr[0]==ptr[0]){ ++ptr; ++tptr; }
++                    if( tptr[0] || (ptr[0]!='=' && !isspace(ptr[0])) ){
++                        fprintf (stderr, "%s:%u: unexpected key tag name (!=\"%s\")\n",
++                                 pretty_input_file_name (), lineno, tname);
++                        exit (1);
++                    }
++                    while( isspace(ptr[0]) && ptr < line_end ) ++ptr;
++                    if( ptr==line_end || ptr[0]!='=' ){
++                        fprintf (stderr, "%s:%u: '=' expected\n",
++                                 pretty_input_file_name (), lineno, tname);
++                        exit (1);
++                    } else
++                        ptr++;
++                    while( isspace(ptr[0]) && ptr < line_end ) ++ptr;
++                    if( ptr==line_end || ptr[0]!='"' ){
++                        fprintf (stderr, "%s:%u: '\"' expected\n",
++                                 pretty_input_file_name (), lineno, tname);
++                        exit (1);
++                    }
++                    line=ptr;
++                    single_line_struct=0;
++                    lineinc=2;
++                }
++            }
+             if (line[0] == '"')
+               {
+                 /* Parse a string in ANSI C syntax.  */
+@@ -922,12 +955,36 @@ Input::read_input ()
+                 keyword_length = kp - keyword;
+                 if (option[TYPE])
+                   {
+-                    char *line_rest = new char[line_end - lp + 1];
+-                    memcpy (line_rest, lp, line_end - lp);
+-                    line_rest[line_end - lp -
+-                              (line_end > lp && line_end[-1] == '\n' ? 1 : 0)]
+-                      = '\0';
+-                    rest = line_rest;
++                      if( single_line_struct ){
++                          char *line_rest = new char[line_end - lp + 1];
++                          memcpy (line_rest, lp, line_end - lp);
++                          line_rest[line_end - lp -
++                                    (line_end > lp && line_end[-1] == '\n' ? 1 : 0)]
++                              = '\0';
++                          rest = line_rest;
++                      } else {
++                          const char *end_s=line_end;
++                          while( end_s < keywords_end ){
++                              if( memcmp( end_s, "},\n", 3)==0 ){
++                                  char *rest_s=new char[end_s - lp +1];
++                                  memcpy( rest_s, lp, end_s -lp);
++                                  rest_s[end_s-lp]='\0';
++                                  rest=rest_s;
++                                  line_end=end_s+3;
++                                  break;
++                              } else {
++                                  end_s=(const char*)memchr(end_s, '\n', keywords_end-end_s);
++                                  if( end_s == NULL ){
++                                      fprintf( stderr, "%s:%u:"
++                                               "missing structure end marker (\"},\")",
++                                               pretty_input_file_name (), lineno+lineinc);
++                                      exit (1);
++                                  }
++                                  end_s++;
++                                  lineinc++;
++                              }
++                          }
++                      }
+                   }
+                 else
+                   rest = empty_string;
+@@ -978,7 +1035,7 @@ Input::read_input ()
+             list_tail = &(*list_tail)->rest();
+           }
+ 
+-        lineno++;
++        lineno+=lineinc;
+         line = line_end;
+       }
+     *list_tail = NULL;
+diff --git a/src/output.cc b/src/output.cc
+index 9661ce0..4be3358 100644
+--- a/src/output.cc
++++ b/src/output.cc
+@@ -1137,9 +1137,9 @@ output_keyword_entry (KeywordExt *temp, int stringpool_index, const char *indent
+ {
+   if (option[TYPE])
+     output_line_directive (temp->_lineno);
+-  printf ("%s    ", indent);
++  //printf ("%s    ", indent);
+   if (option[TYPE])
+-    printf ("{");
++      printf ("{   .%s=", option.get_slot_name ());
+   if (option[SHAREDLIB])
+     printf ("(int)(long)&((struct %s_t *)0)->%s_str%d",
+             option.get_stringpool_name (), option.get_stringpool_name (),
