@@ -1,8 +1,8 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=ttf-opensans-ib
-pkgver=1.2
-pkgrel=17
+pkgver=1.10
+pkgrel=1
 depends=('fontconfig')
 pkgdesc="Open Sans is a humanist sans serif typeface designed by Steve Matteson, Type Director of Ascender Corp."
 url="http://opensans.com/"
@@ -12,15 +12,13 @@ conflicts=('t1-opensans-ib' 'ttf-opensans')
 provides=('ttf-opensans')
 groups=('infinality-bundle-fonts')
 install=$pkgname.install
-source=(http://bohoomil.com/src/open_sans.zip{,.sig}
-        http://bohoomil.com/src/open_sans_condensed.zip{,.sig}
+source=(http://www.opensans.com/download/open-sans.zip
+        http://www.opensans.com/download/open-sans-condensed.zip
         45-opensans.conf
         90-tt-opensans.conf)
 validgpgkeys=('A9244FB5E93F11F0E975337FAE6866C7962DDE58')
-sha1sums=('1fc651d6dd131baf795dd4b0dcc259980bcb9c58'
-          'SKIP'
-          'db8b311e0f139ca3ce5e1108a2d8b430af39e759'
-          'SKIP'
+sha1sums=('3edba27a9951a4cfd18af1c1f9d3df9a43f08ace'
+          'baac0e7cb19ab8eaa6b41d4ac8258d6731ed38d7'
           'e2cccbc4c5d9552430fe158351de374e2aa3b889'
           'c270db279deb3cf53b79e846dbb296f7d14c6322')
 
@@ -28,7 +26,7 @@ package(){
   cd "${srcdir}"
 
   install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 'LICENSE.txt' \
+  install -m644 'Apache License.txt' \
     "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
