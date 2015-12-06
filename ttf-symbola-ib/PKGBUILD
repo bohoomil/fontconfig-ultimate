@@ -1,7 +1,7 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=ttf-symbola-ib
-pkgver=7.21
+pkgver=8.00
 pkgrel=1
 depends=('fontconfig')
 pkgdesc="Symbola is a free symbol-type font."
@@ -17,7 +17,7 @@ source=(http://users.teilar.gr/~g1951d/Symbola.zip
         COPYING
         45-symbola.conf
         90-tt-symbola.conf)
-sha1sums=('d76c801607fb4d4f2c7d823da5bf8564a93d2d3a'
+sha1sums=('bc4fd6be4827d65456e837971fb26fe487bb6221'
           '3964a993a97d51f019d2dd592eda7bc87817260f'
           'bece6c5f6f1c869264d2d7d8aaf53b27970b09f7'
           '55667eafb4db4bc51c42a2c81ffb667337bb6135')
