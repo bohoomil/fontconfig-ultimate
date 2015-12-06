@@ -2,8 +2,8 @@
 
 pkgname=ttf-lohit-bengali-ib
 _src_pkg=lohit-bengali-ttf
-pkgver=2.5.3
-pkgrel=5
+pkgver=2.91.2
+pkgrel=1
 depends=('fontconfig')
 pkgdesc="Lohit Bengali font."
 url="https://fedorahosted.org/lohit/"
@@ -16,9 +16,9 @@ source=("https://fedorahosted.org/releases/l/o/lohit/${_src_pkg}-${pkgver}.tar.g
         40-lohit-bengali.conf
         66-lohit-bengali.conf
         90-tt-lohit-bengali.conf)
-sha1sums=('92bfebcf2c9495743bf888ff99472ac3e3594a74'
+sha1sums=('759bf31f2f39bf4fa5a2bf72b053e40b73546112'
           'e3e4168e3c9e6b5389fd61164406e3e77988b793'
-          '5ff2c7e3e8da1de242263f146811d7ef07fb7050'
+          '4ca03fe756c7a17de29eeab6fabbd2a437166a4d'
           '92e56a9b2cd1e113dcbc2555b37e60cf07c7795f')
 
 package(){
