@@ -2,8 +2,8 @@
 
 pkgname=ttf-lohit-assamese-ib
 _src_pkg=lohit-assamese-ttf
-pkgver=2.5.3
-pkgrel=5
+pkgver=2.91.2
+pkgrel=1
 depends=('fontconfig')
 pkgdesc="Lohit Assamese font."
 url="https://fedorahosted.org/lohit/"
@@ -16,7 +16,7 @@ source=("https://fedorahosted.org/releases/l/o/lohit/${_src_pkg}-${pkgver}.tar.g
         40-lohit-assamese.conf
         66-lohit-assamese.conf
         90-tt-lohit-assamese.conf)
-sha1sums=('c6db744b895bec13e8e29cafe91a37366b0418a9'
+sha1sums=('9475744f8e957c930e43f600a2f799aaab39d94b'
           'baae0cc8902bb5d516fd39248ea946cf7c4c57d3'
           '5ff2c7e3e8da1de242263f146811d7ef07fb7050'
           'e112688f0922a409a8071059aadc7f5ed82273ec')
