@@ -2,8 +2,8 @@
 
 pkgname=ttf-lohit-odia-ib
 _src_pkg=lohit-odia-ttf
-pkgver=2.5.5
-pkgrel=5
+pkgver=2.91.0
+pkgrel=1
 depends=('fontconfig')
 pkgdesc="Lohit Oriya font."
 url="https://fedorahosted.org/lohit/"
@@ -18,7 +18,7 @@ source=("https://fedorahosted.org/releases/l/o/lohit/${_src_pkg}-${pkgver}.tar.g
         40-lohit-odia.conf
         66-lohit-odia.conf
         90-tt-lohit-odia.conf)
-sha1sums=('084a9de1c60f145dd9cb8b7bca99c812eefadc90'
+sha1sums=('fb4f6fd675a84fb5a4f8f0ad4970cce4cf40ecd1'
           '31d2937b8487246d75380ba80ed89fcb67ff620a'
           'e0c47d862e55262c06cccb3916f31a9ee1869380'
           'e9c2bec9f3c8d2ef7a08c5e3947a8fce7247a38a')
