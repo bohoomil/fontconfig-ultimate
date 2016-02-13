@@ -1,14 +1,14 @@
 #!/bin/bash
 
 ###          freetype2-infinality-ultimate settings          ###
-###           rev. 0.4.9.0, for freetype2 v.2.6.2            ###
+###           rev. 0.4.9.1, for freetype2 v.2.6.3            ###
 ###                                                          ###
-###                Copyright (c) 2015 bohoomil               ###
+###                Copyright (c) 2016 bohoomil               ###
 ### The MIT License (MIT) http://opensource.org/licenses/MIT ###
 ###      part of infinality-bundle  http://bohoomil.com      ###
 
 
-### As of version 2.6.2-1, freetype2-infinality-ultimate comes with
+### As of version 2.6.3-1, freetype2-infinality-ultimate comes with
 ### the "ultimate3" rendering style enabled internally by default.
 ### It is still possible to use the optional "infinality-settings.sh"
 ### script to switch between additional built-in rendering schemes and
