@@ -1,0 +1,3943 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index f02ee51..6535678 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -36,11 +36,11 @@
+ #
+ # For an iOS static library, use
+ #
+-#   cmake <path-to-freetype2-src-dir> -D IOS_PLATFORM=OS -G Xcode
++#   cmake -D IOS_PLATFORM=OS -G Xcode <path-to-freetype2-src-dir>
+ #
+ # or
+ #
+-#   cmake <path-to-freetype2-src-dir> -D IOS_PLATFORM=SIMULATOR -G Xcode
++#   cmake -D IOS_PLATFORM=SIMULATOR -G Xcode <path-to-freetype2-src-dir>
+ #
+ # Please refer to the cmake manual for further options, in particular, how
+ # to modify compilation and linking parameters.
+@@ -102,7 +102,7 @@ if (APPLE)
+     set(BUILD_SHARED_LIBS OFF)
+ 
+     set(CMAKE_TOOLCHAIN_FILE
+-      ${PROJECT_SOURCE_DIR}/builds/cmake/iOS.cmake)
++      ${CMAKE_SOURCE_DIR}/builds/cmake/iOS.cmake)
+   endif ()
+ else ()
+   if (DEFINED IOS_PLATFORM)
+diff --git a/ChangeLog b/ChangeLog
+index a19b4de..33c18b9 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,424 @@
++2016-03-26  Werner Lemberg  <wl@gnu.org>
++
++	[pfr] Robustify bitmap strike handling (#47514).
++
++	We did a binary search for a charcode without ensuring that the
++	searched data is ordered.  Validating the order is now done lazily,
++	this is, the first access to a bitmap glyph triggers the order check
++	in the corresponding bitmap strike.
++
++	* src/pfr/pfrtypes.h (PFR_BitmapFlags): New values
++	`PFR_BITMAP_VALID_CHARCODES' and `PFR_BITMAP_CHARCODES_VALIDATED'.
++
++	* src/pfr/pfrsbit.c (pfr_lookup_bitmap_data): Make `flags' argument
++	a pointer.  Handle new PFR_BITMAP_XXX flags.
++	(pfr_slot_load_bitmap): Updated.
++
++2016-03-26  Werner Lemberg  <wl@gnu.org>
++
++	[pfr] Fix handling of compound glyphs.
++
++	Extra items are indicated with different bit positions.
++
++	* src/pfr/pfrtypes.h (PFR_GlyphFlags): Replace
++	`PFR_GLYPH_EXTRA_ITEMS' with `PFR_GLYPH_SIMPLE_EXTRA_ITEMS' and
++	`PFR_GLYPH_COMPOUND_EXTRA_ITEMS'.
++
++	* src/pfr/pfrgload.c (pfr_glyph_load_simple,
++	pfr_glyph_load_compound): Use them.
++
++2016-03-25  Werner Lemberg  <wl@gnu.org>
++
++	[pfr] Minor.
++
++	* src/pfr/pfrsbit.c, srf/pfr/pfrobjs.c: Use flag names instead of
++	bare numbers.
++
++2016-03-25  Werner Lemberg  <wl@gnu.org>
++
++	[pfr] Various clang sanitizer fixes.
++
++	* src/pfr/pfrsbit.c (pfr_load_bitmap_metrics): Correctly handle
++	signed nibbles.
++	(pfr_slot_load_bitmap): Correctly exit frame in case of error.
++	Fix invalid left shifts.
++
++2016-03-23  Werner Lemberg  <wl@gnu.org>
++
++	Rename `VERSION.DLL' (#47472).
++
++	* docs/VERSION.DLL: Renamed to...
++	* docs/VERSIONS.TXT: ...this.
++
++2016-03-23  Werner Lemberg  <wl@gnu.org>
++
++	[raster, smooth] Directly test outline size (#47500).
++
++	This improves stand-alone compilation.
++
++	* src/base/ftoutln.c (FT_Outline_Render): Move cbox size test to...
++
++	* src/raster/ftraster.c (ft_black_render), src/smooth/ftgrays.c
++	(gray_raster_render): ...these functions.
++
++2016-03-23  Werner Lemberg  <wl@gnu.org>
++
++	[raster, smooth] Fix some clang sanitizer runtime issues.
++
++	* src/raster/ftraster.c (ft_black_reset, ft_black_set_mode,
++	ft_black_render): Harmonize signatures with `ftimage.h'.
++
++	* src/smooth/ftgrays.c (gray_raster_render, gray_raster_reset):
++	Ditto.
++
++2016-03-22  Werner Lemberg  <wl@gnu.org>
++
++	* src/truetype/ttgload.c (TT_Load_Simple_Glyph): Minor.
++
++	This fixes an AddressSanitizer issue:
++
++	  ttgload.c:430:7: runtime error: null pointer passed as argument 1,
++	                   which is declared to never be null
++
++2016-03-21  Werner Lemberg  <wl@gnu.org>
++
++	* src/autofit/afhints.c (af_glyph_hints_reload): Thinko.
++
++	This fixes the previous commit to this file.
++
++2016-03-21  Alexei Podtelezhnikov  <apodtele@gmail.com>
++
++	[smooth] Partly revert recent changes.
++
++	* src/smooth/ftgrays.c (gray_conic_to, gray_cubic_to): Rework
++	conditions to fix rendering issues.
++
++2016-03-20  Werner Lemberg  <wl@gnu.org>
++
++	[autofit] Show `near' points in tracing.
++
++	* src/autofit/afhints.h (AF_FLAG_NEAR): New macro.
++
++	* src/autofit/afhints.c (af_glyph_hints_dump_points): Implement it.
++	(af_glyph_hints_reload): Handle AF_FLAG_NEAR.
++
++2016-03-18  Alexei Podtelezhnikov  <apodtele@gmail.com>
++
++	[smooth] Minor refactoring and microoptimizations.
++
++	* src/smooth/ftgrays.c (gray_render_conic, gray_render_cubic): Move
++	band clipping from here.
++	(gray_conic_to, gray_cubic_to): ... to here.
++	(gray_rander_line, gray_render_scanline): Initialize variables closer
++	to their use.
++
++2016-03-17  Alexei Podtelezhnikov  <apodtele@gmail.com>
++
++	[smooth] Minor refactoring.
++
++	* src/smooth/ftgrays.c (gray_render_conic, gray_render_cubic): Move
++	upscaling from here.
++	(gray_conic_to, gray_cubic_to): ... to here.
++
++2016-03-15  Werner Lemberg  <wl@gnu.org>
++
++	* src/autofit/aflatin.c (af_latin_compute_stem_width): Optimize.
++
++2016-03-14  Alexei Podtelezhnikov  <apodtele@gmail.com>
++
++	[smooth] Temporarily revert 6eb6158dd787 (#47114).
++
++	* src/smooth/ftgrays.c (gray_render_line): Old implementation.
++
++2016-03-12  Werner Lemberg  <wl@gnu.org>
++
++	[ftfuzzer] Improve coverage of rasterfuzzer.
++
++	* src/tools/ftfuzzer/rasterfuzzer.cc (LLVMFuzzerTestOneInput): Use
++	input data for `tags' array also.
++	Trim input data to get more positive hits.
++
++2016-03-11  Pavlo Denysov  <paul.kiev+savannah@gmail.com>
++
++	Fix CMake issues for iOS (patch #8941).
++
++	* CMakeLists.txt (CMAKE_TOOLCHAIN_FILE): Fix directory.
++	* builds/cmake/iOS.cmake: No longer enforce gcc.
++
++2016-03-09  Behdad Esfahbod  <behdad@behdad.org>
++
++	[truetype] Fix handling of non-intermediate GX tuples.
++
++	We probably did not notice this as all fonts we tested had only
++	tuple_coords[i] be +1 or -1 for non-intermediate tuples.
++
++	* src/truetype/ttgxvar.c (ft_var_apply_tuple): Implement it.
++
++2016-03-06  Alexei Podtelezhnikov  <apodtele@gmail.com>
++
++	[base] Refuse to render enormous outlines (#47114).
++
++	The goal is to avoid integer overflows in the rendering algorithms.
++	The limit is chosen arbitrarily at some 2^18 pixels, which should be
++	enough for modern devices including printers.
++
++	* src/base/ftoutln.c (FT_Outline_Render): Check CBox and reject
++	enormous outlines.
++
++2016-03-06  Alexei Podtelezhnikov  <apodtele@gmail.com>
++
++	[smooth] Replace left shifts with multiplications (#47114).
++
++	* src/smooth/ftgrays.c (SUBPIXELS, UPSCALE, DOWNSCALE): Do it.
++
++2016-03-05  Werner Lemberg  <wl@gnu.org>
++
++	[autofit] Avoid excessive stem length rounding (#25392).
++
++	* src/autofit/aflatin.c (af_latin_compute_stem_width): Add argument
++	to pass difference between hinted and unhinted position of base
++	point; use this to adjust the stem width depending on the PPEM so
++	that it doesn't become too large under certain circumstances.
++	Update all callers using value 0 for this argument except...
++	(af_latin_align_linked_edge): Pass position delta of base point to
++	`af_latin_compute_stem_width'.
++
++2016-03-05  J Raynor <jxraynor@gmail.com>
++
++	Make FreeType compile on AIX out of the box.
++
++	* builds/unix/configure.raw (XX_ANSIFLAGS): Don't use `-ansi' on
++	AIX.
++
++2016-03-01  Werner Lemberg  <wl@gnu.org>
++	    Kostya Serebryany  <kcc@google.com>
++
++	[ftfuzzer] Add unit for testing smooth and black rasterizers.
++
++	* src/tools/ftfuzzer/rasterfuzzer.cc: New file.
++
++2016-03-01  Werner Lemberg  <wl@gnu.org>
++
++	[autofit] Fix reallocation error introduced in 2016-02-27 (#47310).
++
++	* src/autofit/aflatin.c (af_latin_hints_compute_segments): Reassign
++	`prev_segment' after reallocation.
++
++2016-03-01  Werner Lemberg  <wl@gnu.org>
++
++	Fix clang warnings.
++
++	* src/autofit/aflatin.c (af_latin_hints_compute_segments): Use
++	FT_UShort for `min_flags' and `max_flags'.
++	Initialize `prev_*' variables.
++
++	* src/cff/cffobjs.c (cff_face_init) [FT_DEBUG_LEVEL_TRACE]: Fix
++	types of local variables.
++
++	* src/smooth/ftgrays.c (gray_dump_cells) [FT_DEBUG_LEVEL_TRACE]:
++	Update `printf' format string.
++
++	* src/tools/ftfuzzer/ftfuzzer.cc (setIntermediateAxis): Add cast.
++	(LLVMFuzzerTestOneInput): Fix loop type.
++
++2016-02-29  Werner Lemberg  <wl@gnu.org>
++
++	[autofit] Add blue-zone support for Sinhala script.
++
++	This essentially moves the Sinhala script from the `Indic' hinter to
++	the `Latin' hinter.
++
++	* src/autofit/afblue.dat: Add blue zone data for Sinhala.
++
++	* src/autofit/afblue.c, src/autofit/afblue.h: Regenerated.
++
++	* src/autofit/afscript.h: Add Sinhala standard character and move data
++	out of AF_CONFIG_OPTION_INDIC block.
++
++	* src/autofit/afranges.c: Move Sinhala data out of
++	AF_CONFIG_OPTION_INDIC block.
++
++	* src/autofit/afstyles.h: Update Sinhala data; in particular, use
++	AF_WRITING_SYSTEM_LATIN.
++
++2016-02-27  Werner Lemberg  <wl@gnu.org>
++
++	[autofit] Properly handle spikes pointing to the x-axis.
++
++	An example that gets better rendered is glyph `uusignTaml' (glyph
++	index 2286) in font `FreeSerif.ttf' (Version 0412.2263) at 22ppem.
++
++	* src/autofit/aflatin.c (af_latin_hints_compute_segments): Properly
++	handle segments where the last point of the first segment is
++	identical to the first point in the second one.  This can happen for
++	malformed fonts or spikes.  We either merge the new segment with the
++	previous one (both segments point into the same direction), or we
++	discard the shorter segment if they point into different directions.
++
++2016-02-27  Werner Lemberg  <wl@gnu.org>
++
++	[autofit] Minor code clean-up.
++
++	* src/autofit/aflatin.c (af_latin_hints_compute_segments): Change
++	some local variable names to better differentiate between values
++	along a segment and values orthogonal to it.
++
++2016-02-26  Werner Lemberg  <wl@gnu.org>
++
++	[autofit] Improve BOUND action.
++
++	In complex glyph shapes, the original logic was too simple to cater
++	for situations that would actually need something similar to PS Hint
++	masks.  This fix should alleviate the worst cases.
++
++	* src/autofit/aflatin.c (af_latin_hint_edges): Don't allow
++	complete disappearance of stems.
++
++2016-02-25  Werner Lemberg  <wl@gnu.org>
++
++	[autofit] Add blue-zone support for Tamil script.
++
++	This essentially moves the Tamil script from the `Indic' hinter to
++	the `Latin' hinter.
++
++	* src/autofit/afblue.dat: Add blue zone data for Tamil.
++
++	* src/autofit/afblue.c, src/autofit/afblue.h: Regenerated.
++
++	* src/autofit/afscript.h: Add Tamil standard character and move data
++	out of AF_CONFIG_OPTION_INDIC block.
++
++	* src/autofit/afranges.c: Move Tamil data out of
++	AF_CONFIG_OPTION_INDIC block.
++
++	* src/autofit/afstyles.h: Update Tamil data; in particular, use
++	AF_WRITING_SYSTEM_LATIN.
++
++2016-02-18  Werner Lemberg  <wl@gnu.org>
++
++	[autofit] Add blue-zone support for Malayalam script.
++
++	This essentially moves the Malayalam script from the `Indic' hinter
++	to the `Latin' hinter.
++
++	* src/autofit/afblue.dat: Add blue zone data for Malayalam.
++
++	* src/autofit/afblue.c, src/autofit/afblue.h: Regenerated.
++
++	* src/autofit/afscript.h: Add Malayalam standard characters and move
++	data out of AF_CONFIG_OPTION_INDIC block.
++
++	* src/autofit/afranges.c: Move Malayalam data out of
++	AF_CONFIG_OPTION_INDIC block.
++
++	* src/autofit/afstyles.h: Update Malayalam data; in particular, use
++	AF_WRITING_SYSTEM_LATIN.
++
++2016-02-16  Alexei Podtelezhnikov  <apodtele@gmail.com>
++
++	[smooth] Fix integer overflow (#47114).
++
++	* src/smooth/ftgrays.c (TArea): Make it unconditionally `long'.
++
++2016-02-15  Werner Lemberg  <wl@gnu.org>
++
++	* src/cff/cffparse.c (cff_parse_multiple_master): Improve tracing.
++
++2016-02-15  Werner Lemberg  <wl@gnu.org>
++
++	[cff] Handle T2 operator only with old CFF engine (#47157).
++
++	* src/cff/cffparse.c (cff_parser_run) <opcode 31>: Enclose with
++	#ifdef CFF_CONFIG_OPTION_OLD_ENGINE...#endif.
++
++2016-02-15  Werner Lemberg  <wl@gnu.org>
++
++	[cff] Partially handle `load' and `store' ops in old CFF engine.
++
++	Now all glyphs of MM CFFs like `ITCGaramondMM-It.otf' can be
++	displayed.
++
++	* src/cff/cffgload.c (cff_decoder_parse_charstrings) <cff_op_store,
++	cff_op_load>: Partially implement it.
++
++	* src/cff/cffparse.c (cff_parser_init): Add new parameter to pass
++	the number of Multiple Master axes.
++	Update all callers.
++	(cff_parse_multiple_master): Get number of axes.
++	(cff_parser_run) <opcode 31>: Updated.
++	* src/cff/cffparse.h: Updated.
++	(CFF_ParserRec): Add `num_axes' field.
++
++	* src/cff/cffload.c: Updated.
++
++	* src/cff/cfftypes.h (CFF_FontRecDictRec): Add `num_axes' field.
++
++2016-02-15  Werner Lemberg  <wl@gnu.org>
++
++	[cff] Correctly trace SIDs that contain NULL bytes.
++
++	We need this to properly trace Multiple Master CFFs, which contain
++	two SIDs that are charstrings.
++
++	This commit makes FreeType also show the last SID, omitted
++	previously due to a bug.
++
++	* src/cff/cfftypes.h (CFF_FontRec): Add `string_pool_size' field.
++
++	* src/cff/cffload.c (cff_index_get_pointers): Add argument to return
++	the pool size.
++	Update all callers.
++
++	* src/cff/cffobjs.c (cff_face_init) [FT_DEBUG_LEVEL_TRACE]: Directly
++	access `cff->strings' to display the non-default strings.
++
++2016-02-14  Werner Lemberg  <wl@gnu.org>
++
++	* src/base/fthash.c: Include FT_INTERNAL_MEMORY_H.
++
++2016-02-14  Werner Lemberg  <wl@gnu.org>
++
++	* src/cff/cffparse.c: Include `cffgload.h'.
++
++	Problem reported by Colin Walters <walters@verbum.org>.
++
++2016-02-14  Werner Lemberg  <wl@gnu.org>
++
++	[cff] Make old CFF engine show MM CFFs (without variations).
++
++	The new code only displays the first master in the font.
++
++	* src/cff/cffgload.c (cff_decode_parse_charstrings): Add new
++	parameter to allow function calls from dictionaries also.
++	<cff_op_blend>: Partially implement it.
++	Update all callers.
++	* src/cff/cffgload.h: Updated.
++
++	* src/cff/cffparse.c (cff_parser_init): Add new parameter to pass the
++	number of Multiple Master designs.
++	Update all callers.
++	(cff_parse_multiple_master): New function to rudimentarily parse
++	operator.
++	(cff_parser_run): Handle `T2' operator.
++	* src/cff/cffparse.h: Updated.
++	(CFF_ParserRec): Add `num_designs' field.
++
++	* src/cff/cffload.c: Updated.
++
++	* src/cff/cfftoken.h: Handle `MultipleMaster' operator.
++
++	* src/cff/cfftypes.h (CFF_FontRecDictRec): Add `num_designs' field.
++
++	* src/sfnt/sfobjs.c (sfnt_init_face): Don't handle `fvar' table for
++	MM CFFs.
++
++2016-02-09  Werner Lemberg  <wl@gnu.org>
++
++	[docmaker] Don't emit trailing newlines.
++
++	* src/tools/docmaker/tohtml.py (HtmlFormatter::make_html_code):
++	Use `rstrip'.
++
+ 2016-02-07  Werner Lemberg  <wl@gnu.org>
+ 
+ 	* Version 2.6.3 released.
+diff --git a/builds/cmake/iOS.cmake b/builds/cmake/iOS.cmake
+index 9fb20c0..378dbd8 100644
+--- a/builds/cmake/iOS.cmake
++++ b/builds/cmake/iOS.cmake
+@@ -85,11 +85,6 @@ if (CMAKE_UNAME)
+     DARWIN_MAJOR_VERSION "${CMAKE_HOST_SYSTEM_VERSION}")
+ endif (CMAKE_UNAME)
+ 
+-# force the compilers to gcc for iOS
+-include(CMakeForceCompiler)
+-CMAKE_FORCE_C_COMPILER(gcc gcc)
+-CMAKE_FORCE_CXX_COMPILER(g++ g++)
+-
+ # skip the platform compiler checks for cross compiling
+ set(CMAKE_CXX_COMPILER_WORKS TRUE)
+ set(CMAKE_C_COMPILER_WORKS TRUE)
+diff --git a/builds/unix/configure.raw b/builds/unix/configure.raw
+index 1be10a3..e6fd748 100644
+--- a/builds/unix/configure.raw
++++ b/builds/unix/configure.raw
+@@ -15,7 +15,7 @@ AC_INIT([FreeType], [@VERSION@], [freetype@nongnu.org], [freetype])
+ AC_CONFIG_SRCDIR([ftconfig.in])
+ 
+ 
+-# Don't forget to update docs/VERSION.DLL!
++# Don't forget to update `docs/VERSIONS.TXT'!
+ 
+ version_info='18:3:12'
+ AC_SUBST([version_info])
+@@ -235,6 +235,9 @@ if test "x$GCC" = xyes; then
+   *-*-mingw*)
+     XX_ANSIFLAGS="-pedantic"
+     ;;
++  *-*-aix*)
++    XX_ANSIFLAGS="-pedantic"
++    ;;
+   *)
+     GCC_VERSION=`$CC -dumpversion`
+     GCC_MAJOR=`echo "$GCC_VERSION" | sed 's/\([[^.]][[^.]]*\).*/\1/'`
+diff --git a/docs/VERSION.DLL b/docs/VERSION.DLL
+deleted file mode 100644
+index 804c2f2..0000000
+--- a/docs/VERSION.DLL
++++ /dev/null
+@@ -1,119 +0,0 @@
+-Due  to our  use of  `libtool' to  generate and  install the  FreeType 2
+-libraries on  Unix systems, as  well as  other historical events,  it is
+-generally very  difficult to  know precisely which  release of  the font
+-engine is installed on a given system.
+-
+-This file tries  to explain why and to document  ways to properly detect
+-FreeType on Unix.
+-
+-
+-1. Version and Release numbers
+-------------------------------
+-
+-For each new  public release of FreeType 2, there  are generally *three*
+-distinct `version' numbers to consider:
+-
+-  * The official FreeType 2 release number, like 2.3.1 or 2.4.10.
+-
+-  * The libtool (and  Unix) specific version number,  like 13.0.7.  This
+-    is what `freetype-config --version' returns.
+-
+-  * The platform-specific  shared object  number, used for  example when
+-    the library is installed as `/usr/lib/libfreetype.so.6.7.1'.
+-
+-The platform-specific  number is, unsurprisingly,  platform-specific and
+-varies  with the  operating system  you are  using (several  variants of
+-Linux, FreeBSD,  Solaris, etc.).  You  should thus _never_ use  it, even
+-for simple tests.
+-
+-The libtool-specific  number does  not equal the  release number  but is
+-tied to it.
+-
+-The release number is available  at *compile* time through the following
+-macros defined in FT_FREETYPE_H:
+-
+-  - FREETYPE_MAJOR: major release number
+-  - FREETYPE_MINOR: minor release number
+-  - FREETYPE_PATCH: patch release number
+-
+-See below for a small autoconf fragment.
+-
+-The  release  number   is  also  available  at   *runtime*  through  the
+-`FT_Library_Version' API.
+-
+-
+-2. History
+-----------
+-
+-The  following   table  gives,  for   all  releases  since   2.4.0,  the
+-corresponding libtool number, as well  as the shared object number found
+-on _most_ systems, but not all of them:
+-
+-
+-    release     libtool     so
+-  -------------------------------
+-     2.6.3      18.3.12   6.12.3
+-     2.6.2      18.2.12   6.12.2
+-     2.6.1      18.1.12   6.12.1
+-     2.6.0      18.0.12   6.12.0
+-     2.5.5      17.4.11   6.11.4
+-     2.5.4      17.3.11   6.11.3
+-     2.5.3      17.2.11   6.11.2
+-     2.5.2      17.1.11   6.11.1
+-     2.5.1      17.0.11   6.11.0
+-     2.5.0      16.2.10   6.10.2
+-     2.4.12     16.1.10   6.10.1
+-     2.4.11     16.0.10   6.10.0
+-     2.4.10     15.0.9    6.9.0
+-     2.4.9      14.1.8    6.8.1
+-     2.4.8      14.0.8    6.8.0
+-     2.4.7      13.2.7    6.7.2
+-     2.4.6      13.1.7    6.7.1
+-     2.4.5      13.0.7    6.7.0
+-     2.4.4      12.2.6    6.6.2
+-     2.4.3      12.1.6    6.6.1
+-     2.4.2      12.0.6    6.6.0
+-     2.4.1      11.1.5    6.5.1
+-     2.4.0      11.0.5    6.5.0
+-
+-
+-3. Autoconf Code Fragment
+--------------------------
+-
+-Lars Clausen contributed the following autoconf fragment to detect which
+-version of  FreeType is  installed on  a system.  This  one tests  for a
+-version that  is at least 2.0.9;  you should change it  to check against
+-other release numbers.
+-
+-
+-  AC_MSG_CHECKING([whether FreeType version is 2.0.9 or higher])
+-  old_CPPFLAGS="$CPPFLAGS"
+-  CPPFLAGS=`freetype-config --cflags`
+-  AC_TRY_CPP([
+-
+-#include <ft2build.h>
+-#include FT_FREETYPE_H
+-#if (FREETYPE_MAJOR*1000 + FREETYPE_MINOR)*1000 + FREETYPE_PATCH < 2000009
+-#error Freetype version too low.
+-#endif
+-  ],
+-  [AC_MSG_RESULT(yes)
+-   FREETYPE_LIBS=`freetype-config --libs`
+-   AC_SUBST(FREETYPE_LIBS)
+-   AC_DEFINE(HAVE_FREETYPE,1,[Define if you have the FreeType2 library])
+-   CPPFLAGS="$old_CPPFLAGS"],
+-  [AC_MSG_ERROR([Need FreeType library version 2.0.9 or higher])])
+-
+-------------------------------------------------------------------------
+-
+-Copyright 2002-2016 by
+-David Turner, Robert Wilhelm, and Werner Lemberg.
+-
+-This  file is  part  of the  FreeType  project, and  may  only be  used,
+-modified,  and  distributed under  the  terms  of  the FreeType  project
+-license, LICENSE.TXT.  By continuing  to use, modify, or distribute this
+-file  you indicate that  you have  read the  license and  understand and
+-accept it fully.
+-
+-
+---- end of VERSION.DLL ---
+diff --git a/docs/VERSIONS.TXT b/docs/VERSIONS.TXT
+new file mode 100644
+index 0000000..e2c72bc
+--- /dev/null
++++ b/docs/VERSIONS.TXT
+@@ -0,0 +1,119 @@
++Due  to our  use of  `libtool' to  generate and  install the  FreeType 2
++libraries on  Unix systems, as  well as  other historical events,  it is
++generally very  difficult to  know precisely which  release of  the font
++engine is installed on a given system.
++
++This file tries  to explain why and to document  ways to properly detect
++FreeType on Unix.
++
++
++1. Version and Release numbers
++------------------------------
++
++For each new  public release of FreeType 2, there  are generally *three*
++distinct `version' numbers to consider:
++
++  * The official FreeType 2 release number, like 2.3.1 or 2.4.10.
++
++  * The libtool (and  Unix) specific version number,  like 13.0.7.  This
++    is what `freetype-config --version' returns.
++
++  * The platform-specific  shared object  number, used for  example when
++    the library is installed as `/usr/lib/libfreetype.so.6.7.1'.
++
++The platform-specific  number is, unsurprisingly,  platform-specific and
++varies  with the  operating system  you are  using (several  variants of
++Linux, FreeBSD,  Solaris, etc.).  You  should thus _never_ use  it, even
++for simple tests.
++
++The libtool-specific  number does  not equal the  release number  but is
++tied to it.
++
++The release number is available  at *compile* time through the following
++macros defined in FT_FREETYPE_H:
++
++  - FREETYPE_MAJOR: major release number
++  - FREETYPE_MINOR: minor release number
++  - FREETYPE_PATCH: patch release number
++
++See below for a small autoconf fragment.
++
++The  release  number   is  also  available  at   *runtime*  through  the
++`FT_Library_Version' API.
++
++
++2. History
++----------
++
++The  following   table  gives,  for   all  releases  since   2.4.0,  the
++corresponding libtool number, as well  as the shared object number found
++on _most_ systems, but not all of them:
++
++
++    release     libtool     so
++  -------------------------------
++     2.6.3      18.3.12   6.12.3
++     2.6.2      18.2.12   6.12.2
++     2.6.1      18.1.12   6.12.1
++     2.6.0      18.0.12   6.12.0
++     2.5.5      17.4.11   6.11.4
++     2.5.4      17.3.11   6.11.3
++     2.5.3      17.2.11   6.11.2
++     2.5.2      17.1.11   6.11.1
++     2.5.1      17.0.11   6.11.0
++     2.5.0      16.2.10   6.10.2
++     2.4.12     16.1.10   6.10.1
++     2.4.11     16.0.10   6.10.0
++     2.4.10     15.0.9    6.9.0
++     2.4.9      14.1.8    6.8.1
++     2.4.8      14.0.8    6.8.0
++     2.4.7      13.2.7    6.7.2
++     2.4.6      13.1.7    6.7.1
++     2.4.5      13.0.7    6.7.0
++     2.4.4      12.2.6    6.6.2
++     2.4.3      12.1.6    6.6.1
++     2.4.2      12.0.6    6.6.0
++     2.4.1      11.1.5    6.5.1
++     2.4.0      11.0.5    6.5.0
++
++
++3. Autoconf Code Fragment
++-------------------------
++
++Lars Clausen contributed the following autoconf fragment to detect which
++version of  FreeType is  installed on  a system.  This  one tests  for a
++version that  is at least 2.0.9;  you should change it  to check against
++other release numbers.
++
++
++  AC_MSG_CHECKING([whether FreeType version is 2.0.9 or higher])
++  old_CPPFLAGS="$CPPFLAGS"
++  CPPFLAGS=`freetype-config --cflags`
++  AC_TRY_CPP([
++
++#include <ft2build.h>
++#include FT_FREETYPE_H
++#if (FREETYPE_MAJOR*1000 + FREETYPE_MINOR)*1000 + FREETYPE_PATCH < 2000009
++#error Freetype version too low.
++#endif
++  ],
++  [AC_MSG_RESULT(yes)
++   FREETYPE_LIBS=`freetype-config --libs`
++   AC_SUBST(FREETYPE_LIBS)
++   AC_DEFINE(HAVE_FREETYPE,1,[Define if you have the FreeType2 library])
++   CPPFLAGS="$old_CPPFLAGS"],
++  [AC_MSG_ERROR([Need FreeType library version 2.0.9 or higher])])
++
++------------------------------------------------------------------------
++
++Copyright 2002-2016 by
++David Turner, Robert Wilhelm, and Werner Lemberg.
++
++This  file is  part  of the  FreeType  project, and  may  only be  used,
++modified,  and  distributed under  the  terms  of  the FreeType  project
++license, LICENSE.TXT.  By continuing  to use, modify, or distribute this
++file  you indicate that  you have  read the  license and  understand and
++accept it fully.
++
++
++--- end of VERSIONS.TXT ---
+diff --git a/docs/release b/docs/release
+index 3d66762..fc03a50 100644
+--- a/docs/release
++++ b/docs/release
+@@ -13,7 +13,7 @@ How to prepare a new release
+ 
+ . README: Update.
+ 
+-. docs/VERSION.DLL: Document changed `version_info'.
++. docs/VERSIONS.TXT: Document changed `version_info'.
+ 
+ . ChangeLog:   Announce  new  release   (both  in  the  freetype2  and
+   freetype2-demos modules).
+diff --git a/src/autofit/afblue.c b/src/autofit/afblue.c
+index 7d9646c..55704ea 100644
+--- a/src/autofit/afblue.c
++++ b/src/autofit/afblue.c
+@@ -128,6 +128,10 @@
+     '\0',
+     '\xE1', '\xB5', '\x96', ' ', '\xCA', '\xB8', ' ', '\xE1', '\xB5', '\x8D',  /* ᵖ ʸ ᵍ */
+     '\0',
++    '\xE0', '\xB4', '\x92', ' ', '\xE0', '\xB4', '\x9F', ' ', '\xE0', '\xB4', '\xA0', ' ', '\xE0', '\xB4', '\xB1', ' ', '\xE0', '\xB4', '\x9A', ' ', '\xE0', '\xB4', '\xAA', ' ', '\xE0', '\xB4', '\x9A', '\xE0', '\xB5', '\x8D', '\xE0', '\xB4', '\x9A', ' ', '\xE0', '\xB4', '\xAA', '\xE0', '\xB5', '\x8D', '\xE0', '\xB4', '\xAA',  /* ഒ ട ഠ റ ച പ ച്ച പ്പ */
++    '\0',
++    '\xE0', '\xB4', '\x9F', ' ', '\xE0', '\xB4', '\xA0', ' ', '\xE0', '\xB4', '\xA7', ' ', '\xE0', '\xB4', '\xB6', ' ', '\xE0', '\xB4', '\x98', ' ', '\xE0', '\xB4', '\x9A', ' ', '\xE0', '\xB4', '\xA5', ' ', '\xE0', '\xB4', '\xB2',  /* ട ഠ ധ ശ ഘ ച ഥ ല */
++    '\0',
+     '\xE1', '\x80', '\x81', ' ', '\xE1', '\x80', '\x82', ' ', '\xE1', '\x80', '\x84', ' ', '\xE1', '\x80', '\x92', ' ', '\xE1', '\x80', '\x9D', ' ', '\xE1', '\x81', '\xA5', ' ', '\xE1', '\x81', '\x8A', ' ', '\xE1', '\x81', '\x8B',  /* ခ ဂ င ဒ ဝ ၥ ၊ ။ */
+     '\0',
+     '\xE1', '\x80', '\x84', ' ', '\xE1', '\x80', '\x8E', ' ', '\xE1', '\x80', '\x92', ' ', '\xE1', '\x80', '\x95', ' ', '\xE1', '\x80', '\x97', ' ', '\xE1', '\x80', '\x9D', ' ', '\xE1', '\x81', '\x8A', ' ', '\xE1', '\x81', '\x8B',  /* င ဎ ဒ ပ ဗ ဝ ၊ ။ */
+@@ -136,6 +140,16 @@
+     '\0',
+     '\xE1', '\x80', '\x89', ' ', '\xE1', '\x80', '\x8A', ' ', '\xE1', '\x80', '\xA5', ' ', '\xE1', '\x80', '\xA9', ' ', '\xE1', '\x80', '\xA8', ' ', '\xE1', '\x81', '\x82', ' ', '\xE1', '\x81', '\x85', ' ', '\xE1', '\x81', '\x89',  /* ဉ ည ဥ ဩ ဨ ၂ ၅ ၉ */
+     '\0',
++    '\xE0', '\xB6', '\x89', ' ', '\xE0', '\xB6', '\x9A', ' ', '\xE0', '\xB6', '\x9D', ' ', '\xE0', '\xB6', '\xB3', ' ', '\xE0', '\xB6', '\xB4', ' ', '\xE0', '\xB6', '\xBA', ' ', '\xE0', '\xB6', '\xBD', ' ', '\xE0', '\xB7', '\x86',  /* ඉ ක ඝ ඳ ප ය ල ෆ */
++    '\0',
++    '\xE0', '\xB6', '\x91', ' ', '\xE0', '\xB6', '\x94', ' ', '\xE0', '\xB6', '\x9D', ' ', '\xE0', '\xB6', '\xA2', ' ', '\xE0', '\xB6', '\xA7', ' ', '\xE0', '\xB6', '\xAE', ' ', '\xE0', '\xB6', '\xB0', ' ', '\xE0', '\xB6', '\xBB',  /* එ ඔ ඝ ජ ට ථ ධ ර */
++    '\0',
++    '\xE0', '\xB6', '\xAF', ' ', '\xE0', '\xB6', '\xB3', ' ', '\xE0', '\xB6', '\x8B', ' ', '\xE0', '\xB6', '\xBD', ' ', '\xE0', '\xB6', '\xAD', '\xE0', '\xB7', '\x96', ' ', '\xE0', '\xB6', '\xAD', '\xE0', '\xB7', '\x94', ' ', '\xE0', '\xB6', '\xB6', '\xE0', '\xB7', '\x94', ' ', '\xE0', '\xB6', '\xAF', '\xE0', '\xB7', '\x94',  /* ද ඳ උ ල තූ තු බු දු */
++    '\0',
++    '\xE0', '\xAE', '\x89', ' ', '\xE0', '\xAE', '\x92', ' ', '\xE0', '\xAE', '\x93', ' ', '\xE0', '\xAE', '\xB1', ' ', '\xE0', '\xAE', '\x88', ' ', '\xE0', '\xAE', '\x95', ' ', '\xE0', '\xAE', '\x99', ' ', '\xE0', '\xAE', '\x9A',  /* உ ஒ ஓ ற ஈ க ங ச */
++    '\0',
++    '\xE0', '\xAE', '\x95', ' ', '\xE0', '\xAE', '\x9A', ' ', '\xE0', '\xAE', '\xB2', ' ', '\xE0', '\xAE', '\xB6', ' ', '\xE0', '\xAE', '\x89', ' ', '\xE0', '\xAE', '\x99', ' ', '\xE0', '\xAE', '\x9F', ' ', '\xE0', '\xAE', '\xAA',  /* க ச ல ஶ உ ங ட ப */
++    '\0',
+     '\xE0', '\xB0', '\x87', ' ', '\xE0', '\xB0', '\x8C', ' ', '\xE0', '\xB0', '\x99', ' ', '\xE0', '\xB0', '\x9E', ' ', '\xE0', '\xB0', '\xA3', ' ', '\xE0', '\xB0', '\xB1', ' ', '\xE0', '\xB1', '\xAF',  /* ఇ ఌ ఙ ఞ ణ ఱ ౯ */
+     '\0',
+     '\xE0', '\xB0', '\x85', ' ', '\xE0', '\xB0', '\x95', ' ', '\xE0', '\xB0', '\x9A', ' ', '\xE0', '\xB0', '\xB0', ' ', '\xE0', '\xB0', '\xBD', ' ', '\xE0', '\xB1', '\xA8', ' ', '\xE0', '\xB1', '\xAC',  /* అ క చ ర ఽ ౨ ౬ */
+@@ -287,12 +301,22 @@
+     { AF_BLUE_STRING_LATIN_SUPS_SMALL,           0                                 },
+     { AF_BLUE_STRING_LATIN_SUPS_SMALL_DESCENDER, 0                                 },
+     { AF_BLUE_STRING_MAX,                        0                                 },
++    { AF_BLUE_STRING_MALAYALAM_TOP,    AF_BLUE_PROPERTY_LATIN_TOP },
++    { AF_BLUE_STRING_MALAYALAM_BOTTOM, 0                          },
++    { AF_BLUE_STRING_MAX,              0                          },
+     { AF_BLUE_STRING_MYANMAR_TOP,       AF_BLUE_PROPERTY_LATIN_TOP      |
+                                         AF_BLUE_PROPERTY_LATIN_X_HEIGHT   },
+     { AF_BLUE_STRING_MYANMAR_BOTTOM,    0                                 },
+     { AF_BLUE_STRING_MYANMAR_ASCENDER,  AF_BLUE_PROPERTY_LATIN_TOP        },
+     { AF_BLUE_STRING_MYANMAR_DESCENDER, 0                                 },
+     { AF_BLUE_STRING_MAX,               0                                 },
++    { AF_BLUE_STRING_SINHALA_TOP,       AF_BLUE_PROPERTY_LATIN_TOP },
++    { AF_BLUE_STRING_SINHALA_BOTTOM,    0                          },
++    { AF_BLUE_STRING_SINHALA_DESCENDER, 0                          },
++    { AF_BLUE_STRING_MAX,               0                          },
++    { AF_BLUE_STRING_TAMIL_TOP,    AF_BLUE_PROPERTY_LATIN_TOP },
++    { AF_BLUE_STRING_TAMIL_BOTTOM, 0                          },
++    { AF_BLUE_STRING_MAX,          0                          },
+     { AF_BLUE_STRING_TELUGU_TOP,    AF_BLUE_PROPERTY_LATIN_TOP },
+     { AF_BLUE_STRING_TELUGU_BOTTOM, 0                          },
+     { AF_BLUE_STRING_MAX,           0                          },
+diff --git a/src/autofit/afblue.dat b/src/autofit/afblue.dat
+index 9a7757c..9ef2f79 100644
+--- a/src/autofit/afblue.dat
++++ b/src/autofit/afblue.dat
+@@ -200,6 +200,11 @@ AF_BLUE_STRING_ENUM AF_BLUE_STRINGS_ARRAY AF_BLUE_STRING_MAX_LEN:
+   AF_BLUE_STRING_LATIN_SUPS_SMALL_DESCENDER
+     "ᵖ ʸ ᵍ"
+ 
++  AF_BLUE_STRING_MALAYALAM_TOP
++    "ഒ ട ഠ റ ച പ ച്ച പ്പ"
++  AF_BLUE_STRING_MALAYALAM_BOTTOM
++    "ട ഠ ധ ശ ഘ ച ഥ ല"
++
+   AF_BLUE_STRING_MYANMAR_TOP
+     "ခ ဂ င ဒ ဝ ၥ ၊ ။"
+   AF_BLUE_STRING_MYANMAR_BOTTOM
+@@ -209,6 +214,18 @@ AF_BLUE_STRING_ENUM AF_BLUE_STRINGS_ARRAY AF_BLUE_STRING_MAX_LEN:
+   AF_BLUE_STRING_MYANMAR_DESCENDER
+     "ဉ ည ဥ ဩ ဨ ၂ ၅ ၉"
+ 
++  AF_BLUE_STRING_SINHALA_TOP
++    "ඉ ක ඝ ඳ ප ය ල ෆ"
++  AF_BLUE_STRING_SINHALA_BOTTOM
++    "එ ඔ ඝ ජ ට ථ ධ ර"
++  AF_BLUE_STRING_SINHALA_DESCENDER
++    "ද ඳ උ ල තූ තු බු දු"
++
++  AF_BLUE_STRING_TAMIL_TOP
++    "உ ஒ ஓ ற ஈ க ங ச"
++  AF_BLUE_STRING_TAMIL_BOTTOM
++    "க ச ல ஶ உ ங ட ப"
++
+   AF_BLUE_STRING_TELUGU_TOP
+     "ఇ ఌ ఙ ఞ ణ ఱ ౯"
+   AF_BLUE_STRING_TELUGU_BOTTOM
+@@ -504,6 +521,11 @@ AF_BLUE_STRINGSET_ENUM AF_BLUE_STRINGSETS_ARRAY AF_BLUE_STRINGSET_MAX_LEN:
+     { AF_BLUE_STRING_LATIN_SUPS_SMALL_DESCENDER, 0                                 }
+     { AF_BLUE_STRING_MAX,                        0                                 }
+ 
++  AF_BLUE_STRINGSET_MLYM
++    { AF_BLUE_STRING_MALAYALAM_TOP,    AF_BLUE_PROPERTY_LATIN_TOP }
++    { AF_BLUE_STRING_MALAYALAM_BOTTOM, 0                          }
++    { AF_BLUE_STRING_MAX,              0                          }
++
+   AF_BLUE_STRINGSET_MYMR
+     { AF_BLUE_STRING_MYANMAR_TOP,       AF_BLUE_PROPERTY_LATIN_TOP      |
+                                         AF_BLUE_PROPERTY_LATIN_X_HEIGHT   }
+@@ -512,6 +534,17 @@ AF_BLUE_STRINGSET_ENUM AF_BLUE_STRINGSETS_ARRAY AF_BLUE_STRINGSET_MAX_LEN:
+     { AF_BLUE_STRING_MYANMAR_DESCENDER, 0                                 }
+     { AF_BLUE_STRING_MAX,               0                                 }
+ 
++  AF_BLUE_STRINGSET_SINH
++    { AF_BLUE_STRING_SINHALA_TOP,       AF_BLUE_PROPERTY_LATIN_TOP }
++    { AF_BLUE_STRING_SINHALA_BOTTOM,    0                          }
++    { AF_BLUE_STRING_SINHALA_DESCENDER, 0                          }
++    { AF_BLUE_STRING_MAX,               0                          }
++
++  AF_BLUE_STRINGSET_TAML
++    { AF_BLUE_STRING_TAMIL_TOP,    AF_BLUE_PROPERTY_LATIN_TOP }
++    { AF_BLUE_STRING_TAMIL_BOTTOM, 0                          }
++    { AF_BLUE_STRING_MAX,          0                          }
++
+   AF_BLUE_STRINGSET_TELU
+     { AF_BLUE_STRING_TELUGU_TOP,    AF_BLUE_PROPERTY_LATIN_TOP }
+     { AF_BLUE_STRING_TELUGU_BOTTOM, 0                          }
+diff --git a/src/autofit/afblue.h b/src/autofit/afblue.h
+index 75cd6c3..832b685 100644
+--- a/src/autofit/afblue.h
++++ b/src/autofit/afblue.h
+@@ -128,20 +128,27 @@ FT_BEGIN_HEADER
+     AF_BLUE_STRING_LATIN_SUPS_SMALL_F_TOP = 1146,
+     AF_BLUE_STRING_LATIN_SUPS_SMALL = 1172,
+     AF_BLUE_STRING_LATIN_SUPS_SMALL_DESCENDER = 1197,
+-    AF_BLUE_STRING_MYANMAR_TOP = 1208,
+-    AF_BLUE_STRING_MYANMAR_BOTTOM = 1240,
+-    AF_BLUE_STRING_MYANMAR_ASCENDER = 1272,
+-    AF_BLUE_STRING_MYANMAR_DESCENDER = 1300,
+-    AF_BLUE_STRING_TELUGU_TOP = 1332,
+-    AF_BLUE_STRING_TELUGU_BOTTOM = 1360,
+-    AF_BLUE_STRING_THAI_TOP = 1388,
+-    AF_BLUE_STRING_THAI_BOTTOM = 1412,
+-    AF_BLUE_STRING_THAI_ASCENDER = 1440,
+-    AF_BLUE_STRING_THAI_LARGE_ASCENDER = 1452,
+-    AF_BLUE_STRING_THAI_DESCENDER = 1464,
+-    AF_BLUE_STRING_THAI_LARGE_DESCENDER = 1480,
+-    AF_BLUE_STRING_THAI_DIGIT_TOP = 1488,
+-    af_blue_1_1 = 1499,
++    AF_BLUE_STRING_MALAYALAM_TOP = 1208,
++    AF_BLUE_STRING_MALAYALAM_BOTTOM = 1252,
++    AF_BLUE_STRING_MYANMAR_TOP = 1284,
++    AF_BLUE_STRING_MYANMAR_BOTTOM = 1316,
++    AF_BLUE_STRING_MYANMAR_ASCENDER = 1348,
++    AF_BLUE_STRING_MYANMAR_DESCENDER = 1376,
++    AF_BLUE_STRING_SINHALA_TOP = 1408,
++    AF_BLUE_STRING_SINHALA_BOTTOM = 1440,
++    AF_BLUE_STRING_SINHALA_DESCENDER = 1472,
++    AF_BLUE_STRING_TAMIL_TOP = 1516,
++    AF_BLUE_STRING_TAMIL_BOTTOM = 1548,
++    AF_BLUE_STRING_TELUGU_TOP = 1580,
++    AF_BLUE_STRING_TELUGU_BOTTOM = 1608,
++    AF_BLUE_STRING_THAI_TOP = 1636,
++    AF_BLUE_STRING_THAI_BOTTOM = 1660,
++    AF_BLUE_STRING_THAI_ASCENDER = 1688,
++    AF_BLUE_STRING_THAI_LARGE_ASCENDER = 1700,
++    AF_BLUE_STRING_THAI_DESCENDER = 1712,
++    AF_BLUE_STRING_THAI_LARGE_DESCENDER = 1728,
++    AF_BLUE_STRING_THAI_DIGIT_TOP = 1736,
++    af_blue_1_1 = 1747,
+ #ifdef AF_CONFIG_OPTION_CJK
+     AF_BLUE_STRING_CJK_TOP = af_blue_1_1 + 1,
+     AF_BLUE_STRING_CJK_BOTTOM = af_blue_1_1 + 203,
+@@ -213,10 +220,13 @@ FT_BEGIN_HEADER
+     AF_BLUE_STRINGSET_LATN = 50,
+     AF_BLUE_STRINGSET_LATB = 57,
+     AF_BLUE_STRINGSET_LATP = 64,
+-    AF_BLUE_STRINGSET_MYMR = 71,
+-    AF_BLUE_STRINGSET_TELU = 76,
+-    AF_BLUE_STRINGSET_THAI = 79,
+-    af_blue_2_1 = 87,
++    AF_BLUE_STRINGSET_MLYM = 71,
++    AF_BLUE_STRINGSET_MYMR = 74,
++    AF_BLUE_STRINGSET_SINH = 79,
++    AF_BLUE_STRINGSET_TAML = 83,
++    AF_BLUE_STRINGSET_TELU = 86,
++    AF_BLUE_STRINGSET_THAI = 89,
++    af_blue_2_1 = 97,
+ #ifdef AF_CONFIG_OPTION_CJK
+     AF_BLUE_STRINGSET_HANI = af_blue_2_1 + 0,
+     af_blue_2_1_1 = af_blue_2_1 + 2,
+diff --git a/src/autofit/afcjk.c b/src/autofit/afcjk.c
+index 4ba5d22..427e4d8 100644
+--- a/src/autofit/afcjk.c
++++ b/src/autofit/afcjk.c
+@@ -1528,7 +1528,7 @@
+       }
+ 
+       if ( dist < 54 )
+-        dist += ( 54 - dist ) / 2 ;
++        dist += ( 54 - dist ) / 2;
+       else if ( dist < 3 * 64 )
+       {
+         FT_Pos  delta;
+diff --git a/src/autofit/afhints.c b/src/autofit/afhints.c
+index 9ed058f..6c3d032 100644
+--- a/src/autofit/afhints.c
++++ b/src/autofit/afhints.c
+@@ -314,7 +314,7 @@
+     AF_DUMP(( "Table of points:\n" ));
+ 
+     if ( hints->num_points )
+-      AF_DUMP(( "  index  hedge  hseg  vedge  vseg  flags"
++      AF_DUMP(( "  index  hedge  hseg  vedge  vseg  flags "
+                 "  xorg  yorg  xscale  yscale   xfit    yfit" ));
+     else
+       AF_DUMP(( "  (none)\n" ));
+@@ -335,7 +335,7 @@
+         contour++;
+       }
+ 
+-      AF_DUMP(( "  %5d  %5s %5s  %5s %5s  %s "
++      AF_DUMP(( "  %5d  %5s %5s  %5s %5s  %s"
+                 " %5d %5d %7.2f %7.2f %7.2f %7.2f\n",
+                 point_idx,
+                 af_print_idx( buf1,
+@@ -344,8 +344,11 @@
+                 af_print_idx( buf3,
+                               af_get_edge_index( hints, segment_idx_0, 0 ) ),
+                 af_print_idx( buf4, segment_idx_0 ),
+-                ( point->flags & AF_FLAG_WEAK_INTERPOLATION ) ? "weak"
+-                                                              : " -- ",
++                ( point->flags & AF_FLAG_NEAR )
++                  ? " near "
++                  : ( point->flags & AF_FLAG_WEAK_INTERPOLATION )
++                    ? " weak "
++                    : "strong",
+ 
+                 point->fx,
+                 point->fy,
+@@ -813,18 +816,26 @@
+       AF_Point  point;
+       AF_Point  point_limit = points + hints->num_points;
+ 
++      /* value 20 in `near_limit' is heuristic */
++      FT_UInt  units_per_em = hints->metrics->scaler.face->units_per_EM;
++      FT_Int   near_limit   = 20 * units_per_em / 2048;
++
+ 
+       /* compute coordinates & Bezier flags, next and prev */
+       {
+         FT_Vector*  vec           = outline->points;
+         char*       tag           = outline->tags;
+-        AF_Point    end           = points + outline->contours[0];
++        FT_Short    endpoint      = outline->contours[0];
++        AF_Point    end           = points + endpoint;
+         AF_Point    prev          = end;
+         FT_Int      contour_index = 0;
+ 
+ 
+         for ( point = points; point < point_limit; point++, vec++, tag++ )
+         {
++          FT_Pos  out_x, out_y;
++
++
+           point->in_dir  = (FT_Char)AF_DIR_NONE;
+           point->out_dir = (FT_Char)AF_DIR_NONE;
+ 
+@@ -833,6 +844,9 @@
+           point->ox = point->x = FT_MulFix( vec->x, x_scale ) + x_delta;
+           point->oy = point->y = FT_MulFix( vec->y, y_scale ) + y_delta;
+ 
++          end->fx = (FT_Short)outline->points[endpoint].x;
++          end->fy = (FT_Short)outline->points[endpoint].y;
++
+           switch ( FT_CURVE_TAG( *tag ) )
+           {
+           case FT_CURVE_TAG_CONIC:
+@@ -845,6 +859,12 @@
+             point->flags = AF_FLAG_NONE;
+           }
+ 
++          out_x = point->fx - prev->fx;
++          out_y = point->fy - prev->fy;
++
++          if ( FT_ABS( out_x ) + FT_ABS( out_y ) < near_limit )
++            prev->flags |= AF_FLAG_NEAR;
++
+           point->prev = prev;
+           prev->next  = point;
+           prev        = point;
+@@ -853,8 +873,9 @@
+           {
+             if ( ++contour_index < outline->n_contours )
+             {
+-              end  = points + outline->contours[contour_index];
+-              prev = end;
++              endpoint = outline->contours[contour_index];
++              end      = points + endpoint;
++              prev     = end;
+             }
+           }
+         }
+@@ -880,17 +901,15 @@
+          *  Compute directions of `in' and `out' vectors.
+          *
+          *  Note that distances between points that are very near to each
+-         *  other are accumulated.  In other words, the auto-hinter
++         *  other are accumulated.  In other words, the auto-hinter either
+          *  prepends the small vectors between near points to the first
+-         *  non-near vector.  All intermediate points are tagged as
+-         *  weak; the directions are adjusted also to be equal to the
+-         *  accumulated one.
++         *  non-near vector, or the sum of small vector lengths exceeds a
++         *  threshold, thus `grouping' the small vectors.  All intermediate
++         *  points are tagged as weak; the directions are adjusted also to
++         *  be equal to the accumulated one.
+          */
+ 
+-        /* value 20 in `near_limit' is heuristic */
+-        FT_UInt  units_per_em = hints->metrics->scaler.face->units_per_EM;
+-        FT_Int   near_limit   = 20 * units_per_em / 2048;
+-        FT_Int   near_limit2  = 2 * near_limit - 1;
++        FT_Int  near_limit2 = 2 * near_limit - 1;
+ 
+         AF_Point*  contour;
+         AF_Point*  contour_limit = hints->contours + hints->num_contours;
+@@ -937,7 +956,7 @@
+           /* now loop over all points of the contour to get */
+           /* `in' and `out' vector directions               */
+ 
+-          curr  = first;
++          curr = first;
+ 
+           /*
+            *  We abuse the `u' and `v' fields to store index deltas to the
+@@ -960,7 +979,7 @@
+ 
+ 
+             point = next;
+-            next = point->next;
++            next  = point->next;
+ 
+             out_x += next->fx - point->fx;
+             out_y += next->fy - point->fy;
+diff --git a/src/autofit/afhints.h b/src/autofit/afhints.h
+index 4563565..faa5bdb 100644
+--- a/src/autofit/afhints.h
++++ b/src/autofit/afhints.h
+@@ -221,6 +221,9 @@ FT_BEGIN_HEADER
+   /* candidates for weak interpolation have this flag set */
+ #define AF_FLAG_WEAK_INTERPOLATION  ( 1U << 4 )
+ 
++  /* the distance to the next point is very small */
++#define AF_FLAG_NEAR  ( 1U << 5 )
++
+ 
+   /* edge hint flags */
+ #define AF_EDGE_NORMAL  0
+diff --git a/src/autofit/aflatin.c b/src/autofit/aflatin.c
+index 8a45116..f9b8507 100644
+--- a/src/autofit/aflatin.c
++++ b/src/autofit/aflatin.c
+@@ -1436,14 +1436,34 @@
+     /* do each contour separately */
+     for ( ; contour < contour_limit; contour++ )
+     {
+-      AF_Point  point      =  contour[0];
+-      AF_Point  last       =  point->prev;
+-      int       on_edge    =  0;
+-      FT_Pos    min_pos    =  32000;  /* minimum segment pos != min_coord */
+-      FT_Pos    max_pos    = -32000;  /* maximum segment pos != max_coord */
+-      FT_Pos    min_on_pos =  32000;
+-      FT_Pos    max_on_pos = -32000;
+-      FT_Bool   passed;
++      AF_Point  point   = contour[0];
++      AF_Point  last    = point->prev;
++      int       on_edge = 0;
++
++      /* we call values measured along a segment (point->v)    */
++      /* `coordinates', and values orthogonal to it (point->u) */
++      /* `positions'                                           */
++      FT_Pos     min_pos      =  32000;
++      FT_Pos     max_pos      = -32000;
++      FT_Pos     min_coord    =  32000;
++      FT_Pos     max_coord    = -32000;
++      FT_UShort  min_flags    =  AF_FLAG_NONE;
++      FT_UShort  max_flags    =  AF_FLAG_NONE;
++      FT_Pos     min_on_coord =  32000;
++      FT_Pos     max_on_coord = -32000;
++
++      FT_Bool  passed;
++
++      AF_Segment  prev_segment = NULL;
++
++      FT_Pos     prev_min_pos      = min_pos;
++      FT_Pos     prev_max_pos      = max_pos;
++      FT_Pos     prev_min_coord    = min_coord;
++      FT_Pos     prev_max_coord    = max_coord;
++      FT_UShort  prev_min_flags    = min_flags;
++      FT_UShort  prev_max_flags    = max_flags;
++      FT_Pos     prev_min_on_coord = min_on_coord;
++      FT_Pos     prev_max_on_coord = max_on_coord;
+ 
+ 
+       if ( point == last )  /* skip singletons -- just in case */
+@@ -1478,51 +1498,181 @@
+ 
+         if ( on_edge )
+         {
++          /* get minimum and maximum position */
+           u = point->u;
+           if ( u < min_pos )
+             min_pos = u;
+           if ( u > max_pos )
+             max_pos = u;
+ 
+-          /* get minimum and maximum coordinate of on points */
++          /* get minimum and maximum coordinate together with flags */
++          v = point->v;
++          if ( v < min_coord )
++          {
++            min_coord = v;
++            min_flags = point->flags;
++          }
++          if ( v > max_coord )
++          {
++            max_coord = v;
++            max_flags = point->flags;
++          }
++
++          /* get minimum and maximum coordinate of `on' points */
+           if ( !( point->flags & AF_FLAG_CONTROL ) )
+           {
+             v = point->v;
+-            if ( v < min_on_pos )
+-              min_on_pos = v;
+-            if ( v > max_on_pos )
+-              max_on_pos = v;
++            if ( v < min_on_coord )
++              min_on_coord = v;
++            if ( v > max_on_coord )
++              max_on_coord = v;
+           }
+ 
+           if ( point->out_dir != segment_dir || point == last )
+           {
+-            /* we are just leaving an edge; record a new segment! */
+-            segment->last = point;
+-            segment->pos  = (FT_Short)( ( min_pos + max_pos ) >> 1 );
+-
+-            /* a segment is round if either its first or last point */
+-            /* is a control point, and the length of the on points  */
+-            /* inbetween doesn't exceed a heuristic limit           */
+-            if ( ( segment->first->flags | point->flags ) & AF_FLAG_CONTROL &&
+-                 ( max_on_pos - min_on_pos ) < flat_threshold               )
+-              segment->flags |= AF_EDGE_ROUND;
+-
+-            /* compute segment size */
+-            min_pos = max_pos = point->v;
+-
+-            v = segment->first->v;
+-            if ( v < min_pos )
+-              min_pos = v;
+-            if ( v > max_pos )
+-              max_pos = v;
+-
+-            segment->min_coord = (FT_Short)min_pos;
+-            segment->max_coord = (FT_Short)max_pos;
+-            segment->height    = (FT_Short)( segment->max_coord -
+-                                             segment->min_coord );
++            /* check whether the new segment's start point is identical to */
++            /* the previous segment's end point; for example, this might   */
++            /* happen for spikes                                           */
++
++            if ( !prev_segment || segment->first != prev_segment->last )
++            {
++              /* points are different: we are just leaving an edge, thus */
++              /* record a new segment                                    */
++
++              segment->last = point;
++              segment->pos  = (FT_Short)( ( min_pos + max_pos ) >> 1 );
++
++              /* a segment is round if either its first or last point */
++              /* is a control point, and the length of the on points  */
++              /* inbetween doesn't exceed a heuristic limit           */
++              if ( ( min_flags | max_flags ) & AF_FLAG_CONTROL      &&
++                   ( max_on_coord - min_on_coord ) < flat_threshold )
++                segment->flags |= AF_EDGE_ROUND;
++
++              segment->min_coord = (FT_Short)min_coord;
++              segment->max_coord = (FT_Short)max_coord;
++              segment->height    = segment->max_coord - segment->min_coord;
++
++              prev_segment      = segment;
++              prev_min_pos      = min_pos;
++              prev_max_pos      = max_pos;
++              prev_min_coord    = min_coord;
++              prev_max_coord    = max_coord;
++              prev_min_flags    = min_flags;
++              prev_max_flags    = max_flags;
++              prev_min_on_coord = min_on_coord;
++              prev_max_on_coord = max_on_coord;
++            }
++            else
++            {
++              /* points are the same: we don't create a new segment but */
++              /* merge the current segment with the previous one        */
++
++              if ( prev_segment->last->in_dir == point->in_dir )
++              {
++                /* we have identical directions (this can happen for       */
++                /* degenerate outlines that move zig-zag along the main    */
++                /* axis without changing the coordinate value of the other */
++                /* axis, and where the segments have just been merged):    */
++                /* unify segments                                          */
++
++                /* update constraints */
++
++                if ( prev_min_pos < min_pos )
++                  min_pos = prev_min_pos;
++                if ( prev_max_pos > max_pos )
++                  max_pos = prev_max_pos;
++
++                if ( prev_min_coord < min_coord )
++                {
++                  min_coord = prev_min_coord;
++                  min_flags = prev_min_flags;
++                }
++                if ( prev_max_coord > max_coord )
++                {
++                  max_coord = prev_max_coord;
++                  max_flags = prev_max_flags;
++                }
++
++                if ( prev_min_on_coord < min_on_coord )
++                  min_on_coord = prev_min_on_coord;
++                if ( prev_max_on_coord > max_on_coord )
++                  max_on_coord = prev_max_on_coord;
++
++                prev_segment->last = point;
++                prev_segment->pos  = (FT_Short)( ( min_pos +
++                                                   max_pos ) >> 1 );
++
++                if ( ( min_flags | max_flags ) & AF_FLAG_CONTROL      &&
++                     ( max_on_coord - min_on_coord ) < flat_threshold )
++                  prev_segment->flags |= AF_EDGE_ROUND;
++                else
++                  prev_segment->flags &= ~AF_EDGE_ROUND;
++
++                prev_segment->min_coord = (FT_Short)min_coord;
++                prev_segment->max_coord = (FT_Short)max_coord;
++                prev_segment->height    = prev_segment->max_coord -
++                                          prev_segment->min_coord;
++              }
++              else
++              {
++                /* we have different directions; use the properties of the */
++                /* longer segment and discard the other one                */
++
++                if ( FT_ABS( prev_max_coord - prev_min_coord ) >
++                     FT_ABS( max_coord - min_coord ) )
++                {
++                  /* discard current segment */
++
++                  if ( min_pos < prev_min_pos )
++                    prev_min_pos = min_pos;
++                  if ( max_pos > prev_max_pos )
++                    prev_max_pos = max_pos;
++
++                  prev_segment->last = point;
++                  prev_segment->pos  = (FT_Short)( ( prev_min_pos +
++                                                     prev_max_pos ) >> 1 );
++                }
++                else
++                {
++                  /* discard previous segment */
++
++                  if ( prev_min_pos < min_pos )
++                    min_pos = prev_min_pos;
++                  if ( prev_max_pos > max_pos )
++                    max_pos = prev_max_pos;
++
++                  segment->last = point;
++                  segment->pos  = (FT_Short)( ( min_pos + max_pos ) >> 1 );
++
++                  if ( ( min_flags | max_flags ) & AF_FLAG_CONTROL      &&
++                       ( max_on_coord - min_on_coord ) < flat_threshold )
++                    segment->flags |= AF_EDGE_ROUND;
++
++                  segment->min_coord = (FT_Short)min_coord;
++                  segment->max_coord = (FT_Short)max_coord;
++                  segment->height    = segment->max_coord -
++                                       segment->min_coord;
++
++                  *prev_segment = *segment;
++
++                  prev_min_pos      = min_pos;
++                  prev_max_pos      = max_pos;
++                  prev_min_coord    = min_coord;
++                  prev_max_coord    = max_coord;
++                  prev_min_flags    = min_flags;
++                  prev_max_flags    = max_flags;
++                  prev_min_on_coord = min_on_coord;
++                  prev_max_on_coord = max_on_coord;
++                }
++              }
++
++              axis->num_segments--;
++            }
+ 
+             on_edge = 0;
+             segment = NULL;
++
+             /* fall through */
+           }
+         }
+@@ -1551,15 +1701,22 @@
+           segment->first = point;
+           segment->last  = point;
+ 
+-          min_pos = max_pos = point->u;
++          /* `af_axis_hints_new_segment' reallocates memory,    */
++          /* thus we have to refresh the `prev_segment' pointer */
++          if ( prev_segment )
++            prev_segment = segment - 1;
++
++          min_pos   = max_pos   = point->u;
++          min_coord = max_coord = point->v;
++          min_flags = max_flags = point->flags;
+ 
+           if ( point->flags & AF_FLAG_CONTROL )
+           {
+-            min_on_pos =  32000;
+-            max_on_pos = -32000;
++            min_on_coord =  32000;
++            max_on_coord = -32000;
+           }
+           else
+-            min_on_pos = max_on_pos = point->v;
++            min_on_coord = max_on_coord = point->v;
+ 
+           on_edge = 1;
+         }
+@@ -2347,6 +2504,7 @@
+   af_latin_compute_stem_width( AF_GlyphHints  hints,
+                                AF_Dimension   dim,
+                                FT_Pos         width,
++                               FT_Pos         base_delta,
+                                FT_UInt        base_flags,
+                                FT_UInt        stem_flags )
+   {
+@@ -2424,7 +2582,39 @@
+             dist += delta;
+         }
+         else
+-          dist = ( dist + 32 ) & ~63;
++        {
++          /* A stem's end position depends on two values: the start        */
++          /* position and the stem length.  The former gets usually        */
++          /* rounded to the grid, while the latter gets rounded also if it */
++          /* exceeds a certain length (see below in this function).  This  */
++          /* `double rounding' can lead to a great difference to the       */
++          /* original, unhinted position; this normally doesn't matter for */
++          /* large PPEM values, but for small sizes it can easily make     */
++          /* outlines collide.  For this reason, we adjust the stem length */
++          /* by a small amount depending on the PPEM value in case the     */
++          /* former and latter rounding both point into the same           */
++          /* direction.                                                    */
++
++          FT_Pos  bdelta = 0;
++
++
++          if ( ( ( width > 0 ) && ( base_delta > 0 ) ) ||
++               ( ( width < 0 ) && ( base_delta < 0 ) ) )
++          {
++            FT_UInt  ppem = metrics->root.scaler.face->size->metrics.x_ppem;
++
++
++            if ( ppem < 10 )
++              bdelta = base_delta;
++            else if ( ppem < 30 )
++              bdelta = ( base_delta * (FT_Pos)( 30 - ppem ) ) / 20;
++
++            if ( bdelta < 0 )
++              bdelta = -bdelta;
++          }
++
++          dist = ( dist - bdelta + 32 ) & ~63;
++        }
+       }
+     }
+     else
+@@ -2513,11 +2703,17 @@
+                               AF_Edge        base_edge,
+                               AF_Edge        stem_edge )
+   {
+-    FT_Pos  dist = stem_edge->opos - base_edge->opos;
++    FT_Pos  dist, base_delta;
++    FT_Pos  fitted_width;
+ 
+-    FT_Pos  fitted_width = af_latin_compute_stem_width( hints, dim, dist,
+-                                                        base_edge->flags,
+-                                                        stem_edge->flags );
++
++    dist       = stem_edge->opos - base_edge->opos;
++    base_delta = base_edge->pos - base_edge->opos;
++
++    fitted_width = af_latin_compute_stem_width( hints, dim,
++                                                dist, base_delta,
++                                                base_edge->flags,
++                                                stem_edge->flags );
+ 
+ 
+     stem_edge->pos = base_edge->pos + fitted_width;
+@@ -2721,7 +2917,8 @@
+ 
+ 
+         org_len = edge2->opos - edge->opos;
+-        cur_len = af_latin_compute_stem_width( hints, dim, org_len,
++        cur_len = af_latin_compute_stem_width( hints, dim,
++                                               org_len, 0,
+                                                edge->flags,
+                                                edge2->flags );
+ 
+@@ -2790,7 +2987,8 @@
+         org_len    = edge2->opos - edge->opos;
+         org_center = org_pos + ( org_len >> 1 );
+ 
+-        cur_len = af_latin_compute_stem_width( hints, dim, org_len,
++        cur_len = af_latin_compute_stem_width( hints, dim,
++                                               org_len, 0,
+                                                edge->flags,
+                                                edge2->flags );
+ 
+@@ -2850,7 +3048,8 @@
+           org_len    = edge2->opos - edge->opos;
+           org_center = org_pos + ( org_len >> 1 );
+ 
+-          cur_len    = af_latin_compute_stem_width( hints, dim, org_len,
++          cur_len    = af_latin_compute_stem_width( hints, dim,
++                                                    org_len, 0,
+                                                     edge->flags,
+                                                     edge2->flags );
+ 
+@@ -2885,14 +3084,21 @@
+              ( top_to_bottom_hinting ? ( edge->pos > edge[-1].pos )
+                                      : ( edge->pos < edge[-1].pos ) ) )
+         {
++          /* don't move if stem would (almost) disappear otherwise; */
++          /* the ad-hoc value 16 corresponds to 1/4px               */
++          if ( edge->link && FT_ABS( edge->link->pos - edge[-1].pos ) > 16 )
++          {
+ #ifdef FT_DEBUG_LEVEL_TRACE
+-          FT_TRACE5(( "  BOUND: edge %d (pos=%.2f) moved to %.2f\n",
+-                      edge - edges, edge->pos / 64.0, edge[-1].pos / 64.0 ));
++            FT_TRACE5(( "  BOUND: edge %d (pos=%.2f) moved to %.2f\n",
++                        edge - edges,
++                        edge->pos / 64.0,
++                        edge[-1].pos / 64.0 ));
+ 
+-          num_actions++;
++            num_actions++;
+ #endif
+ 
+-          edge->pos = edge[-1].pos;
++            edge->pos = edge[-1].pos;
++          }
+         }
+       }
+     }
+@@ -3048,13 +3254,20 @@
+              ( top_to_bottom_hinting ? ( edge->pos > edge[-1].pos )
+                                      : ( edge->pos < edge[-1].pos ) ) )
+         {
++          /* don't move if stem would (almost) disappear otherwise; */
++          /* the ad-hoc value 16 corresponds to 1/4px               */
++          if ( edge->link && FT_ABS( edge->link->pos - edge[-1].pos ) > 16 )
++          {
+ #ifdef FT_DEBUG_LEVEL_TRACE
+-          FT_TRACE5(( "  BOUND: edge %d (pos=%.2f) moved to %.2f\n",
+-                      edge - edges, edge->pos / 64.0, edge[-1].pos / 64.0 ));
++            FT_TRACE5(( "  BOUND: edge %d (pos=%.2f) moved to %.2f\n",
++                        edge - edges,
++                        edge->pos / 64.0,
++                        edge[-1].pos / 64.0 ));
+ 
+-          num_actions++;
++            num_actions++;
+ #endif
+-          edge->pos = edge[-1].pos;
++            edge->pos = edge[-1].pos;
++          }
+         }
+ 
+         if ( edge + 1 < edge_limit                                   &&
+@@ -3062,14 +3275,21 @@
+              ( top_to_bottom_hinting ? ( edge->pos < edge[1].pos )
+                                      : ( edge->pos > edge[1].pos ) ) )
+         {
++          /* don't move if stem would (almost) disappear otherwise; */
++          /* the ad-hoc value 16 corresponds to 1/4px               */
++          if ( edge->link && FT_ABS( edge->link->pos - edge[-1].pos ) > 16 )
++          {
+ #ifdef FT_DEBUG_LEVEL_TRACE
+-          FT_TRACE5(( "  BOUND: edge %d (pos=%.2f) moved to %.2f\n",
+-                      edge - edges, edge->pos / 64.0, edge[1].pos / 64.0 ));
++            FT_TRACE5(( "  BOUND: edge %d (pos=%.2f) moved to %.2f\n",
++                        edge - edges,
++                        edge->pos / 64.0,
++                        edge[1].pos / 64.0 ));
+ 
+-          num_actions++;
++            num_actions++;
+ #endif
+ 
+-          edge->pos = edge[1].pos;
++            edge->pos = edge[1].pos;
++          }
+         }
+       }
+     }
+diff --git a/src/autofit/aflatin2.c b/src/autofit/aflatin2.c
+index 1fab85e..5db4a41 100644
+--- a/src/autofit/aflatin2.c
++++ b/src/autofit/aflatin2.c
+@@ -1,3 +1,8 @@
++/* ATTENTION: This file doesn't compile.  It is only here as a reference */
++/*            of an alternative latin hinting algorithm that was always  */
++/*            marked as experimental.                                    */
++
++
+ /***************************************************************************/
+ /*                                                                         */
+ /*  aflatin2.c                                                             */
+diff --git a/src/autofit/aflatin2.h b/src/autofit/aflatin2.h
+index c17a6a2..f83f704 100644
+--- a/src/autofit/aflatin2.h
++++ b/src/autofit/aflatin2.h
+@@ -1,3 +1,8 @@
++/* ATTENTION: This file doesn't compile.  It is only here as a reference */
++/*            of an alternative latin hinting algorithm that was always  */
++/*            marked as experimental.                                    */
++
++
+ /***************************************************************************/
+ /*                                                                         */
+ /*  aflatin2.h                                                             */
+diff --git a/src/autofit/afranges.c b/src/autofit/afranges.c
+index 4e81e78..8340474 100644
+--- a/src/autofit/afranges.c
++++ b/src/autofit/afranges.c
+@@ -354,6 +354,21 @@
+   };
+ 
+ 
++  const AF_Script_UniRangeRec  af_mlym_uniranges[] =
++  {
++    AF_UNIRANGE_REC(  0x0D00UL,  0x0D7FUL ),  /* Malayalam */
++    AF_UNIRANGE_REC(       0UL,       0UL )
++  };
++
++  const AF_Script_UniRangeRec  af_mlym_nonbase_uniranges[] =
++  {
++    AF_UNIRANGE_REC(  0x0D01UL,  0x0D01UL ),
++    AF_UNIRANGE_REC(  0x0D4DUL,  0x0D4EUL ),
++    AF_UNIRANGE_REC(  0x0D62UL,  0x0D63UL ),
++    AF_UNIRANGE_REC(       0UL,       0UL )
++  };
++
++
+   const AF_Script_UniRangeRec  af_mymr_uniranges[] =
+   {
+     AF_UNIRANGE_REC( 0x1000UL, 0x109FUL ),    /* Myanmar            */
+@@ -391,6 +406,35 @@
+   };
+ 
+ 
++  const AF_Script_UniRangeRec  af_sinh_uniranges[] =
++  {
++    AF_UNIRANGE_REC(  0x0D80UL,  0x0DFFUL ),  /* Sinhala */
++    AF_UNIRANGE_REC(       0UL,       0UL )
++  };
++
++  const AF_Script_UniRangeRec  af_sinh_nonbase_uniranges[] =
++  {
++    AF_UNIRANGE_REC(  0x0DCAUL,  0x0DCAUL ),
++    AF_UNIRANGE_REC(  0x0DD2UL,  0x0DD6UL ),
++    AF_UNIRANGE_REC(       0UL,       0UL )
++  };
++
++
++  const AF_Script_UniRangeRec  af_taml_uniranges[] =
++  {
++    AF_UNIRANGE_REC(  0x0B80UL,  0x0BFFUL ),  /* Tamil */
++    AF_UNIRANGE_REC(       0UL,       0UL )
++  };
++
++  const AF_Script_UniRangeRec  af_taml_nonbase_uniranges[] =
++  {
++    AF_UNIRANGE_REC(  0x0B82UL,  0x0B82UL ),
++    AF_UNIRANGE_REC(  0x0BC0UL,  0x0BC2UL ),
++    AF_UNIRANGE_REC(  0x0BCDUL,  0x0BCDUL ),
++    AF_UNIRANGE_REC(       0UL,       0UL )
++  };
++
++
+   const AF_Script_UniRangeRec  af_telu_uniranges[] =
+   {
+     AF_UNIRANGE_REC(  0x0C00UL,  0x0C7FUL ),  /* Telugu */
+@@ -473,21 +517,6 @@
+   };
+ 
+ 
+-  const AF_Script_UniRangeRec  af_mlym_uniranges[] =
+-  {
+-    AF_UNIRANGE_REC(  0x0D00UL,  0x0D7FUL ),  /* Malayalam */
+-    AF_UNIRANGE_REC(       0UL,       0UL )
+-  };
+-
+-  const AF_Script_UniRangeRec  af_mlym_nonbase_uniranges[] =
+-  {
+-    AF_UNIRANGE_REC(  0x0D01UL,  0x0D01UL ),
+-    AF_UNIRANGE_REC(  0x0D4DUL,  0x0D4EUL ),
+-    AF_UNIRANGE_REC(  0x0D62UL,  0x0D63UL ),
+-    AF_UNIRANGE_REC(       0UL,       0UL )
+-  };
+-
+-
+   const AF_Script_UniRangeRec  af_orya_uniranges[] =
+   {
+     AF_UNIRANGE_REC(  0x0B00UL,  0x0B7FUL ),  /* Oriya */
+@@ -506,20 +535,6 @@
+   };
+ 
+ 
+-  const AF_Script_UniRangeRec  af_sinh_uniranges[] =
+-  {
+-    AF_UNIRANGE_REC(  0x0D80UL,  0x0DFFUL ),  /* Sinhala */
+-    AF_UNIRANGE_REC(       0UL,       0UL )
+-  };
+-
+-  const AF_Script_UniRangeRec  af_sinh_nonbase_uniranges[] =
+-  {
+-    AF_UNIRANGE_REC(  0x0DCAUL,  0x0DCAUL ),
+-    AF_UNIRANGE_REC(  0x0DD2UL,  0x0DD6UL ),
+-    AF_UNIRANGE_REC(       0UL,       0UL )
+-  };
+-
+-
+   const AF_Script_UniRangeRec  af_sund_uniranges[] =
+   {
+     AF_UNIRANGE_REC(  0x1B80UL,  0x1BBFUL ),  /* Sundanese            */
+@@ -551,21 +566,6 @@
+   };
+ 
+ 
+-  const AF_Script_UniRangeRec  af_taml_uniranges[] =
+-  {
+-    AF_UNIRANGE_REC(  0x0B80UL,  0x0BFFUL ),  /* Tamil */
+-    AF_UNIRANGE_REC(       0UL,       0UL )
+-  };
+-
+-  const AF_Script_UniRangeRec  af_taml_nonbase_uniranges[] =
+-  {
+-    AF_UNIRANGE_REC(  0x0B82UL,  0x0B82UL ),
+-    AF_UNIRANGE_REC(  0x0BC0UL,  0x0BC2UL ),
+-    AF_UNIRANGE_REC(  0x0BCDUL,  0x0BCDUL ),
+-    AF_UNIRANGE_REC(       0UL,       0UL )
+-  };
+-
+-
+   const AF_Script_UniRangeRec  af_tibt_uniranges[] =
+   {
+     AF_UNIRANGE_REC(  0x0F00UL,  0x0FFFUL ),  /* Tibetan */
+diff --git a/src/autofit/afscript.h b/src/autofit/afscript.h
+index 9bbb6f3..84c2a14 100644
+--- a/src/autofit/afscript.h
++++ b/src/autofit/afscript.h
+@@ -111,6 +111,12 @@
+           HINTING_BOTTOM_TO_TOP,
+           "\xE1\xB5\x92 \xE1\xB4\xBC \xE2\x81\xB0" ) /* ᵒ ᴼ ⁰ */
+ 
++  SCRIPT( mlym, MLYM,
++          "Malayalam",
++          HB_SCRIPT_MALAYALAM,
++          HINTING_BOTTOM_TO_TOP,
++          "\xE0\xB4\xA0 \xE0\xB4\xB1" ) /* ഠ റ */
++
+   SCRIPT( mymr, MYMR,
+           "Myanmar",
+           HB_SCRIPT_MYANMAR,
+@@ -123,6 +129,19 @@
+           HINTING_BOTTOM_TO_TOP,
+           "" )
+ 
++  SCRIPT( sinh, SINH,
++          "Sinhala",
++          HB_SCRIPT_SINHALA,
++          HINTING_BOTTOM_TO_TOP,
++          "\xE0\xB6\xA7" ) /* ට */
++
++  /* only digit zero has a simple (round) shape in the Tamil script */
++  SCRIPT( taml, TAML,
++          "Tamil",
++          HB_SCRIPT_TAMIL,
++          HINTING_BOTTOM_TO_TOP,
++          "\xE0\xAF\xA6" ) /* ௦ */
++
+   /* there are no simple forms for letters; we thus use two digit shapes */
+   SCRIPT( telu, TELU,
+           "Telugu",
+@@ -156,24 +175,12 @@
+           HINTING_BOTTOM_TO_TOP,
+           "o" ) /* XXX */
+ 
+-  SCRIPT( mlym, MLYM,
+-          "Malayalam",
+-          HB_SCRIPT_MALAYALAM,
+-          HINTING_BOTTOM_TO_TOP,
+-          "o" ) /* XXX */
+-
+   SCRIPT( orya, ORYA,
+           "Oriya",
+           HB_SCRIPT_ORIYA,
+           HINTING_BOTTOM_TO_TOP,
+           "o" ) /* XXX */
+ 
+-  SCRIPT( sinh, SINH,
+-          "Sinhala",
+-          HB_SCRIPT_SINHALA,
+-          HINTING_BOTTOM_TO_TOP,
+-          "o" ) /* XXX */
+-
+   SCRIPT( sund, SUND,
+           "Sundanese",
+           HB_SCRIPT_SUNDANESE,
+@@ -186,12 +193,6 @@
+           HINTING_BOTTOM_TO_TOP,
+           "o" ) /* XXX */
+ 
+-  SCRIPT( taml, TAML,
+-          "Tamil",
+-          HB_SCRIPT_TAMIL,
+-          HINTING_BOTTOM_TO_TOP,
+-          "o" ) /* XXX */
+-
+   SCRIPT( tibt, TIBT,
+           "Tibetan",
+           HB_SCRIPT_TIBETAN,
+diff --git a/src/autofit/afstyles.h b/src/autofit/afstyles.h
+index 9c57258..9134aef 100644
+--- a/src/autofit/afstyles.h
++++ b/src/autofit/afstyles.h
+@@ -168,6 +168,13 @@
+          AF_COVERAGE_DEFAULT )
+ #endif
+ 
++  STYLE( mlym_dflt, MLYM_DFLT,
++         "Malayalam default style",
++         AF_WRITING_SYSTEM_LATIN,
++         AF_SCRIPT_MLYM,
++         AF_BLUE_STRINGSET_MLYM,
++         AF_COVERAGE_DEFAULT )
++
+   STYLE( mymr_dflt, MYMR_DFLT,
+          "Myanmar default style",
+          AF_WRITING_SYSTEM_LATIN,
+@@ -182,6 +189,20 @@
+          (AF_Blue_Stringset)0,
+          AF_COVERAGE_DEFAULT )
+ 
++  STYLE( sinh_dflt, SINH_DFLT,
++         "Sinhala default style",
++         AF_WRITING_SYSTEM_LATIN,
++         AF_SCRIPT_SINH,
++         AF_BLUE_STRINGSET_SINH,
++         AF_COVERAGE_DEFAULT )
++
++  STYLE( taml_dflt, TAML_DFLT,
++         "Tamil default style",
++         AF_WRITING_SYSTEM_LATIN,
++         AF_SCRIPT_TAML,
++         AF_BLUE_STRINGSET_TAML,
++         AF_COVERAGE_DEFAULT )
++
+   STYLE( telu_dflt, TELU_DFLT,
+          "Telugu default style",
+          AF_WRITING_SYSTEM_LATIN,
+@@ -211,12 +232,9 @@
+   STYLE_DEFAULT_INDIC( gujr, GUJR, "Gujarati" )
+   STYLE_DEFAULT_INDIC( guru, GURU, "Gurmukhi" )
+   STYLE_DEFAULT_INDIC( limb, LIMB, "Limbu" )
+-  STYLE_DEFAULT_INDIC( mlym, MLYM, "Malayalam" )
+   STYLE_DEFAULT_INDIC( orya, ORYA, "Oriya" )
+-  STYLE_DEFAULT_INDIC( sinh, SINH, "Sinhala" )
+   STYLE_DEFAULT_INDIC( sund, SUND, "Sundanese" )
+   STYLE_DEFAULT_INDIC( sylo, SYLO, "Syloti Nagri" )
+-  STYLE_DEFAULT_INDIC( taml, TAML, "Tamil" )
+   STYLE_DEFAULT_INDIC( tibt, TIBT, "Tibetan" )
+ 
+ #endif /* AF_CONFIG_OPTION_INDIC */
+diff --git a/src/base/ftbitmap.c b/src/base/ftbitmap.c
+index 8cc3a17..24fead3 100644
+--- a/src/base/ftbitmap.c
++++ b/src/base/ftbitmap.c
+@@ -351,7 +351,7 @@
+     }
+ 
+     /* for each row */
+-    for ( y = 0; y < bitmap->rows ; y++ )
++    for ( y = 0; y < bitmap->rows; y++ )
+     {
+       /*
+        * Horizontally:
+diff --git a/src/base/fthash.c b/src/base/fthash.c
+index 779f795..21bc8dd 100644
+--- a/src/base/fthash.c
++++ b/src/base/fthash.c
+@@ -41,6 +41,7 @@
+ 
+ #include <ft2build.h>
+ #include FT_INTERNAL_HASH_H
++#include FT_INTERNAL_MEMORY_H
+ 
+ 
+ #define INITIAL_HT_SIZE  241
+diff --git a/src/base/ftmac.c b/src/base/ftmac.c
+index 5cfa012..e97fdbf 100644
+--- a/src/base/ftmac.c
++++ b/src/base/ftmac.c
+@@ -228,7 +228,7 @@
+ 
+ 
+     if ( !fontName || !face_index )
+-      return FT_THROW( Invalid_Argument) ;
++      return FT_THROW( Invalid_Argument);
+ 
+     err = FT_GetFileRef_From_Mac_ATS_Name( fontName, &ref, face_index );
+     if ( err )
+diff --git a/src/base/ftrfork.c b/src/base/ftrfork.c
+index 4d3de46..4660c97 100644
+--- a/src/base/ftrfork.c
++++ b/src/base/ftrfork.c
+@@ -403,7 +403,7 @@
+         errors[i] = FT_Err_Ok;
+ 
+       if ( errors[i] )
+-        continue ;
++        continue;
+ 
+       errors[i] = (FT_RACCESS_GUESS_TABLE_GET[i].func)( library,
+                                                  stream, base_name,
+diff --git a/src/base/ftstream.c b/src/base/ftstream.c
+index 8b5bad8..bb512a7 100644
+--- a/src/base/ftstream.c
++++ b/src/base/ftstream.c
+@@ -778,7 +778,7 @@
+ 
+       case ft_frame_short_be:
+       case ft_frame_ushort_be:  /* read a 2-byte big-endian short */
+-        value = FT_NEXT_USHORT( cursor) ;
++        value = FT_NEXT_USHORT( cursor );
+         sign_shift = 16;
+         break;
+ 
+diff --git a/src/cache/ftcmru.h b/src/cache/ftcmru.h
+index ea78a32..ae3c4ce 100644
+--- a/src/cache/ftcmru.h
++++ b/src/cache/ftcmru.h
+@@ -185,7 +185,7 @@ FT_BEGIN_HEADER
+         }                                                                   \
+         _node = _node->next;                                                \
+                                                                             \
+-      } while ( _node != _first) ;                                          \
++      } while ( _node != _first);                                           \
+     }                                                                       \
+                                                                             \
+     error = FTC_MruList_New( (list), (key), (FTC_MruNode*)(void*)&(node) ); \
+diff --git a/src/cff/cffgload.c b/src/cff/cffgload.c
+index df57d67..752c18e 100644
+--- a/src/cff/cffgload.c
++++ b/src/cff/cffgload.c
+@@ -680,7 +680,7 @@
+ #endif /* FT_CONFIG_OPTION_INCREMENTAL */
+ 
+     {
+-      CFF_Font  cff  = (CFF_Font)(face->extra.data);
++      CFF_Font  cff = (CFF_Font)(face->extra.data);
+ 
+ 
+       return cff_index_access_element( &cff->charstrings_index, glyph_index,
+@@ -826,7 +826,7 @@
+       /* the seac operator must not be nested */
+       decoder->seac = TRUE;
+       error = cff_decoder_parse_charstrings( decoder, charstring,
+-                                             charstring_len );
++                                             charstring_len, 0 );
+       decoder->seac = FALSE;
+ 
+       cff_free_glyph_data( face, &charstring, charstring_len );
+@@ -856,7 +856,7 @@
+       /* the seac operator must not be nested */
+       decoder->seac = TRUE;
+       error = cff_decoder_parse_charstrings( decoder, charstring,
+-                                             charstring_len );
++                                             charstring_len, 0 );
+       decoder->seac = FALSE;
+ 
+       cff_free_glyph_data( face, &charstring, charstring_len );
+@@ -895,13 +895,17 @@
+   /*                                                                       */
+   /*    charstring_len  :: The length in bytes of the charstring stream.   */
+   /*                                                                       */
++  /*    in_dict         :: Set to 1 if function is called from top or      */
++  /*                       private DICT (needed for Multiple Master CFFs). */
++  /*                                                                       */
+   /* <Return>                                                              */
+   /*    FreeType error code.  0 means success.                             */
+   /*                                                                       */
+   FT_LOCAL_DEF( FT_Error )
+   cff_decoder_parse_charstrings( CFF_Decoder*  decoder,
+                                  FT_Byte*      charstring_base,
+-                                 FT_ULong      charstring_len )
++                                 FT_ULong      charstring_len,
++                                 FT_Bool       in_dict )
+   {
+     FT_Error           error;
+     CFF_Decoder_Zone*  zone;
+@@ -913,6 +917,10 @@
+     FT_Fixed*          stack;
+     FT_Int             charstring_type =
+                          decoder->cff->top_font.font_dict.charstring_type;
++    FT_UShort          num_designs =
++                         decoder->cff->top_font.font_dict.num_designs;
++    FT_UShort          num_axes =
++                         decoder->cff->top_font.font_dict.num_axes;
+ 
+     T2_Hints_Funcs     hinter;
+ 
+@@ -1241,6 +1249,44 @@
+         if ( op == cff_op_unknown )
+           continue;
+ 
++        /* in Multiple Master CFFs, T2 charstrings can appear in */
++        /* dictionaries, but some operators are prohibited       */
++        if ( in_dict )
++        {
++          switch ( op )
++          {
++          case cff_op_hstem:
++          case cff_op_vstem:
++          case cff_op_vmoveto:
++          case cff_op_rlineto:
++          case cff_op_hlineto:
++          case cff_op_vlineto:
++          case cff_op_rrcurveto:
++          case cff_op_hstemhm:
++          case cff_op_hintmask:
++          case cff_op_cntrmask:
++          case cff_op_rmoveto:
++          case cff_op_hmoveto:
++          case cff_op_vstemhm:
++          case cff_op_rcurveline:
++          case cff_op_rlinecurve:
++          case cff_op_vvcurveto:
++          case cff_op_hhcurveto:
++          case cff_op_vhcurveto:
++          case cff_op_hvcurveto:
++          case cff_op_hflex:
++          case cff_op_flex:
++          case cff_op_hflex1:
++          case cff_op_flex1:
++          case cff_op_callsubr:
++          case cff_op_callgsubr:
++            goto MM_Error;
++
++          default:
++            break;
++          }
++        }
++
+         /* check arguments */
+         req_args = cff_argument_counts[op];
+         if ( req_args & CFF_COUNT_CHECK_WIDTH )
+@@ -1278,7 +1324,9 @@
+             case cff_op_endchar:
+               /* If there is a width specified for endchar, we either have */
+               /* 1 argument or 5 arguments.  We like to argue.             */
+-              set_width_ok = ( num_args == 5 ) || ( num_args == 1 );
++              set_width_ok = in_dict
++                               ? 0
++                               : ( ( num_args == 5 ) || ( num_args == 1 ) );
+               break;
+ 
+             default:
+@@ -1971,6 +2019,10 @@
+             return error;
+ 
+         case cff_op_endchar:
++          /* in dictionaries, `endchar' simply indicates end of data */
++          if ( in_dict )
++            return error;
++
+           FT_TRACE4(( " endchar\n" ));
+ 
+           /* We are going to emulate the seac operator. */
+@@ -2198,6 +2250,10 @@
+ 
+             FT_TRACE4(( " put\n" ));
+ 
++            /* the Type2 specification before version 16-March-2000 */
++            /* didn't give a hard-coded size limit of the temporary */
++            /* storage array; instead, an argument of the           */
++            /* `MultipleMaster' operator set the size               */
+             if ( idx >= 0 && idx < CFF_MAX_TRANS_ELEMENTS )
+               decoder->buildchar[idx] = val;
+           }
+@@ -2222,23 +2278,66 @@
+         case cff_op_store:
+           /* this operator was removed from the Type2 specification */
+           /* in version 16-March-2000                               */
+-          FT_TRACE4(( " store\n"));
+ 
+-          goto Unimplemented;
++          /* since we currently don't handle interpolation of multiple */
++          /* master fonts, this is a no-op                             */
++          FT_TRACE4(( " store\n"));
++          break;
+ 
+         case cff_op_load:
+           /* this operator was removed from the Type2 specification */
+           /* in version 16-March-2000                               */
+-          FT_TRACE4(( " load\n" ));
++          {
++            FT_Int  reg_idx = (FT_Int)args[0];
++            FT_Int  idx     = (FT_Int)args[1];
++            FT_Int  count   = (FT_Int)args[2];
++
++
++            FT_TRACE4(( " load\n" ));
++
++            /* since we currently don't handle interpolation of multiple */
++            /* master fonts, we store a vector [1 0 0 ...] in the        */
++            /* temporary storage array regardless of the Registry index  */
++            if ( reg_idx >= 0 && reg_idx <= 2             &&
++                 idx >= 0 && idx < CFF_MAX_TRANS_ELEMENTS &&
++                 count >= 0 && count <= num_axes          )
++            {
++              FT_Int  end, i;
++
+ 
+-          goto Unimplemented;
++              end = FT_MIN( idx + count, CFF_MAX_TRANS_ELEMENTS );
++
++              if ( idx < end )
++                decoder->buildchar[idx] = 1 << 16;
++
++              for ( i = idx + 1; i < end; i++ )
++                decoder->buildchar[i] = 0;
++            }
++          }
++          break;
+ 
+         case cff_op_blend:
+           /* this operator was removed from the Type2 specification */
+           /* in version 16-March-2000                               */
+-          FT_TRACE4(( " blend\n" ));
++          {
++            FT_Int  num_results = (FT_Int)( args[0] >> 16 );
++
++
++            FT_TRACE4(( " blend\n" ));
++
++            if ( num_results < 0 )
++              goto Syntax_Error;
++
++            if ( num_results * (FT_Int)num_designs > num_args )
++              goto Stack_Underflow;
+ 
+-          goto Unimplemented;
++            /* since we currently don't handle interpolation of multiple */
++            /* master fonts, return the `num_results' values of the      */
++            /* first master                                              */
++            args     -= num_results * ( num_designs - 1 );
++            num_args -= num_results * ( num_designs - 1 );
++          }
++          break;
+ 
+         case cff_op_dotsection:
+           /* this operator is deprecated and ignored by the parser */
+@@ -2511,7 +2610,6 @@
+           break;
+ 
+         default:
+-        Unimplemented:
+           FT_ERROR(( "Unimplemented opcode: %d", ip[-1] ));
+ 
+           if ( ip[-1] == 12 )
+@@ -2535,6 +2633,11 @@
+   Fail:
+     return error;
+ 
++  MM_Error:
++    FT_TRACE4(( "cff_decoder_parse_charstrings:"
++                " invalid opcode found in top DICT charstring\n"));
++    return FT_THROW( Invalid_File_Format );
++
+   Syntax_Error:
+     FT_TRACE4(( "cff_decoder_parse_charstrings: syntax error\n" ));
+     return FT_THROW( Invalid_File_Format );
+@@ -2608,7 +2711,8 @@
+         if ( !error )
+           error = cff_decoder_parse_charstrings( &decoder,
+                                                  charstring,
+-                                                 charstring_len );
++                                                 charstring_len,
++                                                 0 );
+ 
+         cff_free_glyph_data( face, &charstring, &charstring_len );
+       }
+@@ -2859,7 +2963,8 @@
+       if ( driver->hinting_engine == FT_CFF_HINTING_FREETYPE )
+         error = cff_decoder_parse_charstrings( &decoder,
+                                                charstring,
+-                                               charstring_len );
++                                               charstring_len,
++                                               0 );
+       else
+ #endif
+       {
+diff --git a/src/cff/cffgload.h b/src/cff/cffgload.h
+index 2257307..b875fbe 100644
+--- a/src/cff/cffgload.h
++++ b/src/cff/cffgload.h
+@@ -227,7 +227,8 @@ FT_BEGIN_HEADER
+   FT_LOCAL( FT_Error )
+   cff_decoder_parse_charstrings( CFF_Decoder*  decoder,
+                                  FT_Byte*      charstring_base,
+-                                 FT_ULong      charstring_len );
++                                 FT_ULong      charstring_len,
++                                 FT_Bool       in_dict );
+ #endif
+ 
+   FT_LOCAL( FT_Error )
+diff --git a/src/cff/cffload.c b/src/cff/cffload.c
+index 42cc37e..9d3846c 100644
+--- a/src/cff/cffload.c
++++ b/src/cff/cffload.c
+@@ -382,13 +382,15 @@
+   static FT_Error
+   cff_index_get_pointers( CFF_Index   idx,
+                           FT_Byte***  table,
+-                          FT_Byte**   pool )
++                          FT_Byte**   pool,
++                          FT_ULong*   pool_size )
+   {
+     FT_Error   error     = FT_Err_Ok;
+     FT_Memory  memory    = idx->stream->memory;
+ 
+     FT_Byte**  t         = NULL;
+     FT_Byte*   new_bytes = NULL;
++    FT_ULong   new_size;
+ 
+ 
+     *table = NULL;
+@@ -400,10 +402,11 @@
+         goto Exit;
+     }
+ 
+-    if ( idx->count > 0                                        &&
+-         !FT_NEW_ARRAY( t, idx->count + 1 )                    &&
+-         ( !pool || !FT_ALLOC( new_bytes,
+-                               idx->data_size + idx->count ) ) )
++    new_size = idx->data_size + idx->count;
++
++    if ( idx->count > 0                                &&
++         !FT_NEW_ARRAY( t, idx->count + 1 )            &&
++         ( !pool || !FT_ALLOC( new_bytes, new_size ) ) )
+     {
+       FT_ULong  n, cur_offset;
+       FT_ULong  extra = 0;
+@@ -459,6 +462,8 @@
+ 
+       if ( pool )
+         *pool = new_bytes;
++      if ( pool_size )
++        *pool_size = new_size;
+     }
+ 
+   Exit:
+@@ -809,7 +814,7 @@
+     /* When multiple GIDs map to the same CID, we choose the lowest */
+     /* GID.  This is not described in any spec, but it matches the  */
+     /* behaviour of recent Acroread versions.                       */
+-    for ( j = (FT_Long)num_glyphs - 1; j >= 0 ; j-- )
++    for ( j = (FT_Long)num_glyphs - 1; j >= 0; j-- )
+       charset->cids[charset->sids[j]] = (FT_UShort)j;
+ 
+     charset->max_cid    = max_cid;
+@@ -1316,7 +1321,12 @@
+     CFF_Private      priv = &font->private_dict;
+ 
+ 
+-    cff_parser_init( &parser, CFF_CODE_TOPDICT, &font->font_dict, library );
++    cff_parser_init( &parser,
++                     CFF_CODE_TOPDICT,
++                     &font->font_dict,
++                     library,
++                     0,
++                     0 );
+ 
+     /* set defaults */
+     FT_MEM_ZERO( top, sizeof ( *top ) );
+@@ -1370,7 +1380,12 @@
+       priv->expansion_factor = (FT_Fixed)( 0.06 * 0x10000L );
+       priv->blue_scale       = (FT_Fixed)( 0.039625 * 0x10000L * 1000 );
+ 
+-      cff_parser_init( &parser, CFF_CODE_PRIVATE, priv, library );
++      cff_parser_init( &parser,
++                       CFF_CODE_PRIVATE,
++                       priv,
++                       library,
++                       top->num_designs,
++                       top->num_axes );
+ 
+       if ( FT_STREAM_SEEK( base_offset + font->font_dict.private_offset ) ||
+            FT_FRAME_ENTER( font->font_dict.private_size )                 )
+@@ -1400,7 +1415,7 @@
+         goto Exit;
+ 
+       error = cff_index_get_pointers( &font->local_subrs_index,
+-                                      &font->local_subrs, NULL );
++                                      &font->local_subrs, NULL, NULL );
+       if ( error )
+         goto Exit;
+     }
+@@ -1478,16 +1493,17 @@
+ 
+     /* read the name, top dict, string and global subrs index */
+     if ( FT_SET_ERROR( cff_index_init( &font->name_index,
+-                                       stream, 0 ) )                  ||
++                                       stream, 0 ) )                       ||
+          FT_SET_ERROR( cff_index_init( &font->font_dict_index,
+-                                       stream, 0 ) )                  ||
++                                       stream, 0 ) )                       ||
+          FT_SET_ERROR( cff_index_init( &string_index,
+-                                       stream, 1 ) )                  ||
++                                       stream, 1 ) )                       ||
+          FT_SET_ERROR( cff_index_init( &font->global_subrs_index,
+-                                       stream, 1 ) )                  ||
++                                       stream, 1 ) )                       ||
+          FT_SET_ERROR( cff_index_get_pointers( &string_index,
+                                                &font->strings,
+-                                               &font->string_pool ) ) )
++                                               &font->string_pool,
++                                               &font->string_pool_size ) ) )
+       goto Exit;
+ 
+     font->num_strings = string_index.count;
+@@ -1614,7 +1630,7 @@
+     font->num_glyphs = font->charstrings_index.count;
+ 
+     error = cff_index_get_pointers( &font->global_subrs_index,
+-                                    &font->global_subrs, NULL );
++                                    &font->global_subrs, NULL, NULL );
+ 
+     if ( error )
+       goto Exit;
+diff --git a/src/cff/cffobjs.c b/src/cff/cffobjs.c
+index e22ae82..b49616d 100644
+--- a/src/cff/cffobjs.c
++++ b/src/cff/cffobjs.c
+@@ -625,11 +625,44 @@
+         FT_TRACE4(( "SIDs\n" ));
+ 
+         /* dump string index, including default strings for convenience */
+-        for ( idx = 0; idx < cff->num_strings + 390; idx++ )
++        for ( idx = 0; idx <= 390; idx++ )
+         {
+           s = cff_index_get_sid_string( cff, idx );
+           if ( s )
+-            FT_TRACE4(("  %5d %s\n", idx, s ));
++            FT_TRACE4(( "  %5d %s\n", idx, s ));
++        }
++
++        /* In Multiple Master CFFs, two SIDs hold the Normalize Design  */
++        /* Vector (NDV) and Convert Design Vector (CDV) charstrings,    */
++        /* which may contain NULL bytes in the middle of the data, too. */
++        /* We thus access `cff->strings' directly.                      */
++        for ( idx = 1; idx < cff->num_strings; idx++ )
++        {
++          FT_Byte*    s1    = cff->strings[idx - 1];
++          FT_Byte*    s2    = cff->strings[idx];
++          FT_PtrDist  s1len = s2 - s1 - 1; /* without the final NULL byte */
++          FT_PtrDist  l;
++
++
++          FT_TRACE4(( "  %5d ", idx + 390 ));
++          for ( l = 0; l < s1len; l++ )
++            FT_TRACE4(( "%c", s1[l] ));
++          FT_TRACE4(( "\n" ));
++        }
++
++        /* print last element */
++        if ( cff->num_strings )
++        {
++          FT_Byte*    s1    = cff->strings[cff->num_strings - 1];
++          FT_Byte*    s2    = cff->string_pool + cff->string_pool_size;
++          FT_PtrDist  s1len = s2 - s1 - 1;
++          FT_PtrDist  l;
++
++
++          FT_TRACE4(( "  %5d ", cff->num_strings + 390 ));
++          for ( l = 0; l < s1len; l++ )
++            FT_TRACE4(( "%c", s1[l] ));
++          FT_TRACE4(( "\n" ));
+         }
+       }
+ #endif /* FT_DEBUG_LEVEL_TRACE */
+diff --git a/src/cff/cffparse.c b/src/cff/cffparse.c
+index acbdc5a..2ece516 100644
+--- a/src/cff/cffparse.c
++++ b/src/cff/cffparse.c
+@@ -23,6 +23,7 @@
+ 
+ #include "cfferrs.h"
+ #include "cffpic.h"
++#include "cffgload.h"
+ 
+ 
+   /*************************************************************************/
+@@ -39,7 +40,9 @@
+   cff_parser_init( CFF_Parser  parser,
+                    FT_UInt     code,
+                    void*       object,
+-                   FT_Library  library)
++                   FT_Library  library,
++                   FT_UShort   num_designs,
++                   FT_UShort   num_axes )
+   {
+     FT_MEM_ZERO( parser, sizeof ( *parser ) );
+ 
+@@ -47,6 +50,8 @@
+     parser->object_code = code;
+     parser->object      = object;
+     parser->library     = library;
++    parser->num_designs = num_designs;
++    parser->num_axes    = num_axes;
+   }
+ 
+ 
+@@ -649,6 +654,56 @@
+   }
+ 
+ 
++  /* The `MultipleMaster' operator comes before any  */
++  /* top DICT operators that contain T2 charstrings. */
++
++  static FT_Error
++  cff_parse_multiple_master( CFF_Parser  parser )
++  {
++    CFF_FontRecDict  dict = (CFF_FontRecDict)parser->object;
++    FT_Error         error;
++
++
++#ifdef FT_DEBUG_LEVEL_TRACE
++    /* beautify tracing message */
++    if ( ft_trace_levels[FT_COMPONENT] < 4 )
++      FT_TRACE1(( "Multiple Master CFFs not supported yet,"
++                  " handling first master design only\n" ));
++    else
++      FT_TRACE1(( " (not supported yet,"
++                  " handling first master design only)\n" ));
++#endif
++
++    error = FT_ERR( Stack_Underflow );
++
++    /* currently, we handle only the first argument */
++    if ( parser->top >= parser->stack + 5 )
++    {
++      FT_Long  num_designs = cff_parse_num( parser->stack );
++
++
++      if ( num_designs > 16 || num_designs < 2 )
++      {
++        FT_ERROR(( "cff_parse_multiple_master:"
++                   " Invalid number of designs\n" ));
++        error = FT_THROW( Invalid_File_Format );
++      }
++      else
++      {
++        dict->num_designs   = (FT_UShort)num_designs;
++        dict->num_axes      = (FT_UShort)( parser->top - parser->stack - 4 );
++
++        parser->num_designs = dict->num_designs;
++        parser->num_axes    = dict->num_axes;
++
++        error = FT_Err_Ok;
++      }
++    }
++
++    return error;
++  }
++
++
+   static FT_Error
+   cff_parse_cid_ros( CFF_Parser  parser )
+   {
+@@ -972,7 +1027,7 @@
+         if ( parser->top - parser->stack >= CFF_MAX_STACK_DEPTH )
+           goto Stack_Overflow;
+ 
+-        *parser->top ++ = p;
++        *parser->top++ = p;
+ 
+         /* now, skip it */
+         if ( v == 30 )
+@@ -1001,6 +1056,136 @@
+         else if ( v > 246 )
+           p += 1;
+       }
++#ifdef CFF_CONFIG_OPTION_OLD_ENGINE
++      else if ( v == 31 )
++      {
++        /* a Type 2 charstring */
++
++        CFF_Decoder  decoder;
++        CFF_FontRec  cff_rec;
++        FT_Byte*     charstring_base;
++        FT_ULong     charstring_len;
++
++        FT_Fixed*  stack;
++        FT_Byte*   q;
++
++
++        charstring_base = ++p;
++
++        /* search `endchar' operator */
++        for (;;)
++        {
++          if ( p >= limit )
++            goto Exit;
++          if ( *p == 14 )
++            break;
++          p++;
++        }
++
++        charstring_len = (FT_ULong)( p - charstring_base ) + 1;
++
++        /* construct CFF_Decoder object */
++        FT_MEM_ZERO( &decoder, sizeof ( decoder ) );
++        FT_MEM_ZERO( &cff_rec, sizeof ( cff_rec ) );
++
++        cff_rec.top_font.font_dict.num_designs = parser->num_designs;
++        cff_rec.top_font.font_dict.num_axes    = parser->num_axes;
++        decoder.cff                            = &cff_rec;
++
++        error = cff_decoder_parse_charstrings( &decoder,
++                                               charstring_base,
++                                               charstring_len,
++                                               1 );
++
++        /* Now copy the stack data in the temporary decoder object,    */
++        /* converting it back to charstring number representations     */
++        /* (this is ugly, I know).                                     */
++        /*                                                             */
++        /* We overwrite the original top DICT charstring under the     */
++        /* assumption that the charstring representation of the result */
++        /* of `cff_decoder_parse_charstrings' is shorter, which should */
++        /* be always true.                                             */
++
++        q     = charstring_base - 1;
++        stack = decoder.stack;
++
++        while ( stack < decoder.top )
++        {
++          FT_ULong  num;
++          FT_Bool   neg;
++
++
++          if ( parser->top - parser->stack >= CFF_MAX_STACK_DEPTH )
++            goto Stack_Overflow;
++
++          *parser->top++ = q;
++
++          if ( *stack < 0 )
++          {
++            num = (FT_ULong)-*stack;
++            neg = 1;
++          }
++          else
++          {
++            num = (FT_ULong)*stack;
++            neg = 0;
++          }
++
++          if ( num & 0xFFFFU )
++          {
++            if ( neg )
++              num = (FT_ULong)-num;
++
++            *q++ = 255;
++            *q++ = ( num & 0xFF000000U ) >> 24;
++            *q++ = ( num & 0x00FF0000U ) >> 16;
++            *q++ = ( num & 0x0000FF00U ) >>  8;
++            *q++ =   num & 0x000000FFU;
++          }
++          else
++          {
++            num >>= 16;
++
++            if ( neg )
++            {
++              if ( num <= 107 )
++                *q++ = (FT_Byte)( 139 - num );
++              else if ( num <= 1131 )
++              {
++                *q++ = (FT_Byte)( ( ( num - 108 ) >> 8 ) + 251 );
++                *q++ = (FT_Byte)( ( num - 108 ) & 0xFF );
++              }
++              else
++              {
++                num = (FT_ULong)-num;
++
++                *q++ = 28;
++                *q++ = (FT_Byte)( num >> 8 );
++                *q++ = (FT_Byte)( num & 0xFF );
++              }
++            }
++            else
++            {
++              if ( num <= 107 )
++                *q++ = (FT_Byte)( num + 139 );
++              else if ( num <= 1131 )
++              {
++                *q++ = (FT_Byte)( ( ( num - 108 ) >> 8 ) + 247 );
++                *q++ = (FT_Byte)( ( num - 108 ) & 0xFF );
++              }
++              else
++              {
++                *q++ = 28;
++                *q++ = (FT_Byte)( num >> 8 );
++                *q++ = (FT_Byte)( num & 0xFF );
++              }
++            }
++          }
++
++          stack++;
++        }
++      }
++#endif /* CFF_CONFIG_OPTION_OLD_ENGINE */
+       else
+       {
+         /* This is not a number, hence it's an operator.  Compute its code */
+diff --git a/src/cff/cffparse.h b/src/cff/cffparse.h
+index bb9425a..a95970e 100644
+--- a/src/cff/cffparse.h
++++ b/src/cff/cffparse.h
+@@ -36,16 +36,19 @@ FT_BEGIN_HEADER
+ 
+   typedef struct  CFF_ParserRec_
+   {
+-    FT_Library library;
+-    FT_Byte*   start;
+-    FT_Byte*   limit;
+-    FT_Byte*   cursor;
++    FT_Library  library;
++    FT_Byte*    start;
++    FT_Byte*    limit;
++    FT_Byte*    cursor;
+ 
+-    FT_Byte*   stack[CFF_MAX_STACK_DEPTH + 1];
+-    FT_Byte**  top;
++    FT_Byte*    stack[CFF_MAX_STACK_DEPTH + 1];
++    FT_Byte**   top;
+ 
+-    FT_UInt    object_code;
+-    void*      object;
++    FT_UInt     object_code;
++    void*       object;
++
++    FT_UShort   num_designs; /* a copy of `CFF_FontRecDict->num_designs' */
++    FT_UShort   num_axes;    /* a copy of `CFF_FontRecDict->num_axes'    */
+ 
+   } CFF_ParserRec, *CFF_Parser;
+ 
+@@ -54,7 +57,9 @@ FT_BEGIN_HEADER
+   cff_parser_init( CFF_Parser  parser,
+                    FT_UInt     code,
+                    void*       object,
+-                   FT_Library  library);
++                   FT_Library  library,
++                   FT_UShort   num_designs,
++                   FT_UShort   num_axes );
+ 
+   FT_LOCAL( FT_Error )
+   cff_parser_run( CFF_Parser  parser,
+diff --git a/src/cff/cfftoken.h b/src/cff/cfftoken.h
+index 44b6580..22637c7 100644
+--- a/src/cff/cfftoken.h
++++ b/src/cff/cfftoken.h
+@@ -38,6 +38,9 @@
+   CFF_FIELD_NUM     ( 13,    unique_id,           "UniqueID" )
+   CFF_FIELD_CALLBACK( 5,     font_bbox,           "FontBBox" )
+   CFF_FIELD_NUM     ( 0x108, stroke_width,        "StrokeWidth" )
++#if 0
++  CFF_FIELD_DELTA   ( 14,    xuid, 16,            "XUID" )
++#endif
+   CFF_FIELD_NUM     ( 15,    charset_offset,      "charset" )
+   CFF_FIELD_NUM     ( 16,    encoding_offset,     "Encoding" )
+   CFF_FIELD_NUM     ( 17,    charstrings_offset,  "CharStrings" )
+@@ -48,8 +51,13 @@
+ #if 0
+   CFF_FIELD_STRING  ( 0x116, base_font_name,      "BaseFontName" )
+   CFF_FIELD_DELTA   ( 0x117, base_font_blend, 16, "BaseFontBlend" )
++#endif
++
++  /* the next two operators were removed from the Type2 specification */
++  /* in version 16-March-2000                                         */
+   CFF_FIELD_CALLBACK( 0x118, multiple_master,     "MultipleMaster" )
+-  CFF_FIELD_CALLBACK( 0x119, blend_axis_types,    "BlendAxisTypes" )
++#if 0
++  CFF_FIELD_CALLBACK( 0x11A, blend_axis_types,    "BlendAxisTypes" )
+ #endif
+ 
+   CFF_FIELD_CALLBACK( 0x11E, cid_ros,              "ROS" )
+diff --git a/src/cff/cfftypes.h b/src/cff/cfftypes.h
+index 80f13fe..4426c7e 100644
+--- a/src/cff/cfftypes.h
++++ b/src/cff/cfftypes.h
+@@ -145,6 +145,12 @@ FT_BEGIN_HEADER
+     FT_ULong   cid_fd_select_offset;
+     FT_UInt    cid_font_name;
+ 
++    /* the next fields come from the data of the deprecated          */
++    /* `MultipleMaster' operator; they are needed to parse the (also */
++    /* deprecated) `blend' operator in Type 2 charstrings            */
++    FT_UShort  num_designs;
++    FT_UShort  num_axes;
++
+   } CFF_FontRecDictRec, *CFF_FontRecDict;
+ 
+ 
+@@ -250,6 +256,7 @@ FT_BEGIN_HEADER
+     FT_UInt          num_strings;
+     FT_Byte**        strings;
+     FT_Byte*         string_pool;
++    FT_ULong         string_pool_size;
+ 
+     CFF_SubFontRec   top_font;
+     FT_UInt          num_subfonts;
+diff --git a/src/gxvalid/gxvcommn.c b/src/gxvalid/gxvcommn.c
+index 2606e57..4b5e415 100644
+--- a/src/gxvalid/gxvcommn.c
++++ b/src/gxvalid/gxvcommn.c
+@@ -900,7 +900,7 @@
+     for ( i = 0; i < nnames; i++ )
+     {
+       if ( FT_Get_Sfnt_Name( gxvalid->face, i, &name ) != FT_Err_Ok )
+-        continue ;
++        continue;
+ 
+       if ( name.name_id == name_index )
+         goto Out;
+@@ -1472,7 +1472,7 @@
+     if ( ( p + ( maxEntry + 1 ) * entrySize ) > limit )
+       FT_INVALID_TOO_SHORT;
+ 
+-    for (entry = 0; entry <= maxEntry ; entry++ )
++    for (entry = 0; entry <= maxEntry; entry++ )
+     {
+       FT_UShort                        newState_idx;
+       FT_UShort                        flags;
+diff --git a/src/gxvalid/gxvcommn.h b/src/gxvalid/gxvcommn.h
+index d49c4b4..9470c84 100644
+--- a/src/gxvalid/gxvcommn.h
++++ b/src/gxvalid/gxvcommn.h
+@@ -338,7 +338,7 @@ FT_BEGIN_HEADER
+                                                         \
+                                                         \
+               for ( b = p; b < (FT_Bytes)p + len; b++ ) \
+-                FT_TRACE1(("\\x%02x", *b)) ;            \
++                FT_TRACE1(("\\x%02x", *b));             \
+             }                                           \
+           FT_END_STMNT
+ 
+@@ -350,9 +350,9 @@ FT_BEGIN_HEADER
+                                                         \
+               for ( b = p; b < (FT_Bytes)p + len; b++ ) \
+                 if ( 0x40 < *b && *b < 0x7E )           \
+-                  FT_TRACE1(("%c", *b)) ;               \
++                  FT_TRACE1(("%c", *b));                \
+                 else                                    \
+-                  FT_TRACE1(("\\x%02x", *b)) ;          \
++                  FT_TRACE1(("\\x%02x", *b));           \
+             }                                           \
+           FT_END_STMNT
+ 
+diff --git a/src/gxvalid/gxvjust.c b/src/gxvalid/gxvjust.c
+index fc8db0d..20d29bf 100644
+--- a/src/gxvalid/gxvjust.c
++++ b/src/gxvalid/gxvjust.c
+@@ -152,7 +152,7 @@
+                                         FT_Bytes       limit,
+                                         GXV_Validator  gxvalid )
+   {
+-    FT_Bytes  p         = table ;
++    FT_Bytes  p         = table;
+     FT_Bytes  wdc_end   = table + GXV_JUST_DATA( wdc_offset_max );
+     FT_UInt   i;
+ 
+diff --git a/src/gxvalid/gxvmort1.c b/src/gxvalid/gxvmort1.c
+index 24fed63..fd761d0 100644
+--- a/src/gxvalid/gxvmort1.c
++++ b/src/gxvalid/gxvmort1.c
+@@ -192,7 +192,7 @@
+ 
+ 
+     GXV_NAME_ENTER( "validating contents of substitutionTable" );
+-    for ( i = 0; i < num_gids ; i ++ )
++    for ( i = 0; i < num_gids; i++ )
+     {
+       FT_UShort  dst_gid;
+ 
+diff --git a/src/gxvalid/gxvtrak.c b/src/gxvalid/gxvtrak.c
+index 8accdfb..0f07c04 100644
+--- a/src/gxvalid/gxvtrak.c
++++ b/src/gxvalid/gxvtrak.c
+@@ -111,7 +111,7 @@
+ 
+     GXV_LIMIT_CHECK( nTracks * ( 4 + 2 + 2 ) );
+ 
+-    for ( i = 0; i < nTracks; i ++ )
++    for ( i = 0; i < nTracks; i++ )
+     {
+       p = table + i * ( 4 + 2 + 2 );
+       track     = FT_NEXT_LONG( p );
+@@ -125,7 +125,7 @@
+ 
+       gxv_sfntName_validate( nameIndex, 256, 32767, gxvalid );
+ 
+-      for ( j = i; j < nTracks; j ++ )
++      for ( j = i; j < nTracks; j++ )
+       {
+          p = table + j * ( 4 + 2 + 2 );
+          t = FT_NEXT_LONG( p );
+diff --git a/src/otvalid/otvmath.c b/src/otvalid/otvmath.c
+index 6c46178..6c785b6 100644
+--- a/src/otvalid/otvmath.c
++++ b/src/otvalid/otvmath.c
+@@ -88,7 +88,7 @@
+                                           FT_Int         isItalic )
+   {
+     FT_Bytes  p = table;
+-    FT_UInt   i, cnt, table_size ;
++    FT_UInt   i, cnt, table_size;
+ 
+     OTV_OPTIONAL_TABLE( Coverage );
+     OTV_OPTIONAL_TABLE( DeviceTableOffset );
+diff --git a/src/pcf/pcfread.c b/src/pcf/pcfread.c
+index fca677f..dec05db 100644
+--- a/src/pcf/pcfread.c
++++ b/src/pcf/pcfread.c
+@@ -442,7 +442,7 @@ THE SOFTWARE.
+     int           i;
+ 
+ 
+-    for ( i = 0 ; i < face->nprops && !found; i++ )
++    for ( i = 0; i < face->nprops && !found; i++ )
+     {
+       if ( !ft_strcmp( properties[i].name, prop ) )
+         found = 1;
+diff --git a/src/pfr/pfrgload.c b/src/pfr/pfrgload.c
+index 1dbbf95..f9cd1f6 100644
+--- a/src/pfr/pfrgload.c
++++ b/src/pfr/pfrgload.c
+@@ -336,7 +336,7 @@
+     /* XXX: we ignore the secondary stroke and edge definitions */
+     /*      since we don't support native PFR hinting           */
+     /*                                                          */
+-    if ( flags & PFR_GLYPH_EXTRA_ITEMS )
++    if ( flags & PFR_GLYPH_SINGLE_EXTRA_ITEMS )
+     {
+       error = pfr_extra_items_skip( &p, limit );
+       if ( error )
+@@ -579,7 +579,7 @@
+ 
+     /* ignore extra items when present */
+     /*                                 */
+-    if ( flags & PFR_GLYPH_EXTRA_ITEMS )
++    if ( flags & PFR_GLYPH_COMPOUND_EXTRA_ITEMS )
+     {
+       error = pfr_extra_items_skip( &p, limit );
+       if ( error )
+diff --git a/src/pfr/pfrobjs.c b/src/pfr/pfrobjs.c
+index 81b1312..769a3b6 100644
+--- a/src/pfr/pfrobjs.c
++++ b/src/pfr/pfrobjs.c
+@@ -524,8 +524,8 @@
+         FT_UInt    probe       = power * size;
+         FT_UInt    extra       = count - power;
+         FT_Byte*   base        = stream->cursor;
+-        FT_Bool    twobytes    = FT_BOOL( item->flags & 1 );
+-        FT_Bool    twobyte_adj = FT_BOOL( item->flags & 2 );
++        FT_Bool    twobytes    = FT_BOOL( item->flags & PFR_KERN_2BYTE_CHAR );
++        FT_Bool    twobyte_adj = FT_BOOL( item->flags & PFR_KERN_2BYTE_ADJ  );
+         FT_Byte*   p;
+         FT_UInt32  cpair;
+ 
+diff --git a/src/pfr/pfrsbit.c b/src/pfr/pfrsbit.c
+index 22f6096..d271593 100644
+--- a/src/pfr/pfrsbit.c
++++ b/src/pfr/pfrsbit.c
+@@ -277,20 +277,75 @@
+   pfr_lookup_bitmap_data( FT_Byte*   base,
+                           FT_Byte*   limit,
+                           FT_UInt    count,
+-                          FT_UInt    flags,
++                          FT_UInt*   flags,
+                           FT_UInt    char_code,
+                           FT_ULong*  found_offset,
+                           FT_ULong*  found_size )
+   {
+     FT_UInt   left, right, char_len;
+-    FT_Bool   two = FT_BOOL( flags & 1 );
++    FT_Bool   two = FT_BOOL( *flags & PFR_BITMAP_2BYTE_CHARCODE );
+     FT_Byte*  buff;
+ 
+ 
+     char_len = 4;
+-    if ( two )       char_len += 1;
+-    if ( flags & 2 ) char_len += 1;
+-    if ( flags & 4 ) char_len += 1;
++    if ( two )
++      char_len += 1;
++    if ( *flags & PFR_BITMAP_2BYTE_SIZE )
++      char_len += 1;
++    if ( *flags & PFR_BITMAP_3BYTE_OFFSET )
++      char_len += 1;
++
++    if ( !( *flags & PFR_BITMAP_CHARCODES_VALIDATED ) )
++    {
++      FT_Byte*  p;
++      FT_Byte*  lim;
++      FT_UInt   code;
++      FT_Long   prev_code;
++
++
++      *flags    |= PFR_BITMAP_VALID_CHARCODES;
++      prev_code  = -1;
++      lim        = base + count * char_len;
++
++      if ( lim > limit )
++      {
++        FT_TRACE0(( "pfr_lookup_bitmap_data:"
++                    " number of bitmap records too large,\n"
++                    "                       "
++                    " thus ignoring all bitmaps in this strike\n" ));
++        *flags &= ~PFR_BITMAP_VALID_CHARCODES;
++      }
++      else
++      {
++        /* check whether records are sorted by code */
++        for ( p = base; p < lim; p += char_len )
++        {
++          if ( two )
++            code = FT_PEEK_USHORT( p );
++          else
++            code = *p;
++
++          if ( code <= prev_code )
++          {
++            FT_TRACE0(( "pfr_lookup_bitmap_data:"
++                        " bitmap records are not sorted,\n"
++                        "                       "
++                        " thus ignoring all bitmaps in this strike\n" ));
++            *flags &= ~PFR_BITMAP_VALID_CHARCODES;
++            break;
++          }
++
++          prev_code = code;
++        }
++      }
++
++      *flags |= PFR_BITMAP_CHARCODES_VALIDATED;
++    }
++
++    /* ignore bitmaps in case table is not valid     */
++    /* (this might be sanitized, but PFR is dead...) */
++    if ( !( *flags & PFR_BITMAP_VALID_CHARCODES ) )
++      goto Fail;
+ 
+     left  = 0;
+     right = count;
+@@ -303,11 +358,6 @@
+       middle = ( left + right ) >> 1;
+       buff   = base + middle * char_len;
+ 
+-      /* check that we are not outside of the table -- */
+-      /* this is possible with broken fonts...         */
+-      if ( buff + char_len > limit )
+-        goto Fail;
+-
+       if ( two )
+         code = PFR_NEXT_USHORT( buff );
+       else
+@@ -329,12 +379,12 @@
+     return;
+ 
+   Found_It:
+-    if ( flags & 2 )
++    if ( *flags & PFR_BITMAP_2BYTE_SIZE )
+       *found_size = PFR_NEXT_USHORT( buff );
+     else
+       *found_size = PFR_NEXT_BYTE( buff );
+ 
+-    if ( flags & 4 )
++    if ( *flags & PFR_BITMAP_3BYTE_OFFSET )
+       *found_offset = PFR_NEXT_ULONG( buff );
+     else
+       *found_offset = PFR_NEXT_USHORT( buff );
+@@ -357,7 +407,6 @@
+   {
+     FT_Error  error = FT_Err_Ok;
+     FT_Byte   flags;
+-    FT_Char   c;
+     FT_Byte   b;
+     FT_Byte*  p = *pdata;
+     FT_Long   xpos, ypos, advance;
+@@ -377,9 +426,9 @@
+     {
+     case 0:
+       PFR_CHECK( 1 );
+-      c    = PFR_NEXT_INT8( p );
+-      xpos = c >> 4;
+-      ypos = ( (FT_Char)( c << 4 ) ) >> 4;
++      b    = PFR_NEXT_BYTE( p );
++      xpos = (FT_Char)b >> 4;
++      ypos = ( (FT_Char)( b << 4 ) ) >> 4;
+       break;
+ 
+     case 1:
+@@ -571,9 +620,12 @@
+ 
+ 
+       char_len = 4;
+-      if ( strike->flags & 1 ) char_len += 1;
+-      if ( strike->flags & 2 ) char_len += 1;
+-      if ( strike->flags & 4 ) char_len += 1;
++      if ( strike->flags & PFR_BITMAP_2BYTE_CHARCODE )
++        char_len += 1;
++      if ( strike->flags & PFR_BITMAP_2BYTE_SIZE )
++        char_len += 1;
++      if ( strike->flags & PFR_BITMAP_3BYTE_OFFSET )
++        char_len += 1;
+ 
+       /* access data directly in the frame to speed lookups */
+       if ( FT_STREAM_SEEK( phys->bct_offset + strike->bct_offset ) ||
+@@ -583,7 +635,7 @@
+       pfr_lookup_bitmap_data( stream->cursor,
+                               stream->limit,
+                               strike->num_bitmaps,
+-                              strike->flags,
++                              &strike->flags,
+                               character->char_code,
+                               &gps_offset,
+                               &gps_size );
+@@ -630,6 +682,8 @@
+                                        &xpos, &ypos,
+                                        &xsize, &ysize,
+                                        &advance, &format );
++      if ( error )
++        goto Exit1;
+ 
+       /*
+        * Before allocating the target bitmap, we check whether the given
+@@ -675,7 +729,7 @@
+       {
+         if ( FT_ERR_EQ( error, Invalid_Table ) )
+           FT_ERROR(( "pfr_slot_load_bitmap: invalid bitmap dimensions\n" ));
+-        goto Exit;
++        goto Exit1;
+       }
+ 
+       /*
+@@ -710,8 +764,8 @@
+         /* XXX: needs casts to fit FT_Glyph_Metrics.{width|height} */
+         glyph->root.metrics.width        = (FT_Pos)xsize << 6;
+         glyph->root.metrics.height       = (FT_Pos)ysize << 6;
+-        glyph->root.metrics.horiBearingX = xpos << 6;
+-        glyph->root.metrics.horiBearingY = ypos << 6;
++        glyph->root.metrics.horiBearingX = xpos * 64;
++        glyph->root.metrics.horiBearingY = ypos * 64;
+         glyph->root.metrics.horiAdvance  = FT_PIX_ROUND( ( advance >> 2 ) );
+         glyph->root.metrics.vertBearingX = - glyph->root.metrics.width >> 1;
+         glyph->root.metrics.vertBearingY = 0;
+@@ -732,11 +786,13 @@
+                       p,
+                       stream->limit,
+                       format,
+-                      FT_BOOL(face->header.color_flags & 2),
++                      FT_BOOL( face->header.color_flags &
++                               PFR_FLAG_INVERT_BITMAP   ),
+                       &glyph->root.bitmap );
+         }
+       }
+ 
++    Exit1:
+       FT_FRAME_EXIT();
+     }
+ 
+diff --git a/src/pfr/pfrtypes.h b/src/pfr/pfrtypes.h
+index 592acbd..24ca4d3 100644
+--- a/src/pfr/pfrtypes.h
++++ b/src/pfr/pfrtypes.h
+@@ -121,6 +121,10 @@ FT_BEGIN_HEADER
+ 
+   typedef enum  PFR_BitmapFlags_
+   {
++    /* not part of the specification but used for implementation */
++    PFR_BITMAP_VALID_CHARCODES     = 0x80,
++    PFR_BITMAP_CHARCODES_VALIDATED = 0x40,
++
+     PFR_BITMAP_3BYTE_OFFSET   = 4,
+     PFR_BITMAP_2BYTE_SIZE     = 2,
+     PFR_BITMAP_2BYTE_CHARCODE = 1
+@@ -291,8 +295,11 @@ FT_BEGIN_HEADER
+ 
+   typedef enum  PFR_GlyphFlags_
+   {
+-    PFR_GLYPH_IS_COMPOUND   = 0x80,
+-    PFR_GLYPH_EXTRA_ITEMS   = 0x08,
++    PFR_GLYPH_IS_COMPOUND = 0x80,
++
++    PFR_GLYPH_SINGLE_EXTRA_ITEMS   = 0x08,
++    PFR_GLYPH_COMPOUND_EXTRA_ITEMS = 0x40,
++
+     PFR_GLYPH_1BYTE_XYCOUNT = 0x04,
+     PFR_GLYPH_XCOUNT        = 0x02,
+     PFR_GLYPH_YCOUNT        = 0x01
+diff --git a/src/raster/ftraster.c b/src/raster/ftraster.c
+index d6c5ded..01ed1c5 100644
+--- a/src/raster/ftraster.c
++++ b/src/raster/ftraster.c
+@@ -3106,9 +3106,9 @@
+ 
+ 
+   static void
+-  ft_black_reset( black_PRaster  raster,
+-                  char*          pool_base,
+-                  Long           pool_size )
++  ft_black_reset( FT_Raster  raster,
++                  PByte      pool_base,
++                  ULong      pool_size )
+   {
+     FT_UNUSED( raster );
+     FT_UNUSED( pool_base );
+@@ -3117,20 +3117,20 @@
+ 
+ 
+   static int
+-  ft_black_set_mode( black_PRaster  raster,
+-                     ULong          mode,
+-                     const char*    palette )
++  ft_black_set_mode( FT_Raster  raster,
++                     ULong      mode,
++                     void*      args )
+   {
+     FT_UNUSED( raster );
+     FT_UNUSED( mode );
+-    FT_UNUSED( palette );
++    FT_UNUSED( args );
+ 
+     return 0;
+   }
+ 
+ 
+   static int
+-  ft_black_render( black_PRaster            raster,
++  ft_black_render( FT_Raster                raster,
+                    const FT_Raster_Params*  params )
+   {
+     const FT_Outline*  outline    = (const FT_Outline*)params->source;
+@@ -3175,6 +3175,20 @@
+     if ( !target_map->buffer )
+       return FT_THROW( Invalid );
+ 
++    /* reject too large outline coordinates */
++    {
++      FT_Vector*  vec   = outline->points;
++      FT_Vector*  limit = vec + outline->n_points;
++
++
++      for ( ; vec < limit; vec++ )
++      {
++        if ( vec->x < -0x1000000L || vec->x > 0x1000000L ||
++             vec->y < -0x1000000L || vec->y > 0x1000000L )
++         return FT_THROW( Invalid );
++      }
++    }
++
+     ras.outline = *outline;
+     ras.target  = *target_map;
+ 
+diff --git a/src/sfnt/sfobjs.c b/src/sfnt/sfobjs.c
+index 2cf2ee2..2e8c1ec 100644
+--- a/src/sfnt/sfobjs.c
++++ b/src/sfnt/sfobjs.c
+@@ -949,6 +949,10 @@
+              instance_size * num_instances > fvar_len )
+         num_instances = 0;
+ 
++      /* we don't support Multiple Master CFFs yet */
++      if ( !face->goto_table( face, TTAG_CFF, stream, 0 ) )
++        num_instances = 0;
++
+       /* we support at most 2^15 - 1 instances */
+       if ( num_instances >= ( 1U << 15 ) - 1 )
+       {
+diff --git a/src/sfnt/ttcmap.c b/src/sfnt/ttcmap.c
+index 92ec523..8f9e3c1 100644
+--- a/src/sfnt/ttcmap.c
++++ b/src/sfnt/ttcmap.c
+@@ -1245,7 +1245,7 @@
+             mid = max + 1;
+ 
+           /* search in segments before the current segment */
+-          for ( i = max ; i > 0; i-- )
++          for ( i = max; i > 0; i-- )
+           {
+             FT_UInt   prev_end;
+             FT_Byte*  old_p;
+diff --git a/src/smooth/ftgrays.c b/src/smooth/ftgrays.c
+index dac332d..885b0df 100644
+--- a/src/smooth/ftgrays.c
++++ b/src/smooth/ftgrays.c
+@@ -320,17 +320,17 @@ typedef ptrdiff_t  FT_PtrDist;
+ 
+ #define ONE_PIXEL       ( 1L << PIXEL_BITS )
+ #define TRUNC( x )      ( (TCoord)( (x) >> PIXEL_BITS ) )
+-#define SUBPIXELS( x )  ( (TPos)(x) << PIXEL_BITS )
++#define SUBPIXELS( x )  ( (TPos)(x) * ONE_PIXEL )
+ #define FLOOR( x )      ( (x) & -ONE_PIXEL )
+ #define CEILING( x )    ( ( (x) + ONE_PIXEL - 1 ) & -ONE_PIXEL )
+ #define ROUND( x )      ( ( (x) + ONE_PIXEL / 2 ) & -ONE_PIXEL )
+ 
+ #if PIXEL_BITS >= 6
+-#define UPSCALE( x )    ( (x) << ( PIXEL_BITS - 6 ) )
++#define UPSCALE( x )    ( (x) * ( ONE_PIXEL >> 6 ) )
+ #define DOWNSCALE( x )  ( (x) >> ( PIXEL_BITS - 6 ) )
+ #else
+ #define UPSCALE( x )    ( (x) >> ( 6 - PIXEL_BITS ) )
+-#define DOWNSCALE( x )  ( (x) << ( 6 - PIXEL_BITS ) )
++#define DOWNSCALE( x )  ( (x) * ( 64 >> PIXEL_BITS ) )
+ #endif
+ 
+ 
+@@ -388,25 +388,7 @@ typedef ptrdiff_t  FT_PtrDist;
+ 
+   typedef long  TCoord;   /* integer scanline/pixel coordinate */
+   typedef long  TPos;     /* sub-pixel coordinate              */
+-
+-  /* determine the type used to store cell areas.  This normally takes at */
+-  /* least PIXEL_BITS*2 + 1 bits.  On 16-bit systems, we need to use      */
+-  /* `long' instead of `int', otherwise bad things happen                 */
+-
+-#if PIXEL_BITS <= 7
+-
+-  typedef int  TArea;
+-
+-#else /* PIXEL_BITS >= 8 */
+-
+-  /* approximately determine the size of integers using an ANSI-C header */
+-#if FT_UINT_MAX == 0xFFFFU
+-  typedef long  TArea;
+-#else
+-  typedef int   TArea;
+-#endif
+-
+-#endif /* PIXEL_BITS >= 8 */
++  typedef long  TArea;    /* cell areas, coordinate products   */
+ 
+ 
+   /* maximum number of gray spans in a call to the span callback */
+@@ -689,7 +671,7 @@ typedef ptrdiff_t  FT_PtrDist;
+     gray_set_cell( RAS_VAR_ ex, ey );
+   }
+ 
+-#if 0
++#if 1
+ 
+   /*************************************************************************/
+   /*                                                                       */
+@@ -707,12 +689,8 @@ typedef ptrdiff_t  FT_PtrDist;
+     int     incr;
+ 
+ 
+-    dx = x2 - x1;
+-
+     ex1 = TRUNC( x1 );
+     ex2 = TRUNC( x2 );
+-    fx1 = (TCoord)( x1 - SUBPIXELS( ex1 ) );
+-    fx2 = (TCoord)( x2 - SUBPIXELS( ex2 ) );
+ 
+     /* trivial case.  Happens often */
+     if ( y1 == y2 )
+@@ -721,6 +699,9 @@ typedef ptrdiff_t  FT_PtrDist;
+       return;
+     }
+ 
++    fx1 = (TCoord)( x1 - SUBPIXELS( ex1 ) );
++    fx2 = (TCoord)( x2 - SUBPIXELS( ex2 ) );
++
+     /* everything is located in a single cell.  That is easy! */
+     /*                                                        */
+     if ( ex1 == ex2 )
+@@ -737,6 +718,7 @@ typedef ptrdiff_t  FT_PtrDist;
+     p     = ( ONE_PIXEL - fx1 ) * ( y2 - y1 );
+     first = ONE_PIXEL;
+     incr  = 1;
++    dx    = x2 - x1;
+ 
+     if ( dx < 0 )
+     {
+@@ -805,17 +787,15 @@ typedef ptrdiff_t  FT_PtrDist;
+ 
+     ey1 = TRUNC( ras.y );
+     ey2 = TRUNC( to_y );     /* if (ey2 >= ras.max_ey) ey2 = ras.max_ey-1; */
+-    fy1 = (TCoord)( ras.y - SUBPIXELS( ey1 ) );
+-    fy2 = (TCoord)( to_y - SUBPIXELS( ey2 ) );
+-
+-    dx = to_x - ras.x;
+-    dy = to_y - ras.y;
+ 
+     /* perform vertical clipping */
+     if ( ( ey1 >= ras.max_ey && ey2 >= ras.max_ey ) ||
+          ( ey1 <  ras.min_ey && ey2 <  ras.min_ey ) )
+       goto End;
+ 
++    fy1 = (TCoord)( ras.y - SUBPIXELS( ey1 ) );
++    fy2 = (TCoord)( to_y - SUBPIXELS( ey2 ) );
++
+     /* everything is on a single scanline */
+     if ( ey1 == ey2 )
+     {
+@@ -823,6 +803,9 @@ typedef ptrdiff_t  FT_PtrDist;
+       goto End;
+     }
+ 
++    dx = to_x - ras.x;
++    dy = to_y - ras.y;
++
+     /* vertical line - avoid calling gray_render_scanline */
+     incr = 1;
+ 
+@@ -936,8 +919,6 @@ typedef ptrdiff_t  FT_PtrDist;
+     TCoord  ex1, ex2, ey1, ey2;
+ 
+ 
+-    ex1 = TRUNC( ras.x );
+-    ex2 = TRUNC( to_x );
+     ey1 = TRUNC( ras.y );
+     ey2 = TRUNC( to_y );
+ 
+@@ -946,12 +927,15 @@ typedef ptrdiff_t  FT_PtrDist;
+          ( ey1 <  ras.min_ey && ey2 <  ras.min_ey ) )
+       goto End;
+ 
+-    dx = to_x - ras.x;
+-    dy = to_y - ras.y;
++    ex1 = TRUNC( ras.x );
++    ex2 = TRUNC( to_x );
+ 
+     fx1 = ras.x - SUBPIXELS( ex1 );
+     fy1 = ras.y - SUBPIXELS( ey1 );
+ 
++    dx = to_x - ras.x;
++    dy = to_y - ras.y;
++
+     if ( ex1 == ex2 && ey1 == ey2 )       /* inside one cell */
+       ;
+     else if ( dy == 0 ) /* ex1 != ex2 */  /* any horizontal line */
+@@ -1081,25 +1065,14 @@ typedef ptrdiff_t  FT_PtrDist;
+ 
+ 
+   static void
+-  gray_render_conic( RAS_ARG_ const FT_Vector*  control,
+-                              const FT_Vector*  to )
++  gray_render_conic( RAS_ARG )
+   {
+     TPos        dx, dy;
+-    TPos        min, max, y;
+     int         top, level;
+-    int*        levels;
+-    FT_Vector*  arc;
+-
++    int*        levels = ras.lev_stack;
++    FT_Vector*  arc = ras.bez_stack;
+ 
+-    levels = ras.lev_stack;
+ 
+-    arc      = ras.bez_stack;
+-    arc[0].x = UPSCALE( to->x );
+-    arc[0].y = UPSCALE( to->y );
+-    arc[1].x = UPSCALE( control->x );
+-    arc[1].y = UPSCALE( control->y );
+-    arc[2].x = ras.x;
+-    arc[2].y = ras.y;
+     top      = 0;
+ 
+     dx = FT_ABS( arc[2].x + arc[0].x - 2 * arc[1].x );
+@@ -1110,20 +1083,8 @@ typedef ptrdiff_t  FT_PtrDist;
+     if ( dx < ONE_PIXEL / 4 )
+       goto Draw;
+ 
+-    /* short-cut the arc that crosses the current band */
+-    min = max = arc[0].y;
+-
+-    y = arc[1].y;
+-    if ( y < min ) min = y;
+-    if ( y > max ) max = y;
+-
+-    y = arc[2].y;
+-    if ( y < min ) min = y;
+-    if ( y > max ) max = y;
+-
+-    if ( TRUNC( min ) >= ras.max_ey || TRUNC( max ) < ras.min_ey )
+-      goto Draw;
+-
++    /* we can calculate the number of necessary bisections because  */
++    /* each bisection predictably reduces deviation at least 4-fold */
+     level = 0;
+     do
+     {
+@@ -1183,47 +1144,13 @@ typedef ptrdiff_t  FT_PtrDist;
+ 
+ 
+   static void
+-  gray_render_cubic( RAS_ARG_ const FT_Vector*  control1,
+-                              const FT_Vector*  control2,
+-                              const FT_Vector*  to )
++  gray_render_cubic( RAS_ARG )
+   {
+-    FT_Vector*  arc;
+-    TPos        min, max, y;
+-
+-
+-    arc      = ras.bez_stack;
+-    arc[0].x = UPSCALE( to->x );
+-    arc[0].y = UPSCALE( to->y );
+-    arc[1].x = UPSCALE( control2->x );
+-    arc[1].y = UPSCALE( control2->y );
+-    arc[2].x = UPSCALE( control1->x );
+-    arc[2].y = UPSCALE( control1->y );
+-    arc[3].x = ras.x;
+-    arc[3].y = ras.y;
++    FT_Vector*  arc = ras.bez_stack;
++    TPos        dx, dy, dx_, dy_;
++    TPos        dx1, dy1, dx2, dy2;
++    TPos        L, s, s_limit;
+ 
+-    /* Short-cut the arc that crosses the current band. */
+-    min = max = arc[0].y;
+-
+-    y = arc[1].y;
+-    if ( y < min )
+-      min = y;
+-    if ( y > max )
+-      max = y;
+-
+-    y = arc[2].y;
+-    if ( y < min )
+-      min = y;
+-    if ( y > max )
+-      max = y;
+-
+-    y = arc[3].y;
+-    if ( y < min )
+-      min = y;
+-    if ( y > max )
+-      max = y;
+-
+-    if ( TRUNC( min ) >= ras.max_ey || TRUNC( max ) < ras.min_ey )
+-      goto Draw;
+ 
+     for (;;)
+     {
+@@ -1232,64 +1159,53 @@ typedef ptrdiff_t  FT_PtrDist;
+       /* F. Hain, at                                                      */
+       /* http://www.cis.southalabama.edu/~hain/general/Publications/Bezier/Camera-ready%20CISST02%202.pdf */
+ 
+-      {
+-        TPos  dx, dy, dx_, dy_;
+-        TPos  dx1, dy1, dx2, dy2;
+-        TPos  L, s, s_limit;
+-
++      /* dx and dy are x and y components of the P0-P3 chord vector. */
++      dx = dx_ = arc[3].x - arc[0].x;
++      dy = dy_ = arc[3].y - arc[0].y;
+ 
+-        /* dx and dy are x and y components of the P0-P3 chord vector. */
+-        dx = dx_ = arc[3].x - arc[0].x;
+-        dy = dy_ = arc[3].y - arc[0].y;
++      L = FT_HYPOT( dx_, dy_ );
+ 
+-        L = FT_HYPOT( dx_, dy_ );
++      /* Avoid possible arithmetic overflow below by splitting. */
++      if ( L > 32767 )
++        goto Split;
+ 
+-        /* Avoid possible arithmetic overflow below by splitting. */
+-        if ( L > 32767 )
+-          goto Split;
++      /* Max deviation may be as much as (s/L) * 3/4 (if Hain's v = 1). */
++      s_limit = L * (TPos)( ONE_PIXEL / 6 );
+ 
+-        /* Max deviation may be as much as (s/L) * 3/4 (if Hain's v = 1). */
+-        s_limit = L * (TPos)( ONE_PIXEL / 6 );
++      /* s is L * the perpendicular distance from P1 to the line P0-P3. */
++      dx1 = arc[1].x - arc[0].x;
++      dy1 = arc[1].y - arc[0].y;
++      s = FT_ABS( dy * dx1 - dx * dy1 );
+ 
+-        /* s is L * the perpendicular distance from P1 to the line P0-P3. */
+-        dx1 = arc[1].x - arc[0].x;
+-        dy1 = arc[1].y - arc[0].y;
+-        s = FT_ABS( dy * dx1 - dx * dy1 );
++      if ( s > s_limit )
++        goto Split;
+ 
+-        if ( s > s_limit )
+-          goto Split;
++      /* s is L * the perpendicular distance from P2 to the line P0-P3. */
++      dx2 = arc[2].x - arc[0].x;
++      dy2 = arc[2].y - arc[0].y;
++      s = FT_ABS( dy * dx2 - dx * dy2 );
+ 
+-        /* s is L * the perpendicular distance from P2 to the line P0-P3. */
+-        dx2 = arc[2].x - arc[0].x;
+-        dy2 = arc[2].y - arc[0].y;
+-        s = FT_ABS( dy * dx2 - dx * dy2 );
++      if ( s > s_limit )
++        goto Split;
+ 
+-        if ( s > s_limit )
+-          goto Split;
+-
+-        /* Split super curvy segments where the off points are so far
+-           from the chord that the angles P0-P1-P3 or P0-P2-P3 become
+-           acute as detected by appropriate dot products. */
+-        if ( dx1 * ( dx1 - dx ) + dy1 * ( dy1 - dy ) > 0 ||
+-             dx2 * ( dx2 - dx ) + dy2 * ( dy2 - dy ) > 0 )
+-          goto Split;
+-
+-        /* No reason to split. */
+-        goto Draw;
+-      }
+-
+-    Split:
+-      gray_split_cubic( arc );
+-      arc += 3;
+-      continue;
++      /* Split super curvy segments where the off points are so far
++         from the chord that the angles P0-P1-P3 or P0-P2-P3 become
++         acute as detected by appropriate dot products. */
++      if ( dx1 * ( dx1 - dx ) + dy1 * ( dy1 - dy ) > 0 ||
++           dx2 * ( dx2 - dx ) + dy2 * ( dy2 - dy ) > 0 )
++        goto Split;
+ 
+-    Draw:
+       gray_render_line( RAS_VAR_ arc[0].x, arc[0].y );
+ 
+       if ( arc == ras.bez_stack )
+         return;
+ 
+       arc -= 3;
++      continue;
++
++    Split:
++      gray_split_cubic( arc );
++      arc += 3;
+     }
+   }
+ 
+@@ -1331,7 +1247,27 @@ typedef ptrdiff_t  FT_PtrDist;
+                  const FT_Vector*  to,
+                  gray_PWorker      worker )
+   {
+-    gray_render_conic( RAS_VAR_ control, to );
++    FT_Vector*  arc = ras.bez_stack;
++
++
++    arc[0].x = UPSCALE( to->x );
++    arc[0].y = UPSCALE( to->y );
++    arc[1].x = UPSCALE( control->x );
++    arc[1].y = UPSCALE( control->y );
++    arc[2].x = ras.x;
++    arc[2].y = ras.y;
++
++    /* short-cut the arc that crosses the current band */
++    if ( ( TRUNC( arc[0].y ) >= ras.max_ey &&
++           TRUNC( arc[1].y ) >= ras.max_ey &&
++           TRUNC( arc[2].y ) >= ras.max_ey ) ||
++         ( TRUNC( arc[0].y ) <  ras.min_ey &&
++           TRUNC( arc[1].y ) <  ras.min_ey &&
++           TRUNC( arc[2].y ) <  ras.min_ey ) )
++      gray_render_line( RAS_VAR_ arc[0].x, arc[0].y );
++    else
++      gray_render_conic( RAS_VAR );
++
+     return 0;
+   }
+ 
+@@ -1342,7 +1278,31 @@ typedef ptrdiff_t  FT_PtrDist;
+                  const FT_Vector*  to,
+                  gray_PWorker      worker )
+   {
+-    gray_render_cubic( RAS_VAR_ control1, control2, to );
++    FT_Vector*  arc = ras.bez_stack;
++
++
++    arc[0].x = UPSCALE( to->x );
++    arc[0].y = UPSCALE( to->y );
++    arc[1].x = UPSCALE( control2->x );
++    arc[1].y = UPSCALE( control2->y );
++    arc[2].x = UPSCALE( control1->x );
++    arc[2].y = UPSCALE( control1->y );
++    arc[3].x = ras.x;
++    arc[3].y = ras.y;
++
++    /* short-cut the arc that crosses the current band */
++    if ( ( TRUNC( arc[0].y ) >= ras.max_ey &&
++           TRUNC( arc[1].y ) >= ras.max_ey &&
++           TRUNC( arc[2].y ) >= ras.max_ey &&
++           TRUNC( arc[3].y ) >= ras.max_ey ) ||
++         ( TRUNC( arc[0].y ) <  ras.min_ey &&
++           TRUNC( arc[1].y ) <  ras.min_ey &&
++           TRUNC( arc[2].y ) <  ras.min_ey &&
++           TRUNC( arc[3].y ) <  ras.min_ey ) )
++      gray_render_line( RAS_VAR_ arc[0].x, arc[0].y );
++    else
++      gray_render_cubic( RAS_VAR );
++
+     return 0;
+   }
+ 
+@@ -1521,7 +1481,8 @@ typedef ptrdiff_t  FT_PtrDist;
+       printf( "%3d:", yindex );
+ 
+       for ( cell = ras.ycells[yindex]; cell != NULL; cell = cell->next )
+-        printf( " (%3ld, c:%4ld, a:%6d)", cell->x, cell->cover, cell->area );
++        printf( " (%3ld, c:%4ld, a:%6ld)",
++                cell->x, cell->cover, cell->area );
+       printf( "\n" );
+     }
+   }
+@@ -2066,7 +2027,7 @@ typedef ptrdiff_t  FT_PtrDist;
+ 
+ 
+   static int
+-  gray_raster_render( gray_PRaster             raster,
++  gray_raster_render( FT_Raster                raster,
+                       const FT_Raster_Params*  params )
+   {
+     const FT_Outline*  outline     = (const FT_Outline*)params->source;
+@@ -2115,6 +2076,20 @@ typedef ptrdiff_t  FT_PtrDist;
+     if ( !( params->flags & FT_RASTER_FLAG_AA ) )
+       return FT_THROW( Invalid_Mode );
+ 
++    /* reject too large outline coordinates */
++    {
++      FT_Vector*  vec   = outline->points;
++      FT_Vector*  limit = vec + outline->n_points;
++
++
++      for ( ; vec < limit; vec++ )
++      {
++        if ( vec->x < -0x1000000L || vec->x > 0x1000000L ||
++             vec->y < -0x1000000L || vec->y > 0x1000000L )
++         return FT_THROW( Invalid_Outline );
++      }
++    }
++
+     /* compute clipping box */
+     if ( !( params->flags & FT_RASTER_FLAG_DIRECT ) )
+     {
+@@ -2221,9 +2196,9 @@ typedef ptrdiff_t  FT_PtrDist;
+ 
+ 
+   static void
+-  gray_raster_reset( FT_Raster  raster,
+-                     char*      pool_base,
+-                     long       pool_size )
++  gray_raster_reset( FT_Raster       raster,
++                     unsigned char*  pool_base,
++                     unsigned long   pool_size )
+   {
+     FT_UNUSED( raster );
+     FT_UNUSED( pool_base );
+diff --git a/src/tools/docmaker/tohtml.py b/src/tools/docmaker/tohtml.py
+index 8da10b8..9b28780 100644
+--- a/src/tools/docmaker/tohtml.py
++++ b/src/tools/docmaker/tohtml.py
+@@ -390,7 +390,7 @@ class  HtmlFormatter( Formatter ):
+         """Convert a code sequence to HTML."""
+         line = code_header + '\n'
+         for l in lines:
+-            line = line + html_quote( l ) + '\n'
++            line = line + html_quote( l ).rstrip() + '\n'
+ 
+         return line + code_footer
+ 
+diff --git a/src/tools/ftfuzzer/ftfuzzer.cc b/src/tools/ftfuzzer/ftfuzzer.cc
+index 7df7abc..39f2b39 100644
+--- a/src/tools/ftfuzzer/ftfuzzer.cc
++++ b/src/tools/ftfuzzer/ftfuzzer.cc
+@@ -161,7 +161,7 @@
+                     variations->axis[i].def     ) / 2;
+ 
+     if ( FT_Set_Var_Design_Coordinates( face,
+-                                        coords.size(),
++                                        FT_UInt( coords.size() ),
+                                         coords.data() ) )
+       return;
+   }
+@@ -248,7 +248,7 @@
+ 
+         // loop over all bitmap stroke sizes
+         // and an arbitrary size for outlines
+-        for ( long  fixed_sizes_index = 0;
++        for ( int  fixed_sizes_index = 0;
+               fixed_sizes_index < face->num_fixed_sizes + 1;
+               fixed_sizes_index++ )
+         {
+diff --git a/src/tools/ftfuzzer/rasterfuzzer.cc b/src/tools/ftfuzzer/rasterfuzzer.cc
+new file mode 100644
+index 0000000..05187b0
+--- /dev/null
++++ b/src/tools/ftfuzzer/rasterfuzzer.cc
+@@ -0,0 +1,129 @@
++// rasterfuzzer.cc
++//
++//   A fuzzing function to test FreeType's rasterizers with libFuzzer.
++//
++// Copyright 2016 by
++// David Turner, Robert Wilhelm, and Werner Lemberg.
++//
++// This file is part of the FreeType project, and may only be used,
++// modified, and distributed under the terms of the FreeType project
++// license, LICENSE.TXT.  By continuing to use, modify, or distribute
++// this file you indicate that you have read the license and
++// understand and accept it fully.
++
++
++#include <stdint.h>
++
++#include <vector>
++
++
++  using namespace std;
++
++
++#include <ft2build.h>
++
++#include FT_FREETYPE_H
++#include FT_IMAGE_H
++#include FT_OUTLINE_H
++
++
++  static FT_Library  library;
++  static int         InitResult;
++
++
++  struct FT_Global {
++    FT_Global() {
++      InitResult = FT_Init_FreeType( &library );
++    }
++    ~FT_Global() {
++      FT_Done_FreeType( library );
++    }
++  };
++
++  FT_Global  global_ft;
++
++
++  extern "C" int
++  LLVMFuzzerTestOneInput( const uint8_t*  data,
++                          size_t          size_ )
++  {
++    unsigned char  pixels[4];
++
++    FT_Bitmap  bitmap_mono = {
++      1,                  // rows
++      1,                  // width
++      4,                  // pitch
++      pixels,             // buffer
++      2,                  // num_grays
++      FT_PIXEL_MODE_MONO, // pixel_mode
++      0,                  // palette_mode
++      NULL                // palette
++    };
++
++    FT_Bitmap  bitmap_gray = {
++      1,                  // rows
++      1,                  // width
++      4,                  // pitch
++      pixels,             // buffer
++      256,                // num_grays
++      FT_PIXEL_MODE_GRAY, // pixel_mode
++      0,                  // palette_mode
++      NULL                // palette
++    };
++
++    const size_t vsize = sizeof ( FT_Vector );
++    const size_t tsize = sizeof ( char );
++
++    // we use the input data for both points and tags
++    short  n_points = short( size_ / ( vsize + tsize ) );
++    if ( n_points <= 2 )
++      return 0;
++
++    FT_Vector*  points = reinterpret_cast<FT_Vector*>(
++                           const_cast<uint8_t*>(
++                             data ) );
++    char*       tags   = reinterpret_cast<char*>(
++                           const_cast<uint8_t*>(
++                             data + size_t( n_points ) * vsize ) );
++
++    // to reduce the number of invalid outlines that are immediately
++    // rejected in `FT_Outline_Render', limit values to 2^18 pixels
++    // (i.e., 2^24 bits)
++    for ( short  i = 0; i < n_points; i++ )
++    {
++      if ( points[i].x == LONG_MIN )
++        points[i].x = 0;
++      else if ( points[i].x < 0 )
++        points[i].x = -( -points[i].x & 0xFFFFFF ) - 1;
++      else
++        points[i].x = ( points[i].x & 0xFFFFFF ) + 1;
++
++      if ( points[i].y == LONG_MIN )
++        points[i].y = 0;
++      else if ( points[i].y < 0 )
++        points[i].y = -( -points[i].y & 0xFFFFFF ) - 1;
++      else
++        points[i].y = ( points[i].y & 0xFFFFFF ) + 1;
++    }
++
++    short  contours[1];
++    contours[0] = n_points - 1;
++
++    FT_Outline  outline =
++    {
++      1,               // n_contours
++      n_points,        // n_points
++      points,          // points
++      tags,            // tags
++      contours,        // contours
++      FT_OUTLINE_NONE  // flags
++    };
++
++    FT_Outline_Get_Bitmap( library, &outline, &bitmap_mono );
++    FT_Outline_Get_Bitmap( library, &outline, &bitmap_gray );
++
++    return 0;
++  }
++
++
++// END
+diff --git a/src/tools/ftfuzzer/runinput.cc b/src/tools/ftfuzzer/runinput.cc
+index 8fa75ad..d5f9f15 100644
+--- a/src/tools/ftfuzzer/runinput.cc
++++ b/src/tools/ftfuzzer/runinput.cc
+@@ -1,6 +1,6 @@
+ // runinput.cc
+ //
+-//   A `main' function for `ftfuzzer.cc'.
++//   A `main' function for fuzzers like `ftfuzzer.cc'.
+ //
+ // Copyright 2015-2016 by
+ // David Turner, Robert Wilhelm, and Werner Lemberg.
+diff --git a/src/truetype/ttgload.c b/src/truetype/ttgload.c
+index 4ab6603..d1cb357 100644
+--- a/src/truetype/ttgload.c
++++ b/src/truetype/ttgload.c
+@@ -427,7 +427,8 @@
+       load->glyph->control_len  = n_ins;
+       load->glyph->control_data = load->exec->glyphIns;
+ 
+-      FT_MEM_COPY( load->exec->glyphIns, p, (FT_Long)n_ins );
++      if ( n_ins )
++        FT_MEM_COPY( load->exec->glyphIns, p, (FT_Long)n_ins );
+     }
+ 
+ #endif /* TT_USE_BYTECODE_INTERPRETER */
+diff --git a/src/truetype/ttgxvar.c b/src/truetype/ttgxvar.c
+index 5f760a2..ce4c8a0 100644
+--- a/src/truetype/ttgxvar.c
++++ b/src/truetype/ttgxvar.c
+@@ -551,7 +551,7 @@
+       for ( i = 0; i < blend->tuplecount; i++ )
+       {
+         FT_TRACE5(( "  [ " ));
+-        for ( j = 0 ; j < (FT_UInt)gvar_head.axisCount; j++ )
++        for ( j = 0; j < (FT_UInt)gvar_head.axisCount; j++ )
+         {
+           blend->tuplecoords[i * gvar_head.axisCount + j] =
+             FT_GET_SHORT() * 4;                 /* convert to FT_Fixed */
+@@ -632,8 +632,8 @@
+         break;
+       }
+ 
+-      else if ( ( blend->normalizedcoords[i] < 0 && tuple_coords[i] > 0 ) ||
+-                ( blend->normalizedcoords[i] > 0 && tuple_coords[i] < 0 ) )
++      else if ( ( blend->normalizedcoords[i] < FT_MIN( 0, tuple_coords[i] ) ) ||
++                ( blend->normalizedcoords[i] > FT_MAX( 0, tuple_coords[i] ) ) )
+       {
+         FT_TRACE6(( "      tuple coordinate value %.4f is exceeded, stop\n",
+                     tuple_coords[i] / 65536.0 ));
+@@ -646,10 +646,9 @@
+         FT_TRACE6(( "      tuple coordinate value %.4f fits\n",
+                     tuple_coords[i] / 65536.0 ));
+         /* not an intermediate tuple */
+-        apply = FT_MulFix( apply,
+-                           blend->normalizedcoords[i] > 0
+-                             ? blend->normalizedcoords[i]
+-                             : -blend->normalizedcoords[i] );
++        apply = FT_MulDiv( apply,
++                           blend->normalizedcoords[i],
++                           tuple_coords[i] );
+       }
+ 
+       else if ( blend->normalizedcoords[i] < im_start_coords[i] ||
+diff --git a/src/truetype/ttobjs.c b/src/truetype/ttobjs.c
+index cd4e294..a05f216 100644
+--- a/src/truetype/ttobjs.c
++++ b/src/truetype/ttobjs.c
+@@ -398,11 +398,11 @@
+     for ( j = 0; j < TRICK_SFNT_IDS_NUM_FACES; j++ )
+     {
+       if ( !has_cvt  && !sfnt_id[j][TRICK_SFNT_ID_cvt].Length )
+-        num_matched_ids[j] ++;
++        num_matched_ids[j]++;
+       if ( !has_fpgm && !sfnt_id[j][TRICK_SFNT_ID_fpgm].Length )
+-        num_matched_ids[j] ++;
++        num_matched_ids[j]++;
+       if ( !has_prep && !sfnt_id[j][TRICK_SFNT_ID_prep].Length )
+-        num_matched_ids[j] ++;
++        num_matched_ids[j]++;
+       if ( num_matched_ids[j] == TRICK_SFNT_IDS_PER_FACE )
+         return TRUE;
+     }
+diff --git a/src/type1/t1afm.c b/src/type1/t1afm.c
+index 3c7735d..bbd843c 100644
+--- a/src/type1/t1afm.c
++++ b/src/type1/t1afm.c
+@@ -197,7 +197,7 @@
+     /*   encoding of first glyph (1 byte)     */
+     /*   encoding of second glyph (1 byte)    */
+     /*   offset (little-endian short)         */
+-    for ( ; p < limit ; p += 4 )
++    for ( ; p < limit; p += 4 )
+     {
+       kp->index1 = FT_Get_Char_Index( t1_face, p[0] );
+       kp->index2 = FT_Get_Char_Index( t1_face, p[1] );
+diff --git a/src/type1/t1load.c b/src/type1/t1load.c
+index a53037c..ccf00b4 100644
+--- a/src/type1/t1load.c
++++ b/src/type1/t1load.c
+@@ -326,7 +326,7 @@
+                                       /* Point to axes after MM_Var struct */
+     mmvar->namedstyle      = NULL;
+ 
+-    for ( i = 0 ; i < mmaster.num_axis; ++i )
++    for ( i = 0; i < mmaster.num_axis; ++i )
+     {
+       mmvar->axis[i].name    = mmaster.axis[i].name;
+       mmvar->axis[i].minimum = INT_TO_FIXED( mmaster.axis[i].minimum);
+diff --git a/src/type1/t1objs.c b/src/type1/t1objs.c
+index f553f86..a009117 100644
+--- a/src/type1/t1objs.c
++++ b/src/type1/t1objs.c
+@@ -67,7 +67,7 @@
+                             "pshinter" );
+     return ( module && pshinter && pshinter->get_globals_funcs )
+            ? pshinter->get_globals_funcs( module )
+-           : 0 ;
++           : 0;
+   }
+ 
+ 
