@@ -3,9 +3,9 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=freetype2-infinality-ultimate
-pkgver=2.6.2
-pkgrel=4
-_patchrel=2015.12.05
+pkgver=2.6.3
+pkgrel=1
+_patchrel=2016.03.26
 pkgdesc="TrueType font rendering library with Infinality patches and custom settings."
 arch=('i686' 'x86_64')
 changelog=CHANGELOG
@@ -24,12 +24,12 @@ source=(http://downloads.sourceforge.net/sourceforge/freetype/freetype-${pkgver}
          infinality-settings.sh
          infinality-settings-generic)
 
-sha1sums=('29c22b85b77cb22cf95c13e7062e21f39fe6b17a'
+sha1sums=('6c98bd5d0be313207c37ca23d25faf983486aee5'
           'abf7a8f726ad6359533651a8942636880febf9f6'
-          '319c377ef4e3f6bc2f52acb893c9b880ef9578b4'
-          'a19a000e778a0b29b0ef0623d566b12187b7f24a'
+          'dc527dc3b45bb5f17533e7e049d16c475007a945'
+          '67807aef078bba232f9a0dd56ec1e8788b03689e'
           'a1859f2eacae2046a9ef705ac2bcc4bdf4fd9717'
-          '40d8cabfcf68e95ca4e580049a006726f7bbce81'
+          '44ca94634f894011db9ed7edbb105b50ca591e52'
           '4d219670cb9641b649f6ba0f2a799006f7c3c3c5')
 
 prepare() {

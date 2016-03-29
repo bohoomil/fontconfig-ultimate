@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ###          freetype2-infinality-ultimate settings          ###
-###           rev. 0.4.9.0, for freetype2 v.2.6.2            ###
+###              rev. 0.5, for freetype2 v.2.6.3             ###
 ###                                                          ###
 ###                Copyright (c) 2015 bohoomil               ###
 ### The MIT License (MIT) http://opensource.org/licenses/MIT ###
@@ -15,7 +15,7 @@
 ### create custom ones if necessary. Once modified, "infinality-settings.sh"
 ### needs to be copied to "/etc/X11/xinit/xinitrc.d/".
 ###
-### There are three basic levels of customization available to a user:
+### There are two levels of customization available to a user:
 ###
 ### 1. A set of 7 preconfigured styles selectable by name.
 
@@ -27,26 +27,16 @@
 ### ultimate5 <> darkest & heaviest ("MacIsh")
 ### osx       <> Apple OS X
 ### windowsxp <> MS Windows XP
-### custom    <> user defined
 
 ### If you want to use a style from the list, uncomment the variable below
 ### and set its name as the value.
 
 
-#INFINALITY_FT="ultimate3"
+#export INFINALITY_FT="ultimate3"
 
 
-### 2. Additionally, the chosen style can be adjusted by setting custom
-###    filter parameters. If you want to use this functionality, uncomment
-###    the variable below and enter custom values.
-
-
-#export INFINALITY_FT_FILTER_PARAMS="08 24 36 24 08"
-
-
-### 3. Setting the rendering style to "custom" lets you create custom styles
-###    from scratch. Uncomment the variables below and enter the values
-###    of your choice.
+### 2. If you want to create a custom style, uncomment the variables below
+###    and enter the values of your choice.
 
 
 #export INFINALITY_FT_FILTER_PARAMS="08 24 36 24 08"
@@ -58,6 +48,8 @@
 #export INFINALITY_FT_CHROMEOS_STYLE_SHARPENING_STRENGTH="0"
 #export INFINALITY_FT_STEM_ALIGNMENT_STRENGTH="15"
 #export INFINALITY_FT_STEM_FITTING_STRENGTH="15"
+#export INFINALITY_FT_STEM_DARKENING_AUTOFIT="false"
+#export INFINALITY_FT_STEM_DARKENING_CFF="false"
 #export INFINALITY_FT_GAMMA_CORRECTION="0 100"
 #export INFINALITY_FT_BRIGHTNESS="0"
 #export INFINALITY_FT_CONTRAST="0"
@@ -66,7 +58,6 @@
 #export INFINALITY_FT_AUTOHINT_SNAP_STEM_HEIGHT="0"
 #export INFINALITY_FT_STEM_SNAPPING_SLIDING_SCALE="0"
 #export INFINALITY_FT_USE_KNOWN_SETTINGS_ON_SELECTED_FONTS="false"
-
 
 ### Please refer to "infinality-settings-generic" file for detailed explanation
 ### of customization options and provided examples.
