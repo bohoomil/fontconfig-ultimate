@@ -24,13 +24,14 @@ index fd52581..bb81fb8 100755
  
  # respect GNUMAKE environment variable for backwards compatibility
 diff --git a/devel/ftoption.h b/devel/ftoption.h
-index f68b3ad..fb01836 100644
---- a/devel/ftoption.h
-+++ b/devel/ftoption.h
-@@ -607,6 +607,17 @@ FT_BEGIN_HEADER
- 
-   /*************************************************************************/
+--- a/devel/ftoption.h	2016-03-28 12:09:54.392246487 +0200
++++ b/devel/ftoption.h	2016-03-28 12:17:20.364039723 +0200
+@@ -604,6 +604,16 @@ FT_BEGIN_HEADER
    /*                                                                       */
+ #define TT_CONFIG_OPTION_SUBPIXEL_HINTING
+ 
++  /*************************************************************************/
++  /*                                                                       */
 +  /* Define FT_CONFIG_OPTION_INFINALITY_PATCHSET if you want to enable     */
 +  /* all additional infinality patches, which are configured via env       */
 +  /* variables.                                                            */
@@ -39,12 +40,9 @@ index f68b3ad..fb01836 100644
 +  /*   defined.                                                            */
 +  /*                                                                       */
 +#define FT_CONFIG_OPTION_INFINALITY_PATCHSET
-+
-+  /*************************************************************************/
-+  /*                                                                       */
-   /* If you define TT_CONFIG_OPTION_UNPATENTED_HINTING, a special version  */
-   /* of the TrueType bytecode interpreter is used that doesn't implement   */
-   /* any of the patented opcodes and algorithms.  The patents related to   */
+ 
+   /*************************************************************************/
+   /*                                                                       */
 diff --git a/include/freetype/config/ftoption.h b/include/freetype/config/ftoption.h
 index b481f8f..b05932a 100644
 --- a/include/freetype/config/ftoption.h
@@ -58,16 +56,16 @@ index b481f8f..b05932a 100644
  
  
    /*************************************************************************/
-@@ -602,11 +602,22 @@ FT_BEGIN_HEADER
+@@ -602,7 +602,19 @@ FT_BEGIN_HEADER
    /*   This option requires TT_CONFIG_OPTION_BYTECODE_INTERPRETER to be    */
    /*   defined.                                                            */
    /*                                                                       */
 -/* #define TT_CONFIG_OPTION_SUBPIXEL_HINTING */
 +#define TT_CONFIG_OPTION_SUBPIXEL_HINTING
- 
- 
-   /*************************************************************************/
-   /*                                                                       */
++
++
++   /*************************************************************************/
++   /*                                                                       */
 +  /* Define FT_CONFIG_OPTION_INFINALITY_PATCHSET if you want to enable     */
 +  /* all additional infinality patches, which are configured via env       */
 +  /* variables.                                                            */
@@ -76,12 +74,9 @@ index b481f8f..b05932a 100644
 +  /*   defined.                                                            */
 +  /*                                                                       */
 +#define FT_CONFIG_OPTION_INFINALITY_PATCHSET
-+
-+  /*************************************************************************/
-+  /*                                                                       */
-   /* If you define TT_CONFIG_OPTION_UNPATENTED_HINTING, a special version  */
-   /* of the TrueType bytecode interpreter is used that doesn't implement   */
-   /* any of the patented opcodes and algorithms.  The patents related to   */
+ 
+ 
+   /*************************************************************************/
 diff --git a/src/autofit/aflatin.c b/src/autofit/aflatin.c
 index 53851e7..c20e7d3 100644
 --- a/src/autofit/aflatin.c
@@ -109,7 +104,7 @@ index 53851e7..c20e7d3 100644
  
    /* needed for computation of round vs. flat segments */
  #define FLAT_THRESHOLD( x )  ( x / 14 )
-@@ -916,7 +923,10 @@
+@@ -1028,7 +1035,10 @@
      FT_Pos        delta;
      AF_LatinAxis  axis;
      FT_UInt       nn;
@@ -121,7 +116,7 @@ index 53851e7..c20e7d3 100644
  
      if ( dim == AF_DIMENSION_HORZ )
      {
-@@ -944,7 +954,7 @@
+@@ -1056,7 +1066,7 @@
      {
        AF_LatinAxis  Axis = &metrics->axis[AF_DIMENSION_VERT];
        AF_LatinBlue  blue = NULL;
@@ -130,7 +125,7 @@ index 53851e7..c20e7d3 100644
  
        for ( nn = 0; nn < Axis->blue_count; nn++ )
        {
-@@ -954,7 +964,12 @@
+@@ -1066,7 +1076,12 @@
            break;
          }
        }
@@ -144,7 +139,7 @@ index 53851e7..c20e7d3 100644
        if ( blue )
        {
          FT_Pos   scaled;
-@@ -1110,7 +1125,13 @@
+@@ -1222,7 +1237,13 @@
  
          /* a blue zone is only active if it is less than 3/4 pixels tall */
          dist = FT_MulFix( blue->ref.org - blue->shoot.org, scale );
@@ -158,7 +153,7 @@ index 53851e7..c20e7d3 100644
          {
  #if 0
            FT_Pos  delta1;
-@@ -1161,7 +1182,12 @@
+@@ -1273,7 +1294,12 @@
              delta2 = -delta2;
  
            blue->ref.fit   = FT_PIX_ROUND( blue->ref.cur );
@@ -171,7 +166,7 @@ index 53851e7..c20e7d3 100644
  
  #endif
  
-@@ -2015,7 +2041,10 @@
+@@ -2337,7 +2363,10 @@
                dist = edge->fpos - blue->shoot.org;
                if ( dist < 0 )
                  dist = -dist;
@@ -183,12 +178,10 @@ index 53851e7..c20e7d3 100644
                dist = FT_MulFix( dist, scale );
                if ( dist < best_dist )
                {
-@@ -2190,8 +2219,17 @@
+@@ -2513,8 +2542,17 @@
      FT_Pos           dist     = width;
      FT_Int           sign     = 0;
      FT_Int           vertical = ( dim == AF_DIMENSION_VERT );
--
--
 +#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
 +    FT_Int           infinality_dist = 0;
 +    FT_UInt          autohint_snap_stem_height = 0;
@@ -197,13 +190,14 @@ index 53851e7..c20e7d3 100644
 +        autohint_snap_stem_height = 100;
 +    else if ( autohint_snap_stem_height < 0 )
 +        autohint_snap_stem_height = 0;
-+
+ 
+-
 +    if ( autohint_snap_stem_height == 0 )
 +#endif /* FT_CONFIG_OPTION_INFINALITY_PATCHSET */
      if ( !AF_LATIN_HINTS_DO_STEM_ADJUST( hints ) ||
           axis->extra_light                       )
        return width;
-@@ -2201,9 +2239,73 @@
+@@ -2524,9 +2562,73 @@
        dist = -width;
        sign = 1;
      }
@@ -253,7 +247,8 @@ index 53851e7..c20e7d3 100644
 +            infinality_dist = 254;
 +          else infinality_dist = ( infinality_dist + 16 ) & ~63;
 +        }
-+
+ 
+-    if ( (  vertical && !AF_LATIN_HINTS_DO_VERT_SNAP( hints ) ) ||
 +      }
 +      if ( infinality_dist < 52 )
 +      {
@@ -270,15 +265,14 @@ index 53851e7..c20e7d3 100644
 +              ( ( vertical && !AF_LATIN_HINTS_DO_VERT_SNAP( hints ) )  ||
 +                ( !vertical && !AF_LATIN_HINTS_DO_HORZ_SNAP( hints ) ) ) )
 +#else
- 
--    if ( (  vertical && !AF_LATIN_HINTS_DO_VERT_SNAP( hints ) ) ||
++
 +    if ( ( vertical && !AF_LATIN_HINTS_DO_VERT_SNAP( hints ) ) ||
           ( !vertical && !AF_LATIN_HINTS_DO_HORZ_SNAP( hints ) ) )
 +#endif /* FT_CONFIG_OPTION_INFINALITY_PATCHSET */
      {
        /* smooth hinting process: very lightly quantize the stem width */
  
-@@ -2263,6 +2365,9 @@
+@@ -2618,6 +2720,9 @@
        }
      }
      else
@@ -288,7 +282,7 @@ index 53851e7..c20e7d3 100644
      {
        /* strong hinting process: snap the stem width to integer pixels */
  
-@@ -2270,7 +2375,10 @@
+@@ -2625,7 +2730,10 @@
  
  
        dist = af_latin_snap_width( axis->widths, axis->width_count, dist );
@@ -300,7 +294,7 @@ index 53851e7..c20e7d3 100644
        if ( vertical )
        {
          /* in the case of vertical hinting, always round */
-@@ -2333,6 +2441,32 @@
+@@ -2688,6 +2796,32 @@
      }
  
    Done_Width:
@@ -333,16 +327,16 @@ index 53851e7..c20e7d3 100644
      if ( sign )
        dist = -dist;
  
-@@ -2354,6 +2488,8 @@
-                                                         base_edge->flags,
-                                                         stem_edge->flags );
+@@ -2706,6 +2840,8 @@
+     FT_Pos  dist, base_delta;
+     FT_Pos  fitted_width;
  
 +/* if fitted_width causes stem_edge->pos to land basically on top of an existing
 + * stem_edge->pos, then add or remove 64.  Need to figure out a way to do this */
  
-     stem_edge->pos = base_edge->pos + fitted_width;
- 
-@@ -2915,8 +3051,11 @@
+     dist       = stem_edge->opos - base_edge->opos;
+     base_delta = base_edge->pos - base_edge->opos;
+@@ -3314,8 +3450,11 @@
      int       dim;
  
      AF_LatinAxis  axis;
@@ -356,7 +350,7 @@ index 53851e7..c20e7d3 100644
      error = af_glyph_hints_reload( hints, outline );
      if ( error )
        goto Exit;
-@@ -2986,7 +3125,11 @@
+@@ -3385,7 +3524,11 @@
      }
  
      af_glyph_hints_save( hints, outline );
@@ -373,7 +367,7 @@ diff --git a/src/autofit/aflatin.h b/src/autofit/aflatin.h
 index dd75ef3..257265e 100644
 --- a/src/autofit/aflatin.h
 +++ b/src/autofit/aflatin.h
-@@ -62,6 +62,9 @@ FT_BEGIN_HEADER
+@@ -64,6 +64,9 @@ FT_BEGIN_HEADER
  
  #define AF_LATIN_MAX_WIDTHS  16
  
@@ -387,7 +381,7 @@ diff --git a/src/base/Jamfile b/src/base/Jamfile
 index e39fb09..a33e9a1 100644
 --- a/src/base/Jamfile
 +++ b/src/base/Jamfile
-@@ -55,6 +55,7 @@ SubDir  FT2_TOP $(FT2_SRC_DIR) base ;
+@@ -56,6 +56,7 @@ SubDir  FT2_TOP $(FT2_SRC_DIR) base ;
                      ftglyph
                      ftgxval
                      ftinit
@@ -399,7 +393,7 @@ diff --git a/src/base/ftbase.c b/src/base/ftbase.c
 index 253dfb7..59d2d17 100644
 --- a/src/base/ftbase.c
 +++ b/src/base/ftbase.c
-@@ -33,6 +33,9 @@
+@@ -34,6 +34,9 @@
  #include "ftstream.c"
  #include "fttrigon.c"
  #include "ftutil.c"
@@ -2559,7 +2553,7 @@ index 5ee7e0a..9c9e9e4 100644
  
  #ifdef FT_CONFIG_OPTION_SUBPIXEL_RENDERING
  
-@@ -305,11 +308,36 @@
+@@ -307,11 +310,36 @@
    FT_Library_SetLcdFilter( FT_Library    library,
                             FT_LcdFilter  filter )
    {
@@ -2671,7 +2665,7 @@ index ea40396..7156a0b 100644
      if ( !face || !face->size || !face->glyph )
        return FT_THROW( Invalid_Face_Handle );
  
-@@ -702,6 +738,18 @@
+@@ -701,6 +737,18 @@
      {
        FT_AutoHinter_Interface  hinting;
  
@@ -2690,7 +2684,7 @@ index ea40396..7156a0b 100644
  
        /* try to load embedded bitmaps first if available            */
        /*                                                            */
-@@ -747,6 +795,18 @@
+@@ -746,6 +794,18 @@
        if ( error )
          goto Exit;
  
@@ -2709,7 +2703,7 @@ index ea40396..7156a0b 100644
        if ( slot->format == FT_GLYPH_FORMAT_OUTLINE )
        {
          /* check that the loaded outline is correct */
-@@ -4724,6 +4784,11 @@
+@@ -4727,6 +4787,11 @@
      /* That's ok now */
      *alibrary = library;
  
@@ -2736,14 +2730,15 @@ index 201ceab..4c8746d 100644
  
    /*************************************************************************/
    /*                                                                       */
-@@ -910,7 +912,13 @@
+@@ -913,7 +915,13 @@
      FT_Vector*  points;
      FT_Int      c, first, last;
      FT_Int      orientation;
+-
 +#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
 +    FT_Bool use_various_tweaks = FALSE;
 +    if( ftinf ) use_various_tweaks=ftinf->use_various_tweaks;
- 
++
 +    if ( use_various_tweaks )
 +      ystrength = FT_PIX_FLOOR ( ystrength );
 +#endif
@@ -2809,10 +2804,10 @@ diff --git a/src/base/rules.mk b/src/base/rules.mk
 index 1852e08..f7ae0e6 100644
 --- a/src/base/rules.mk
 +++ b/src/base/rules.mk
-@@ -41,6 +41,7 @@ BASE_SRC := $(BASE_DIR)/basepic.c  \
-             $(BASE_DIR)/ftcalc.c   \
+@@ -42,6 +42,7 @@ BASE_SRC := $(BASE_DIR)/basepic.c  \
              $(BASE_DIR)/ftdbgmem.c \
              $(BASE_DIR)/ftgloadr.c \
+             $(BASE_DIR)/fthash.c   \
 +            $(BASE_DIR)/ftinf.c    \
              $(BASE_DIR)/ftobjs.c   \
              $(BASE_DIR)/ftoutln.c  \
@@ -5781,7 +5776,7 @@ diff --git a/src/truetype/ttinterp.c b/src/truetype/ttinterp.c
 index 1c1d7de..bd37b44 100644
 --- a/src/truetype/ttinterp.c
 +++ b/src/truetype/ttinterp.c
-@@ -5792,6 +5792,7 @@
+@@ -5610,6 +5610,7 @@
  
        if ( exc->ignore_x_mode                                 &&
             exc->GS.freeVector.x != 0                          &&
@@ -5879,3 +5874,77 @@ index ba5fc0a..5f6e0ae 100644
          }
      }
      return NULL;
+
+diff -urN freetype-2.6.2.orig/src/autofit/afmodule.c freetype-2.6.2/src/autofit/afmodule.c
+--- a/src/autofit/afmodule.c	2015-12-07 12:42:05.976290812 +0000
++++ b/src/autofit/afmodule.c	2015-12-08 09:56:13.342393047 +0000
+@@ -22,6 +22,10 @@
+ #include "aferrors.h"
+ #include "afpic.h"
+ 
++#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
++#include "../base/ftinf.h"
++#endif
++
+ #ifdef FT_DEBUG_AUTOFIT
+ 
+ #ifndef FT_MAKE_OPTION_SINGLE_OBJECT
+@@ -372,6 +376,9 @@
+     module->warping           = 0;
+ #endif
+     module->no_stem_darkening = TRUE;
++#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
++    if(ftinf) module->no_stem_darkening = !ftinf->stem_darkening_autofit;
++#endif /* FT_CONFIG_OPTION_INFINALITY_PATCHSET */
+ 
+     module->darken_params[0]  = CFF_CONFIG_OPTION_DARKENING_PARAMETER_X1;
+     module->darken_params[1]  = CFF_CONFIG_OPTION_DARKENING_PARAMETER_Y1;
+diff -urN freetype-2.6.2.orig/src/base/ftinf.c freetype-2.6.2/src/base/ftinf.c
+--- a/src/base/ftinf.c	2015-12-07 12:42:05.976290812 +0000
++++ b/src/base/ftinf.c	2015-12-08 09:55:29.149551250 +0000
+@@ -235,6 +235,10 @@
+     if( s ) sscanf( s, "%d", &_env.stem_snapping_sliding_scale );
+     s=getenv( "INFINALITY_FT_STEM_ALIGNMENT_STRENGTH" );
+     if( s ) sscanf( s, "%d", &_env.stem_alignment_strength );
++    s=getenv( "INFINALITY_FT_STEM_DARKENING_AUTOFIT" );
++    if( s ) _env.stem_darkening_autofit=bool_val( s );
++    s=getenv( "INFINALITY_FT_STEM_DARKENING_CFF" );
++    if( s ) _env.stem_darkening_cff=bool_val( s );
+     s=getenv( "INFINALITY_FT_STEM_FITTING_STRENGTH" );
+     if( s ) sscanf( s, "%d", &_env.stem_fitting_strength );
+     s=getenv( "INFINALITY_FT_CHROMEOS_STYLE_SHARPENING_STRENGTH" );
+diff -urN freetype-2.6.2.orig/src/base/ftinf.h freetype-2.6.2/src/base/ftinf.h
+--- a/src/base/ftinf.h	2015-12-07 12:42:05.976290812 +0000
++++ b/src/base/ftinf.h	2015-12-08 09:53:54.557327499 +0000
+@@ -42,6 +42,8 @@
+     int global_embolden_y_value;
+     int grayscale_filter_strength;
+     int stem_alignment_strength;
++    int stem_darkening_autofit;
++    int stem_darkening_cff;
+     int stem_fitting_strength;
+     int stem_snapping_sliding_scale;
+     int use_known_settings_on_selected_fonts;
+diff -urN freetype-2.6.2.orig/src/cff/cffobjs.c freetype-2.6.2/src/cff/cffobjs.c
+--- a/src/cff/cffobjs.c	2015-12-07 12:42:05.972957515 +0000
++++ b/src/cff/cffobjs.c	2015-12-08 09:56:23.342283975 +0000
+@@ -34,6 +34,9 @@
+ 
+ #include "cfferrs.h"
+ 
++#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
++#include "../base/ftinf.h"
++#endif
+ 
+   /*************************************************************************/
+   /*                                                                       */
+@@ -1053,6 +1056,9 @@
+ #endif
+ 
+     driver->no_stem_darkening = TRUE;
++#ifdef FT_CONFIG_OPTION_INFINALITY_PATCHSET
++    if(ftinf) driver->no_stem_darkening = !ftinf->stem_darkening_cff;
++#endif /* FT_CONFIG_OPTION_INFINALITY_PATCHSET */
+ 
+     driver->darken_params[0] = CFF_CONFIG_OPTION_DARKENING_PARAMETER_X1;
+     driver->darken_params[1] = CFF_CONFIG_OPTION_DARKENING_PARAMETER_Y1;
