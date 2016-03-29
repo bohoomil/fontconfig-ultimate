@@ -1,0 +1,95 @@
+TuxJDK
+===================================================================
+--- a/src/share/classes/sun/font/FreetypeFontScaler.java
++++ b/src/share/classes/sun/font/FreetypeFontScaler.java
+@@ -24,12 +24,12 @@
+  */
+ 
+ package sun.font;
+-
++import java.awt.geom.AffineTransform;
++import java.awt.GraphicsEnvironment;
+ import java.awt.geom.GeneralPath;
+ import java.awt.geom.Point2D;
+ import java.awt.geom.Rectangle2D;
+ import java.lang.ref.WeakReference;
+-
+ /* This is Freetype based implementation of FontScaler.
+  *
+  * Note that in case of runtime error it is expected that
+@@ -214,8 +214,14 @@ class FreetypeFontScaler extends FontSca
+             int aa, int fm, float boldness, float italic,
+             boolean disableHinting) {
+         if (nativeScaler != 0L) {
++            double ptToPxScale = 1.0d;
++            GraphicsEnvironment graphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment();
++            if (!graphicsEnvironment.isHeadlessInstance()) {
++                AffineTransform normalizingTransform = graphicsEnvironment.getDefaultScreenDevice().getDefaultConfiguration().getNormalizingTransform();
++                ptToPxScale = normalizingTransform.getScaleY();
++            }
+             return createScalerContextNative(nativeScaler, matrix,
+-                                             aa, fm, boldness, italic);
++                                             aa, fm, boldness, italic, ptToPxScale);
+         }
+         return NullFontScaler.getNullScalerContext();
+     }
+@@ -254,7 +260,7 @@ class FreetypeFontScaler extends FontSca
+     private native long getUnitsPerEMNative(long pScaler);
+ 
+     native long createScalerContextNative(long pScaler, double[] matrix,
+-            int aa, int fm, float boldness, float italic);
++            int aa, int fm, float boldness, float italic, double ptToPxScale);
+ 
+     /* Freetype scaler context does not contain any pointers that
+        has to be invalidated if native scaler is bad */
+===================================================================
+--- a/src/share/native/sun/font/freetypeScaler.c
++++ b/src/share/native/sun/font/freetypeScaler.c
+@@ -87,6 +87,8 @@ typedef struct FTScalerContext {
+     int        renderFlags;   /* configuration specific to particular engine */
+     int        pathType;
+     int        ptsz;          /* size in points */
++    int        pxsz;          /* size in pixels */
++    int        dpi;           /* screen dpi */
+ } FTScalerContext;
+ 
+ #ifdef DEBUG
+@@ -358,7 +360,7 @@ static double euclidianDistance(double a
+ JNIEXPORT jlong JNICALL
+ Java_sun_font_FreetypeFontScaler_createScalerContextNative(
+         JNIEnv *env, jobject scaler, jlong pScaler, jdoubleArray matrix,
+-        jint aa, jint fm, jfloat boldness, jfloat italic) {
++        jint aa, jint fm, jfloat boldness, jfloat italic, jdouble ptToPxScale) {
+     double dmat[4], ptsz;
+     FTScalerContext *context =
+             (FTScalerContext*) calloc(1, sizeof(FTScalerContext));
+@@ -375,6 +377,15 @@ Java_sun_font_FreetypeFontScaler_createS
+         //text can not be smaller than 1 point
+         ptsz = 1.0;
+     }
++
++    // scale can be used to calculate both DPI and pixel size,
++    // with pixel size we have to guess, looks like calculated value has to be rounded up:
++    double pxsz = ptsz * ptToPxScale + 0.5;
++    // because we operate with quite high numbers - no need to round up DPI:
++    double dpi = 72.0 * ptToPxScale;
++
++    context->pxsz = (int)pxsz;
++    context->dpi = (int)dpi;
+     context->ptsz = (int)(ptsz * 64);
+     context->transform.xx =  FloatToFTFixed((float)dmat[0]/ptsz);
+     context->transform.yx = -FloatToFTFixed((float)dmat[1]/ptsz);
+@@ -404,7 +415,12 @@ static int setupFTContext(JNIEnv *env,
+     if (context != NULL) {
+         FT_Set_Transform(scalerInfo->face, &context->transform, NULL);
+ 
+-        errCode = FT_Set_Char_Size(scalerInfo->face, 0, context->ptsz, 72, 72);
++        // we could use calculated pixel size for this,
++        // but who knows if we guessed with rounding up,
++        // so we will leave it up to freetype2 to decide the pixel size
++        // based on DPI value:
++        //errCode = FT_Set_Pixel_Sizes(scalerInfo->face, 0, context->pxsz);
++        errCode = FT_Set_Char_Size(scalerInfo->face, 0, context->ptsz, 0, context->dpi);
+ 
+         if (errCode == 0) {
+             errCode = FT_Activate_Size(scalerInfo->face->size);
