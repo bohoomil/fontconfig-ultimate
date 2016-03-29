@@ -6,8 +6,25 @@ CHANGELOG
 ---------
 
 
+2016-03-28
+~~~~~~~~~~
+
+### fontconfig-infinality-ultimate, rev. 2.11.94-1
+
+* Upstream version upgrade.
+* Updated `fontconfig-infinality-ultimate` patches.
+
+2015-08-29
+~~~~~~~~~~
+
+### fontconfig-infinality-ultimate, rev. 2.11.1-30
+
+* Temporarily switching to git code base (fixed existing issues and bugs).
+
 2015-08-25
 ~~~~~~~~~~
+
+### fontconfig-infinality-ultimate, rev. 2.11.1-29
 
 * [PATCH] Fix an overflow when casting from double to int (Raziel-23).
 * Fix #81 (doublecmd-gtk2 fails at start with "Division by Zero").

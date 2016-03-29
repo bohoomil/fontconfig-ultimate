@@ -1,5 +1,5 @@
---- a/configure.ac	2015-03-18 21:12:24.000000000 +0100
-+++ b/configure.ac	2015-03-18 21:35:29.224165540 +0100
+--- a/configure.ac	2015-06-02 10:33:03.000000000 +0200
++++ b/configure.ac	2016-03-29 04:42:20.964043231 +0200
 @@ -520,9 +520,14 @@ AC_SUBST(FC_FONTDATE)
  
  AC_ARG_WITH(templatedir,
