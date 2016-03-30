@@ -6,6 +6,11 @@ CHANGELOG
 ---------
 
 
+2016-03-30
+~~~~~~~~~~
+
+* Fixed #133 & #138 (freetype crashing with `poppler-qt`).
+
 2016-03-28
 ~~~~~~~~~~
 
