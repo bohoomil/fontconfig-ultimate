@@ -5948,3 +5948,30 @@ diff -urN freetype-2.6.2.orig/src/cff/cffobjs.c freetype-2.6.2/src/cff/cffobjs.c
  
      driver->darken_params[0] = CFF_CONFIG_OPTION_DARKENING_PARAMETER_X1;
      driver->darken_params[1] = CFF_CONFIG_OPTION_DARKENING_PARAMETER_Y1;
+
+diff --git a/src/autofit/aflatin.c b/src/autofit/aflatin.c
+index 742e767..6f444fa 100644
+--- a/src/autofit/aflatin.c
++++ b/src/autofit/aflatin.c
+@@ -2418,12 +2418,15 @@ FT_Pos infinality_cur_width = 0;
+            abs( axis->widths[0].cur - infinality_dist ) < 32   &&
+            axis->widths[0].cur > 52                            )
+       {
+-        if ( strstr( metrics->root.scaler.face->style_name, "Regular" )      ||
+-             strstr( metrics->root.scaler.face->style_name, "Book" )         ||
+-             strstr( metrics->root.scaler.face->style_name, "Medium" )       ||
+-             strcmp( metrics->root.scaler.face->style_name, "Italic" ) == 0  ||
+-             strcmp( metrics->root.scaler.face->style_name, "Oblique" ) == 0 )
+-        {
++          const char *style_name=metrics->root.scaler.face->style_name;
++          if ( style_name!=NULL &&
++               ( strstr( style_name, "Regular" )      ||
++                 strstr( style_name, "Book" )         ||
++                 strstr( style_name, "Medium" )       ||
++                 strcmp( style_name, "Italic" ) == 0  ||
++                 strcmp( style_name, "Oblique" ) == 0 )
++              )
++         {
+           /* regular weight */
+           if ( axis->widths[0].cur < 64 )
+             infinality_dist = 64;
