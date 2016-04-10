@@ -13,6 +13,7 @@ CHANGELOG
 
 * Upstream version upgrade.
 * Fix #139.
+* Alpm hook was implemented.
 
 2016-03-28
 ~~~~~~~~~~
