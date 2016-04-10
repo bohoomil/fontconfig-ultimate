@@ -9,6 +9,13 @@ CHANGELOG
 2016-04-10
 ~~~~~~~~~~
 
+### fontconfig-infinality-ultimate, rev. 2.11.95-2
+
+* Alpm hook moved to the default location.
+
+2016-04-10
+~~~~~~~~~~
+
 ### fontconfig-infinality-ultimate, rev. 2.11.95-1
 
 * Upstream version upgrade.
