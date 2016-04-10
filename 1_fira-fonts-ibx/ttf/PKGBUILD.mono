@@ -1,7 +1,7 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=ttf-fira-mono-ibx
-pkgver=3.204
+pkgver=3.206
 pkgrel=1
 depends=(fontconfig)
 pkgdesc="A monospace typeface designed for the Firefox OS."
@@ -10,18 +10,18 @@ arch=(any)
 license=(Apache)
 groups=(infinality-bundle-fonts-extra)
 conflicts=(ttf-fira-mono otf-fira-mono otf-fira-mono-ibx)
+provides=(ttf-fira-mono)
 replaces=(ttf-fira-mono)
-install="${pkgname}.install"
-source=(http://www.carrois.com/downloads/fira_mono_3_2/FiraMonoFonts3204.zip
+source=(http://www.carrois.com/downloads/fira_mono_3_2/FiraMonoFonts3206.zip
         45-fira-mono.conf
         90-tt-fira-mono.conf)
-sha1sums=('e200a6c9c9c0ea56cf8191805ef162b9900fcec4'
+sha1sums=('47b1a9ead4be8da9724d0293cadd9f372b908d51'
           'd8a085a8e70c28f405dc3ed0d60a5d44d045c86c'
           'b2970ffff80f13bb73ae05e1d9e858aa016aa6ad')
 
 package() {
 
-  cd "${srcdir}"/FiraMonoFonts3204/WEB
+  cd "${srcdir}"/FiraMonoFonts3206/WEB
   install -d -m755 "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 TTF/FiraMono-*.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 

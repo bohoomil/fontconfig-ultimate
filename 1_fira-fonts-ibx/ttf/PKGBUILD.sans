@@ -1,7 +1,7 @@
 # Maintainer: bohoomil <@zoho.com>
 
-pkgver=4.104
-pkgrel=2
+pkgver=4.106
+pkgrel=1
 pkgname=ttf-fira-sans-ibx
 depends=(fontconfig)
 pkgdesc="A sans-serif typeface designed for the Firefox OS."
@@ -12,16 +12,15 @@ groups=(infinality-bundle-fonts-extra)
 conflicts=(ttf-fira-sans otf-fira-sans otf-fira-sans-ibx)
 replaces=(ttf-fira-sans)
 provides=(ttf-fira-sans)
-install=${pkgname}.install
-source=("http://www.carrois.com/downloads/fira_4_1/FiraFonts4104.zip"
+source=("http://www.carrois.com/downloads/fira_4_1/FiraFonts4106.zip"
         45-fira-sans.conf
         90-tt-fira-sans.conf)
-sha1sums=('7c7b38573559ba35295347aa579873b0c0d8e084'
+sha1sums=('8995612712eb02ac713398ad7fc20739b581d160'
           'aebc44373e661b95d07b6159d4f958321d8a2e87'
           '4c431e944840726afea8683a50a8b70a5abcb38a')
 
 package_ttf-fira-sans-ibx() {
-  cd "${srcdir}"/FiraFonts4104/WEB/TTF
+  cd "${srcdir}"/FiraFonts4106/WEB/TTF
 
   install -d -m755 "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 FiraSans-*.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
