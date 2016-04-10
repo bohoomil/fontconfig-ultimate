@@ -3,10 +3,10 @@
 
 _basename=fontconfig
 pkgname=lib32-$_basename-infinality-ultimate
-pkgver=2.11.1
-pkgrel=7
+pkgver=2.11.95
+pkgrel=1
 _master_name=fontconfig-ultimate-master
-pkgdesc="A library for configuring and customizing font access (32-bit, infinality-bundle,  git version, r1780)"
+pkgdesc="A library for configuring and customizing font access (32-bit, infinality-bundle)"
 arch=(x86_64)
 url="http://www.fontconfig.org/release/"
 license=('custom' 'MIT')
@@ -18,37 +18,15 @@ provides=('lib32-fontconfig')
 conflicts=('lib32-fontconfig')
 install="lib32-fontconfig.install"
 
-source=("http://bohoomil.com/src/${_basename}-git-r1780.tar.bz2"{,.sig}
-        "http://bohoomil.com/src/${_basename}-ultimate-git.tar.bz2"{,.sig})
-sha1sums=('d9e4f7a098355caf9e89ad080532ff098902f5da'
-          'SKIP'
-          '8cf389e512bbcc4baeab0f1d03a5f0e469b82139'
-          'SKIP')
-
-prepare() {
-
-  # copy fontconfig-ib patches & stuff
-  cd "${srcdir}/${_basename}-ultimate-git"
-
-  cp -r fontconfig_patches/06-missing_mans.patch "${srcdir}/${_basename}"
-
-  # prepare src
-  cd "${srcdir}/${_basename}"
-
-  # fix missing manuals fixes
-  patch -Np1 -i 06-missing_mans.patch
-
-  aclocal
-  libtoolize -f
-  automake -afi
-}
+source=(http://www.fontconfig.org/release/${_basename}-${pkgver}.tar.bz2)
+sha1sums=('2d22f865134d7a8d738122db92cd160a73e7128f')
 
 build() {
   export CC="gcc -m32"
   export CXX="g++ -m32"
   export PKG_CONFIG_PATH="/usr/lib32/pkgconfig"
 
-  cd "${_basename}"
+  cd "${srcdir}/${_basename}-${pkgver}"
 
   ./configure --prefix=/usr \
     --sysconfdir=/etc \
@@ -65,12 +43,12 @@ build() {
 }
 
 check() {
-  cd "${_basename}"
+  cd "${srcdir}/${_basename}-${pkgver}"
   make -k check
 }
 
 package() {
-  cd "${_basename}"
+  cd "${srcdir}/${_basename}-${pkgver}"
 
   make DESTDIR="${pkgdir}" install
 
