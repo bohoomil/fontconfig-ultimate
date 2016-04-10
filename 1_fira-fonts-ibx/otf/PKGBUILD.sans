@@ -1,0 +1,40 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=otf-fira-sans-ibx
+pkgver=4.106
+pkgrel=1
+depends=('fontconfig')
+pkgdesc="A sans-serif typeface designed for the Firefox OS."
+url="https://www.mozilla.org/en-US/styleguide/products/firefox-os/typeface/"
+arch=('any')
+license=('Apache')
+conflicts=('ttf-fira-sans' 'otf-fira-sans' 'ttf-fira-sans-ibx')
+replaces=('otf-fira-sans')
+groups=('infinality-bundle-fonts-extra')
+source=("http://www.carrois.com/downloads/fira_4_1/FiraFonts4106.zip"
+        45-fira-sans.conf
+        90-non-tt-fira-sans.conf)
+sha1sums=('8995612712eb02ac713398ad7fc20739b581d160'
+          'aebc44373e661b95d07b6159d4f958321d8a2e87'
+          '38bc787c66433f10f368896fb93c70783de4fbcc')
+
+package() {
+  cd "${srcdir}"/FiraFonts4106/OTF
+
+  install -d -m755 "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 FiraSans-*.otf \
+    "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  cd "${srcdir}"
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-fira-sans.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-fira-sans.conf
+  install -m644 90-non-tt-fira-sans.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-fira-sans.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/90-non-tt-fira-sans.conf .
+  ln -s ../conf.avail/45-fira-sans.conf .
+}
+
