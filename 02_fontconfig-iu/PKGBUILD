@@ -3,11 +3,11 @@
 
 pkgname=fontconfig-infinality-ultimate
 _basename=fontconfig
-pkgdesc="A library for configuring and customizing font access, optimized for freetype2-infinality-ultimate (git version, r1780)."
-url=('http://www.fontconfig.org/release/')
+pkgdesc="A library for configuring and customizing font access, optimized for freetype2-infinality-ultimate."
+url='http://www.fontconfig.org/release/'
 license=('custom' 'MIT')
-pkgver=2.11.1
-pkgrel=30
+pkgver=2.11.95
+pkgrel=1
 #_master_name=fontconfig-ultimate-master
 arch=('i686' 'x86_64')
 changelog=CHANGELOG
@@ -28,12 +28,10 @@ backup=('etc/fonts/fonts.conf'
         'etc/fonts/conf.avail.infinality/38-repl-webfonts-custom.conf'
         'etc/fonts/conf.avail.infinality/97-selective-rendering-custom.conf')
 install=fontconfig-ultimate.install
-
-source=("http://bohoomil.com/src/${_basename}-git-r1780.tar.bz2"{,.sig}
-        "http://bohoomil.com/src/${_basename}-ultimate-git.tar.bz2"{,.sig})
-sha1sums=('d9e4f7a098355caf9e89ad080532ff098902f5da'
-          'SKIP'
-          '8cf389e512bbcc4baeab0f1d03a5f0e469b82139'
+source=(http://www.fontconfig.org/release/${_basename}-${pkgver}.tar.bz2
+        http://bohoomil.com/src/${_basename}-ultimate-git.tar.bz2{,.sig})
+sha1sums=('2d22f865134d7a8d738122db92cd160a73e7128f'
+          '150c7f0961ca8bf9836fc0a22b7c0528fada8cd9'
           'SKIP')
 
 # a nice page to test font matching:
@@ -45,17 +43,16 @@ prepare() {
            02-configure.ac.patch
            03-Makefile.in.patch
            04-Makefile.conf.d.patch
-           05-Makefile.am.in.patch
-           06-missing_mans.patch)
+           05-Makefile.am.in.patch)
 
   # copy fontconfig-ib patches & stuff
   cd "${_basename}-ultimate-git"
 
-  cp -r conf.d.infinality "${srcdir}/${_basename}"/conf.d.infinality
-  cp -r fontconfig_patches/*.patch "${srcdir}/${_basename}"
+  cp -r conf.d.infinality "${srcdir}/${_basename}-${pkgver}"/conf.d.infinality
+  cp -r fontconfig_patches/*.patch "${srcdir}/${_basename}-${pkgver}"
 
   # prepare src
-  cd "${srcdir}/${_basename}"
+  cd "${srcdir}/${_basename}-${pkgver}"
 
   # infinality & post release fixes
   for patch in "${patches[@]}"; do
@@ -63,15 +60,16 @@ prepare() {
   done
 
   # fc-blanks.py
-  sed -i 's/python/python2/' fc-blanks/fc-blanks.py
+  #sed -i 's/python/python2/' fc-blanks/fc-blanks.py
 
   aclocal
   libtoolize -f
   automake -afi
+
 }
 
 build() {
-  cd "${_basename}"
+  cd "${_basename}-${pkgver}"
 
   ./configure --prefix=/usr \
     --sysconfdir=/etc \
@@ -86,12 +84,12 @@ build() {
 }
 
 check() {
-  cd "${_basename}"
+  cd "${_basename}-${pkgver}"
   make -k check
 }
 
 package() {
-  cd "${_basename}"
+  cd "${_basename}-${pkgver}"
   make DESTDIR="${pkgdir}" install
 
   #Install license
