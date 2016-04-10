@@ -1,5 +1,5 @@
---- a/conf.d/Makefile.in	2015-06-02 10:33:36.000000000 +0200
-+++ b/conf.d/Makefile.in	2016-03-29 05:13:32.527364325 +0200
+--- a/conf.d/Makefile.in	2016-04-06 14:07:58.000000000 +0200
++++ b/conf.d/Makefile.in	2016-04-10 05:03:20.826448802 +0200
 @@ -173,7 +173,7 @@ am__uninstall_files_from_dir = { \
      || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
           $(am__cd) "$$dir" && rm -f $$files; }; \
@@ -9,7 +9,7 @@
  DATA = $(config_DATA) $(template_DATA)
  am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
  am__DIST_COMMON = $(srcdir)/Makefile.in README
-@@ -344,25 +344,8 @@ target_alias = @target_alias@
+@@ -344,26 +344,8 @@ target_alias = @target_alias@
  top_build_prefix = @top_build_prefix@
  top_builddir = @top_builddir@
  top_srcdir = @top_srcdir@
@@ -17,6 +17,7 @@
 -DOC_SOURCES = README.in
  DOC_FILES = $(DOC_SOURCES:.in=)
 -CONF_LINKS = \
+-	10-hinting-slight.conf	\
 -	10-scale-bitmap-fonts.conf \
 -	20-unhint-small-vera.conf \
 -	30-urw-aliases.conf \
@@ -36,7 +37,7 @@
  
  EXTRA_DIST = $(template_DATA) $(DOC_SOURCES)
  CLEANFILES = $(DOC_FILES)
-@@ -523,7 +506,7 @@ check: $(BUILT_SOURCES)
+@@ -528,7 +510,7 @@ check: $(BUILT_SOURCES)
  	$(MAKE) $(AM_MAKEFLAGS) check-am
  all-am: Makefile $(DATA)
  installdirs:
@@ -45,7 +46,7 @@
  	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
  	done
  install: $(BUILT_SOURCES)
-@@ -646,9 +629,6 @@ uninstall-am: uninstall-configDATA unins
+@@ -651,9 +633,6 @@ uninstall-am: uninstall-configDATA unins
  .PRECIOUS: Makefile
  
  
