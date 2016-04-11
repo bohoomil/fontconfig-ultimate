@@ -7,7 +7,7 @@ pkgdesc="A library for configuring and customizing font access, optimized for fr
 url='http://www.fontconfig.org/release/'
 license=('custom' 'MIT')
 pkgver=2.11.95
-pkgrel=2
+pkgrel=3
 #_master_name=fontconfig-ultimate-master
 arch=('i686' 'x86_64')
 changelog=CHANGELOG
@@ -33,7 +33,7 @@ source=(http://www.fontconfig.org/release/${_basename}-${pkgver}.tar.bz2
         fc-cache-ib.hook)
 sha1sums=('2d22f865134d7a8d738122db92cd160a73e7128f'
           '150c7f0961ca8bf9836fc0a22b7c0528fada8cd9'
-          '9e2a909e538ce5d433a979870968c709b30f99d0')
+          'de59ec72e8517d0c95b91bd3401fb0c49f4eea60')
 
 # a nice page to test font matching:
 # http://zipcon.net/~swhite/docs/computers/browsers/fonttest.html
