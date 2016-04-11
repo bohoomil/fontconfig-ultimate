@@ -6,6 +6,7 @@ Operation = Remove
 Target = usr/share/fonts/*
 
 [Action]
+Description = Update IU font cache
 When = PostTransaction
 Exec = /usr/bin/fc-cache --system-only
 NeedsTargets
