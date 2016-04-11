@@ -2,7 +2,7 @@
 
 pkgname=ttf-libre-caslon-ibx
 pkgver=1.0
-pkgrel=7
+pkgrel=8
 pkgdesc="The Libre Caslon fonts designed by Pablo Impallari. TrueType version."
 url="http://www.impallari.com/"
 depends=('fontconfig')
@@ -10,28 +10,29 @@ arch=('any')
 license=('custom:OFL')
 conflicts=('ttf-impallari-libre-caslon-text' 'otf-libre-caslon-ibx' 't1-libre-caslon-ibx')
 groups=('infinality-bundle-fonts-extra')
-install=${pkgname}.install
-source=("http://www.impallari.com/media/uploads/prosources/update-94-source.zip"
+#http://www.impallari.com/media/uploads/prosources/update-94-source.zip
+source=(lcaslon.zip::https://github.com/impallari/Libre-Caslon-Text/archive/master.zip
         45-libre-caslon.conf
         90-tt-libre-caslon.conf)
-sha1sums=('15f4625b5800efa946427bf20aafa435987f6aae'
+sha1sums=('cadbc17f0d1bfce4f9b5eb13f1ce60b712aff902'
           '24eaa548d791d1fb7732921e53560827d3f27bcf'
           '761054515e8dc188bd0eae0ae86eb26bd4c84a84')
 
 package(){
-  cd "${srcdir}"/"Libre Caslon Text v1.0"
+  cd "${srcdir}"/"Libre-Caslon-Text-master"
 
   install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
   install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
-  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 fonts/TTF/*.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
+  cd "${srcdir}"
   install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
   install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 ../45-libre-caslon.conf \
+  install -m644 45-libre-caslon.conf \
     "${pkgdir}"/etc/fonts/conf.avail/45-libre-caslon.conf
-  install -m644 ../90-tt-libre-caslon.conf \
+  install -m644 90-tt-libre-caslon.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-libre-caslon.conf
 
   cd "${pkgdir}"/etc/fonts/conf.d

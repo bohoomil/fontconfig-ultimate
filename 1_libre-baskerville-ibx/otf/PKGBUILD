@@ -2,7 +2,7 @@
 
 pkgname=otf-libre-baskerville-ibx
 pkgver=1.0
-pkgrel=6
+pkgrel=7
 pkgdesc="Libre Baskerville font designed by Pablo Impallari. OpenType version."
 url="http://www.impallari.com/"
 depends=('fontconfig')
@@ -11,7 +11,6 @@ replaces=('t1-libre-baskerville-ibx')
 groups=('infinality-bundle-fonts-extra')
 arch=('any')
 license=('custom:OFL')
-install=${pkgname}.install
 source=("http://www.impallari.com/media/uploads/prosources/update-86-source.zip"
         45-libre-baskerville.conf
         90-non-tt-libre-baskerville.conf)

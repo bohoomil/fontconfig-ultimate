@@ -2,7 +2,7 @@
 
 pkgname=otf-source-serif-pro-ibx
 pkgver=1.017
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="Source Serif Pro is a serif typeface in the transitional style, designed to complement Source Sans. OpenType version."
 url="http://www.adobe.com/"
@@ -10,7 +10,6 @@ arch=('any')
 license=('custom:OFL')
 conflicts=('adobe-source-serif-pro-fonts' 'ttf-source-serif-pro-ibx')
 groups=('infinality-bundle-fonts-extra')
-install=$pkgname.install
 source=("https://github.com/adobe-fonts/source-serif-pro/archive/${pkgver}R.tar.gz"
         45-source-serif-pro.conf
         90-non-tt-source-serif-pro.conf)

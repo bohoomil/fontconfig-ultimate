@@ -2,7 +2,7 @@
 
 pkgname=t1-paratype-ibx
 pkgver=2014.09.11
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Paratype font family. Type 1 version (CTAN)."
 groups=('infinality-bundle-fonts-extra')
@@ -11,7 +11,6 @@ conflicts=('ttf-paratype' 'ttf-ptsans' 'ttf-pt-mono' 'ttf-pt-sans' 'ttf-pt-serif
            'ttf-paratype-ibx')
 arch=('any')
 license=('custom')
-install=$pkgname.install
 source=("http://mirrors.ctan.org/fonts/paratype.zip"
         45-paratype.conf
         90-non-tt-paratype.conf)

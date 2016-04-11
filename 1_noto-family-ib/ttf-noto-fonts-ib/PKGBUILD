@@ -6,7 +6,7 @@ _pkgsa=ttf-noto-fonts-sans-ib
 _pkgse=ttf-noto-fonts-serif-ib
 _pkgver=2015-09-29
 pkgver=${_pkgver//-}
-pkgrel=1
+pkgrel=2
 pkgdesc="Google Noto fonts."
 depends=(fontconfig)
 url="http://www.google.com/get/noto/"
@@ -16,7 +16,6 @@ conflicts=(ttf-noto ttf-noto-svn ttf-google-webfonts-git noto-fonts ttf-croscore
 replaces=(ttf-croscore-fonts-ibx ttf-noto-sans-ib ttf-noto-serif-ib)
 provides=(noto-fonts)
 license=(Apache)
-install=$pkgname.install
 source=("https://github.com/googlei18n/noto-fonts/archive/v$_pkgver-license-adobe.tar.gz"
         "http://bohoomil.com/src/noto-sans-multi-fixed.tar.xz"{,.sig}
         40-noto-arabic.conf

@@ -1,7 +1,7 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=otf-source-han-sans-jp-ibx
-pkgver=1.003
+pkgver=1.004
 pkgrel=1
 depends=('fontconfig')
 pkgdesc="A set of Pan-CJK fonts designed to complement Source Sans Pro. Japanese subset, OpenType/CFF (OTF) fonts."
@@ -11,11 +11,10 @@ license=('Apache')
 conflicts=('adobe-source-han-sans-jp-fonts')
 replaces=('adobe-source-han-sans-jp-fonts')
 groups=('infinality-bundle-fonts-extra' 'source-han-sans-cjk')
-install=$pkgname.install
 source=("https://github.com/adobe-fonts/source-han-sans/archive/${pkgver}R.tar.gz"
         40-source-han-sans-jp.conf
         90-non-tt-source-han-sans-jp.conf)
-sha1sums=('494a464e71d20191e1660313f00dbc1f82e2896f'
+sha1sums=('dbaac2da2a3a5329967605256fa63a041f0d8eb7'
           '964a773057cac052cfb23497a7b72a1826829162'
           '35fea512dd4ad75001da524942b97cb0c92d9278')
 

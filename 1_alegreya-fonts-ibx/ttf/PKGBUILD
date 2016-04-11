@@ -3,14 +3,13 @@
 pkgname=ttf-alegreya-fonts-ibx
 pkgname=('ttf-alegreya-ibx' 'ttf-alegreya-sans-ibx')
 pkgver=1.003
-pkgrel=4
+pkgrel=5
 depends=('fontconfig')
 pkgdesc="Alegreya and Alegreya Sans are modern font families designed by Juan Pablo del Peral."
 url="http://www.huertatipografica.com/"
 arch=('any')
 groups=('infinality-bundle-fonts-extra')
 license=('custom:OFL')
-install=$pkgname.install
 # http://www.huertatipografica.com/free_download/24
 # http://www.google.com/fonts
 source=(http://bohoomil.com/src/alegreya-sans-ht-full-pack-ttf.zip{,.sig}
@@ -35,7 +34,6 @@ sha1sums=('240ebab403fcde2abb1a25ef763f135f2d7f69e4'
 package_ttf-alegreya-ibx(){
   pkgdesc="Alegreya is a serif typeface originally intended for literature. TrueType version."
   conflicts=('otf-alegreya-ibx')
-  install=$pkgname.install
 
   cd "${srcdir}"
 
@@ -62,7 +60,6 @@ package_ttf-alegreya-ibx(){
 package_ttf-alegreya-sans-ibx(){
   pkgdesc="Alegreya Sans is a humanist sans serif family with a calligraphic feeling that conveys a dynamic and varied rhythm. TrueType version."
   conflicts=('otf-alegreya-sans-ibx')
-  install=$pkgname.install
 
   cd "${srcdir}"
 

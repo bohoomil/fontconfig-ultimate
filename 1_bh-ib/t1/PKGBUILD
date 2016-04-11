@@ -4,7 +4,7 @@
 pkgname=t1-bh-ib
 _basename=font-bh-type1
 pkgver=1.0.3
-pkgrel=2
+pkgrel=3
 pkgdesc="Luxi Sans, Serif and Mono families by Bigelow & Holmes. Type 1 version."
 url="http://xorg.freedesktop.org/"
 arch=(any)
@@ -13,7 +13,6 @@ groups=('infinality-bundle-fonts')
 license=('custom')
 conflicts=('font-bh-ttf' 'luximono' 'ttf-bh-ib')
 provides=('font-bh-ttf')
-install=$pkgname.install
 source=(${url}/releases/individual/font/font-bh-type1-1.0.3.tar.bz2
         45-luxi.conf
         90-non-tt-luxi.conf)

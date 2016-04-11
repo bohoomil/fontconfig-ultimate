@@ -3,7 +3,7 @@
 pkgname=ttf-noto-fonts-nonlatin-ib
 _pkgver=2015-09-29
 pkgver=${_pkgver//-}
-pkgrel=1
+pkgrel=2
 pkgdesc="Google Noto fonts: non-Latin extension."
 url="http://www.google.com/get/noto/"
 arch=(any)
@@ -11,20 +11,19 @@ depends=(fontconfig ttf-noto-fonts-ib)
 conflicts=(ttf-noto-arabic ttf-noto-hebrew ttf-noto-nocjk ttf-noto-sans ttf-noto-svn ttf-google-webfonts-git ttf-noto-sans-multilang-ib)
 replaces=(ttf-noto-sans-multilang-ib)
 groups=(infinality-bundle-fonts)
-license=(Apache)
-install=$pkgname.install
-source=(http://storage.googleapis.com/noto-website/pkgs/Noto-hinted.zip
+license=(custom:OFL)
+source=(https://noto-website-2.storage.googleapis.com/pkgs/Noto-hinted.zip
         45-noto-nonlatin.conf
         90-tt-noto-nonlatin.conf)
 validgpgkeys=('A9244FB5E93F11F0E975337FAE6866C7962DDE58')
-sha1sums=('a2f8ce9ce9a65b2495a7b03cf50a29900496268d'
+sha1sums=('c0d29504f8eeedede34eae93b3ac8561cfa5721a'
           'b829e1b967b6589d1247b3b4069f1d42ba59f179'
           'e9eca0fcc4aaac3d85dbf77e6b230732cd6d3b50')
 
 package() {
   cd "${srcdir}"
 
-  _nonlatin=(NotoNastaliqUrduDraft.ttf NotoSansAvestan-Regular.ttf NotoSansBalinese-Regular.ttf NotoSansBamum-Regular.ttf NotoSansBatak-Regular.ttf NotoSansBrahmi-Regular.ttf NotoSansBuginese-Regular.ttf NotoSansBuhid-Regular.ttf NotoSansCanadianAboriginal-Regular.ttf NotoSansCarian-Regular.ttf NotoSansCherokee-Regular.ttf NotoSansCoptic-Regular.ttf NotoSansCuneiform-Regular.ttf NotoSansCypriot-Regular.ttf NotoSansDeseret-Regular.ttf NotoSansEgyptianHieroglyphs-Regular.ttf NotoSansGlagolitic-Regular.ttf NotoSansGothic-Regular.ttf NotoSansHanunoo-Regular.ttf NotoSansImperialAramaic-Regular.ttf NotoSansInscriptionalPahlavi-Regular.ttf NotoSansInscriptionalParthian-Regular.ttf NotoSansJavanese-Regular.ttf NotoSansKaithi-Regular.ttf NotoSansKayahLi-Regular.ttf NotoSansKharoshthi-Regular.ttf NotoSansLepcha-Regular.ttf NotoSansLimbu-Regular.ttf NotoSansLinearB-Regular.ttf NotoSansLisu-Regular.ttf NotoSansLycian-Regular.ttf NotoSansLydian-Regular.ttf NotoSansMandaic-Regular.ttf NotoSansMeeteiMayek-Regular.ttf NotoSansMongolian-Regular.ttf NotoSansNKo-Regular.ttf NotoSansNewTaiLue-Regular.ttf NotoSansOgham-Regular.ttf NotoSansOlChiki-Regular.ttf NotoSansOldItalic-Regular.ttf NotoSansOldPersian-Regular.ttf NotoSansOldSouthArabian-Regular.ttf NotoSansOldTurkic-Regular.ttf NotoSansOsmanya-Regular.ttf NotoSansPhagsPa-Regular.ttf NotoSansPhoenician-Regular.ttf NotoSansRejang-Regular.ttf NotoSansRunic-Regular.ttf NotoSansSamaritan-Regular.ttf NotoSansSaurashtra-Regular.ttf NotoSansShavian-Regular.ttf NotoSansSundanese-Regular.ttf NotoSansSylotiNagri-Regular.ttf NotoSansSymbols-Regular.ttf NotoSansSyriacEastern-Regular.ttf NotoSansSyriacEstrangela-Regular.ttf NotoSansSyriacWestern-Regular.ttf NotoSansTagalog-Regular.ttf NotoSansTagbanwa-Regular.ttf NotoSansTaiLe-Regular.ttf NotoSansTaiTham-Regular.ttf NotoSansTaiViet-Regular.ttf NotoSansTifinagh-Regular.ttf NotoSansUgaritic-Regular.ttf NotoSansVai-Regular.ttf NotoSansYi-Regular.ttf)
+  _nonlatin=(NotoNastaliqUrdu-Regular.ttf NotoSansAvestan-Regular.ttf NotoSansBalinese-Regular.ttf NotoSansBamum-Regular.ttf NotoSansBatak-Regular.ttf NotoSansBrahmi-Regular.ttf NotoSansBuginese-Regular.ttf NotoSansBuhid-Regular.ttf NotoSansCanadianAboriginal-Regular.ttf NotoSansCarian-Regular.ttf NotoSansCherokee-Regular.ttf NotoSansCoptic-Regular.ttf NotoSansCuneiform-Regular.ttf NotoSansCypriot-Regular.ttf NotoSansDeseret-Regular.ttf NotoSansEgyptianHieroglyphs-Regular.ttf NotoSansGlagolitic-Regular.ttf NotoSansGothic-Regular.ttf NotoSansHanunoo-Regular.ttf NotoSansImperialAramaic-Regular.ttf NotoSansInscriptionalPahlavi-Regular.ttf NotoSansInscriptionalParthian-Regular.ttf NotoSansJavanese-Regular.ttf NotoSansKaithi-Regular.ttf NotoSansKayahLi-Regular.ttf NotoSansKharoshthi-Regular.ttf NotoSansLepcha-Regular.ttf NotoSansLimbu-Regular.ttf NotoSansLinearB-Regular.ttf NotoSansLisu-Regular.ttf NotoSansLycian-Regular.ttf NotoSansLydian-Regular.ttf NotoSansMandaic-Regular.ttf NotoSansMeeteiMayek-Regular.ttf NotoSansMongolian-Regular.ttf NotoSansNKo-Regular.ttf NotoSansNewTaiLue-Regular.ttf NotoSansOgham-Regular.ttf NotoSansOlChiki-Regular.ttf NotoSansOldItalic-Regular.ttf NotoSansOldPersian-Regular.ttf NotoSansOldSouthArabian-Regular.ttf NotoSansOldTurkic-Regular.ttf NotoSansOsmanya-Regular.ttf NotoSansPhagsPa-Regular.ttf NotoSansPhoenician-Regular.ttf NotoSansRejang-Regular.ttf NotoSansRunic-Regular.ttf NotoSansSamaritan-Regular.ttf NotoSansSaurashtra-Regular.ttf NotoSansShavian-Regular.ttf NotoSansSundanese-Regular.ttf NotoSansSylotiNagri-Regular.ttf NotoSansSymbols-Regular.ttf NotoSansSyriacEastern-Regular.ttf NotoSansSyriacEstrangela-Regular.ttf NotoSansSyriacWestern-Regular.ttf NotoSansTagalog-Regular.ttf NotoSansTagbanwa-Regular.ttf NotoSansTaiLe-Regular.ttf NotoSansTaiTham-Regular.ttf NotoSansTaiViet-Regular.ttf NotoSansTifinagh-Regular.ttf NotoSansUgaritic-Regular.ttf NotoSansVai-Regular.ttf NotoSansYi-Regular.ttf)
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
@@ -34,7 +33,7 @@ package() {
 
   # License
   install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
-  install -m644 LICENSE.txt \
+  install -m644 LICENSE_OFL.txt \
     "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 
   # fontconfig templates

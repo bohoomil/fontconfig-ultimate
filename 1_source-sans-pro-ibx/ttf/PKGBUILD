@@ -2,7 +2,7 @@
 
 pkgname=ttf-source-sans-pro-ibx
 pkgver=2.020ro+1.075it
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="A set of OpenType fonts designed for user interfaces. TrueType version."
 url="http://www.adobe.com/"
@@ -10,7 +10,6 @@ arch=('any')
 license=('custom:OFL')
 conflicts=('adobe-source-sans-pro-fonts' 'otf-source-sans-pro' 'ttf-source-sans-pro' 't1-source-sans-pro-ibx' 'otf-source-sans-pro-ibx')
 groups=('infinality-bundle-fonts-extra')
-install=$pkgname.install
 source=(https://github.com/adobe-fonts/source-sans-pro/archive/2.020R-ro/1.075R-it.tar.gz
         45-source-sans-pro.conf
         90-tt-source-sans-pro.conf)

@@ -2,7 +2,7 @@
 
 pkgname=otf-heuristica-ib
 pkgver=1.0.2
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Heuristica is an extended version of Adobe Utopia font. OpenType version."
 url="http://code.google.com/p/evristika/"
@@ -12,7 +12,6 @@ provides=('t1-adobe-utopia-ib')
 arch=('any')
 license=('custom:OFL')
 groups=('infinality-bundle-fonts')
-install=$pkgname.install
 source=("https://downloads.sourceforge.net/project/heuristica/heuristica-otf-${pkgver}.tar.xz"
         45-heuristica.conf
         90-non-tt-heuristica.conf)

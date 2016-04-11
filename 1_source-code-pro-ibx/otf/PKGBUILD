@@ -1,25 +1,26 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=otf-source-code-pro-ibx
-pkgver=1.017
-pkgrel=6
+pkgver=2.010ro+1.030it
+_relver=2.010R-ro/1.030R-it
+_tarver=${_relver//\//-}
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="A set of OpenType fonts designed for user interfaces. OpenType version."
-url="http://www.adobe.com/"
+url="http://adobe-fonts.github.io/source-code-pro/"
 arch=('any')
 conflicts=('adobe-source-sans-pro-fonts' 'otf-source-sans-pro' 'ttf-source-sans-pro' 't1-source-code-pro-ibx' 'ttf-source-code-pro')
 license=('custom:OFL')
 groups=('infinality-bundle-fonts-extra')
-install=$pkgname.install
-source=("https://github.com/adobe-fonts/source-code-pro/archive/${pkgver}R.tar.gz"
+source=("${_tarver}.tar.gz::https://github.com/adobe-fonts/source-code-pro/archive/${_relver}.tar.gz"
         45-source-code-pro.conf
         90-non-tt-source-code-pro.conf)
-sha1sums=('badce7cc053e7e943636920140fd249676585b36'
+sha1sums=('d266fb8cc558a85d76432ee0731144fade7b4be1'
           'd20feb494116f95e4a35ad40f625a94f9a3bbcb2'
           '287ef2255289182912eb2daa16810bd87d7100b1')
 
 package(){
-  cd "source-code-pro-${pkgver}R"
+  cd "source-code-pro-$_tarver"
 
   install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
   install -m644 LICENSE.txt \

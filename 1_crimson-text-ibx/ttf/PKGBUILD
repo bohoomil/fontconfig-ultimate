@@ -2,7 +2,8 @@
 
 pkgname=ttf-crimson-text-ibx
 _gitname=Crimson
-pkgver=0.8
+_pkgver=2014.10.11
+pkgver=${_pkgver//.}
 pkgrel=7
 depends=('fontconfig')
 pkgdesc="Crimson Text is an open source serif font family in the tradition of beautiful oldstyle typefaces. TrueType version."
@@ -11,25 +12,25 @@ arch=('any')
 conflicts=('otf-crimson-text' 'otf-crimson-text-ibx')
 groups=('infinality-bundle-fonts-extra')
 license=('custom:OFL')
-install=$pkgname.install
-source=(git+https://github.com/skosch/Crimson.git
+#source=(git+https://github.com/skosch/Crimson.git
+source=(https://github.com/skosch/Crimson/releases/download/fonts-october2014/binaries.zip
         45-crimson-text.conf
         90-tt-crimson-text.conf)
-md5sums=('SKIP'
+md5sums=('744398ad223a3e34b255e0f922c8de5b'
          '5e549238466293c0800ac4fbf8a2d4d7'
          'f60b63dbb9bd23cc6f6c3f43562bd4cd')
 
 package(){
-  cd "${srcdir}"/"Crimson/Desktop Fonts"
+  cd "${srcdir}"
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
-  install -Dm644 TTF/*.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -Dm644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
   install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
   install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 ../../45-crimson-text.conf \
+  install -m644 45-crimson-text.conf \
     "${pkgdir}"/etc/fonts/conf.avail/45-crimson-text.conf
-  install -m644 ../../90-tt-crimson-text.conf \
+  install -m644 90-tt-crimson-text.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-crimson-text.conf
 
   cd "${pkgdir}"/etc/fonts/conf.d

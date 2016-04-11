@@ -5,13 +5,13 @@
 pkgname=ttf-droid-family
 pkgname=('ttf-droid-ib' 'ttf-droid-nonlatin-ib')
 pkgver=20121017
-pkgrel=11
+pkgrel=12
 pkgdesc="General-purpose fonts released by Google as part of Android. Includes additional monospaced variants with dotted and slashed zeros."
 arch=('any')
 license=('Apache')
 url="http://code.google.com/android/"
 groups=('infinality-bundle-fonts')
-source=(ftp://ftp.archlinux.org/other/community/ttf-droid/ttf-droid-20121017.tar.xz
+source=(https://sources.archlinux.org/other/community/ttf-droid/ttf-droid-20121017.tar.xz
         http://www.cosmix.org/software/files/DroidSansMonoSlashed.zip
         http://www.cosmix.org/software/files/DroidSansMonoDotted.zip
         45-droid.conf
@@ -25,7 +25,6 @@ package_ttf-droid-ib(){
   conflicts=('ttf-droid' 'ttf-droid-monovar' 'ttf-droid-monovar-ib')
   replaces=('ttf-droid' 'ttf-droid-monovar' 'ttf-droid-monovar-ib')
   provides=('ttf-font' 'ttf-droid')
-  install=$pkgname.install
 
   cd "${srcdir}"/google-droid-fonts-"${pkgver}"
 
@@ -57,7 +56,6 @@ package_ttf-droid-ib(){
 package_ttf-droid-nonlatin-ib(){
   pkgdesc="General-purpose fonts released by Google as part of Android. Non-Latin language support."
   depends=('fontconfig' 'ttf-droid-ib')
-  install=$pkgname.install
 
   cd "${srcdir}"/google-droid-fonts-"${pkgver}"
 

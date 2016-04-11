@@ -3,7 +3,7 @@
 pkgname=sinkin-sans-ibx
 pkgname=('otf-sinkin-sans-ibx' 'ttf-sinkin-sans-ibx')
 pkgver=1.1
-pkgrel=5
+pkgrel=6
 depends=('fontconfig')
 pkgdesc="Sinkin Sans is a simple, pleasant, luxuriously proportioned and easy to read sans-serif."
 url="http://www.k-type.com/"
@@ -22,7 +22,6 @@ sha1sums=('e95495df31674a2bcb7622dd7a7050f0e8a94aed'
 package_otf-sinkin-sans-ibx(){
   pkgdesc="Sinkin Sans is a simple, pleasant, luxuriously proportioned and easy to read sans-serif. OTF version."
   conflicts=('ttf-sinkin-sans-ibx')
-  install=$pkgname.install
 
   cd "${srcdir}"/"SINKIN SANS FAMILY"/OTF
 
@@ -48,7 +47,6 @@ package_otf-sinkin-sans-ibx(){
 package_ttf-sinkin-sans-ibx(){
   pkgdesc="Sinkin Sans is a simple, pleasant, luxuriously proportioned and easy to read sans-serif. TTF version."
   conflicts=('otf-sinkin-sans-ibx')
-  install=$pkgname.install
 
   cd "${srcdir}"/"SINKIN SANS FAMILY"
 

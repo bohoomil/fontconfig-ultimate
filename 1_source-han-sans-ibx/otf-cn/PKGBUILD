@@ -1,7 +1,7 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=otf-source-han-sans-cn-ibx
-pkgver=1.003
+pkgver=1.004
 pkgrel=1
 depends=('fontconfig')
 pkgdesc="A set of Pan-CJK fonts designed to complement Source Sans Pro. Simplified Chinese subset, OpenType/CFF (OTF) fonts."
@@ -11,11 +11,10 @@ license=('Apache')
 conflicts=('adobe-source-han-sans-cn-fonts')
 replaces=('adobe-source-han-sans-cn-fonts')
 groups=('infinality-bundle-fonts-extra' 'source-han-sans-cjk')
-install=$pkgname.install
 source=("https://github.com/adobe-fonts/source-han-sans/archive/${pkgver}R.tar.gz"
         40-source-han-sans-cn.conf
         90-non-tt-source-han-sans-cn.conf)
-sha1sums=('494a464e71d20191e1660313f00dbc1f82e2896f'
+sha1sums=('dbaac2da2a3a5329967605256fa63a041f0d8eb7'
           '92ead7d591ed97268359694e79c8cef126630c8e'
           '26c2e070827f912965b0054f94edaab5808fefc8')
 

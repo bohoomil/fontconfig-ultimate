@@ -2,7 +2,7 @@
 
 pkgname=ttf-andada-ibx
 pkgver=1.003
-pkgrel=6
+pkgrel=7
 depends=('fontconfig')
 pkgdesc="Andada is a text font with an organic-slab serif, hybrid style, a solid design of medium stroke contrast. TrueType version."
 url="http://www.huertatipografica.com/"
@@ -11,7 +11,6 @@ conflicts=('otf-andada-ibx')
 groups=('infinality-bundle-fonts-extra')
 license=('custom:OFL')
 # http://www.fontsc.com (ttf)
-install=$pkgname.install
 source=(http://bohoomil.com/src/andada_ttf.zip{,.sig}
         http://bohoomil.com/src/andada_sc.zip{,.sig}
         45-andada.conf

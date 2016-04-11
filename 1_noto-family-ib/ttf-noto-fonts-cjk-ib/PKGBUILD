@@ -3,12 +3,11 @@
 pkgname=noto-fonts-cjk-ib
 pkgname=('ttf-noto-fonts-cjk-ib' 'otf-noto-fonts-cjk-ib' 'otf-noto-fonts-cjk-mono-ib')
 pkgver=1.004
-pkgrel=1
+pkgrel=2
 pkgdesc="Google Noto CJK fonts."
 arch=(any)
 url="https://www.google.com/get/noto/"
 license=(custom:SIL)
-install=$pkgname.install
 source=("https://github.com/googlei18n/noto-cjk/archive/v$pkgver.tar.gz")
 sha256sums=('835a42755c1e8d6a4a406f32609da1f0fa7f9674d05760f0be658d9d6f4ab71c')
 
@@ -17,7 +16,6 @@ package_ttf-noto-fonts-cjk-ib() {
   depends=(fontconfig)
   conflicts=(ttf-noto-cjk otf-noto-cjk otf-noto-japanese otf-noto-korean otf-noto-simplified-chinese otf-noto-traditional-chinese noto-fonts-cjk otf-noto-fonts-cjk-ib)
   provides=(noto-fonts-cjk)
-  install=$pkgname.install
 
   cd "noto-cjk-${pkgver}"
 
@@ -35,7 +33,6 @@ package_otf-noto-fonts-cjk-ib() {
   depends=(fontconfig)
   conflicts=(ttf-noto-cjk otf-noto-cjk otf-noto-japanese otf-noto-korean otf-noto-simplified-chinese otf-noto-traditional-chinese noto-fonts-cjk ttf-noto-fonts-cjk-ib)
   provides=(noto-fonts-cjk)
-  install=$pkgname.install
 
   cd "noto-cjk-${pkgver}"
 
@@ -51,7 +48,6 @@ package_otf-noto-fonts-cjk-ib() {
 package_otf-noto-fonts-cjk-mono-ib() {
   pkgdesc="Google Noto CJK fonts (mono OpenType collection)."
   depends=(fontconfig)
-  install=$pkgname.install
 
   cd "noto-cjk-${pkgver}"
 

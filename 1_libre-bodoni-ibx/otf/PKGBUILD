@@ -1,0 +1,40 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=otf-libre-bodoni-ibx
+pkgver=1.001
+pkgrel=1
+pkgdesc="Libre Bodoni font designed by Pablo Impallari. OpenType version."
+url="http://www.impallari.com/"
+depends=('fontconfig')
+conflicts=(ttf-libre-bodoni-ibx)
+groups=('infinality-bundle-fonts-extra')
+arch=('any')
+license=('custom:OFL')
+source=(lbodoni.zip::https://github.com/impallari/Libre-Bodoni/archive/master.zip
+        45-libre-bodoni.conf
+        90-non-tt-libre-bodoni.conf)
+sha1sums=('5d1facaaf85a3fc0d6eb5a39b1811247dbf7b272'
+          '0020387deed4ae613051fe0c1507430904f29b4a'
+          '4128f5e071c0efb6d9bb3facfc5d5814acfec81a')
+
+package(){
+  cd "${srcdir}"/"Libre-Bodoni-master"
+
+  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 fonts/OTF/*.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  cd "${srcdir}"
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  install -m644 45-libre-bodoni.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-libre-bodoni.conf
+  install -m644 90-non-tt-libre-bodoni.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-non-tt-libre-bodoni.conf
+
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-libre-bodoni.conf .
+  ln -s ../conf.avail/90-non-tt-libre-bodoni.conf .
+}

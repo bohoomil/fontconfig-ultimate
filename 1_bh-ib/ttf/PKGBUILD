@@ -3,7 +3,7 @@
 
 pkgname=ttf-bh-ib
 pkgver=1.2
-pkgrel=2
+pkgrel=3
 pkgdesc="Luxi Sans, Serif and Mono families by Bigelow & Holmes. TrueType version."
 arch=(any)
 depends=('fontconfig')
@@ -11,7 +11,6 @@ conflicts=('font-bh-ttf' 'luximono' 't1-bh-ib')
 groups=('infinality-bundle-fonts')
 license=('custom')
 url="http://www.fontsquirrel.com/fonts/list/foundry/bigelow-holmes"
-install=$pkgname.install
 source=(http://bohoomil.com/src/Luxi-Mono.zip{,.sig}
         http://bohoomil.com/src/Luxi-Sans.zip{,.sig}
         http://bohoomil.com/src/Luxi-Serif.zip{,.sig}

@@ -3,15 +3,14 @@
 
 pkgname=otf-vollkorn-ibx
 pkgdesc="Vollkorn typeface by Friedrich Althausen. OpenType version."
-url=('http://vollkorn-typeface.com/')
+url=http://vollkorn-typeface.com/
 license=('custom:OFL')
 pkgver=3.005
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 conflicts=('otf-vollkorn' 'ttf-vollkorn' 'ttf-vollkorn-ibx')
 groups=('infinality-bundle-fonts-extra')
 arch=('any')
-install=$pkgname.install
 source=(http://vollkorn-typeface.com/download/vollkorn-${pkgver//./-}.zip
         45-vollkorn.conf
         90-non-tt-vollkorn.conf)

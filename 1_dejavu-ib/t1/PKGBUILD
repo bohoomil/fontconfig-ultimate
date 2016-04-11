@@ -4,7 +4,7 @@
 
 pkgname=t1-dejavu-ib
 pkgver=2.34
-pkgrel=10
+pkgrel=11
 pkgdesc="Font family based on the Bitstream Vera Fonts with a wider range of characters. Re-packed for infinality-bundle-fonts. Type 1 version."
 arch=('any')
 url="http://dejavu-fonts.org/wiki/Main_Page"
@@ -22,8 +22,6 @@ sha1sums=('f77232e447079a269dae426ea00460849a68634e'
           'b8fafbd2622046a312d1dffc32f7e017aeb24fae')
 
 package() {
-install=${pkgname}.install
-
   cd "${srcdir}"/dejavu
 
   install -dm755 "${pkgdir}"/usr/share/fonts/"${pkgname}"

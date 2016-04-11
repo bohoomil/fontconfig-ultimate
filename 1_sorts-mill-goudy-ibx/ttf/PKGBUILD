@@ -2,7 +2,7 @@
 
 pkgname=ttf-sorts-mill-goudy-ibx
 pkgver=3.1
-pkgrel=7
+pkgrel=8
 depends=('fontconfig')
 pkgdesc="A modern revival of Goudy Oldstyle and Italic. TrueType version."
 url="http://crudfactory.com/"
@@ -10,7 +10,6 @@ arch=('any')
 groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-sortsmillgoudy' 'otf-sorts-mill-goudy-ibx')
 license=('MIT')
-install=$pkgname.install
 source=("http://sortsmill.googlecode.com/files/goudy-3.1.zip"
         45-sorts-mill-goudy.conf
         90-tt-sorts-mill-goudy.conf)

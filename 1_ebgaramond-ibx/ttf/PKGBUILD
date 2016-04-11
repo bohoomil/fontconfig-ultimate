@@ -2,7 +2,7 @@
 
 pkgname=ttf-ebgaramond-ibx
 pkgver=0.15
-pkgrel=7
+pkgrel=8
 depends=('fontconfig')
 pkgdesc="EB Garamond is a revival by Georg Duffner of the 16th century fonts designed by Claude Garamond. TrueType version."
 url="http://www.georgduffner.at/ebgaramond/"
@@ -10,7 +10,6 @@ arch=('any')
 conflicts=('ttf-ebgaramond' 'otf-ebgaramond' 'otf-eb-garamond' 't1-ebgaramond-ibx' 'otf-ebgaramond-ibx')
 groups=('infinality-bundle-fonts-extra')
 license=('custom:OFL')
-install=$pkgname.install
 source=(http://bohoomil.com/src/ebgaramond_ttf.tar.xz{,.sig}
         '45-ebgaramond.conf'
         '90-tt-ebgaramond.conf')

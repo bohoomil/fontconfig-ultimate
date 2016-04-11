@@ -2,7 +2,7 @@
 
 pkgname=ttf-paratype-ibx
 pkgver=2014.09.11
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Paratype font family. TrueType version."
 groups=('infinality-bundle-fonts-extra')
@@ -10,7 +10,6 @@ conflicts=('ttf-paratype' 'ttf-ptsans' 'ttf-pt-mono' 'ttf-pt-sans' 'ttf-pt-serif
 url="http://www.paratype.com/public/"
 arch=('any')
 license=('custom')
-install=$pkgname.install
 source=("http://mirrors.ctan.org/fonts/paratype.zip"
         45-paratype.conf
         90-tt-paratype.conf)
