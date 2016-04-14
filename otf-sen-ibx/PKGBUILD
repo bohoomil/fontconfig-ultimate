@@ -1,7 +1,7 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=otf-sen-ibx
-pkgver=1.0
+pkgver=1.003
 pkgrel=1
 depends=('fontconfig')
 pkgdesc="Sen is a Geohumanist sans typeface, a more neutral version of geometric classics such as Avenir or Futura with a humanist touch."
@@ -9,16 +9,16 @@ url="http://www.philatype.com/"
 arch=('any')
 license=('custom:OFL')
 groups=('infinality-bundle-fonts-extra')
-source=(sen.zip::"http://bit.ly/senfonts"
+#sen.zip::"http://bit.ly/senfonts"
+source=(sen.zip::https://github.com/philatype/Sen/archive/master.zip
         45-sen.conf
         90-non-tt-sen.conf)
-install=${pkgname}.install
-sha1sums=('d1979e9a8b92c3789ee1dd338713dc9f8cd5674f'
+sha1sums=('75f103691c87de19f925172df044b7482ae69925'
           'e75cdc3a2a2c3fd35499fa844f671198757de8de'
           '6f19d8784bf414cac58710722564178b71a445b2')
 
 package() {
-  cd "${srcdir}"
+  cd "${srcdir}/Sen-master"
 
   install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
   install -m644 'OFL_License.txt' \
@@ -27,6 +27,7 @@ package() {
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 OTFs/*.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
+  cd "${srcdir}"
   install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
   install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   install -m644 45-sen.conf \

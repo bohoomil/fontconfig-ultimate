@@ -2,7 +2,7 @@
 
 pkgname=otf-latin-modern-ibx
 pkgver=2.004
-pkgrel=4
+pkgrel=5
 pkgdesc="The Latin Modern (LM) Family of Fonts. OpenType version."
 url="http://www.gust.org.pl/projects/e-foundry/latin-modern"
 depends=('fontconfig')
@@ -10,7 +10,6 @@ conflicts=('otf-latin-modern')
 groups=('infinality-bundle-fonts-extra')
 arch=('any')
 license=('custom')
-install=${pkgname}.install
 source=("http://mirrors.ctan.org/fonts/lm.zip"
         45-latin-modern.conf
         90-non-tt-latin-modern.conf)

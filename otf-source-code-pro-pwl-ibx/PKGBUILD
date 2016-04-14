@@ -4,7 +4,7 @@
 _gitname=powerline-fonts
 pkgname=otf-source-code-pro-pwl-ibx
 pkgver=1.017
-pkgrel=5
+pkgrel=6
 pkgdesc='Pre-patched and adjusted version for use with the new Powerline plugin.'
 arch=('any')
 url="https://github.com/Lokaltog/${_gitname}/tree/master/SourceCodePro"
@@ -17,7 +17,6 @@ conflicts=('otf-source-code-pro-powerline-git')
 provides=('otf-source-code-pro-powerline-git')
 replaces=('otf-source-code-pro-powerline-git')
 groups=('infinality-bundle-fonts-extra')
-install=${pkgname}.install
 source=("git+https://github.com/Lokaltog/${_gitname}"
         45-source-code-pro-pwl.conf
         90-non-tt-source-code-pro-pwl.conf)

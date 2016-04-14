@@ -2,7 +2,7 @@
 
 pkgname=otf-montserrat-ibx
 pkgver=1.0
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Montserrat, by Julieta Ulanovsky, aims to rescue the beauty of urban typography from the first half of the 20th century."
 url="http://www.fontsquirrel.com/"
@@ -13,8 +13,7 @@ source=(montserrat.zip::"http://www.fontsquirrel.com/fonts/download/montserrat"
         http://bohoomil.com/src/Montserrat-Hairline_fixed.otf{,.sig}
         45-montserrat.conf
         90-non-tt-montserrat.conf)
-install=${pkgname}.install
-sha1sums=('885e66a4ecffa3866cb8f310bbdb8598b1104307'
+sha1sums=('d1e07ed5d2f92f946c180ca9c9230f10b6182c1c'
           '500cabc30a634370515b3af18fe43203945e9ed2'
           'SKIP'
           '305c20dd89f9dafb62a19cc3a9d8c661342ec374'

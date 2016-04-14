@@ -1,8 +1,8 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=otf-inconsolatazi4-ibx
-pkgver=1.04
-pkgrel=10
+pkgver=1.10
+pkgrel=1
 depends=('fontconfig')
 pkgdesc="Monospace font for pretty code listings and for the terminal."
 url="http://www.levien.com/type/myfonts/inconsolata.html"
@@ -11,11 +11,10 @@ license=('custom:OFL')
 groups=('infinality-bundle-fonts-extra')
 replaces=('t1-inconsolata-zi4-ibx' 'otf-inconsolatazi4-ib')
 conflicts=('ttf-inconsolata' 'otf-inconsolata' 'otf-inconsolatazi4-ib')
-install=$pkgname.install
 source=("http://mirrors.ctan.org/fonts/inconsolata.zip"
         45-inconsolatazi4.conf
         90-non-tt-inconsolatazi4.conf)
-sha1sums=('6544075761a7b7fa2f71eaf286ef9cf39cbabd52'
+sha1sums=('abb7b335c4d7f6eec9445606c635c4edd4eb8612'
           '4d8d33210e76fb159bbef70946c3a25354b62a16'
           'cd37f07d0ba632648dca1c6766da493fe079c662')
 

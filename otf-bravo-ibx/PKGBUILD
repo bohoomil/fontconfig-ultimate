@@ -9,7 +9,6 @@ url="https://www.behance.net/gallery/10527763/Bravo-Free-Typeface"
 arch=('any')
 groups=('infinality-bundle-fonts-extra')
 license=('custom:OFL')
-install=$pkgname.install
 source=(BravoTypeface.zip::"https://dl.dropboxusercontent.com/u/57042481/Bravo%20Typeface.zip"
         45-bravo.conf
         90-non-tt-bravo.conf)

@@ -2,7 +2,7 @@
 
 pkgname=otf-fanwood-ibx
 pkgver=1.1
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="Based on Bitstream's Transitional 551 and reworked by Barry Schwartz, Fanwood is an OpenType serif typeface mainly suited for paragraphs."
 url="http://crudfactory.com/"
@@ -11,7 +11,6 @@ groups=('infinality-bundle-fonts-extra')
 conflicts=('otf-fanwood')
 replaces=('otf-fanwood')
 license=('MIT')
-install=$pkgname.install
 source=(http://sortsmill.googlecode.com/files/fanwood-1.1.zip
         45-fanwood.conf
         90-non-tt-fanwood.conf)

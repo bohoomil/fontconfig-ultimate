@@ -2,7 +2,7 @@
 
 pkgname=otf-enriqueta-ibx
 pkgver=1.001
-pkgrel=3
+pkgrel=4
 depends=('fontconfig')
 pkgdesc="Enriqueta is a serif typeface with distinctive glyphs, mainly intended for screen."
 url="http://www.fontfuror.com"
@@ -13,7 +13,6 @@ groups=('infinality-bundle-fonts-extra')
 source=(http://bohoomil.com/src/enriqueta.zip{,.sig}
         45-enriqueta.conf
         90-non-tt-enriqueta.conf)
-install=${pkgname}.install
 validgpgkeys=('A9244FB5E93F11F0E975337FAE6866C7962DDE58')
 sha1sums=('8e2ad4cc29121ea15b979d1999d4dd4e3aa90875'
           'SKIP'

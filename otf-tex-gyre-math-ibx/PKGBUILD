@@ -2,7 +2,7 @@
 
 pkgname=otf-tex-gyre-math-ibx
 pkgver=2.005
-pkgrel=3
+pkgrel=4
 pkgdesc="The TeX Gyre (TG) Math Fonts."
 depends=('fontconfig' 'otf-tex-gyre-ib')
 groups=('infinality-bundle-fonts-extra')
@@ -10,7 +10,6 @@ conflicts=('otf-texgyre-pagella-math')
 url="http://www.gust.org.pl/projects/e-foundry/tex-gyre/"
 arch=('any')
 license=('GFL')
-install=$pkgname.install
 source=(http://www.gust.org.pl/projects/e-foundry/tg-math/download/texgyrebonum-math-0973.zip
         http://www.gust.org.pl/projects/e-foundry/tg-math/download/texgyrepagella-math-1605.zip
         http://www.gust.org.pl/projects/e-foundry/tg-math/download/texgyretermes-math-1502.zip

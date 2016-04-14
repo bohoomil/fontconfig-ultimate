@@ -4,7 +4,7 @@
 pkgname=otf-cantarell-ib
 _basename=cantarell-fonts
 pkgver=0.0.24
-pkgrel=1
+pkgrel=2
 epoch=1
 pkgdesc="Cantarell font family."
 arch=('any')
@@ -14,7 +14,6 @@ depends=('fontconfig')
 conflicts=('t1-cantarell-ib' 'cantarell-fonts')
 replaces=('cantarell-fonts')
 provides=('cantarell-fonts')
-install=$pkgname.install
 source=(https://download.gnome.org/sources/${_basename}/${pkgver:0:3}/${_basename}-${pkgver}.tar.xz
         45-cantarell.conf
         90-non-tt-cantarell.conf)

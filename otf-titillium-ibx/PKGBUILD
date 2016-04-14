@@ -2,7 +2,7 @@
 
 pkgname=otf-titillium-ibx
 pkgver=2.0
-pkgrel=4
+pkgrel=5
 depends=('fontconfig')
 pkgdesc="Titillium is an elegant sans-serif typeface created at Accademia di Belle Arti di Urbino."
 url="http://www.campivisivi.net/titillium/"
@@ -11,7 +11,6 @@ groups=('infinality-bundle-fonts-extra')
 conflicts=('otf-titillium')
 replaces=('otf-titillium')
 license=('custom:OFL')
-install=$pkgname.install
 source=(http://www.campivisivi.net/titillium/download/Titillium_roman_upright_italic_2_0_OT.zip
         31-titillium.conf
         45-titillium.conf

@@ -2,20 +2,21 @@
 
 pkgname=otf-permian-family-ibx
 pkgver=1.0
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Developed for the city of Perm, Permian family provides extensive number of Latin and Cyrillic glyphs, icons and small caps."
 url="http://pcrd.ru/"
 arch=('any')
 license=('custom')
 groups=('infinality-bundle-fonts-extra')
-source=("http://pcrd.ru/files/permian.zip"
-        "http://pcrd.ru/files/Permian_Free_Font_License_eng.txt"
+source=(persans.zip::https://www.fontsquirrel.com/fonts/download/permian-sans
+        perserif.zip::https://www.fontsquirrel.com/fonts/download/permian-serif
+        perslab.zip::https://www.fontsquirrel.com/fonts/download/permian-slab
         45-permian.conf
         90-non-tt-permian.conf)
-install=${pkgname}.install
-sha1sums=('51bd88bc588b754c2354ae294c901ddca13f6358'
-          'd246e709ed7166b55497381fbbd9121aa901fc04'
+sha1sums=('1feb1ede40fb1b6df57dd54374cca3385bd11036'
+          'dbef0a96f372ac4bbb78eaded8672c25a00385a4'
+          '292f7202c0b1a65aca03327f3e6f6fb9514955a6'
           '44411053046e1c2c784f3b1339f3d894bc8eb1de'
           '4ff6ff33df5758270447f29b36d026e19db622c1')
 
@@ -23,7 +24,7 @@ package() {
   cd "${srcdir}"
 
   install -d -m755 "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 "Permian_Free_Font_License_eng.txt" \
+  install -m644 "Permian Free Font License English.txt" \
     "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
 
   install -d -m755 "${pkgdir}"/usr/share/fonts/"${pkgname}"

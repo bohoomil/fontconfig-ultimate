@@ -3,7 +3,7 @@
 pkgname=otf-pfeffer-mediaeval-ibx
 _srcpkg=pfeffer_mediaeval
 pkgver=1.0
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Pfeffer Mediæval is the idealised image of a Carolingian minuscule."
 url="http://robert-pfeffer.net"
@@ -12,7 +12,6 @@ groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-pfeffer-mediaeval-ibx')
 replaces=('ttf-pfeffer-mediaeval-ibx')
 license=('custom')
-install=$pkgname.install
 source=("http://robert-pfeffer.net/schriftarten/$_srcpkg.zip"
         45-pfeffer-mediaeval.conf
         90-non-tt-pfeffer-mediaeval.conf)

@@ -2,7 +2,7 @@
 
 pkgname=otf-melthofonts-ibx
 pkgver=1.21
-pkgrel=7
+pkgrel=8
 depends=('fontconfig')
 pkgdesc="Fonts for Syriac script."
 url="http://www.bethmardutho.org/index.php/resources/fonts.html"
@@ -10,7 +10,6 @@ arch=('any')
 groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-meltho')
 license=('custom')
-install=$pkgname.install
 source=(http://www.bethmardutho.org/images/fonts/melthofonts-1.21.zip
         40-melthofonts.conf
         90-non-tt-melthofonts.conf)

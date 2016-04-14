@@ -2,18 +2,17 @@
 
 pkgname=otf-berenis-pro-ibx
 _src_name=Berenis-Pro
-pkgver=20120228
-pkgrel=3
+pkgver=20150322
+pkgrel=1
 pkgdesc="Berenis ADF is a serif family designed as a substitute for Bodoni or Didot."
 arch=('any')
 url="http://arkandis.tuxfamily.org"
 license=('GPL2')
 depends=('fontconfig')
-install=$pkgname.install
 source=("http://arkandis.tuxfamily.org/fonts/${_src_name}-${pkgver}.zip"
         45-berenis-adf-pro.conf
         90-non-tt-berenis-adf-pro.conf)
-sha1sums=('df8637b9c75df5a8e58f6f22f037b3a1ab0d1e26'
+sha1sums=('98bb13ebcf6d9ec6f7647bffae76f4105367b932'
           'a868fe3da746a9585a7e5dabd1db69a7467f31a7'
           '479494c92e32bd5d72c86583c5a1c706ca28a311')
 

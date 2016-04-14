@@ -2,7 +2,7 @@
 
 pkgname=otf-exo2-ibx
 pkgver=2.0
-pkgrel=4
+pkgrel=5
 depends=('fontconfig')
 pkgdesc="Exo is a geometric sans serif font with a technological feel."
 url="http://ndiscovered.com"
@@ -11,7 +11,6 @@ groups=('infinality-bundle-fonts-extra')
 conflicts=('otf-exo')
 replaces=('otf-exo')
 license=('custom:OFL')
-install=$pkgname.install
 source=(http://www.ndiscovered.com/downloads/exo2/EXO_2_OTF.zip
         45-exo2.conf
         90-non-tt-exo2.conf)

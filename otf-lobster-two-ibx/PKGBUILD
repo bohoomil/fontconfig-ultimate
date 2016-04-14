@@ -1,8 +1,8 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=otf-lobster-two-ibx
-pkgver=1.006
-pkgrel=2
+pkgver=1.007
+pkgrel=1
 depends=('fontconfig')
 pkgdesc="Lobster Two is a family version of the original Lobster. OpenType version."
 url="http://www.impallari.com/"
@@ -10,24 +10,24 @@ arch=('any')
 conflicts=('ttf-impallari-lobstertwo')
 groups=('infinality-bundle-fonts-extra')
 license=('custom:OFL')
-install=$pkgname.install
-source=(lobster-two.zip::http://www.fontsquirrel.com/fonts/download/lobster-two/
+#http://www.fontsquirrel.com/fonts/download/lobster-two/
+source=(lobster-two.zip::https://github.com/impallari/The-Lobster-Font/archive/master.zip
         45-lobster-two.conf
         90-non-tt-lobster-two.conf)
-sha1sums=('b1005301a47a613086fb6b1faabee01e0238ebf5'
+sha1sums=('e95ea5ed86a7de54632f02c90bd30824fb6f0f54'
           '42002431ee88385e23e157b818f5392e80538667'
           'f1061889e6f0eb132cd2b106547d31e522de4143')
 
 package(){
-  cd "${srcdir}"
+  cd "${srcdir}/The-Lobster-Font-master"
 
   install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 "SIL Open Font License.txt" \
-    "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
+  install -m644 "OFL.txt" "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
-  install -m644 *.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 fonts/OTF/*.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
+  cd "${srcdir}"
   install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
   install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   install -m644 45-lobster-two.conf \

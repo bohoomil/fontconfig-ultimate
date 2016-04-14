@@ -3,14 +3,13 @@
 
 pkgname=t1-cursor-ib
 pkgver=1.0.4
-pkgrel=1
+pkgrel=2
 pkgdesc="Coursor font. Type 1 version."
 arch=(any)
 license=('custom')
 url="http://xorg.freedesktop.org/"
 depends=('fontconfig')
 groups=('infinality-bundle-fonts')
-install=$pkgname.install
 source=(${url}/releases/individual/font/font-xfree86-type1-${pkgver}.tar.bz2)
 sha1sums=('1381f274a178cbd08627560e17a4a8f6653be3f7')
 

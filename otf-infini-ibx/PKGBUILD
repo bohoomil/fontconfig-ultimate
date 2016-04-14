@@ -2,7 +2,7 @@
 
 pkgname=otf-infini-ibx
 pkgver=1.1
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="Infini is a contemporary humanist sans-serif typeface by Sandrine Nugue."
 url="http://www.cnap.graphismeenfrance.fr/infini/"
@@ -12,13 +12,12 @@ groups=('infinality-bundle-fonts-extra')
 source=("http://www.cnap.graphismeenfrance.fr/infini/telechargement/Infini-cnap-fontes-specimen-v${pkgver}.zip"
         45-infini.conf
         90-non-tt-infini.conf)
-install=${pkgname}.install
-sha1sums=('7f0732eaf70cdb01ca48b82bc19c526370e2b10f'
+sha1sums=('bb4e276882f32046da3546c0eb34d117f826d9fc'
           '1691df270e96d7176ae38625c6741ef85e0e8cae'
           '937692a6652e2be72ab9e8c6ce1aeb24a74264ff')
 
 package() {
-  cd "${srcdir}"
+  cd "${srcdir}/Infini-cnap-fontes-specimen-v${pkgver}"
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 fonts/Gras/*.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
@@ -26,6 +25,7 @@ package() {
   install -m644 fonts/Pictos/*.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 fonts/Romain/*.otf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
+  cd "${srcdir}"
   install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
   install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   install -m644 45-infini.conf \

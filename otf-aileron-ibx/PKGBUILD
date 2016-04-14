@@ -1,8 +1,8 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=otf-aileron-ibx
-pkgver=0.101
-pkgrel=4
+pkgver=0.102
+pkgrel=1
 depends=('fontconfig')
 pkgdesc="Aileron is a high quality sans serif font designed by Sora Sagano."
 url="http://dotcolon.net/"
@@ -13,7 +13,6 @@ source=("http://dotcolon.net/DL/font/aileron.zip"
         COPYING
         45-aileron.conf
         90-non-tt-aileron.conf)
-install=${pkgname}.install
 sha1sums=('df0ac550e211f615827bf4ee1ddd5f83a8494a42'
           '07fde791308bad26de4578a05716e7a5fde3d8af'
           '0b66d2ae456c6eaa6be5ee55168fc78c8bf8931c'

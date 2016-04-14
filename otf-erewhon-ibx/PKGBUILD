@@ -1,7 +1,7 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=otf-erewhon-ibx
-pkgver=1.02
+pkgver=1.05
 pkgrel=1
 depends=('fontconfig')
 pkgdesc="Erewhon is based on the Heuristica family, which is based in turn on Utopia. The size is 6% smaller than Heuristica, matching that of UtopiaStd."
@@ -9,11 +9,10 @@ url="http://www.ctan.org/tex-archive/fonts/erewhon"
 arch=('any')
 groups=('infinality-bundle-fonts-extra')
 license=('custom:OFL')
-install=$pkgname.install
 source=(http://mirrors.ctan.org/fonts/erewhon.zip
         45-erewhon.conf
         90-non-tt-erewhon.conf)
-sha1sums=('f2376e881e1a84878611fcb4ed6bd18bfaa9d3ce'
+sha1sums=('334b35a50548475a87988d628fdcef9a7cb93768'
           '1648a48e6f02f7da610d6544eede2083fbc50cb9'
           '37c4c88d165b74896f59d940aaebb275253a5c0e')
 

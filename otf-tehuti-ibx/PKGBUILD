@@ -1,7 +1,7 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=otf-tehuti-ibx
-pkgver=1.0
+pkgver=2.0
 pkgrel=1
 depends=('fontconfig')
 pkgdesc="Tehuti is a modern font based predominantly off Electra, with touches from Palatino, Janson, and Goudy Oldstyle."
@@ -12,8 +12,7 @@ groups=('infinality-bundle-fonts-extra')
 source=(tehuti.zip::"http://www.fontsquirrel.com/fonts/download/tehuti"
         45-tehuti.conf
         90-non-tt-tehuti.conf)
-install=${pkgname}.install
-sha1sums=('4de24883abc8b9081055d8dc4effd03a21674ffe'
+sha1sums=('2a81b3e98ca6a67875af460cdeb0e74c1b2271c9'
           'b59f07923570683d316a8a1849d22df297e81935'
           'adf2b46c586453c736e47975a4e88d534bd2727e')
 

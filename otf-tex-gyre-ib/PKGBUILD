@@ -2,7 +2,7 @@
 
 pkgname=otf-tex-gyre-ib
 pkgver=2.005
-pkgrel=7
+pkgrel=8
 depends=('fontconfig')
 pkgdesc="The TeX Gyre (TG) Collection of Fonts."
 groups=('infinality-bundle-fonts')
@@ -11,7 +11,6 @@ arch=('any')
 license=('GFL')
 conflicts=('otf-texgyre' 'tex-gyre-fonts' 't1-tex-gyre-ib')
 replaces=('t1-tex-gyre-ib')
-install=$pkgname.install
 source=("http://www.gust.org.pl/projects/e-foundry/tex-gyre/whole/tg-${pkgver}otf.zip"
         GFL.txt
         45-tex-gyre.conf
