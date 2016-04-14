@@ -2,12 +2,12 @@
 
 pkgname=ttf-libre-bodoni-ibx
 pkgver=1.001
-pkgrel=1
+pkgrel=2
 pkgdesc="Libre Bodoni font designed by Pablo Impallari. TrueType version."
 url="http://www.impallari.com/"
 depends=('fontconfig')
 arch=('any')
-conflicts=(ttf-libre-bodoni-ibx)
+conflicts=(otf-libre-bodoni-ibx)
 groups=('infinality-bundle-fonts-extra')
 license=('custom:OFL')
 source=(lbodoni.zip::https://github.com/impallari/Libre-Bodoni/archive/master.zip

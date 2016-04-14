@@ -2,7 +2,7 @@
 
 pkgname=otf-libre-bodoni-ibx
 pkgver=1.001
-pkgrel=1
+pkgrel=2
 pkgdesc="Libre Bodoni font designed by Pablo Impallari. OpenType version."
 url="http://www.impallari.com/"
 depends=('fontconfig')
