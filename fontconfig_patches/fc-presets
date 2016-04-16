@@ -1,10 +1,10 @@
 #!/bin/bash
 
-###                     fc-presets v.0.9                     ###
+###                    fc-presets v.0.9.1                    ###
 ### Set default fontconfig presets for your font collection. ###
 ###          (Thanks cfr for testing and suggestions.)       ###
 ###                                                          ###
-###                Copyright (c) 2014 bohoomil               ###
+###                Copyright (c) 2016 bohoomil               ###
 ### The MIT License (MIT) http://opensource.org/licenses/MIT ###
 ###      part of infinality-bundle  http://bohoomil.com      ###
 
@@ -189,11 +189,11 @@ custom_postjob(){
   targets_current=("30-metric-aliases-$option.conf" "37-repl-global-$option.conf" "60-latin-$option.conf" "65-non-latin-$option.conf" "66-aliases-wine-$option.conf")
   for preset in ${targets_current[@]}; do
     check_current=$(ls *.conf | grep "\-$option.conf")
-    if [[ $check_current == *combi* ]] && [[ -f ./35-repl-custom.conf ]]; then
+    if [[ $check_current == *combi* ]] && [[ -f $config_dir/35-repl-custom.conf ]]; then
       rm -f 35-repl-custom.conf 2>/dev/null
     elif [[ $check_current == *free* ]] || [[ $check_current == *ms* ]]; then
       if [ ! -f 35-repl-custom ]; then
-        ln -s ../conf.avail.infinality/35-repl-custom.conf . 2>/dev/null
+        ln -s $presets_dir/conf.avail.infinality/35-repl-custom.conf . 2>/dev/null
       fi
     fi
   done
