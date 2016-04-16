@@ -1,8 +1,8 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=ttf-myanmar3-ibx
-pkgver=1.358
-pkgrel=7
+pkgver=20110816
+pkgrel=1
 depends=('fontconfig')
 pkgdesc="Font for Myanmar/Burmese script."
 url="http://myanmar3source.googlecode.com/"
@@ -10,8 +10,7 @@ arch=('any')
 groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-myanmar3')
 license=('custom:OFL')
-install=$pkgname.install
-source=("http://myanmar3source.googlecode.com/files/mm3-multi-os%2816-08-2011%29.ttf"
+source=("http://myanmar3source.googlecode.com/files/mm3-multi-os(16-08-2011).ttf"
         40-myanmar3.conf
         90-tt-myanmar3.conf)
 sha1sums=('fa3faaef571b36731c68f955fb159d42ee3c7f55'
@@ -19,18 +18,16 @@ sha1sums=('fa3faaef571b36731c68f955fb159d42ee3c7f55'
           '53a4f9544546bbd12a9c9c072986e5136163ad15')
 
 package() {
-  cd "${srcdir}"
 
-  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
-  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -D -m644 "mm3-multi-os(16-08-2011).ttf" \
+    "${pkgdir}"/usr/share/fonts/"${pkgname}"/mm3-multi-os.ttf
 
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 40-myanmar3.conf \
+  install -D -m644 40-myanmar3.conf \
     "${pkgdir}"/etc/fonts/conf.avail/40-myanmar3.conf
-  install -m644 90-tt-myanmar3.conf \
+  install -D -m644 90-tt-myanmar3.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-myanmar3.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/40-myanmar3.conf .
   ln -s ../conf.avail/90-tt-myanmar3.conf .

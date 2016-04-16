@@ -2,14 +2,13 @@
 
 pkgname=ttf-archivo-narrow-ibx
 pkgver=1.002
-pkgrel=4
+pkgrel=5
 depends=('fontconfig')
 pkgdesc="Archivo from Omnibus-Type is a grotesque sans-serif typeface family derived from Chivo. Narrow style."
 url="http://omnibus-type.com/"
 arch=('any')
 groups=('infinality-bundle-fonts-extra')
 license=('custom:OFL')
-install=$pkgname.install
 source=(http://bohoomil.com/src/archivo_narrow.zip{,.sig}
         45-archivo-narrow.conf
         90-tt-archivo-narrow.conf)
@@ -20,21 +19,18 @@ sha1sums=('8fb3677004c317e0e4e15a3c05cf7713dcfef9c3'
           '8bc1809e19b7c80a77aa5c9009d266a203c20255')
 
 package(){
-  cd "${srcdir}"/
 
-  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -D -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 45-archivo-narrow.conf \
+  install -D -m644 45-archivo-narrow.conf \
     "${pkgdir}"/etc/fonts/conf.avail/45-archivo-narrow.conf
-  install -m644 90-tt-archivo-narrow.conf \
+  install -D -m644 90-tt-archivo-narrow.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-archivo-narrow.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/45-archivo-narrow.conf .
   ln -s ../conf.avail/90-tt-archivo-narrow.conf .

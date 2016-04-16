@@ -1,38 +1,38 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=ttf-amiri-ibx
-pkgver=0.107
-pkgrel=4
+_name=amiri
+pkgver=0.108
+pkgrel=1
 depends=('fontconfig')
 pkgdesc="Amiri is a high quality classical Arabic typeface in Naskh style for typesetting books and other running text."
 url="http://www.amirifont.org/"
 arch=('any')
 license=('custom:OFL')
 groups=('infinality-bundle-fonts-extra')
-source=("http://downloads.sourceforge.net/project/amiri/amiri-0.107.zip"
+source=(https://github.com/khaledhosny/${_name}-font/releases/download/0.108/${_name}-${pkgver}.zip
         40-amiri.conf
         90-tt-amiri.conf)
-install=${pkgname}.install
-sha1sums=('9588b5961958a24a8210b208b3967c92e2dddabb'
+sha1sums=('127bac78b16b8018b1a91b6e797bbd67d233a483'
           '2e03da2a69ffdf2e81614531a9f867f69c435d06'
           'fd736e05c0fb8f0eb0e8d12f7654373f88f1f029')
 
 package() {
-  cd "${srcdir}"/"amiri-${pkgver}"
+  cd "${_name}-${pkgver}"
 
-  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
+  install -D -m644 OFL.txt \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
 
   install -d -m755 "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 ../40-amiri.conf \
+  cd "${srcdir}"
+  install -D -m644 40-amiri.conf \
     "${pkgdir}"/etc/fonts/conf.avail/40-amiri.conf
-  install -m644 ../90-tt-amiri.conf \
+  install -D -m644 90-tt-amiri.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-amiri.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/40-amiri.conf .
   ln -s ../conf.avail/90-tt-amiri.conf .

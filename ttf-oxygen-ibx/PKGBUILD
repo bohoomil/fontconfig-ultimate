@@ -3,7 +3,7 @@
 pkgname=ttf-oxygen-ibx
 epoch=1
 pkgver=5.4.3
-pkgrel=1
+pkgrel=2
 pkgdesc="The Oxygen typeface family is created as part of the KDE Project."
 url="http://kde.org/"
 arch=('i686' 'x86_64') # CMake files are arch-dependent
@@ -13,7 +13,6 @@ makedepends=('extra-cmake-modules' 'qt5-base')
 conflicts=('ttf-oxygen' 'ttf-oxygen-git')
 provides=('ttf-oxygen')
 license=('custom:OFL' 'custom:GPL+FE' 'GPL')
-install=$pkgname.install
 source=("http://download.kde.org/stable/plasma/${pkgver}/oxygen-fonts-${pkgver}.tar.xz"
         http://bohoomil.com/src/Oxygen.zip{,.sig}
         http://bohoomil.com/src/Oxygen_Mono.zip{,.sig}
@@ -22,7 +21,9 @@ source=("http://download.kde.org/stable/plasma/${pkgver}/oxygen-fonts-${pkgver}.
         CMakeLists.txt.patch)
 sha1sums=('328ef4ea6d9d579c92e065aab53aa2f435adaa08'
           '12e43391c3feee3f7c361bfff1c0cbb0c91b6859'
+          'SKIP'
           '381cce855e5ead414f4bc7480a6fa94f7d3ecbdf'
+          'SKIP'
           'cc78ee55ef16f085e7d73dd8eb9df191793791c1'
           '0e884da0573482a1c9ce7b20d43a28231d9689c3'
           '394f3bbda9697e1a341d5fffea69829360c65ddc')

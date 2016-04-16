@@ -1,12 +1,12 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=ttf-lohit-tamil-ib
-_src_pkg_1=lohit-tamil-ttf
-_src_pkg_2=lohit-tamil-classical-ttf
+_name1=lohit-tamil-ttf
+_name2=lohit-tamil-classical-ttf
 pkgver=2.91.1+2.5.3clss
 _pkgver1=2.91.1
 _pkgver2=2.5.3
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="Lohit Tamil and Tamil Classical fonts."
 url="https://fedorahosted.org/lohit/"
@@ -14,9 +14,8 @@ arch=('any')
 conflicts=('lohit-fonts')
 groups=('infinality-bundle-fonts')
 license=('custom:OFL')
-install=$pkgname.install
-source=("https://fedorahosted.org/releases/l/o/lohit/${_src_pkg_1}-${_pkgver1}.tar.gz"
-        "https://fedorahosted.org/releases/l/o/lohit/${_src_pkg_2}-${_pkgver2}.tar.gz"
+source=("https://fedorahosted.org/releases/l/o/lohit/${_name1}-${_pkgver1}.tar.gz"
+        "https://fedorahosted.org/releases/l/o/lohit/${_name2}-${_pkgver2}.tar.gz"
         40-lohit-tamil.conf
         66-lohit-tamil.conf
         90-tt-lohit-tamil.conf)
@@ -27,25 +26,25 @@ sha1sums=('e414bb4e48a45f4c6b1e4af4ab3546036dda747a'
           'c1b9f730ea11a6548421a10095b35df9e0ecd0cb')
 
 package(){
-  cd "${srcdir}"/"${_src_pkg_1}-${_pkgver1}"
-  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  cd "${srcdir}"/"${_name1}-${_pkgver1}"
+
+  install -D -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  cd "${srcdir}"/"${_src_pkg_2}-${_pkgver2}"
+  cd "${srcdir}"/"${_name2}-${_pkgver2}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 ../40-lohit-tamil.conf \
+  cd "${srcdir}"
+  install -D -m644 40-lohit-tamil.conf \
     "${pkgdir}"/etc/fonts/conf.avail/40-lohit-tamil.conf
-  install -m644 ../66-lohit-tamil.conf \
+  install -D -m644 66-lohit-tamil.conf \
     "${pkgdir}"/etc/fonts/conf.avail/66-lohit-tamil.conf
-  install -m644 ../90-tt-lohit-tamil.conf \
+  install -D -m644 90-tt-lohit-tamil.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-lohit-tamil.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/40-lohit-tamil.conf .
   ln -s ../conf.avail/66-lohit-tamil.conf .

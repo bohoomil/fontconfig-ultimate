@@ -4,7 +4,7 @@
 
 pkgname=ttf-nanumgothic-coding-ibx
 pkgver=2.0
-pkgrel=5
+pkgrel=6
 depends=('fontconfig')
 pkgdesc="The monospaced version of NanumGothic."
 url="http://hangeul.naver.com/"
@@ -13,7 +13,6 @@ groups=('infinality-bundle-fonts-extra')
 license=('custom:OFL')
 conflicts=('ttf-nanumgothic_coding')
 replaces=('ttf-nanumgothic_coding')
-install=$pkgname.install
 source=('http://dev.naver.com/frs/download.php/441/NanumGothicCoding-2.0.zip'
         40-nanumgothic-coding.conf
         90-tt-nanumgothic-coding.conf)
@@ -22,20 +21,18 @@ sha1sums=('051e7658cbd74befbd9c9bda9814cc3ede437080'
           'ac50c135c8ba61d0addb525a2fc37b615a14925b')
 
 package(){
-  cd "${srcdir}"
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *-Bold.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"/NanumGothicCoding_Bold.ttf
   rm *-Bold.ttf
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"/NanumGothicCoding.ttf
 
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 40-nanumgothic-coding.conf \
+  install -D -m644 40-nanumgothic-coding.conf \
     "${pkgdir}"/etc/fonts/conf.avail/40-nanumgothic-coding.conf
-  install -m644 90-tt-nanumgothic-coding.conf \
+  install -D -m644 90-tt-nanumgothic-coding.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-nanumgothic-coding.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/40-nanumgothic-coding.conf .
   ln -s ../conf.avail/90-tt-nanumgothic-coding.conf .

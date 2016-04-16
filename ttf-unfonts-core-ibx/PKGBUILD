@@ -1,10 +1,10 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=ttf-unfonts-core-ibx
-_basename=un-fonts-core
+_name=un-fonts-core
 pkgver=1.0.2
 _pkgrev=080608
-pkgrel=6
+pkgrel=7
 depends=('fontconfig')
 pkgdesc="Un Core family of Korean TrueType fonts."
 url="http://kldp.net/projects/unfonts/"
@@ -13,8 +13,7 @@ groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-unfonts-core' 'ttf-unfontscore')
 replaces=('ttf-unfonts-core' 'ttf-unfontscore')
 license=('custom')
-install=$pkgname.install
-source=(http://kldp.net/frs/download.php/4695/$_basename-$pkgver-$_pkgrev.tar.gz
+source=(http://kldp.net/frs/download.php/4695/${_name}-${pkgver}-${_pkgrev}.tar.gz
         40-unfonts-core.conf
         90-tt-unfonts-core.conf)
 sha1sums=('4245d08649a0acc26d8c73e707b61371b9370e7a'
@@ -22,23 +21,20 @@ sha1sums=('4245d08649a0acc26d8c73e707b61371b9370e7a'
           'bc9f39c51b4ca56cdd8167ff351c11d37a243ff0')
 
 package(){
-  cd "${srcdir}"/un-fonts
+  cd un-fonts
 
-  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 COPYING "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m755 -d "${pkgdir}"/usr/share/doc/"${pkgname}"
-  install -m644 README "${pkgdir}"/usr/share/doc/"${pkgname}"
+  install -D -m644 COPYING "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 ../40-unfonts-core.conf \
+  cd "${srcdir}"
+  install -D -m644 40-unfonts-core.conf \
     "${pkgdir}"/etc/fonts/conf.avail/40-unfonts-core.conf
-  install -m644 ../90-tt-unfonts-core.conf \
+  install -D -m644 90-tt-unfonts-core.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-unfonts-core.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/40-unfonts-core.conf .
   ln -s ../conf.avail/90-tt-unfonts-core.conf .

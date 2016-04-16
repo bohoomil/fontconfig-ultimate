@@ -1,9 +1,9 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=ttf-lohit-punjabi-ib
-_src_pkg=lohit-punjabi-ttf
+_name=lohit-punjabi-ttf
 pkgver=2.5.3
-pkgrel=6
+pkgrel=7
 depends=('fontconfig')
 pkgdesc="Lohit Punjabi font."
 url="https://fedorahosted.org/lohit/"
@@ -11,8 +11,7 @@ arch=('any')
 conflicts=('lohit-fonts')
 groups=('infinality-bundle-fonts')
 license=('custom:OFL')
-install=$pkgname.install
-source=("https://fedorahosted.org/releases/l/o/lohit/${_src_pkg}-${pkgver}.tar.gz"
+source=("https://fedorahosted.org/releases/l/o/lohit/${_name}-${pkgver}.tar.gz"
         40-lohit-punjabi.conf
         66-lohit-punjabi.conf
         90-tt-lohit-punjabi.conf)
@@ -22,23 +21,22 @@ sha1sums=('c43c7c9a3ef24b78187bd157ee9ac46559816959'
           'c4878968c17dab5fa06af6c0cf50a22a9742d9bd')
 
 package(){
-  cd "${srcdir}"/"${_src_pkg}-${pkgver}"
+  cd "${_name}-${pkgver}"
 
-  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -D -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 ../40-lohit-punjabi.conf \
+  cd "${srcdir}"
+  install -D -m644 40-lohit-punjabi.conf \
     "${pkgdir}"/etc/fonts/conf.avail/40-lohit-punjabi.conf
-  install -m644 ../66-lohit-punjabi.conf \
+  install -D -m644 66-lohit-punjabi.conf \
     "${pkgdir}"/etc/fonts/conf.avail/66-lohit-punjabi.conf
-  install -m644 ../90-tt-lohit-punjabi.conf \
+  install -D -m644 90-tt-lohit-punjabi.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-lohit-punjabi.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/40-lohit-punjabi.conf .
   ln -s ../conf.avail/66-lohit-punjabi.conf .

@@ -2,7 +2,7 @@
 
 pkgname=ttf-lekton-ibx
 pkgver=34.0
-pkgrel=7
+pkgrel=8
 depends=('fontconfig')
 pkgdesc="Lekton monospace font from Accademia di Belle Arti di Urbino."
 url="http://code.google.com/p/googlefontdirectory/"
@@ -11,7 +11,6 @@ groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-lekton')
 replaces=('ttf-lekton')
 license=('custom:OFL')
-install=$pkgname.install
 source=(https://googlefontdirectory.googlecode.com/hg/ofl/lekton/Lekton-{Bold,Italic,Regular}.ttf
         https://googlefontdirectory.googlecode.com/hg/ofl/lekton/OFL.txt
         45-lekton.conf
@@ -19,25 +18,22 @@ source=(https://googlefontdirectory.googlecode.com/hg/ofl/lekton/Lekton-{Bold,It
 sha1sums=('1d1a400ad0e84ec7a71dd6c586466902c5892c92'
           '24cda7c46be6303454b943e3eb86deb2ab0ebacf'
           'e4a1e6b15ae1df6d47328d5a7531df9b0d02e369'
-          'cd12c82ff7fd6f03768be4cc9b6f924e7add6c65'
+          '39160c1fe404f8d884bb41f9891f24387b8d828b'
           'edf100f3d775f391e9ce664dde31e984fed6db19'
           '6b8b0d14cfa07fbe2cb1a43b9b59cc6f65ef55a6')
 package(){
-  cd "${srcdir}"
 
-  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -D -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 45-lekton.conf \
+  install -D -m644 45-lekton.conf \
     "${pkgdir}"/etc/fonts/conf.avail/45-lekton.conf
-  install -m644 90-tt-lekton.conf \
+  install -D -m644 90-tt-lekton.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-lekton.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/45-lekton.conf .
   ln -s ../conf.avail/90-tt-lekton.conf .

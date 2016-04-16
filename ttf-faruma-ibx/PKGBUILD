@@ -2,40 +2,37 @@
 
 pkgname=ttf-faruma-ibx
 pkgver=2.0
-pkgrel=2
+pkgrel=3
 pkgdesc="A font for Maldivian (Dhivehi) language, Thaana script."
 arch=('any')
 url="http://www.wazu.jp/"
 license=('custom')
 depends=('fontconfig')
 groups=('infinality-bundle-fonts')
-install=${pkgname}.install
-source=(http://www.stomaldives.com/downloads/misc/faruma_fontpack.zip
-        COPYING
+source=(http://bohoomil.com/src/faruma.tar.bz2{,.sig}
         40-faruma.conf
         90-tt-faruma.conf)
-sha1sums=('771715bc1b883bd3beade751368edd1fa0ebf396'
-          '5b53f940683a43c54b04a4fa2d52705b1584f5bd'
+sha1sums=('2df81aeed30e8bf90e40345821b394a1f766c38f'
+          'SKIP'
           'e8f315d2ab9f9b0588ec8f06744cb196c2bdce79'
           'dac039a21172f5ab6aa08e9640524e076c8d3e8d')
 
 package() {
+  cd faruma
+
+  install -D -m644 Faruma_License.txt \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
+
+  install -D -m644 Faruma.ttf \
+    "${pkgdir}"/usr/share/fonts/"${pkgname}"/Faruma.ttf
+
   cd "${srcdir}"
-
-  install -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 COPYING "${pkgdir}"/usr/share/licenses/"${pkgname}"
-
-  install -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
-  install -m644 "Faruma.ttf" \
-    "${pkgdir}"/usr/share/fonts/"${pkgname}"/"Faruma.ttf"
-
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 40-faruma.conf \
+  install -D -m644 40-faruma.conf \
     "${pkgdir}"/etc/fonts/conf.avail/40-faruma.conf
-  install -m644 90-tt-faruma.conf \
+  install -D -m644 90-tt-faruma.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-faruma.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/40-faruma.conf .
   ln -s ../conf.avail/90-tt-faruma.conf .

@@ -2,38 +2,34 @@
 
 pkgname=ttf-noticia-text-ibx
 pkgver=1.003
-pkgrel=4
+pkgrel=5
 depends=('fontconfig')
 pkgdesc="Noticia Text is a contemporary humanist slab serif typeface designed to be used for running text on digital newspapers (both on websites and mobile apps)."
 url="http://jmsole.cl/"
 arch=('any')
 groups=('infinality-bundle-fonts-extra')
 license=('custom:OFL')
-install=$pkgname.install
 source=("noticia-text.zip"::http://www.fontsquirrel.com/fonts/download/noticia-text
         45-noticia-text.conf
         90-tt-noticia-text.conf)
-sha1sums=('2b47030452523f18d09c6232668b3f76ecde446f'
+sha1sums=('e53b802c0b81b1765292fd2d6b368fcd05689091'
           'f1e55526d7c28c50a5493bbdab7ae5091fe81be1'
           '474bafe91ce062a704a49f1d05c27ba3dcdfcc42')
 
 package(){
-  cd "${srcdir}"
 
-  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 "SIL Open Font License.txt" \
+  install -D -m644 "SIL Open Font License.txt" \
     "${pkgdir}"/usr/share/licenses/"${pkgname}"/LICENSE.txt
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 45-noticia-text.conf \
+  install -D -m644 45-noticia-text.conf \
     "${pkgdir}"/etc/fonts/conf.avail/45-noticia-text.conf
-  install -m644 90-tt-noticia-text.conf \
+  install -D -m644 90-tt-noticia-text.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-noticia-text.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/45-noticia-text.conf .
   ln -s ../conf.avail/90-tt-noticia-text.conf .

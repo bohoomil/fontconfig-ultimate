@@ -1,9 +1,9 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=ttf-charis-sil-ibx
-_src_name=CharisSIL
-pkgver=4.114
-pkgrel=3
+_name=CharisSIL
+pkgver=5.000
+pkgrel=1
 depends=('fontconfig')
 pkgdesc="Charis SIL is a serif typeface providing a comprehensive inventory of glyphs for almost any Roman- or Cyrilic-based writing system."
 url="http://www.sil.org/"
@@ -11,36 +11,29 @@ arch=('any')
 license=('custom:OFL')
 conflicts=('ttf-charis')
 groups=('infinality-bundle-fonts-extra')
-install=$pkgname.install
-source=(http://bohoomil.com/src/${_src_name}-${pkgver}.zip{,.sig}
+source=(http://software.sil.org/downloads/charis/${_name}-${pkgver}.zip
         45-charis-sil.conf
         90-tt-charis-sil.conf)
 validgpgkeys=('A9244FB5E93F11F0E975337FAE6866C7962DDE58')
-sha1sums=('d0fbd177612ff843645af8b9755118251b89598b'
-          'SKIP'
+sha1sums=('acced0ca9a477f8b139bffad663109a59384d3db'
           '415235a6b837bb94f0aeec3ec21b040782020076'
           'dc3ba28b19a6cd9bc4010dab21d71ea99c0a60c7')
 
 package(){
-  cd "${srcdir}/${_src_name}-${pkgver}"
+  cd "${_name}-${pkgver}"
 
-  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
-
-  install -m755 -d "${pkgdir}"/usr/share/doc/"${pkgname}"
-  install -m644 documentation/CharisSIL-features.pdf \
-    "${pkgdir}"/usr/share/doc/"${pkgname}"
+  install -D -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 ../45-charis-sil.conf \
+  cd "${srcdir}"
+  install -D -m644 45-charis-sil.conf \
     "${pkgdir}"/etc/fonts/conf.avail/45-charis-sil.conf
-  install -m644 ../90-tt-charis-sil.conf \
+  install -D -m644 90-tt-charis-sil.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-charis-sil.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/45-charis-sil.conf .
   ln -s ../conf.avail/90-tt-charis-sil.conf .

@@ -1,40 +1,38 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=ttf-archivo-black-ibx
-pkgver=1.002
-pkgrel=3
+pkgver=1.004
+pkgrel=1
 depends=('fontconfig')
 pkgdesc="Archivo from Omnibus-Type is a grotesque sans-serif typeface family derived from Chivo. Black style."
 url="http://omnibus-type.com/"
 arch=('any')
 groups=('infinality-bundle-fonts-extra')
 license=('custom:OFL')
-install=$pkgname.install
-source=(http://bohoomil.com/src/archivo_black.zip{,.sig}
+#http://bohoomil.com/src/archivo_black.zip{,.sig}
+source=(http://omnibus-type.com/download/ArchivoBlack-for-Print.zip
         45-archivo-black.conf
         90-tt-archivo-black.conf)
 validgpgkeys=('A9244FB5E93F11F0E975337FAE6866C7962DDE58')
-sha1sums=('648bfa7726b25202c93de60f9011fdb2c34f8335'
-          'SKIP'
+sha1sums=('a211fac35463a3c7e0a7a51d91e83625895510f5'
           '97b66ebd5dab6df2ef0e1310525c386592ea0337'
           'c9adbc42270036be6350b87785bc5779be8f3a57')
 
 package(){
-  cd "${srcdir}"/
+  cd ArchivoBlack-for-Print
 
-  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -D -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 45-archivo-black.conf \
+  cd "${srcdir}"
+  install -D -m644 45-archivo-black.conf \
     "${pkgdir}"/etc/fonts/conf.avail/45-archivo-black.conf
-  install -m644 90-tt-archivo-black.conf \
+  install -D -m644 90-tt-archivo-black.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-archivo-black.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/45-archivo-black.conf .
   ln -s ../conf.avail/90-tt-archivo-black.conf .

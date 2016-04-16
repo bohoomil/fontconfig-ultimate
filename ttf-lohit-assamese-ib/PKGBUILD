@@ -1,8 +1,8 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=ttf-lohit-assamese-ib
-_src_pkg=lohit-assamese-ttf
-pkgver=2.91.2
+_name=lohit-assamese-ttf
+pkgver=2.91.3
 pkgrel=1
 depends=('fontconfig')
 pkgdesc="Lohit Assamese font."
@@ -11,34 +11,32 @@ arch=('any')
 conflicts=('lohit-fonts')
 groups=('infinality-bundle-fonts')
 license=('custom:OFL')
-install=$pkgname.install
-source=("https://fedorahosted.org/releases/l/o/lohit/${_src_pkg}-${pkgver}.tar.gz"
+source=("https://fedorahosted.org/releases/l/o/lohit/${_name}-${pkgver}.tar.gz"
         40-lohit-assamese.conf
         66-lohit-assamese.conf
         90-tt-lohit-assamese.conf)
-sha1sums=('9475744f8e957c930e43f600a2f799aaab39d94b'
+sha1sums=('1fba68bddb5507c14702bdc6cd0320ff556b0ff6'
           'baae0cc8902bb5d516fd39248ea946cf7c4c57d3'
           '5ff2c7e3e8da1de242263f146811d7ef07fb7050'
           'e112688f0922a409a8071059aadc7f5ed82273ec')
 
 package(){
-  cd "${srcdir}"/"${_src_pkg}-${pkgver}"
+  cd "${_name}-${pkgver}"
 
-  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -D -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 ../40-lohit-assamese.conf \
+  cd "${srcdir}"
+  install -D -m644 40-lohit-assamese.conf \
     "${pkgdir}"/etc/fonts/conf.avail/40-lohit-assamese.conf
-  install -m644 ../66-lohit-assamese.conf \
+  install -D -m644 66-lohit-assamese.conf \
     "${pkgdir}"/etc/fonts/conf.avail/66-lohit-assamese.conf
-  install -m644 ../90-tt-lohit-assamese.conf \
+  install -D -m644 90-tt-lohit-assamese.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-lohit-assamese.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/40-lohit-assamese.conf .
   ln -s ../conf.avail/66-lohit-assamese.conf .

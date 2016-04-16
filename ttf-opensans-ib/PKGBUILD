@@ -2,7 +2,7 @@
 
 pkgname=ttf-opensans-ib
 pkgver=1.10
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="Open Sans is a humanist sans serif typeface designed by Steve Matteson, Type Director of Ascender Corp."
 url="http://opensans.com/"
@@ -11,34 +11,29 @@ license=('Apache')
 conflicts=('t1-opensans-ib' 'ttf-opensans')
 provides=('ttf-opensans')
 groups=('infinality-bundle-fonts')
-install=$pkgname.install
 source=(http://www.opensans.com/download/open-sans.zip
         http://www.opensans.com/download/open-sans-condensed.zip
         45-opensans.conf
         90-tt-opensans.conf)
-validgpgkeys=('A9244FB5E93F11F0E975337FAE6866C7962DDE58')
 sha1sums=('3edba27a9951a4cfd18af1c1f9d3df9a43f08ace'
           'baac0e7cb19ab8eaa6b41d4ac8258d6731ed38d7'
           'e2cccbc4c5d9552430fe158351de374e2aa3b889'
           'c270db279deb3cf53b79e846dbb296f7d14c6322')
 
 package(){
-  cd "${srcdir}"
 
-  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 'Apache License.txt' \
+  install -D -m644 'Apache License.txt' \
     "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -dm755 "${pkgdir}"/etc/fonts/conf.avail
-  install -dm755 "${pkgdir}"/etc/fonts/conf.d
-  install -m644 45-opensans.conf \
+  install -D -m644 45-opensans.conf \
     "${pkgdir}"/etc/fonts/conf.avail/45-opensans.conf
-  install -m644 90-tt-opensans.conf \
+  install -D -m644 90-tt-opensans.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-opensans.conf
 
+  install -dm755 "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/45-opensans.conf .
   ln -s ../conf.avail/90-tt-opensans.conf .

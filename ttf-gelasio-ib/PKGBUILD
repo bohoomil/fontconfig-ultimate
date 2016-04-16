@@ -2,44 +2,37 @@
 
 pkgname=ttf-gelasio-ib
 pkgver=1.00
-pkgrel=6
-_hgrev=325e7174147acd060cb6dfe982cf57594a180d53
+pkgrel=7
 depends=('fontconfig')
 pkgdesc="Gelasio serif family by Eben Sorkin."
 url="http://code.google.com/p/googlefontdirectory/"
 arch=('any')
 groups=('infinality-bundle-fonts')
 license=('custom:OFL')
-install=$pkgname.install
-source=(https://googlefontdirectory.googlecode.com/hg-history/${_hgrev}/ofl/gelasio/Gelasio-{Bold,BoldItalic,Italic,Regular}.ttf
-        https://googlefontdirectory.googlecode.com/hg-history/${_hgrev}/ofl/gelasio/OFL.txt
+source=(http://bohoomil.com/src/gelasio.tar.bz2{,.sig}
         45-gelasio.conf
         90-tt-gelasio.conf)
 
-sha1sums=('ac1662f8f95e59e2dc1536dd01cd500be2bb7e46'
-          '2e1e3b6cf233cc337da991f4ab94af088eae9f0e'
-          'bffe2fb3c360a4f4ac310bcfa591379c8a682a3d'
-          '17081ba3c5b026074014699996fbd15d4c28aefc'
-          'cd12c82ff7fd6f03768be4cc9b6f924e7add6c65'
+sha1sums=('f4920adf1fe6ccbc72336d6b007bed29676f5359'
+          'SKIP'
           '67fc5c8d7ebcd96a5a368c2cc220e9568776d05d'
           'fd1b0628eccf0d613de6928ec47f0183c49e7199')
 
 package(){
-  cd "${srcdir}"
+  cd gelasio
 
-  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -D -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 45-gelasio.conf \
+  cd "${srcdir}"
+  install -D -m644 45-gelasio.conf \
     "${pkgdir}"/etc/fonts/conf.avail/45-gelasio.conf
-  install -m644 90-tt-gelasio.conf \
+  install -D -m644 90-tt-gelasio.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-gelasio.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/45-gelasio.conf .
   ln -s ../conf.avail/90-tt-gelasio.conf .

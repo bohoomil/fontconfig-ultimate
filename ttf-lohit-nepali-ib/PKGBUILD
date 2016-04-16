@@ -1,9 +1,9 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=ttf-lohit-nepali-ib
-_src_pkg=lohit-nepali-ttf
-pkgver=2.93.0
-pkgrel=5
+_name=lohit-nepali-ttf
+pkgver=2.94.0
+pkgrel=1
 depends=('fontconfig')
 pkgdesc="Lohit Nepali font."
 url="https://fedorahosted.org/lohit/"
@@ -11,34 +11,32 @@ arch=('any')
 conflicts=('lohit-fonts')
 groups=('infinality-bundle-fonts')
 license=('custom:OFL')
-install=$pkgname.install
-source=("https://fedorahosted.org/releases/l/o/lohit/${_src_pkg}-${pkgver}.tar.gz"
+source=("https://fedorahosted.org/releases/l/o/lohit/${_name}-${pkgver}.tar.gz"
         40-lohit-nepali.conf
         66-lohit-nepali.conf
         90-tt-lohit-nepali.conf)
-sha1sums=('0ee2b147b7c832d271bd4ffc42b1ff645e45ec57'
+sha1sums=('bab3f04f8ab9456482e8d454fc37ae675513b22b'
           '097cca62e45ae7289225c6b7bfb2a89d3e44f7ec'
           'e52a7096b0a5f097ebfc944843fc8b11989595f3'
           'cbfe5eb55d6e347395c2bda08026b7d16c48b77e')
 
 package(){
-  cd "${srcdir}"/"${_src_pkg}-${pkgver}"
+  cd "${_name}-${pkgver}"
 
-  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -D -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 ../40-lohit-nepali.conf \
+  cd "${srcdir}"
+  install -D -m644 40-lohit-nepali.conf \
     "${pkgdir}"/etc/fonts/conf.avail/40-lohit-nepali.conf
-  install -m644 ../66-lohit-nepali.conf \
+  install -D -m644 66-lohit-nepali.conf \
     "${pkgdir}"/etc/fonts/conf.avail/66-lohit-nepali.conf
-  install -m644 ../90-tt-lohit-nepali.conf \
+  install -D -m644 90-tt-lohit-nepali.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-lohit-nepali.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/40-lohit-nepali.conf .
   ln -s ../conf.avail/66-lohit-nepali.conf .

@@ -2,7 +2,7 @@
 # Contributor: bohoomil <@zoho.com>
 
 pkgname=ttf-koruri-ibx
-pkgver=20141224
+pkgver=20151021
 pkgrel=1
 pkgdesc="Japanese TrueType font obtained by mixing M+ and Open Sans (fixed base family name)."
 arch=('any')
@@ -12,28 +12,26 @@ depends=('fontconfig')
 groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-koruri')
 replaces=('ttf-koruri')
-_mirror="jaist"
-install=${pkgname}.install
-source=(http://${_mirror}.dl.sourceforge.jp/koruri/62469/Koruri-${pkgver}.tar.xz
+source=(http://rwthaachen.dl.osdn.jp/koruri/63935/Koruri-${pkgver}.tar.xz
         40-koruri.conf
         90-tt-koruri.conf)
-sha1sums=('b2fc2b32634b63901b0ce045de5994d46cdd0ed9'
+sha1sums=('e2da8341580ee673fb63153e3442269d2ab2a1d4'
           '9fdc5ef0e988112ce19cc2b20b1bbc22ca13c901'
           'be5278f69144dd42a749249e6ab7ed4e0dffb48b')
 
 package() {
-  cd "${srcdir}/Koruri-${pkgver}"
+  cd "Koruri-${pkgver}"
 
-  install -d "${pkgdir}/usr/share/fonts/${pkgname}"
+  install -m755 -d "${pkgdir}/usr/share/fonts/${pkgname}"
   install -m644 *.ttf "${pkgdir}/usr/share/fonts/${pkgname}"
 
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 ../40-koruri.conf \
+  cd "${srcdir}"
+  install -D -m644 40-koruri.conf \
     "${pkgdir}"/etc/fonts/conf.avail/40-koruri.conf
-  install -m644 ../90-tt-koruri.conf \
+  install -D -m644 90-tt-koruri.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-koruri.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/40-koruri.conf .
   ln -s ../conf.avail/90-tt-koruri.conf .

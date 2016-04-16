@@ -2,39 +2,35 @@
 
 pkgname=ttf-inknut-antiqua-ibx
 pkgver=1.001
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="Inknut Antiqua is an Antiqua typeface for literature and long-form text for languages using the Latin or Devanagari scripts."
 url="http://www.forthehearts.net/"
 arch=('any')
 groups=('infinality-bundle-fonts')
 license=('custom:OFL')
-install=$pkgname.install
 source=(inknut-antiqua.zip::"http://www.fontsquirrel.com/fonts/download/inknut-antiqua"
         45-inknut-antiqua.conf
         90-tt-inknut-antiqua.conf)
-sha1sums=('84d975ec5eb9283297250e9165bb738f4ff03646'
+sha1sums=('45959ec47399f502eaffe2541725dc8b3c4c2e53'
           '2fc781efac361f285cf88ae5792d3a053b76f37d'
           '89cfea3f8bb02146f3de869504d176aae1875c5b')
 
 package(){
-  cd "${srcdir}"
 
-  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 'SIL Open Font License.txt' \
+  install -D -m644 'SIL Open Font License.txt' \
     "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
 
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 45-inknut-antiqua.conf \
+  install -D -m644 45-inknut-antiqua.conf \
     "${pkgdir}"/etc/fonts/conf.avail/45-inknut-antiqua.conf
-  install -m644 90-tt-inknut-antiqua.conf \
+  install -D -m644 90-tt-inknut-antiqua.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-inknut-antiqua.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/45-inknut-antiqua.conf .
   ln -s ../conf.avail/90-tt-inknut-antiqua.conf .

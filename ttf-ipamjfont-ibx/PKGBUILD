@@ -4,7 +4,7 @@
 pkgname=ttf-ipamjfont-ibx
 pkgver=003.01
 _pkgver=${pkgver/./}
-pkgrel=1
+pkgrel=2
 pkgdesc="Japanese outline Mincho fonts including the unified characters of the Basic Resident Registers Network and the Family Register of Japan (based on IPAex Mincho fonts)"
 arch=('any')
 url="http://ossipedia.ipa.go.jp/ipamjfont/"
@@ -13,7 +13,6 @@ depends=('fontconfig')
 groups=('infinality-bundle-fonts-extra')
 conflicts=('otf-ipamjfont')
 replaces=('otf-ipamjfont')
-install=${pkgname}.install
 source=(http://download.forest.impress.co.jp/pub/library/i/ipamjfont/10750/ipamjm${_pkgver}.zip
         40-ipamjfont.conf
         90-tt-ipamjfont.conf)
@@ -22,25 +21,21 @@ sha1sums=('62098c7963dff6ceb45965bfdb791f4324142448'
           'b65df8dcbd12c100110f7800f07354959ef61580')
 
 package() {
-  cd "${srcdir}"/"ipamjm${_pkgver}"
+  cd "ipamjm${_pkgver}"
 
-  install -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -d "${pkgdir}"/usr/share/doc/"${pkgname}"
-  install -m644 "IPA_Font_License_Agreement_v1.0.txt" \
-    "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 "Readme_ipamjm${pkgver}.txt" \
-    "${pkgdir}"/usr/share/doc/"${pkgname}"
+  install -D -m644 "IPA_Font_License_Agreement_v1.0.txt" \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
 
   install -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 ../40-ipamjfont.conf \
+  cd "${srcdir}"
+  install -D -m644 40-ipamjfont.conf \
     "${pkgdir}"/etc/fonts/conf.avail/40-ipamjfont.conf
-  install -m644 ../90-tt-ipamjfont.conf \
+  install -D -m644 90-tt-ipamjfont.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-ipamjfont.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/40-ipamjfont.conf .
   ln -s ../conf.avail/90-tt-ipamjfont.conf .

@@ -9,17 +9,16 @@
 pkgname=ttf-liberation-ib
 pkgver=2.00.1
 _narrowver=1.07.4
-pkgrel=12
+pkgrel=13
 pkgdesc='Red Hats Liberation fonts for infinality-bundle-fonts (inc. Liberation Sans Narrow).'
 arch=('any')
 license=('custom:OFL')
-url='https://www.redhat.com/promo/fonts/'
+url=https://fedorahosted.org/liberation-fonts/
 depends=('fontconfig')
 groups=('infinality-bundle-fonts')
 conflicts=('ttf-liberation')
 replaces=('ttf-liberation')
 provides=('ttf-font' 'ttf-liberation')
-install=$pkgname.install
 source=("https://fedorahosted.org/releases/l/i/liberation-fonts/liberation-fonts-ttf-$pkgver.tar.gz"
         "https://fedorahosted.org/releases/l/i/liberation-fonts/liberation-fonts-ttf-$_narrowver.tar.gz"
         30-liberation-mono.conf
@@ -39,9 +38,8 @@ sha1sums=('84b40d7f8bb0cd085dd70b3abed197133d761557'
 package() {
   cd "${srcdir}"/liberation-fonts-ttf-"${pkgver}"
 
-  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 "${srcdir}"/liberation-fonts-ttf-"${pkgver}"/LICENSE \
-    "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -D -m644 "${srcdir}"/liberation-fonts-ttf-"${pkgver}"/LICENSE \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
@@ -49,22 +47,22 @@ package() {
   cd "${srcdir}"/liberation-fonts-ttf-"${_narrowver}"
   install -m644 *Narrow-*.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
 
-  install -m644 ../30-liberation-mono.conf \
+  cd "${srcdir}"
+  install -D -m644 30-liberation-mono.conf \
     "${pkgdir}"/etc/fonts/conf.avail/30-liberation-mono.conf
-  install -m644 ../30-liberation-sans.conf \
+  install -D -m644 30-liberation-sans.conf \
     "${pkgdir}"/etc/fonts/conf.avail/30-liberation-sans.conf
-  install -m644 ../30-liberation-sans-narrow.conf \
+  install -D -m644 30-liberation-sans-narrow.conf \
     "${pkgdir}"/etc/fonts/conf.avail/30-liberation-sans-narrow.conf
-  install -m644 ../30-liberation-serif.conf \
+  install -D -m644 30-liberation-serif.conf \
     "${pkgdir}"/etc/fonts/conf.avail/30-liberation-serif.conf
-  install -m644 ../45-liberation.conf \
+  install -D -m644 45-liberation.conf \
     "${pkgdir}"/etc/fonts/conf.avail/45-liberation.conf
-  install -m644 ../90-tt-liberation.conf \
+  install -D -m644 90-tt-liberation.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-liberation.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/45-liberation.conf .
   ln -s ../conf.avail/90-tt-liberation.conf .

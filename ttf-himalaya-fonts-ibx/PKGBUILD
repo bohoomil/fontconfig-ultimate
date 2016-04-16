@@ -2,7 +2,7 @@
 
 pkgname=ttf-himalaya-fonts-ibx
 pkgver=1.0
-pkgrel=8
+pkgrel=9
 depends=('fontconfig')
 makedepends=('unrar')
 pkgdesc="Himalaya fonts."
@@ -11,7 +11,6 @@ arch=('any')
 groups=('infinality-bundle-fonts-extra')
 license=('custom')
 noextract=('HimalayaFonts.rar')
-install=$pkgname.install
 #http://www.tibetebook.com/nyer_mkho/demig/HimalayaFonts.rar
 source=(http://bohoomil.com/src/HimalayaFonts.rar{,.sig}
         40-himalaya-fonts.conf
@@ -23,23 +22,20 @@ sha1sums=('74f5fa41df50340cd43d73ea92916b7fab5a284d'
           '51a5942be1bb2d01a93ab432bd6af0d0d0ef12d1')
 
 prepare(){
-  cd ${srcdir}
   unrar e HimalayaFonts.rar
 }
 
 package(){
-  cd "${srcdir}"
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 40-himalaya-fonts.conf \
+  install -D -m644 40-himalaya-fonts.conf \
     "${pkgdir}"/etc/fonts/conf.avail/40-himalaya-fonts.conf
-  install -m644 90-tt-himalaya-fonts.conf \
+  install -D -m644 90-tt-himalaya-fonts.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-himalaya-fonts.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/40-himalaya-fonts.conf .
   ln -s ../conf.avail/90-tt-himalaya-fonts.conf .

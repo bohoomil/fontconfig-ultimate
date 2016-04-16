@@ -1,8 +1,9 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=ttf-merriweather-sans-ib
-pkgver=1.003
-pkgrel=8
+_name=merriweather-sans
+pkgver=1.006
+pkgrel=1
 depends=('fontconfig')
 pkgdesc="Merriweather Sans-Serif font family by Eben Sorkin."
 url="http://sorkintype.com"
@@ -11,33 +12,31 @@ groups=('infinality-bundle-fonts')
 conflicts=('ttf-google-webfonts-git' 'ttf-merriweather-sans')
 replaces=('ttf-merriweather-sans')
 license=('custom:OFL')
-install=$pkgname.install
 #http://www.google.com/fonts/
-source=(http://bohoomil.com/src/merriweather_sans_ib.tar.xz{,.sig}
+source=("http://bohoomil.com/src/${_name}_ttf_v${pkgver}.tar.bz2"{,.sig}
         45-merriweather-sans.conf
         90-tt-merriweather-sans.conf)
 validgpgkeys=('A9244FB5E93F11F0E975337FAE6866C7962DDE58')
-sha1sums=('c57e5ee392e166caedb51bba98e33c773bf5df10'
+sha1sums=('ab1d29770c8d95277ad7e4256c803e857d22e4ab'
           'SKIP'
           'cf1094eea5008854b8368a39fb5545f218498ced'
           '27b49bd914983321ab5bc4a807d4ec189de2643d')
 
 package(){
-  cd "${srcdir}"
+  cd "${_name}_ttf_v${pkgver}"
 
-  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -D -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 45-merriweather-sans.conf \
+  cd "${srcdir}"
+  install -D -m644 45-merriweather-sans.conf \
     "${pkgdir}"/etc/fonts/conf.avail/45-merriweather-sans.conf
-  install -m644 90-tt-merriweather-sans.conf \
+  install -D -m644 90-tt-merriweather-sans.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-merriweather-sans.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/45-merriweather-sans.conf .
   ln -s ../conf.avail/90-tt-merriweather-sans.conf .

@@ -2,14 +2,13 @@
 
 pkgname=ttf-playfair-display-ibx
 pkgver=1.002
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="An Open Source typeface family for display and titling use."
 url="http://www.forthehearts.net/"
 arch=('any')
 groups=('infinality-bundle-fonts-extra')
 license=('custom:OFL')
-install=$pkgname.install
 source=(http://bohoomil.com/src/Playfair_Display.zip{,.sig}
         http://bohoomil.com/src/Playfair_Display_SC.zip{,.sig}
         45-playfair-display.conf
@@ -23,19 +22,18 @@ sha1sums=('4d4c950e0e011cab8377d3532a2603d30ef1bb59'
           'ff084105cd1d52124698c7c155aa7b4be932c8ed')
 
 package(){
-  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
+
+  install -D -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 45-playfair-display.conf \
+  install -D -m644 45-playfair-display.conf \
     "${pkgdir}"/etc/fonts/conf.avail/45-playfair-display.conf
-  install -m644 90-tt-playfair-display.conf \
+  install -D -m644 90-tt-playfair-display.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-playfair-display.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/45-playfair-display.conf .
   ln -s ../conf.avail/90-tt-playfair-display.conf .

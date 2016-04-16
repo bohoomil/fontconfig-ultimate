@@ -2,7 +2,7 @@
 
 pkgname=ttf-liberastika-ib
 pkgver=1.1.4
-pkgrel=2
+pkgrel=3
 depends=('fontconfig')
 pkgdesc="Liberastika is a Liberation Sans derivative typeface with re-designed and enhanced Cyrillic section."
 url="http://code.google.com/p/liberastika/"
@@ -10,7 +10,6 @@ arch=('any')
 groups=('infinality-bundle-fonts')
 conflicts=('ttf-liberastika')
 license=('GPL')
-install=$pkgname.install
 source=(http://liberastika.googlecode.com/files/liberastika-ttf-${pkgver}.tar.xz
         45-liberastika.conf
         90-tt-liberastika.conf)
@@ -19,21 +18,18 @@ sha1sums=('9de393a8bde6f503c94f8bd9367339cf6c33d822'
           'be832bf9a5c46fb416098d019e8c75eefdb5da4a')
 
 package(){
-  cd "${srcdir}"
 
-  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 COPYING "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -D -m644 COPYING "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 45-liberastika.conf \
+  install -D -m644 45-liberastika.conf \
     "${pkgdir}"/etc/fonts/conf.avail/45-liberastika.conf
-  install -m644 90-tt-liberastika.conf \
+  install -D -m644 90-tt-liberastika.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-liberastika.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/45-liberastika.conf .
   ln -s ../conf.avail/90-tt-liberastika.conf .

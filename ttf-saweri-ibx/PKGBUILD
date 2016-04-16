@@ -2,14 +2,13 @@
 
 pkgname=ttf-saweri-ibx
 pkgver=1.0
-pkgrel=7
+pkgrel=8
 depends=('fontconfig')
 pkgdesc="Saweri support for Buginese alphabet."
 url="https://sites.google.com/site/niariot87/"
 arch=('any')
 groups=('infinality-bundle-fonts-extra')
 license=('GPL')
-install=$pkgname.install
 source=("https://sites.google.com/site/niariot87/SaweriV2.rar"
         40-saweri.conf
         90-tt-saweri.conf)
@@ -18,18 +17,16 @@ sha1sums=('d2651dcceccb9f3696689bfa37c9c3ed635d352a'
           '5eba5646bbc8ef1c0d5dcb84980f8595878e1d05')
 
 package(){
-  cd "${srcdir}"
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 40-saweri.conf \
+  install -D -m644 40-saweri.conf \
     "${pkgdir}"/etc/fonts/conf.avail/40-saweri.conf
-  install -m644 90-tt-saweri.conf \
+  install -D -m644 90-tt-saweri.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-saweri.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/40-saweri.conf .
   ln -s ../conf.avail/90-tt-saweri.conf .

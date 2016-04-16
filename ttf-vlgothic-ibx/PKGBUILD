@@ -2,7 +2,7 @@
 
 pkgname=ttf-vlgothic-ibx
 pkgver=2.108
-pkgrel=7
+pkgrel=8
 depends=('fontconfig')
 pkgdesc="Japanese VL Gothic font family."
 url="http://vlgothic.dicey.org/"
@@ -11,7 +11,6 @@ groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-vlgothic')
 replaces=('ttf-vlgothic')
 license=('custom')
-install=$pkgname.install
 source=(http://dl.sourceforge.jp/vlgothic/58961/VLGothic-20130607.tar.xz
         40-vlgothic.conf
         90-tt-vlgothic.conf)
@@ -20,30 +19,20 @@ sha1sums=('cac4efd27cc3c01337f38b48660e0ea9f275fdc9'
           '601b38d1927bd5dbe6ef4cbb04dabc5f8b9d08df')
 
 package(){
-  cd "${srcdir}"/VLGothic
-  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 LICENSE "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 LICENSE.en "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 LICENSE_E.mplus "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 LICENSE_J.mplus "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  cd VLGothic
 
-  install -m755 -d "${pkgdir}"/usr/share/doc/"${pkgname}"
-  install -m644 Changelog "${pkgdir}"/usr/share/doc/"${pkgname}"
-  install -m644 README "${pkgdir}"/usr/share/doc/"${pkgname}"
-  install -m644 README.sazanami "${pkgdir}"/usr/share/doc/"${pkgname}"
-  install -m644 README_E.mplus "${pkgdir}"/usr/share/doc/"${pkgname}"
-  install -m644 README_J.mplus "${pkgdir}"/usr/share/doc/"${pkgname}"
+  install -D -m644 LICENSE.en "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 ../40-vlgothic.conf \
+  cd "${srcdir}"
+  install -D -m644 40-vlgothic.conf \
     "${pkgdir}"/etc/fonts/conf.avail/40-vlgothic.conf
-  install -m644 ../90-tt-vlgothic.conf \
+  install -D -m644 90-tt-vlgothic.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-vlgothic.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/40-vlgothic.conf .
   ln -s ../conf.avail/90-tt-vlgothic.conf .

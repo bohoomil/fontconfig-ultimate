@@ -1,10 +1,10 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=ttf-meslo-fonts-ibx
-_basename=Meslo
+_name=Meslo
 pkgver=1.2.1
-pkgrel=3
-depends=('fontconfig')
+pkgrel=4
+depends=('fontconfig' 'unzip')
 pkgdesc="Customized version of Apple's Menlo font."
 url="https://github.com/andreberg/Meslo-Font"
 arch=('any')
@@ -12,41 +12,35 @@ groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-meslo')
 replaces=('ttf-meslo')
 license=('Apache')
-install=$pkgname.install
-source=("${_basename}.LG.v${pkgver}.zip"::https://github.com/andreberg/Meslo-Font/blob/master/dist/v1.2.1/Meslo%20LG%20v1.2.1.zip?raw=true
-        "${_basename}.LG.DZ.v${pkgver}.zip"::https://github.com/andreberg/Meslo-Font/blob/master/dist/v1.2.1/Meslo%20LG%20DZ%20v1.2.1.zip?raw=true
+source=(https://github.com/andreberg/${_name}-Font/archive/v${pkgver}.tar.gz
         45-meslo.conf
         90-tt-meslo.conf)
-sha1sums=('23cc2b1f4ed16f82054b127a8d3653516731f919'
-          'cab7163030dd3063d552a69fb24c9a107241d5d0'
+sha1sums=('979c343d377bdea6ea3ec7ebac15aa296fba3604'
           'ab93cef5977250b3e8b832cc42ab9e17e00d6a77'
           'f3054662f01b893d4e72b91d7be6aea50b4cdf86')
+prepare(){
+  cd "${srcdir}/${_name}-Font-${pkgver}/dist/v${pkgver}"
+
+  for f in *.zip; do unzip "$f"; done
+}
 
 package(){
-  cd "${srcdir}"/"Meslo LG v1.2.1"
-  install -m755 -d "${pkgdir}"/usr/share/doc/"${pkgname}"
-  install -m644 "About Meslo LG v1.2.1.pdf" \
-    "${pkgdir}"/usr/share/doc/"${pkgname}"/"About Meslo LG v1.2.1.pdf"
+  cd "${srcdir}/${_name}-Font-${pkgver}/dist/v${pkgver}/${_name} LG DZ v${pkgver}"
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  cd "${srcdir}"/"Meslo LG DZ v1.2.1"
-  install -m755 -d "${pkgdir}"/usr/share/doc/"${pkgname}"
-  install -m644 "About Meslo LG DZ v1.2.1.pdf" \
-    "${pkgdir}"/usr/share/doc/"${pkgname}"/"About Meslo LG DZ v1.2.1.pdf"
+  cd "${srcdir}/${_name}-Font-${pkgver}/dist/v${pkgver}/${_name} LG v${pkgver}"
 
-  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
   cd "${srcdir}"
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 45-meslo.conf \
+  install -D -m644 45-meslo.conf \
     "${pkgdir}"/etc/fonts/conf.avail/45-meslo.conf
-  install -m644 90-tt-meslo.conf \
+  install -D -m644 90-tt-meslo.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-meslo.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/45-meslo.conf .
   ln -s ../conf.avail/90-tt-meslo.conf .

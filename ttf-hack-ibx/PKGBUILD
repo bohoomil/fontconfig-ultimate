@@ -1,0 +1,34 @@
+# Maintainer: bohoomil <@zoho.com>
+
+pkgname=ttf-hack-ibx
+pkgver=2.019
+pkgrel=1
+depends=('fontconfig')
+pkgdesc="A typeface designed for source code."
+url="http://sourcefoundry.org/hack/"
+arch=('any')
+groups=('infinality-bundle-fonts')
+license=('custom:OFL,custom:Other')
+source=("https://github.com/chrissimpkins/Hack/releases/download/v${pkgver}/Hack-v${pkgver//./_}-ttf.zip"
+        45-hack.conf
+        90-tt-hack.conf)
+sha1sums=('39a6cd9e472960504d5e16a8d940a22e61ed5aae'
+          'efaba6960874a0a051130eb863a4149c7c7ff12a'
+          'ef1c177571149cee83c2065975d744478e6cb7fe')
+
+
+package(){
+
+  install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -D -m644 45-hack.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-hack.conf
+  install -D -m644 90-tt-hack.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-hack.conf
+
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+  cd "${pkgdir}"/etc/fonts/conf.d
+  ln -s ../conf.avail/45-hack.conf .
+  ln -s ../conf.avail/90-tt-hack.conf .
+}

@@ -4,7 +4,7 @@
 
 pkgname=ttf-mph-2b-damase-ibx
 pkgver=002.000
-pkgrel=9
+pkgrel=10
 pkgdesc='Unicode font covering full plane 1, and numerous scripts. Part of infinality-bundle-fonts.'
 url="http://packages.debian.org/unstable/x11/ttf-mph-2b-damase"
 license=('custom:Public_Domain')
@@ -14,7 +14,6 @@ groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-mph-2b-damase')
 provides=('ttf-mph-2b-damase')
 replaces=('ttf-mph-2b-damase')
-install=$pkgname.install
 source=(http://www.wazu.jp/downloads/damase_v.2.zip
         40-mph-2b-damase.conf
         90-tt-mph-2b-damase.conf)
@@ -23,21 +22,20 @@ sha1sums=('7747030937888e1731e3dd8a9dffa18d1febde21'
           '3f74e80db7e077fd048544760c134ebed4f94f2e')
 
 package() {
-  cd "${srcdir}"
-  install -dm755 "${pkgdir}"/usr/share/fonts/"${pkgname}"
-  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  install -D -m644 damase_v.2.ttf \
+    "${pkgdir}"/usr/share/fonts/"${pkgname}"/damase_v.2.ttf
 
   install -dm755 "${pkgdir}"/usr/share/licenses/"${pkgname}"
   echo 'No copyright applies; this work is in the public domain.' > \
     "${pkgdir}/usr/share/licenses/${pkgname}/COPYING"
 
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 40-mph-2b-damase.conf \
+  install -D -m644 40-mph-2b-damase.conf \
     "${pkgdir}"/etc/fonts/conf.avail/40-mph-2b-damase.conf
-  install -m644 90-tt-mph-2b-damase.conf \
+  install -D -m644 90-tt-mph-2b-damase.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-mph-2b-damase.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/40-mph-2b-damase.conf .
   ln -s ../conf.avail/90-tt-mph-2b-damase.conf .

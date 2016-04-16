@@ -2,7 +2,7 @@
 
 pkgname=ttf-consola-mono-ibx
 pkgver=2.001
-pkgrel=4
+pkgrel=5
 depends=('fontconfig')
 pkgdesc="Consola Mono is a legible, programming font by Wojciech Kalinowski."
 url="http://openfontlibrary.org"
@@ -11,7 +11,6 @@ groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-consolamono')
 replaces=('ttf-consolamono')
 license=('custom:OFL')
-install=$pkgname.install
 source=("http://openfontlibrary.org/assets/downloads/consolamono/61cc2afcc4eca96efe7c6ebf178d39df/consolamono.zip"
         45-consola-mono.conf
         90-tt-consola-mono.conf)
@@ -20,22 +19,21 @@ sha1sums=('ba66ce10f62e9fee112631c6b2752fb68099fd76'
           '5e6191875aba13d3eb57bcbdd3c632d75d758d77')
 
 package(){
-  cd "${srcdir}"/'Consola Mono'
+  cd "Consola Mono"
 
-  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 "SIL - Open Font License.txt" \
+  install -D -m644 "SIL - Open Font License.txt" \
     "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 "${srcdir}"/45-consola-mono.conf \
+  cd "${srcdir}"
+  install -D -m644 "${srcdir}"/45-consola-mono.conf \
     "${pkgdir}"/etc/fonts/conf.avail/45-consola-mono.conf
-  install -m644 "${srcdir}"/90-tt-consola-mono.conf \
+  install -D -m644 "${srcdir}"/90-tt-consola-mono.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-consola-mono.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/45-consola-mono.conf .
   ln -s ../conf.avail/90-tt-consola-mono.conf .

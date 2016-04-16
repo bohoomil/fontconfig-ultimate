@@ -1,9 +1,9 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=ttf-lohit-kannada-ib
-_src_pkg=lohit-kannada-ttf
+_name=lohit-kannada-ttf
 pkgver=2.5.3
-pkgrel=5
+pkgrel=6
 depends=('fontconfig')
 pkgdesc="Lohit Kannada font."
 url="https://fedorahosted.org/lohit/"
@@ -11,8 +11,7 @@ arch=('any')
 conflicts=('lohit-fonts')
 groups=('infinality-bundle-fonts')
 license=('custom:OFL')
-install=$pkgname.install
-source=("https://fedorahosted.org/releases/l/o/lohit/${_src_pkg}-${pkgver}.tar.gz"
+source=("https://fedorahosted.org/releases/l/o/lohit/${_name}-${pkgver}.tar.gz"
         40-lohit-kannada.conf
         66-lohit-kannada.conf
         90-tt-lohit-kannada.conf)
@@ -22,23 +21,22 @@ sha1sums=('5268501780e7732b75338bd9acba1b87e3e1ed70'
           'bcaa420c8b3d6fd9e1e9104820e7d54f6ad35dab')
 
 package(){
-  cd "${srcdir}"/"${_src_pkg}-${pkgver}"
+  cd "${_name}-${pkgver}"
 
-  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -D -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 ../40-lohit-kannada.conf \
+  cd "${srcdir}"
+  install -D -m644 40-lohit-kannada.conf \
     "${pkgdir}"/etc/fonts/conf.avail/40-lohit-kannada.conf
-  install -m644 ../66-lohit-kannada.conf \
+  install -D -m644 66-lohit-kannada.conf \
     "${pkgdir}"/etc/fonts/conf.avail/66-lohit-kannada.conf
-  install -m644 ../90-tt-lohit-kannada.conf \
+  install -D -m644 90-tt-lohit-kannada.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-lohit-kannada.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/40-lohit-kannada.conf .
   ln -s ../conf.avail/66-lohit-kannada.conf .

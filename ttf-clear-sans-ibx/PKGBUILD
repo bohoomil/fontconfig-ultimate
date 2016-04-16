@@ -3,7 +3,7 @@
 pkgname=ttf-clear-sans-ibx
 _archname=clearsans
 pkgver=1.00
-pkgrel=7
+pkgrel=8
 depends=('fontconfig')
 pkgdesc="Clear Sans is a versatile OpenType font for screen, print, and Web."
 url="https://01.org/clear-sans"
@@ -12,7 +12,6 @@ license=('Apache')
 groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-clear-sans')
 replaces=('ttf-clear-sans')
-install=$pkgname.install
 source=("https://01.org/sites/default/files/downloads/${_archname}-${pkgver}.zip"
         45-clear-sans.conf
         90-tt-clear-sans.conf)
@@ -21,18 +20,21 @@ sha1sums=('092c5d8e19621d78cb7e14a7eac02c29415d3e0c'
           'b762b740ae18899d4924505d0e92e200b743c1e8')
 
 package(){
-  cd "${srcdir}"/TTF
+  cd TTF
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 ../../45-clear-sans.conf \
+  install -D -m644 ../LICENSE-2.0.txt \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}/COPYING"
+
+  cd "${srcdir}"
+  install -D -m644 45-clear-sans.conf \
     "${pkgdir}"/etc/fonts/conf.avail/45-clear-sans.conf
-  install -m644 ../../90-tt-clear-sans.conf \
+  install -D -m644 90-tt-clear-sans.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-clear-sans.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/45-clear-sans.conf .
   ln -s ../conf.avail/90-tt-clear-sans.conf .

@@ -1,8 +1,8 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=ttf-lohit-devanagari-ib
-_src_pkg=lohit-devanagari-ttf
-pkgver=2.95.1
+_name=lohit-devanagari-ttf
+pkgver=2.95.2
 pkgrel=1
 depends=('fontconfig')
 pkgdesc="Lohit Devanagari font."
@@ -11,34 +11,32 @@ arch=('any')
 conflicts=('lohit-fonts')
 groups=('infinality-bundle-fonts')
 license=('custom:OFL')
-install=$pkgname.install
-source=("https://fedorahosted.org/releases/l/o/lohit/${_src_pkg}-${pkgver}.tar.gz"
+source=("https://fedorahosted.org/releases/l/o/lohit/${_name}-${pkgver}.tar.gz"
         40-lohit-devanagari.conf
         66-lohit-devanagari.conf
         90-tt-lohit-devanagari.conf)
-sha1sums=('99d2bf29920622e558a2dfaa6f3abe84c268833e'
+sha1sums=('834a03f6075763745148d0c0e79b41175f44b500'
           'ec03746a621de6456c0a412f392f762a3bea92e1'
           '2682411eefea9016663af2028196c22f89a18513'
           '3bd004a6eefef9eae20dbf2d2cb2d65e816ead30')
 
 package(){
-  cd "${srcdir}"/"${_src_pkg}-${pkgver}"
+  cd "${_name}-${pkgver}"
 
-  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -D -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 ../40-lohit-devanagari.conf \
+  cd "${srcdir}"
+  install -D -m644 40-lohit-devanagari.conf \
     "${pkgdir}"/etc/fonts/conf.avail/40-lohit-devanagari.conf
-  install -m644 ../66-lohit-devanagari.conf \
+  install -D -m644 66-lohit-devanagari.conf \
     "${pkgdir}"/etc/fonts/conf.avail/66-lohit-devanagari.conf
-  install -m644 ../90-tt-lohit-devanagari.conf \
+  install -D -m644 90-tt-lohit-devanagari.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-lohit-devanagari.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/40-lohit-devanagari.conf .
   ln -s ../conf.avail/66-lohit-devanagari.conf .

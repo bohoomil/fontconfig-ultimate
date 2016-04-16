@@ -1,8 +1,8 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=ttf-caladea-ib
-pkgver=20130214
-pkgrel=6
+pkgver=20140817
+pkgrel=1
 _tarname=crosextrafonts
 depends=('fontconfig')
 pkgdesc="Caladeo is a serif font metrically compatible with Cambria."
@@ -10,27 +10,29 @@ url="https://code.google.com/p/chromium/issues/detail?id=168879"
 arch=('any')
 groups=('infinality-bundle-fonts')
 license=('Apache')
-install=$pkgname.install
-source=(http://commondatastorage.googleapis.com/chromeos-localmirror/distfiles/${_tarname}-$pkgver.tar.gz
+source=(http://mirrors.ctan.org/fonts/caladea.zip
         45-caladea.conf
         90-tt-caladea.conf)
-sha1sums=('6f8f87cd21c4cd7e72031852eb90453dba3e2473'
+sha1sums=('a335d5e0d236cdd074ebe2964b9b8d409839513a'
           '90d29666e807c1f7456f4ffa86f4b6ed5b92639b'
           'd4747515ff61405209314f9d909975eec01f56bf')
 
 package(){
-  cd "${srcdir}"/"${_tarname}"-"${pkgver}"
+  cd caladea
+
+  install -D -m644 doc/LICENSE-2.0 \
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
-  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+  install -m644 truetype/*.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 ../45-caladea.conf \
+  cd "${srcdir}"
+  install -D -m644 45-caladea.conf \
     "${pkgdir}"/etc/fonts/conf.avail/45-caladea.conf
-  install -m644 ../90-tt-caladea.conf \
+  install -D -m644 90-tt-caladea.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-caladea.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/45-caladea.conf .
   ln -s ../conf.avail/90-tt-caladea.conf .

@@ -6,7 +6,7 @@
 
 pkgname=ttf-arphic-ukai-ibx
 pkgver=0.2.20080216.1
-pkgrel=7
+pkgrel=8
 pkgdesc='CJK Unicode font Kaiti style.'
 url='http://www.freedesktop.org/wiki/Software/CJKUnifonts'
 license=('custom:Arphic_Public_License')
@@ -16,7 +16,6 @@ groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-arphic-ukai')
 provides=('ttf-arphic-ukai')
 replaces=('ttf-arphic-ukai')
-install=${pkgname}.install
 source=("http://archive.ubuntu.com/ubuntu/pool/main/t/ttf-arphic-ukai/ttf-arphic-ukai_${pkgver}.orig.tar.gz"
         40-arphic-ukai.conf
         90-tt-arphic-ukai.conf)
@@ -25,20 +24,18 @@ sha1sums=('70f9489e7e15241c13d7eb6496a38736b49024e6'
           'd99784c9669553741dec45809f4cce3ccc2e7607')
 
 package() {
-	cd "${srcdir}"
 
 	install -D -m644 ukai.ttc \
     "${pkgdir}"/usr/share/fonts/"${pkgname}"/ukai.ttc
 	install -D -m644 license/english/ARPHICPL.TXT \
     "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
 
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 ../40-arphic-ukai.conf \
+  install -D -m644 40-arphic-ukai.conf \
     "${pkgdir}"/etc/fonts/conf.avail/40-arphic-ukai.conf
-  install -m644 ../90-tt-arphic-ukai.conf \
+  install -D -m644 90-tt-arphic-ukai.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-arphic-ukai.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/40-arphic-ukai.conf .
   ln -s ../conf.avail/90-tt-arphic-ukai.conf .

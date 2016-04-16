@@ -1,8 +1,8 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=ttf-junicode-ibx
-pkgver=0.7.8
-pkgrel=5
+pkgver=0.7.8+0.6.17cond
+pkgrel=7
 depends=('fontconfig')
 pkgdesc="Junicode is a serif typeface for medievalists with many OpenType features."
 url="http://junicode.sourceforge.net/"
@@ -10,27 +10,30 @@ arch=('any')
 license=('custom:OFL')
 groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-junicode')
-install=$pkgname.install
-source=(http://downloads.sourceforge.net/project/junicode/junicode/junicode-0-7-8/junicode-0-7-8.zip
+source=(junicode.zip::http://www.fontsquirrel.com/fonts/download/junicode
+        http://downloads.sourceforge.net/project/junicode/junicode/junicode-0-7-8/junicode-0-7-8.zip
         45-junicode.conf
         90-tt-junicode.conf)
-sha1sums=('492946ca18c3e23febd7c77221ff438ad85d2147'
+sha1sums=('8ecd69daeb1efc544f09d76a75e06a9671b63371'
+          '492946ca18c3e23febd7c77221ff438ad85d2147'
           'cd7a76487c981d4131b2b881073955ffc94f74c5'
           '86317ae1b421b14ca1ac9f7df7d0dd33a93d2ebd')
 
 package(){
-  cd "${srcdir}"/junicode/fonts
+  cd junicode/fonts
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 ../../45-junicode.conf \
+  install -m644 ../../*Condensed.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+
+  cd "${srcdir}"
+  install -D -m644 45-junicode.conf \
     "${pkgdir}"/etc/fonts/conf.avail/45-junicode.conf
-  install -m644 ../../90-tt-junicode.conf \
+  install -D -m644 90-tt-junicode.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-junicode.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/45-junicode.conf .
   ln -s ../conf.avail/90-tt-junicode.conf .

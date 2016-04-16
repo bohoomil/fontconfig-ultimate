@@ -2,7 +2,7 @@
 
 pkgname=ttf-lato-ibx
 pkgver=2.015
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="Lato is a sanserif type­face family designed in the Summer 2010 by Warsaw-based designer Łukasz Dziedzic."
 url="http://www.latofonts.com/"
@@ -11,7 +11,6 @@ groups=('infinality-bundle-fonts-extra')
 license=('custom:OFL')
 conflicts=('ttf-lato' 't1-lato-ibx' 'otf-lato-ib')
 replaces=('t1-lato-ibx' 'otf-lato-ib')
-install=$pkgname.install
 source=("http://www.latofonts.com/download/Lato2OFL.zip"
         http://bohoomil.com/src/lato-thin-${pkgver}-fixed.tar.xz{,.sig}
         45-lato.conf
@@ -24,12 +23,9 @@ sha1sums=('1b29ec9a8a1c151ff0f2e9f49d5544ddce217604'
           'a84058cb3051d858221a7a0eefeea18db24306c5')
 
 package(){
-  cd "${srcdir}"/Lato2OFL
+  cd Lato2OFL
 
-  install -m755 -d "${pkgdir}"/usr/share/doc/"${pkgname}"
-  install -m644 README.txt "${pkgdir}"/usr/share/doc/"${pkgname}"
-  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -D -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
@@ -49,13 +45,13 @@ lato1=(Lato-Black.ttf Lato-BlackItalic.ttf
   install -m644 "${srcdir}/lato-thin-${pkgver}-fixed/"*.ttf \
     "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 ../45-lato.conf \
+  cd "${srcdir}"
+  install -D -m644 45-lato.conf \
     "${pkgdir}"/etc/fonts/conf.avail/45-lato.conf
-  install -m644 ../90-tt-lato.conf \
+  install -D -m644 90-tt-lato.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-lato.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/45-lato.conf .
   ln -s ../conf.avail/90-tt-lato.conf .

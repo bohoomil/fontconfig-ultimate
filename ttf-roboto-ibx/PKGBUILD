@@ -2,7 +2,7 @@
 
 pkgname=ttf-roboto-ibx
 pkgver=2.0
-pkgrel=6
+pkgrel=8
 pkgdesc="Modern sans-serif font family designed by Christian Robertson and introduced with Android Ice Cream Sandwich operating system. Basic, condensed and slab variants included."
 arch=('any')
 license=('Apache')
@@ -10,7 +10,6 @@ url="http://code.google.com/android/"
 depends=('fontconfig')
 groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-roboto' 'ttf-roboto-fontconfig' 'ttf-roboto-slab')
-install=$pkgname.install
 # http://www.google.com/fonts
 # all scripts
 source=(http://bohoomil.com/src/Roboto_131072_fixed.zip{,.sig}
@@ -29,21 +28,18 @@ sha1sums=('5156a2b332f73750c89fb2e89f44dffaf0ab132b'
           '05cffa42f1ac56bf5595afe2ab67e656555273fb')
 
 package(){
-  cd "${srcdir}"
-
-  install -d -m755 "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 "LICENSE.txt" \
+  install -D -m644 "LICENSE.txt" \
     "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
 
   install -d -m755 "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  cd "${srcdir}"
-  install -d "${pkgdir}"/etc/fonts/conf.avail
-  install -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 45-roboto.conf "${pkgdir}"/etc/fonts/conf.avail
-  install -m644 90-tt-roboto.conf "${pkgdir}"/etc/fonts/conf.avail
+  install -D -m644 45-roboto.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/45-roboto.conf
+  install -D -m644 90-tt-roboto.conf \
+    "${pkgdir}"/etc/fonts/conf.avail/90-tt-roboto.conf
 
+  install -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/45-roboto.conf .
   ln -s ../conf.avail/90-tt-roboto.conf .

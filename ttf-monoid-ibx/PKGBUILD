@@ -1,7 +1,9 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=ttf-monoid-ibx
-pkgver=0.60
+_name=monoid
+_sub=138e2bd5a459265522f0471ec7fa5401525b660b
+pkgver=0.61
 pkgrel=1
 depends=('fontconfig')
 pkgdesc="Monoid is customizable and optimized for coding with bitmap-like sharpness at this fontsize even on low res displays."
@@ -9,27 +11,24 @@ url="http://larsenwork.com/monoid/"
 arch=('any')
 groups=('infinality-bundle-fonts')
 license=('MIT,custom:OFL')
-install=$pkgname.install
-source=("https://cdn.rawgit.com/larsenwork/monoid/b5d5875a890c8ca3537bb92eba02d1a0b01e32d5/Monoid.zip"
+#https://github.com/larsenwork/${_name}/archive/${pkgver}.tar.gz
+source=(https://cdn.rawgit.com/larsenwork/${_name}/${_sub}/Monoid.zip
         45-monoid.conf
         90-tt-monoid.conf)
-sha1sums=('726ef442aba9da61d3710ded2d178edb403ee82a'
+sha1sums=('db171b40e8634aeac9b8616ad90caf88e7090049'
           'c0c61d27e7ea546db547ba028741d53df08eb995'
           'b8cff3c103710cb6c36e02344a592dd698d6eac6')
-
 package(){
-  cd "${srcdir}"
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 45-monoid.conf \
+  install -D -m644 45-monoid.conf \
     "${pkgdir}"/etc/fonts/conf.avail/45-monoid.conf
-  install -m644 90-tt-monoid.conf \
+  install -D -m644 90-tt-monoid.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-monoid.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/45-monoid.conf .
   ln -s ../conf.avail/90-tt-monoid.conf .

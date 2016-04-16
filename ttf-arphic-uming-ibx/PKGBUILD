@@ -6,7 +6,7 @@
 
 pkgname=ttf-arphic-uming-ibx
 pkgver=0.2.20080216.1
-pkgrel=7
+pkgrel=8
 pkgdesc='CJK Unicode font Ming style.'
 url='http://www.freedesktop.org/wiki/Software/CJKUnifonts'
 license=('custom:Arphic_Public_License')
@@ -16,23 +16,26 @@ groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-arphic-uming')
 provides=('ttf-arphic-uming')
 replaces=('ttf-arphic-uming')
-install=${pkgname}.install
-source=("http://archive.ubuntu.com/ubuntu/pool/main/t/ttf-arphic-uming/ttf-arphic-uming_${pkgver}.orig.tar.gz")
-sha1sums=('d6b11cc84142364c66d17a0f02fdffbc1b98cedf')
+source=("http://archive.ubuntu.com/ubuntu/pool/main/t/ttf-arphic-uming/ttf-arphic-uming_${pkgver}.orig.tar.gz"
+        40-arphic-uming.conf
+        90-tt-arphic-uming.conf)
+sha1sums=('d6b11cc84142364c66d17a0f02fdffbc1b98cedf'
+          '732c13b6e2d37cf5710e30ee96f719662d528cc2'
+          'ffddde7b2541f34b7f1f3462ecf46ae791932005')
 
 
 package() {
+
 	install -Dm644 uming.ttc "${pkgdir}"/usr/share/fonts/${pkgname}/uming.ttc
 	install -Dm644 license/english/ARPHICPL.TXT \
-    "${pkgdir}/usr/share/licenses/${pkgname}/COPYING"
+    "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
 
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 ../40-arphic-uming.conf \
+  install -D -m644 40-arphic-uming.conf \
     "${pkgdir}"/etc/fonts/conf.avail/40-arphic-uming.conf
-  install -m644 ../90-tt-arphic-uming.conf \
+  install -D -m644 90-tt-arphic-uming.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-arphic-uming.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/40-arphic-uming.conf .
   ln -s ../conf.avail/90-tt-arphic-uming.conf .

@@ -1,9 +1,9 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=ttf-umeplus-ibx
-_src_name=umeplus-fonts
-pkgver=20140427
-pkgrel=3
+_name=umeplus-fonts
+pkgver=20160402
+pkgrel=1
 depends=('fontconfig')
 pkgdesc="UmePlus fonts are modified Ume and M+ fonts for Japanese."
 url="http://www.geocities.jp/ep3797/modified_fonts_01.html"
@@ -11,33 +11,29 @@ arch=('any')
 groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-umeplus')
 license=('custom:Freeware')
-install=$pkgname.install
-source=(http://downloads.sourceforge.net/project/mdk-ut/30-source/source/${_src_name}-${pkgver}.tar.lzma
+source=(http://rwthaachen.dl.osdn.jp/users/10/10368/${_name}-${pkgver}.tar.xz
         40-umeplus.conf
         90-tt-umeplus.conf)
-sha1sums=('4b03557093258f0965bbf2eafd7deb5c49239b5e'
+sha1sums=('49209ff700e4e3b0f21cd46637858de0f8db4569'
           '0114cbd18c3d3e748f9a0fc224fe96479b72660e'
           '72a8075bd2aee68a65366bd39f0c87306814ebdc')
 
 package(){
-  cd "${srcdir}"/"${_src_name}-${pkgver}"
+  cd "${_name}-${pkgver}"
 
-  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 docs-mplus/LICENSE_E \
+  install -D -m644 docs-mplus/LICENSE_E \
     "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING_En
-  install -m644 docs-mplus/LICENSE_J \
-    "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING_Ja
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 ../40-umeplus.conf \
+  cd "${srcdir}"
+  install -D -m644 40-umeplus.conf \
     "${pkgdir}"/etc/fonts/conf.avail/40-umeplus.conf
-  install -m644 ../90-tt-umeplus.conf \
+  install -D -m644 90-tt-umeplus.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-umeplus.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/40-umeplus.conf .
   ln -s ../conf.avail/90-tt-umeplus.conf .

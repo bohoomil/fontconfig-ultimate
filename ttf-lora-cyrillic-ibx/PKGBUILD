@@ -1,38 +1,38 @@
 # Maintainer: bohoomil <@zoho.com>
 
-pkgname=ttf-lora-ibx
+pkgname=ttf-lora-cyrillic-ibx
 pkgver=1.014
-pkgrel=4
+pkgrel=1
 depends=('fontconfig')
-pkgdesc="Lora is a well-balanced contemporary serif with roots in calligraphy. It is a text typeface with moderate contrast well suited for body text."
+pkgdesc="Lora is a well-balanced contemporary serif with roots in calligraphy."
 url="http://www.cyreal.org/"
 arch=('any')
 license=('custom:OFL')
 groups=('infinality-bundle-fonts-extra')
-source=("lora.zip"::"http://www.google.com/webfonts/download?kit=iwrHM7FQEcKgsUvDuXxrPg"
+conflicts=(ttf-lora-ibx)
+replaces=(ttf-lora-ibx)
+source=(lora.zip::https://github.com/cyrealtype/Lora-Cyrillic/archive/master.zip
         45-lora.conf
         90-tt-lora.conf)
-install=${pkgname}.install
-sha1sums=('0e63abe41764ae89b295e39ea71ce838f4e42b6b'
+sha1sums=('d90c1d4d96abaf7b8df2ef4306025987106bfa51'
           'c0fb0a61c994c2f57730a80f68a28014622e3e5f'
           '5f69ae5efd78480d70ffdeb3642ebc4bb0360ba8')
 
 package() {
-  cd "${srcdir}"
+  cd "Lora-Cyrillic-master"
 
-  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
+  install -D -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
 
   install -d -m755 "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 ../45-lora.conf \
+  cd "${srcdir}"
+  install -D -m644 45-lora.conf \
     "${pkgdir}"/etc/fonts/conf.avail/45-lora.conf
-  install -m644 ../90-tt-lora.conf \
+  install -D -m644 90-tt-lora.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-lora.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/45-lora.conf .
   ln -s ../conf.avail/90-tt-lora.conf .

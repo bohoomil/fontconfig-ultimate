@@ -1,9 +1,9 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=ttf-lohit-odia-ib
-_src_pkg=lohit-odia-ttf
+_name=lohit-odia-ttf
 pkgver=2.91.0
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="Lohit Oriya font."
 url="https://fedorahosted.org/lohit/"
@@ -13,8 +13,7 @@ replaces=('ttf-lohit-oriya-ib')
 provides=('ttf-lohit-oriya-ib')
 groups=('infinality-bundle-fonts')
 license=('custom:OFL')
-install=$pkgname.install
-source=("https://fedorahosted.org/releases/l/o/lohit/${_src_pkg}-${pkgver}.tar.gz"
+source=("https://fedorahosted.org/releases/l/o/lohit/${_name}-${pkgver}.tar.gz"
         40-lohit-odia.conf
         66-lohit-odia.conf
         90-tt-lohit-odia.conf)
@@ -24,23 +23,22 @@ sha1sums=('fb4f6fd675a84fb5a4f8f0ad4970cce4cf40ecd1'
           'e9c2bec9f3c8d2ef7a08c5e3947a8fce7247a38a')
 
 package(){
-  cd "${srcdir}"/"${_src_pkg}-${pkgver}"
+  cd "${_name}-${pkgver}"
 
-  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -D -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 ../40-lohit-odia.conf \
+  cd "${srcdir}"
+  install -D -m644 40-lohit-odia.conf \
     "${pkgdir}"/etc/fonts/conf.avail/40-lohit-odia.conf
-  install -m644 ../66-lohit-odia.conf \
+  install -D -m644 66-lohit-odia.conf \
     "${pkgdir}"/etc/fonts/conf.avail/66-lohit-odia.conf
-  install -m644 ../90-tt-lohit-odia.conf \
+  install -D -m644 90-tt-lohit-odia.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-lohit-odia.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/40-lohit-odia.conf .
   ln -s ../conf.avail/66-lohit-odia.conf .

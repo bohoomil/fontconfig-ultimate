@@ -2,7 +2,7 @@
 
 pkgname=ttf-aboriginal-sans-ibx
 pkgver=9.602
-pkgrel=4
+pkgrel=5
 depends=('fontconfig')
 pkgdesc="Aboriginal Sans typeface by Christopher Harvey for Syllabics, Cherokee, and Latin script."
 url="http://www.languagegeek.com/"
@@ -11,7 +11,6 @@ groups=('infinality-bundle-fonts-extra')
 conflicts=('ttf-aboriginal-sans')
 replaces=('ttf-aboriginal-sans')
 license=('custom:PD')
-install=$pkgname.install
 source=(http://www.languagegeek.com/font/AboriginalSans.zip
         45-aboriginal-sans.conf
         90-tt-aboriginal-sans.conf)
@@ -20,18 +19,16 @@ sha1sums=('690c6cc3026cb80b07c09b7d47b7c4f1dbbc50ec'
           '07c9d2f596accc72bd1b30de013d1318428a9a96')
 
 package(){
-  cd "${srcdir}"
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m644 45-aboriginal-sans.conf \
+  install -D -m644 45-aboriginal-sans.conf \
     "${pkgdir}"/etc/fonts/conf.avail/45-aboriginal-sans.conf
-  install -m644 90-tt-aboriginal-sans.conf \
+  install -D -m644 90-tt-aboriginal-sans.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-aboriginal-sans.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   pushd "${pkgdir}"/etc/fonts/conf.d >/dev/null
   ln -s ../conf.avail/45-aboriginal-sans.conf .
   ln -s ../conf.avail/90-tt-aboriginal-sans.conf .

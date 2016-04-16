@@ -1,9 +1,9 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=ttf-lohit-telugu-ib
-_src_pkg=lohit-telugu-ttf
+_name=lohit-telugu-ttf
 pkgver=2.5.4
-pkgrel=1
+pkgrel=2
 depends=('fontconfig')
 pkgdesc="Lohit Telugu font."
 url="https://fedorahosted.org/lohit/"
@@ -11,8 +11,7 @@ arch=('any')
 conflicts=('lohit-fonts')
 groups=('infinality-bundle-fonts')
 license=('custom:OFL')
-install=$pkgname.install
-source=("https://fedorahosted.org/releases/l/o/lohit/${_src_pkg}-${pkgver}.tar.gz"
+source=("https://fedorahosted.org/releases/l/o/lohit/${_name}-${pkgver}.tar.gz"
         40-lohit-telugu.conf
         66-lohit-telugu.conf
         90-tt-lohit-telugu.conf)
@@ -22,23 +21,22 @@ sha1sums=('b732a861153ef31c454edf6a1004c145ef2ccc44'
           'bcf23f0977605586d397e09299f49301757797c6')
 
 package(){
-  cd "${srcdir}"/"${_src_pkg}-${pkgver}"
+  cd "${_name}-${pkgver}"
 
-  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -D -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 ../40-lohit-telugu.conf \
+  cd "${srcdir}"
+  install -D -m644 40-lohit-telugu.conf \
     "${pkgdir}"/etc/fonts/conf.avail/40-lohit-telugu.conf
-  install -m644 ../66-lohit-telugu.conf \
+  install -D -m644 66-lohit-telugu.conf \
     "${pkgdir}"/etc/fonts/conf.avail/66-lohit-telugu.conf
-  install -m644 ../90-tt-lohit-telugu.conf \
+  install -D -m644 90-tt-lohit-telugu.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-lohit-telugu.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/40-lohit-telugu.conf .
   ln -s ../conf.avail/66-lohit-telugu.conf .

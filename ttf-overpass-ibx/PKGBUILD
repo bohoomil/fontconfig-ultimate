@@ -1,49 +1,46 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=ttf-overpass-fonts-ibx
-_src_name=overpass-fonts
-pkgver=1.01
-pkgrel=2
-_upstream_rev=6.fc20
+_name=overpass-fonts
+pkgver=2.1
+pkgrel=1
+_uprev=2.fc24
 depends=('fontconfig')
-makedepends=('rpmextract')
+makedepends=('rpmextract' 'unzip')
 pkgdesc="Free & open source typeface based on the U.S. interstate highway road signage type system; it is sans-serif and suitable for both body and titling text."
 url="http://fedoraproject.org/wiki/Overpass_Fonts"
 arch=('any')
 groups=('infinality-bundle-fonts-extra')
 license=('custom:OFL')
 conflicts=('ttf-overpass')
-install=$pkgname.install
-source=("http://kojipkgs.fedoraproject.org//packages/overpass-fonts/1.01/6.fc20/src/${_src_name}-${pkgver}-${_upstream_rev}.src.rpm"
+source=(http://kojipkgs.fedoraproject.org//packages/${_name}/${pkgver}/${_uprev}/src/${_name}-${pkgver}-${_uprev}.src.rpm
         45-overpass.conf
         90-tt-overpass.conf)
-sha1sums=('711fe6319d0613d6adf42e6c98fb0ed385b996b1'
+sha1sums=('f0d66a3be0af289db78c13baf621ee95135c0227'
           'df43bdf085f342090c3360f463dfcb0e6fbc6de1'
           '5346a87b567627d87bb22dd9bc50f971635278e5')
 
 prepare() {
-  cd "${srcdir}"
-  rpmextract.sh "${_src_name}-${pkgver}-${_upstream_rev}".src.rpm
-  tar xfv Overpass-Fonts-1.01.tar.gz
+  rpmextract.sh "${_name}-${pkgver}-${_uprev}".src.rpm
+  unzip  "${_name}-ttf-${pkgver}".zip
 }
 
 package(){
-  cd "${srcdir}"/overpass-fonts-1.01
+  cd "${_name}-ttf-${pkgver}"
 
-  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 Overpass-OFL.txt \
+  install -D -m644 LICENSE.md \
     "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 ../45-overpass.conf \
+  cd "${srcdir}"
+  install -D -m644 45-overpass.conf \
     "${pkgdir}"/etc/fonts/conf.avail/45-overpass.conf
-  install -m644 ../90-tt-overpass.conf \
+  install -D -m644 90-tt-overpass.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-overpass.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/45-overpass.conf .
   ln -s ../conf.avail/90-tt-overpass.conf .

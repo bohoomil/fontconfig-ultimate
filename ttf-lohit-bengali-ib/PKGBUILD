@@ -1,8 +1,8 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=ttf-lohit-bengali-ib
-_src_pkg=lohit-bengali-ttf
-pkgver=2.91.2
+_name=lohit-bengali-ttf
+pkgver=2.91.3
 pkgrel=1
 depends=('fontconfig')
 pkgdesc="Lohit Bengali font."
@@ -11,34 +11,32 @@ arch=('any')
 conflicts=('lohit-fonts')
 groups=('infinality-bundle-fonts')
 license=('custom:OFL')
-install=$pkgname.install
-source=("https://fedorahosted.org/releases/l/o/lohit/${_src_pkg}-${pkgver}.tar.gz"
+source=("https://fedorahosted.org/releases/l/o/lohit/${_name}-${pkgver}.tar.gz"
         40-lohit-bengali.conf
         66-lohit-bengali.conf
         90-tt-lohit-bengali.conf)
-sha1sums=('759bf31f2f39bf4fa5a2bf72b053e40b73546112'
+sha1sums=('fdbd27b5298894dd13d688293d70ae95d8757057'
           'e3e4168e3c9e6b5389fd61164406e3e77988b793'
           '4ca03fe756c7a17de29eeab6fabbd2a437166a4d'
           '92e56a9b2cd1e113dcbc2555b37e60cf07c7795f')
 
 package(){
-  cd "${srcdir}"/"${_src_pkg}-${pkgver}"
+  cd "${_name}-${pkgver}"
 
-  install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
-  install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -D -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
 
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
 
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  install -m644 ../40-lohit-bengali.conf \
+  cd "${srcdir}"
+  install -D -m644 40-lohit-bengali.conf \
     "${pkgdir}"/etc/fonts/conf.avail/40-lohit-bengali.conf
-  install -m644 ../66-lohit-bengali.conf \
+  install -D -m644 66-lohit-bengali.conf \
     "${pkgdir}"/etc/fonts/conf.avail/66-lohit-bengali.conf
-  install -m644 ../90-tt-lohit-bengali.conf \
+  install -D -m644 90-tt-lohit-bengali.conf \
     "${pkgdir}"/etc/fonts/conf.avail/90-tt-lohit-bengali.conf
 
+  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
   cd "${pkgdir}"/etc/fonts/conf.d
   ln -s ../conf.avail/40-lohit-bengali.conf .
   ln -s ../conf.avail/66-lohit-bengali.conf .
