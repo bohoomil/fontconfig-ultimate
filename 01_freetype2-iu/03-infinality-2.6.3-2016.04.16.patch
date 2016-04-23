@@ -5938,7 +5938,7 @@ diff -urN freetype-2.6.2.orig/src/cff/cffobjs.c freetype-2.6.2/src/cff/cffobjs.c
  
    /*************************************************************************/
    /*                                                                       */
-@@ -1053,6 +1056,9 @@
+@@ -1089,6 +1092,9 @@
  #endif
  
      driver->no_stem_darkening = TRUE;

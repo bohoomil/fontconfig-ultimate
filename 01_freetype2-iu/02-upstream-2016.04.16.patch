@@ -1,5 +1,5 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index f02ee51..6535678 100644
+index f02ee51..87a68c0 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -36,11 +36,11 @@
@@ -16,7 +16,19 @@ index f02ee51..6535678 100644
  #
  # Please refer to the cmake manual for further options, in particular, how
  # to modify compilation and linking parameters.
-@@ -102,7 +102,7 @@ if (APPLE)
+@@ -68,6 +68,11 @@
+ #   only if it is available.  Example:
+ #
+ #     cmake ... -DWITH_ZLIB=ON -DWITH_HarfBuzz=OFF ...
++#
++# . Installation of FreeType can be controlled with the CMake variables
++#   `SKIP_INSTALL_HEADERS', `SKIP_INSTALL_LIBRARIES', and `SKIP_INSTALL_ALL'
++#   (this is compatible with the same CMake variables in zlib's CMake
++#   support).
+ 
+ 
+ cmake_minimum_required(VERSION 2.6)
+@@ -102,7 +107,7 @@ if (APPLE)
      set(BUILD_SHARED_LIBS OFF)
  
      set(CMAKE_TOOLCHAIN_FILE
@@ -25,11 +37,191 @@ index f02ee51..6535678 100644
    endif ()
  else ()
    if (DEFINED IOS_PLATFORM)
+@@ -173,7 +178,7 @@ foreach (d ZLIB BZip2 PNG HarfBuzz)
+ 
+   if (${d}_FOUND OR ${D}_FOUND)
+     message(STATUS "Building with ${d}")
+-  endif()
++  endif ()
+ endforeach ()
+ 
+ 
+@@ -383,28 +388,33 @@ endif ()
+ 
+ # Installations
+ # Note the trailing slash in the argument to the `DIRECTORY' directive
+-install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/
+-  DESTINATION include/freetype2
+-  PATTERN "internal" EXCLUDE
+-  PATTERN "ftconfig.h" EXCLUDE
+-  PATTERN "ftoption.h" EXCLUDE
+-)
+-install(FILES
+-  ${PROJECT_BINARY_DIR}/include/freetype/config/ftconfig.h
+-  ${PROJECT_BINARY_DIR}/include/freetype/config/ftoption.h
+-  DESTINATION include/freetype2/freetype/config
+-)
+-install(TARGETS freetype
+-  EXPORT freetype-targets
+-  RUNTIME DESTINATION bin
+-  LIBRARY DESTINATION lib
+-  ARCHIVE DESTINATION lib
+-  FRAMEWORK DESTINATION Library/Frameworks
+-)
+-install(EXPORT freetype-targets
+-  DESTINATION lib/cmake/freetype
+-  FILE freetype-config.cmake
+-)
++if (NOT SKIP_INSTALL_HEADERS AND NOT SKIP_INSTALL_ALL)
++  install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/
++    DESTINATION include/freetype2
++    PATTERN "internal" EXCLUDE
++    PATTERN "ftconfig.h" EXCLUDE
++    PATTERN "ftoption.h" EXCLUDE
++    )
++  install(FILES
++    ${PROJECT_BINARY_DIR}/include/freetype/config/ftconfig.h
++    ${PROJECT_BINARY_DIR}/include/freetype/config/ftoption.h
++    DESTINATION include/freetype2/freetype/config
++    )
++endif ()
++
++if (NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL)
++  install(TARGETS freetype
++    EXPORT freetype-targets
++    RUNTIME DESTINATION bin
++    LIBRARY DESTINATION lib
++    ARCHIVE DESTINATION lib
++    FRAMEWORK DESTINATION Library/Frameworks
++    )
++  install(EXPORT freetype-targets
++    DESTINATION lib/cmake/freetype
++    FILE freetype-config.cmake
++    )
++endif ()
+ 
+ 
+ # Packaging
 diff --git a/ChangeLog b/ChangeLog
-index a19b4de..33c18b9 100644
+index a19b4de..ffc0a9c 100644
 --- a/ChangeLog
 +++ b/ChangeLog
-@@ -1,3 +1,424 @@
+@@ -1,3 +1,539 @@
++2016-04-16  David Capello  <davidcapello@gmail.com>
++
++	[cmake] Honor SKIP_INSTALL_* settings (as used in zlib).
++
++	As FreeType depends on zlib, if we don't install zlib (e.g., because
++	we defined SKIP_INSTALL_ALL), FreeType cannot be installed, too
++	(cmake triggers an error saying that FreeType cannot be installed
++	because zlib target isn't in the export set).
++
++	* CMakeLists.txt: Honor `SKIP_INSTALL_HEADERS',
++	`SKIP_INSTALL_LIBRARIES', and `SKIP_INSTALL_ALL' settings.
++
++2016-04-16  Behdad Esfahbod  <behdad@behdad.org>
++
++	[truetype] Another fix for non-intermediate GX tuples.
++
++	* src/truetype/ttgxvar.c (ft_var_apply_tuple): Add some missing
++	cases.
++
++2016-04-12  Alexei Podtelezhnikov  <apodtele@gmail.com>
++
++	Remove forgotten macro.
++
++	* include/freetype/internal/internal.h
++	[FT_INTERNAL_POSTSCRIPT_GLOBALS_H]: Remove.
++
++2016-04-09  Werner Lemberg  <wl@gnu.org>
++
++	[autofit] Add support for Georgian scripts.
++
++	Georgian is problematic, since `uppercase' forms of Mkhedruli
++	(called Mtavruli) are not yet defined in Unicode, which means that
++	proper blue zones can't be defined.  However, there is already a
++	proposal submitted to Unicode; see
++
++	  http://www.unicode.org/L2/L2016/16034-n4707-georgian.pdf
++
++	Additionally, due to historical reasons, Unicode treats Khutsuri as
++	the same script as Mkhedruli, and so does OpenType.  However, since
++	the two scripts have completely different shapes it can happen that
++	blue zones differ considerably.  The tag `geok' used here (derived
++	from ISO 15924) to differentiate the two scripts is not an OpenType
++	tag in use.  If we now have a font that contains both glyphs for
++	Mkhedruli and Khutsuri, and it uses OpenType features for both also,
++	HarfBuzz unavoidably treats all glyphs as `geor'.  As a consequence,
++	blue zones for `geok' are not used for glyphs involved in the
++	OpenType features.
++
++	An issue not yet resolved is which OpenType feature should be used
++	to access Mtavruli glyph shapes; right now, FreeType doesn't set up
++	support for them, but it is easy to add them later on as soon as
++	more information is available.
++
++	* src/autofit/afblue.dat: Add blue zone data for Georgian.
++
++	* src/autofit/afblue.c, src/autofit/afblue.h: Regenerated.
++
++	* src/autofit/afscript.h: Add Georgian standard characters.
++
++	* src/autofit/afranges.c: Add Georgian data.
++
++	* src/autofit/afstyles.h: Add Georgian data.
++
++2016-04-05  Werner Lemberg  <wl@gnu.org>
++
++	[autofit] Provide dummy blue zone for pseudo script `none'.
++
++	Even if the dummy hinter is used as the handler for `none' (which
++	doesn't use blue zones), it is more consistent than the old value
++	(which was 0), pointing to Arabic...
++
++	* src/autofit/afblue.dat: Add `AF_BLUE_STRINGSET_NONE'.
++	* src/autofit/afblue.c, src/autofit/afblue.h: Regenerated.
++
++	* src/autofit/afstyles.h (none_dflt): Use AF_BLUE_STRINGSET_NONE.
++
++2016-03-30  Werner Lemberg  <wl@gnu.org>
++
++	* src/pfr/pfrload.c (pfr_aux_name_load): Thinko (#47567).
++
++2016-03-30  Werner Lemberg  <wl@gnu.org>
++
++	* src/pfr/pfrload.c (pfr_log_font_count): Better font size estimate.
++
++2016-03-30  Werner Lemberg  <wl@gnu.org>
++
++	* src/pfr/pfrload.c (pfr_aux_name_load): Fix memory leak (#47567).
++
++2016-03-29  Werner Lemberg  <wl@gnu.org>
++
++	* src/base/ftadvanc.c (FT_Get_Advances): Fix invalid left shift.
++
++2016-03-29  Werner Lemberg  <wl@gnu.org>
++
++	[pfr] Fix binary search (#47514).
++
++	* src/pfr/pfrsbit.c (pfr_lookup_bitmap_data): Handle border
++	conditions correctly.
++
++2016-03-29  Werner Lemberg  <wl@gnu.org>
++
++	[pfr] Minor.
++
++	* src/pfr/pfrsbit.c (pfr_lookup_bitmap_data): Replace `left',
++	`right', and `middle' with `min', `max', and `mid' as used in other
++	FreeType binary search code.
++	(pfr_load_bitmap_metrics): Fix invalid left shift.
++
++2016-03-29  Werner Lemberg  <wl@gnu.org>
++
++	* src/pfr/pfrtypes.h: Replace all enums with macros.
++
++	We need `~FOO' to unset bits, and only with unsigned values (which
++	`enum' isn't normally) this works cleanly.
++
 +2016-03-26  Werner Lemberg  <wl@gnu.org>
 +
 +	[pfr] Robustify bitmap strike handling (#47514).
@@ -63,7 +255,7 @@ index a19b4de..33c18b9 100644
 +
 +	[pfr] Minor.
 +
-+	* src/pfr/pfrsbit.c, srf/pfr/pfrobjs.c: Use flag names instead of
++	* src/pfr/pfrsbit.c, src/pfr/pfrobjs.c: Use flag names instead of
 +	bare numbers.
 +
 +2016-03-25  Werner Lemberg  <wl@gnu.org>
@@ -454,6 +646,1160 @@ index a19b4de..33c18b9 100644
  2016-02-07  Werner Lemberg  <wl@gnu.org>
  
  	* Version 2.6.3 released.
+@@ -561,7 +1097,7 @@
+ 	[bdf] Remove dead code (#46625).
+ 
+ 	The BDF specification only allows decimal numbers, no octal or
+-	hexidecimal decoding is needed.
++	hexadecimal decoding is needed.
+ 
+ 	* src/bdf/bdflib.c (_bdf_atoul, _bdf_atol, _bdf_atous,
+ 	_bdf_atos): Remove unused code and parameters.
+@@ -734,7 +1270,7 @@
+ 	* src/autofit/afglobal.c: s/hbshim.h/afshaper.h/.
+ 	(af_face_globals_compute_style_coverage): Updated.
+ 
+-	* src/autofit/afglocal.h: s/hbshim.h/afshaper.h/.
++	* src/autofit/afglobal.h: s/hbshim.h/afshaper.h/.
+ 
+ 	* src/autofit/autofit.c: s/hbshim.c/afshaper.c/.
+ 
+@@ -1700,7 +2236,7 @@
+ 
+ 2015-10-04  Werner Lemberg  <wl@gnu.org>
+ 
+-	[bzip2, gzip] Avoid access of unitialized memory (#46109).
++	[bzip2, gzip] Avoid access of uninitialized memory (#46109).
+ 
+ 	* src/bzip2/ftbzip2.c (ft_bzip2_file_fill_input), src/gzip/ftgzip.c
+ 	(ft_gzip_file_fill_input): In case of an error, adjust the limit to
+@@ -1708,7 +2244,7 @@
+ 
+ 2015-10-03  Werner Lemberg  <wl@gnu.org>
+ 
+-	[bzip2, gzip] Avoid access of unitialized memory (#46109).
++	[bzip2, gzip] Avoid access of uninitialized memory (#46109).
+ 
+ 	* src/bzip2/ftbzip2.c (ft_bzip2_file_fill_output), src/gzip/ftgzip.c
+ 	(ft_gzip_file_fill_output): In case of an error, adjust the limit to
+@@ -2117,7 +2653,7 @@
+ 	[raster,smooth] Microoptimizations.
+ 
+ 	* src/raster/ftraster.c (Insert_Y_Turn, Finalize_Profile_Table,
+-	Beziier_Up, ): Use do-while loops.
++	Bezier_Up, ): Use do-while loops.
+ 
+ 	* src/smooth/ftgrays.c (gray_render_scanline, gray_render_line,
+ 	gray_convert_glyph): Ditto.
+@@ -2248,7 +2784,7 @@
+ 	[base] Improve emboldener (#45596).
+ 
+ 	* src/base/ftoutln.c (FT_Outline_EmboldenXY): Correct displacement
+-	of zero-lenght segments.
++	of zero-length segments.
+ 
+ 2015-08-16  Alexei Podtelezhnikov  <apodtele@gmail.com>
+ 
+@@ -2323,7 +2859,7 @@
+ 	* src/type1/t1gload.c (T1_Load_Glyph): Directly modify advances only
+ 	if font matrix is not trivial.
+ 	* src/cff/cffgload.c (cff_slot_load): Ditto.
+-	* sff/cid/cidgload.c (cid_slot_load_glyph): Ditto for advances and the
++	* src/cid/cidgload.c (cid_slot_load_glyph): Ditto for advances and the
+ 	entire outline.
+ 
+ 2015-08-11  Werner Lemberg  <wl@gnu.org>
+@@ -3068,7 +3604,7 @@
+ 
+ 	* src/autofit/afhints.h (AF_HINTS_DO_WARP): New macro.
+ 
+-	* src/autofi/aflatin.c (af_latin_hints_apply)
++	* src/autofit/aflatin.c (af_latin_hints_apply)
+ 	[AF_CONFIG_OPTION_USE_WARPER]: Use `AF_HINTS_DO_WARP' to control use
+ 	of warper.
+ 
+@@ -3699,7 +4235,7 @@
+ 	* src/pfr/pfrload.c (pfr_extra_item_load_font_id): Ditto.
+ 	* src/psaux/psobjs.c (ps_table_add), src/psaux/psobjs.h: Ditto.
+ 	* src/type1/t1load.c (parse_blend_axis_types, parse_encoding,
+-	parse_chharstrings, parse_dict): Ditto.
++	parse_charstrings, parse_dict): Ditto.
+ 	* src/type42/t42parse.c (t42_parse_encoding, t42_parse_charstrings,
+ 	t42_parse_dict): Ditto.
+ 
+@@ -3772,7 +4308,7 @@
+ 	* include/internal/ftstream.h (FT_Stream_Pos): Return `FT_ULong'.
+ 
+ 	* src/base/ftoutln.c, src/base/ftrfork.c, src/base/ftstream.c:
+-	Signedess fixes.
++	Signedness fixes.
+ 
+ 2015-02-16  Werner Lemberg  <wl@gnu.org>
+ 
+@@ -4290,7 +4826,7 @@
+ 
+ 2015-01-11  Werner Lemberg  <wl@gnu.org>
+ 
+-	[truetype] Prettyfing.
++	[truetype] Prettifying.
+ 
+ 	* src/truetype/ttinterp.c (project, dualproj, fast_project,
+ 	fast_dualproj): Rename to...
+@@ -4322,7 +4858,7 @@
+ 	[truetype] More macro expansions.
+ 
+ 	* src/truetype/ttinterp.c (INS_ARG): Remove macro by expansion,
+-	adjusting funtion calls where necessary.
++	adjusting function calls where necessary.
+ 	(FT_UNUSED_ARG): Removed, no longer needed.
+ 
+ 2015-01-10  Werner Lemberg  <wl@gnu.org>
+diff --git a/ChangeLog.20 b/ChangeLog.20
+index 360bb48..2f5c689 100644
+--- a/ChangeLog.20
++++ b/ChangeLog.20
+@@ -330,7 +330,7 @@
+ 
+ 2001-12-22  Francesco Zappa Nardelli  <Francesco.Zappa.Nardelli@ens.fr>
+ 
+-	* src/pfc/pcfread.c (pcf_load_font): Handle property `POINT_SIZE'
++	* src/pcf/pcfread.c (pcf_load_font): Handle property `POINT_SIZE'
+ 	and fix incorrect computation of `available_sizes'.
+ 
+ 2001-12-22  David Turner  <david@freetype.org>
+@@ -412,7 +412,7 @@
+ 	* src/cff/cffgload.h: Updated.
+ 	* src/cff/cffobjs.c: Include FT_INTERNAL_POSTSCRIPT_HINTS_H.
+ 	(CFF_Size_Get_Globals_Funcs, CFF_Size_Done, CFF_Size_Init,
+-	CFF_Size_Reset, CFF_GlyphSlot_Done, CFF_GLyphSlot_Init): New
++	CFF_Size_Reset, CFF_GlyphSlot_Done, CFF_GlyphSlot_Init): New
+ 	functions.
+ 	(CFF_Init_Face): Renamed to ...
+ 	(CFF_Face_Init): This.
+@@ -1176,7 +1176,7 @@
+ 
+ 	* include/freetype/internal/psaux.h (PS_Table): Use FT_Offset for
+ 	`cursor' and `capacity'.
+-	* src/psaux/psobjc.c (reallocate_t1_table): Use FT_Long for second
++	* src/psaux/psobjs.c (reallocate_t1_table): Use FT_Long for second
+ 	parameter.
+ 	(PS_Table_Add): Use FT_Offset for `new_size'.
+ 
+@@ -1710,7 +1710,7 @@
+ 	`FT_Err_*' with `CFF_Err_*'.
+ 	* src/cid/cidparse.c: Replaced `FT_Err_*' with `T1_Err_*'.
+ 	* src/psaux/psobjs.c, src/psaux/t1decode.c: Ditto.
+-	* src/sfnt/sfobcs.c, src/sfnt/ttload.c: Replaced `FT_Err_*' with
++	* src/sfnt/sfobjs.c, src/sfnt/ttload.c: Replaced `FT_Err_*' with
+ 	`TT_Err_*'.
+ 	* src/truetype/ttgload.c, src/truetype/ttobjs.c: Ditto.
+ 	* src/type1/t1gload.c, src/type1/t1load.c, src/type1/t1objs.c,
+@@ -1730,7 +1730,7 @@
+ 	* src/cff/cffobjs.c (CFF_Init_Face, CFF_Done_Face): Use
+ 	FT_LOCAL_DEF.
+ 	* src/cid/cidobjs.c (CID_Done_Driver): Ditto.
+-	* src/trutype/ttobjs.c (TT_Init_Face, TT_Done_Face, TT_Init_Size):
++	* src/truetype/ttobjs.c (TT_Init_Face, TT_Done_Face, TT_Init_Size):
+ 	Ditto.
+ 	* src/type1/t1objs.c (T1_Done_Driver): Ditto.
+ 	* src/pcf/pcfdriver.c (PCF_Done_Face): Ditto.
+diff --git a/ChangeLog.21 b/ChangeLog.21
+index a61682d..ba743ef 100644
+--- a/ChangeLog.21
++++ b/ChangeLog.21
+@@ -327,7 +327,7 @@
+ 	Blaskey <listtarget@danbala.com>).
+ 
+ 	* src/sfnt/ttcmap.h (TT_CMap): Add member `unsorted'.
+-	* src/sfnt/ttcmac.c: Use SFNT_Err_Ok where appropriate.
++	* src/sfnt/ttcmap.c: Use SFNT_Err_Ok where appropriate.
+ 
+ 	(tt_cmap0_validate, tt_cmap2_validate, tt_cmap6_validate,
+ 	tt_cmap8_validate, tt_cmap10_validate, tt_cmap12_validate): Use
+@@ -756,7 +756,7 @@
+ 	(AF_AxisHintsRec): Add `max_segments' and `max_edges'.
+ 	(af_axis_hints_new_segment, af_axis_hints_new_edge): New prototypes.
+ 
+-	* src/autofit/aflatin.c (af_latin_metricsc_scale): Don't call
++	* src/autofit/aflatin.c (af_latin_metrics_scale): Don't call
+ 	AF_SCALER_EQUAL_SCALES.
+ 	(af_latin_hints_compute_segments): Change return type to FT_Error.
+ 	Update all callers.
+@@ -1014,7 +1014,7 @@
+ 	t42_parse_charstrings, t42_parse_dict): Check parser error value
+ 	after call to T1_Skip_PS_Token (where necessary).
+ 
+-	* src/psaux/psobjc.c (skip_string, ps_parser_skip_PS_token,
++	* src/psaux/psobjs.c (skip_string, ps_parser_skip_PS_token,
+ 	ps_tobytes): Add error messages.
+ 
+ 2005-02-12  Werner Lemberg  <wl@gnu.org>
+@@ -1112,7 +1112,7 @@
+ 	but return them as-is.
+ 
+ 	* docs/CHANGES: Mention new bitmap API.
+-	* include/freetype/ftchapter.s: Updated.
++	* include/freetype/ftchapters.h: Updated.
+ 
+ 2004-12-11  Robert Clark  <freetype@ratty.org.uk>
+ 
+@@ -1159,7 +1159,7 @@
+ 	(ah_test_extremum, ah_get_orientation): Removed.
+ 	(ah_outline_load): Use FT_Outline_Get_Orientation.
+ 
+-	* src/base/ftsynth.c (ft_test_extrama, ft_get_orientation): Removed.
++	* src/base/ftsynth.c (ft_test_extrema, ft_get_orientation): Removed.
+ 	(FT_GlyphSlot_Embolden): Use FT_Outline_Get_Orientation.
+ 
+ 2004-11-23  Fernando Papa  <fpapa@netgate.com.uy>
+@@ -1829,7 +1829,7 @@
+ 
+ 2004-08-05  David Turner  <david@freetype.org>
+ 
+-	`Activate' gray-scale specifing hinting within the TrueType
++	`Activate' gray-scale specifying hinting within the TrueType
+ 	bytecode interpreter.  This is an experimental feature which
+ 	should probably be made optional.
+ 
+@@ -1839,7 +1839,7 @@
+ 	(TT_Load_Glyph): Here.
+ 	Set `grayscale' flag except for `FT_LOAD_TARGET_MONO'.
+ 
+-	* src/truetyep/ttinterp.c (Ins_GETINFO): Return MS rasterizer
++	* src/truetype/ttinterp.c (Ins_GETINFO): Return MS rasterizer
+ 	version 1.7.
+ 	Return rotation and stretching info only if glyph is rotated or
+ 	stretched, respectively.
+@@ -2048,7 +2048,7 @@
+ 	pcf_get_metrics, pcf_get_bitmaps, pcf_get_encodings): Improve
+ 	debugging messages.
+ 
+-	* src/pcf/pcfdrivr.c (FT_COMPOMENT): Move up.
++	* src/pcf/pcfdrivr.c (FT_COMPONENT): Move up.
+ 	(PCF_Face_Init): Simplify code.
+ 
+ 	* src/bdf/bdfdrivr.h (BDF_FaceRec): New element `default_glyph'.
+@@ -2116,7 +2116,7 @@
+ 	* include/freetype/cache/ftcmru.h (FTC_MruNode_CompareFunc): Change
+ 	return type to FT_Bool.
+ 
+-	* src/cache/ftbasic.c (ftc_basic_family_compare): Change return
++	* src/cache/ftcbasic.c (ftc_basic_family_compare): Change return
+ 	type to FT_Bool.
+ 
+ 	* src/cache/ftccache.c (FTC_Cache_Init, ftc_cache_init): Make
+@@ -2899,7 +2899,7 @@
+ 	Improve MacOS fond support.  Provide a new API
+ 	`FT_New_Face_From_FSSpec' similar to `FT_New_Face'.
+ 
+-	* src/base/ftmac.c [__MWERKS__]: Include FSp_fpopen.h.
++	* src/base/ftmac.c [__MWERKS__]: Include FSp_fopen.h.
+ 	STREAM_FILE [__MWERKS__]: New macro.
+ 	(ft_FSp_stream_close, ft_FSp_stream_io) [__MWERKS__]: New functions.
+ 	(file_spec_from_path) [__MWERKS__]: Updated #if statement.
+@@ -3331,7 +3331,7 @@
+ 
+ 	* src/cff/cffdrivr.c (cff_get_cmap_info): Call sfnt module's TT CMap
+ 	Info service function if the cmap comes from sfnt.  Return 0 if the
+-	cmap is sythesized in cff module.
++	cmap is synthesized in cff module.
+ 
+ 2004-01-20  David Turner  <david@freetype.org>
+ 
+@@ -3460,7 +3460,7 @@
+ 
+ 2003-12-25  Werner Lemberg  <wl@gnu.org>
+ 
+-	* src/base/fttrigon.c, src/base/ftgloadr.c: Inlude
++	* src/base/fttrigon.c, src/base/ftgloadr.c: Include
+ 	FT_INTERNAL_OBJECTS_H.
+ 
+ 	* src/base/ftstroke.c (FT_Outline_GetInsideBorder,
+@@ -3539,7 +3539,7 @@
+ 	src/cache/ftcsbits.c,
+ 	src/cache/ftccmap.c,
+ 	src/cache/ftcbasic.c (added),
+-	src/cache/ftclru.c (removed):
++	src/cache/ftlru.c (removed):
+ 
+ 	  *Complete* rewrite of the cache sub-system to `solve' the
+ 	  following points:
+@@ -4119,7 +4119,7 @@
+ 	(fnt_cmap_class_rec, fnt_cmap_class), src/bdf/bdflib.c (empty,
+ 	_num_bdf_properties), src/gzip/infutil.c (inflate_mask),
+ 	src/gzip/inffixed.h (fixed_bl, fixed_bd, fixed_tl, fixed_td),
+-	src/gzip/inftrees.h (inflate_trees_fixed), srf/gzip/inftrees.c
++	src/gzip/inftrees.h (inflate_trees_fixed), src/gzip/inftrees.c
+ 	(inflate_trees_fixed): Decorate with more `const' to avoid
+ 	writable global variables which are disallowed on ARM.
+ 
+@@ -4659,7 +4659,7 @@
+ 
+ 	* src/type42/t42drivr.c: Include FT_SERVICE_XFREE86_NAME_H,
+ 	FT_SERVICE_GLYPH_DICT_H, and FT_SERVICE_POSTSCRIPT_NAME_H.
+-	(t42_service_glyph_dict, t42_service_ps_name): New strucures
++	(t42_service_glyph_dict, t42_service_ps_name): New structures
+ 	providing Type 42 services.
+ 	(t42_services): New services list.
+ 	(T42_Get_Interface): Use `ft_service_list_lookup'.
+@@ -4683,7 +4683,7 @@
+ 	(gindex,gindex).
+ 
+ 	* src/base/ftpfr.c (ft_pfr_check): Fix serious typo.
+-	* src/pfr/prfload.c: Remove dead code.
++	* src/pfr/pfrload.c: Remove dead code.
+ 	(pfr_get_gindex, pfr_compare_kern_pairs, pfr_sort_kerning_pairs):
+ 	New functions.
+ 	(pfr_phy_font_done): Free `kern_pairs'.
+@@ -5569,7 +5569,7 @@
+ 	* src/bdf/bdfdrivr.c (BDF_Face_Init), src/pcf/pcfdriver.c
+ 	(PCF_Face_Init): Test for charset registry case-insensitively.
+ 
+-	* src/gzip/ftgzip.c (ft_gzip_fil_io): Revert change from yesterday;
++	* src/gzip/ftgzip.c (ft_gzip_file_io): Revert change from yesterday;
+ 	it has already been fixed differently.
+ 
+ 	* src/truetype/ttinterp.c (DO_SFVTL): Add missing braces around
+@@ -5706,7 +5706,7 @@
+ 	(ah_outline_compute_edges): Scale `edge_distance_threshold' down
+ 	after rounding instead of scaling comparison value in loop.
+ 
+-	* src/autohint/ahhint.c (ah_hinter_align_stong_points): Provide
++	* src/autohint/ahhint.c (ah_hinter_align_strong_points): Provide
+ 	alternative code which runs faster.
+ 	Handle `before->scale == 0'.
+ 
+@@ -5960,7 +5960,7 @@
+ 
+ 2003-03-27  David Turner  <david@freetype.org>
+ 
+-	* README: Udpated.
++	* README: Updated.
+ 
+ 	* README.UNX: Removed (now replaced by docs/INSTALL.UNX).
+ 
+@@ -6275,7 +6275,7 @@
+ 	(bdf_driver_class): Use `bdf_driver_requester'.
+ 
+ 	* src/pcf/pcfdrivr.c: Include FT_BDF_H.
+-	(pcf_get_bdf_property, pdc_driver_requester): New functions
++	(pcf_get_bdf_property, pcf_driver_requester): New functions
+ 	(pcf_driver_class): Use `pcf_driver_requester'.
+ 
+ 	* src/pcf/pcfread.c: Include `pcfread.h'.
+@@ -6547,7 +6547,7 @@
+ 
+ 2002-11-07  David Turner  <david@freetype.org>
+ 
+-	* src/cache/ftcsbit.c (ftc_sbit_node_load): Fixed a small bug that
++	* src/cache/ftcsbits.c (ftc_sbit_node_load): Fixed a small bug that
+ 	caused problems with embedded bitmaps.
+ 
+ 	* src/otlayout/otlayout.h, src/otlyaout/otlconf.h,
+@@ -6608,7 +6608,7 @@
+ 
+ 2002-11-01  David Turner  <david@freetype.org>
+ 
+-	Added PFR-specific public API.  Fixed the kerning retrievel routine
++	Added PFR-specific public API.  Fixed the kerning retrieval routine
+ 	(it returned invalid values when the outline and metrics resolution
+ 	differ).
+ 
+@@ -6695,7 +6695,7 @@
+ 	* src/pfr/pfrgload.c: Include `pfrsbit.h'.
+ 	* src/pfr/pfrload.c (pfr_extra_item_load_kerning_pairs): Rewritten.
+ 	(pfr_phy_font_done, pfr_phy_font_load): Updated.
+-	* src/pfr/pfrobks.c: Include `pfrsbit.h'.
++	* src/pfr/pfrobjs.c: Include `pfrsbit.h'.
+ 	(pfr_face_init): Handle kerning and embedded bitmaps.
+ 	(pfr_slot_load): Load embedded bitmaps.
+ 	(PFR_KERN_INDEX): Removed.
+@@ -7032,7 +7032,7 @@
+ 	(FTC_Image_Cache_Lookup): This function.
+ 	(ftc_image_family_init): Updated.
+ 
+-	* src/cache/ftcsbit.c (FTC_SBitQueryRec, FTC_SBitFamilyRec):
++	* src/cache/ftcsbits.c (FTC_SBitQueryRec, FTC_SBitFamilyRec):
+ 	Updated.
+ 	(ftc_sbit_node_load): Updated.
+ 	Moved code to convert type flags to load flags to...
+@@ -7556,7 +7556,7 @@
+ 	Get glyph offset.
+ 
+ 	* src/truetype/ttobjs.c (TT_Face_Init)
+-	[FT_CONFIG_OPTION_INCOREMENTAL]: Added the incremental loading
++	[FT_CONFIG_OPTION_INCREMENTAL]: Added the incremental loading
+ 	system for the TrueType driver.
+ 
+ 	* src/cid/cidgload.c (cid_load_glyph)
+@@ -7897,7 +7897,7 @@
+ 
+ 2002-06-21  Sven Neumann  <sven@convergence.de>
+ 
+-	* src/prf/pfrtypes.h (PFR_KernPair): New structure.
++	* src/pfr/pfrtypes.h (PFR_KernPair): New structure.
+ 	(PFR_PhyFont): Use it.
+ 	(PFR_KernFlags): New enumeration.
+ 	* src/pfr/pfrload.c (pfr_extra_item_load_kerning_pairs): New
+@@ -8245,7 +8245,7 @@
+ 	`fttype1.c' in src/base.
+ 
+ 	* src/pshinter/pshglob.c (psh_blues_scale_zones): Fixed a bug that
+-	prevented family blue zones substitution from hapenning correctly.
++	prevented family blue zones substitution from happening correctly.
+ 
+ 	* include/freetype/ftbdf.h FT_Get_BDF_Charset_ID): Adding
+ 	documentation comment.
+@@ -8622,7 +8622,7 @@
+ 
+ 2002-04-19  Werner Lemberg  <wl@gnu.org>
+ 
+-	* src/pfr/pfrload.c (pfr_extra_items_farse): Fix debug message.
++	* src/pfr/pfrload.c (pfr_extra_items_parse): Fix debug message.
+ 	(pfr_phy_font_load): s/size/Size/ for local variable to avoid
+ 	compiler warning.
+ 	* src/pfr/pfrobjs.c (pfr_face_init): Fix debug message.
+@@ -8676,7 +8676,7 @@
+ 
+ 2002-04-16  Francesco Zappa Nardelli  <Francesco.Zappa.Nardelli@ens.fr>
+ 
+-	* src/pcf/pcfread (pcf_get_accell): Fix parsing of accelerator
++	* src/pcf/pcfread.c (pcf_get_accel): Fix parsing of accelerator
+ 	tables.
+ 
+ 2002-04-15  David Turner  <david@freetype.org>
+@@ -8716,7 +8716,7 @@
+ 
+ 	src/cache/ftcimage.c, src/cache/ftcsbits.c,
+ 
+-	src/cff/cffdriver.c, src/cff/cffload.c, src/cff/cffobjs.c,
++	src/cff/cffdrivr.c, src/cff/cffload.c, src/cff/cffobjs.c,
+ 
+ 	src/cid/cidload.c, src/cid/cidparse.c, src/cid/cidriver.c,
+ 
+@@ -9068,7 +9068,7 @@
+ 
+ 	* include/freetype/internal/psaux.h, src/cid/cidload.c,
+ 	src/cidtoken.h, src/psaux/psobjs.c, src/psaux/psobjs.h,
+-	src/psaux/t1decode.c, stc/type1/t1load.c, src/type1/t1tokens.h:
++	src/psaux/t1decode.c, src/type1/t1load.c, src/type1/t1tokens.h:
+ 	Updated common PostScript type definitions.
+ 	Renamed all enumeration values like to uppercase variants:
+ 
+@@ -9076,7 +9076,7 @@
+ 	  t1_field_cid_info => T1_FIELD_LOCATION_CID_INFO
+ 	  etc.
+ 
+-	* include/freetype/internal/psglobals.h: Removed.
++	* include/freetype/internal/psglobal.h: Removed.
+ 	* include/freetype/internal/pshints.h, src/pshinter/pshglob.h:
+ 	Updated.
+ 
+diff --git a/ChangeLog.22 b/ChangeLog.22
+index 79f9478..ac19d60 100644
+--- a/ChangeLog.22
++++ b/ChangeLog.22
+@@ -387,10 +387,10 @@
+ 	(FTC_INode_Weight): Commented out.
+ 	* src/cache/ftcimage.h: Updated.
+ 
+-	* src/cache/ftmanag.c (FTC_Manager_Compress,
++	* src/cache/ftcmanag.c (FTC_Manager_Compress,
+ 	FTC_Manager_RegisterCache, FTC_Manager_FlushN):
+ 	s/FT_EXPORT/FT_LOCAL/.
+-	* src/cache/ftmanag.h: Updated.
++	* src/cache/ftcmanag.h: Updated.
+ 
+ 	* src/cache/ftcsbits.c (FTC_SNode_Free, FTC_SNode_New,
+ 	FTC_SNode_Compare): s/FT_EXPORT/FT_LOCAL/.
+@@ -934,7 +934,7 @@
+ 	* include/freetype/freetype.h (FT_GlyphSlotRec): Improve
+ 	documentation of `outline' field.
+ 
+-	* src/sfnt/sfobjc.s: Inckude FT_INTERNAL_DEBUG_H.
++	* src/sfnt/sfobjs.c: Include FT_INTERNAL_DEBUG_H.
+ 	* src/sfnt/sfdriver.c: Include ttmtx.h.
+ 
+ 	* src/autofit/afcjk.c: Include aftypes.h and aflatin.h.
+@@ -1630,8 +1630,8 @@
+ 
+ 	* include/freetype/internal/t1types.h (T1_FaceRec): Updated.
+ 
+-	* src/psaux/t1cmap.h (T1_CmapStdRec): Updated.
+-	(T1_CmapUnicode, T1_CmapUnicodeRec): Removed.
++	* src/psaux/t1cmap.h (T1_CMapStdRec): Updated.
++	(T1_CMapUnicode, T1_CMapUnicodeRec): Removed.
+ 
+ 	* src/psaux/t1cmap.c (t1_get_glyph_name): New callback function.
+ 	(t1_cmap_unicode_init, t1_cmap_unicode_done,
+@@ -1781,7 +1781,7 @@
+ 	Note that this doesn't force auto-hinting for all fonts, however.
+ 
+ 	* src/autofit/afhints.c (af_glyph_hints_reload): Don't set
+-	scaler_fiags here but...
++	scaler_flags here but...
+ 	(af_glyph_hints_rescale): Here.
+ 
+ 	* src/autofit/aflatin.c (af_latin_hints_init): Disable horizontal
+@@ -1813,7 +1813,7 @@
+ 	[TT_CONFIG_OPTION_BDF]: New structure.
+ 	(TT_FaceRec) [TT_CONFIG_OPTION_BDF]: New member `bdf'.
+ 
+-	* include/freetype/ttags.h (TTAG_BDF): New macro.
++	* include/freetype/tttags.h (TTAG_BDF): New macro.
+ 
+ 	* src/sfnt/Jamfile (_sources): Add ttbdf.
+ 
+@@ -1835,7 +1835,7 @@
+ 
+ 2005-12-07  Werner Lemberg  <wl@gnu.org>
+ 
+-	* src/sfnt/sfobjc.c (sfnt_init_face): Move tag check to...
++	* src/sfnt/sfobjs.c (sfnt_init_face): Move tag check to...
+ 	* src/sfnt/ttload.c (sfnt_init): Here, before handling TTCs.
+ 
+ 2005-12-06  Chia-I Wu  <b90201047@ntu.edu.tw>
+@@ -1962,7 +1962,7 @@
+ 
+ 	* docs/CHANGES: Mention scaling bug.
+ 
+-2005-11-18  susuzki toshiya  <mpsuzuki@hiroshima-u.ac.jp>
++2005-11-18  suzuki toshiya  <mpsuzuki@hiroshima-u.ac.jp>
+ 
+ 	* include/freetype/ftgxval.h, src/base/ftgxval.c
+ 	(FT_TrueTypeGX_Free, FT_ClassicKern_Free): New functions to free
+@@ -2311,7 +2311,7 @@
+ 	CJK font).  A SING Glyphlet Font is an OpenType font that contains
+ 	the outline(s), either in a `glyf' or `CFF' table, for a glyph;
+ 	`cmap', `BASE', and `GSUB' tables are present with the same format
+-	and functionaliy as a regular OpenType font; there are no `name',
++	and functionality as a regular OpenType font; there are no `name',
+ 	`head', `OS/2', and `post' tables; there are two new tables, `SING'
+ 	which contains details about the glyphlet, and `META' which contains
+ 	metadata.
+@@ -2320,7 +2320,7 @@
+ 
+ 	  http://www.adobe.com/products/indesign/sing_gaiji.html
+ 
+-	* include/freetype/ttags.h (TTAG_SING, TTAG_META): New macros for
++	* include/freetype/tttags.h (TTAG_SING, TTAG_META): New macros for
+ 	the OpenType tables `SING' and `META'.  These two tables are used in
+ 	SING Glyphlet Format fonts.
+ 
+diff --git a/ChangeLog.23 b/ChangeLog.23
+index bc8ea5b..7fb5813 100644
+--- a/ChangeLog.23
++++ b/ChangeLog.23
+@@ -139,7 +139,7 @@
+ 	Fix compilation warning.
+ 
+ 	* src/base/ftbase.h: s/LOCAL_DEF/LOCAL/.
+-	* src/base/ftobjc.s: Include ftbase.h conditionally.
++	* src/base/ftobjs.c: Include ftbase.h conditionally.
+ 
+ 2010-01-11  Kwang Yul Seo  <skyul@company100.net>
+ 
+@@ -655,7 +655,7 @@
+ 	[Win64] Improve the computation of random seed from stack address.
+ 
+ 	On LLP64 platform, the conversion from pointer to FT_Fixed need
+-	to drop higher 32-bit.  Explict casts are required. Reported by
++	to drop higher 32-bit.  Explicit casts are required. Reported by
+ 	NightStrike from MinGW-w64 project.  See
+ 	http://lists.gnu.org/archive/html/freetype/2009-09/msg00000.html
+ 
+@@ -891,7 +891,7 @@
+ 	pcf: Fix a comparison between FT_Long and FT_ULong.
+ 
+ 	* src/pcf/pcfread.c (pcf_get_bitmaps): Return an error
+-	if PCF_Face->nemetrics is negative.
++	if PCF_Face->nmetrics is negative.
+ 
+ 2009-07-31  suzuki toshiya  <mpsuzuki@hiroshima-u.ac.jp>
+ 
+@@ -1150,7 +1150,7 @@
+ 
+ 2009-07-31  suzuki toshiya  <mpsuzuki@hiroshima-u.ac.jp>
+ 
+-	cache: Insert explict casts for LP64 systems.
++	cache: Insert explicit casts for LP64 systems.
+ 
+ 	* src/cache/ftcbasic.c (FTC_ImageCache_Lookup,
+ 	FTC_SBitCache_Lookup): The type of FTC_ImageType->width
+@@ -1409,7 +1409,7 @@
+ 
+ 	base: Prevent some overflows on LP64 systems.
+ 
+-	* src/base/ftadvance.c (FT_Get_Advances): Cast the
++	* src/base/ftadvanc.c (FT_Get_Advances): Cast the
+ 	unsigned long constant FT_LOAD_ADVANCE_ONLY to FT_UInt32
+ 	for LP64 platforms.
+ 
+@@ -1499,7 +1499,7 @@
+ 
+ 	bdf: Fix some data types mismatching with their sources.
+ 
+-	* src/bdf/bdrdrivr.c (bdf_cmap_char_index): The type
++	* src/bdf/bdfdrivr.c (bdf_cmap_char_index): The type
+ 	of `code' is matched with BDF_encoding_el->enc.
+ 	(bdf_cmap_char_next): The type of `charcode' is
+ 	matched with BDF_encoding_el->enc.  When *acharcode
+@@ -1545,7 +1545,7 @@
+ 	* src/cache/ftcbasic.c (FTC_ImageCache_Lookup): Exclude
+ 	the legacy behaviour from 16-bit platform, because the
+ 	current hack cannot detect the caller uses this function
+-	via legacy convension.
++	via legacy convention.
+ 	(FTC_SBitCache_Lookup): Ditto.
+ 
+ 2009-07-31  suzuki toshiya  <mpsuzuki@hiroshima-u.ac.jp>
+@@ -1585,7 +1585,7 @@
+ 
+ 2009-07-31  suzuki toshiya  <mpsuzuki@hiroshima-u.ac.jp>
+ 
+-	fttypes.h: Cast FT_MAKE_TAG output to FT_Tag exlicitly.
++	fttypes.h: Cast FT_MAKE_TAG output to FT_Tag explicitly.
+ 
+ 	* include/freetype/fttypes.h (FT_MAKE_TAG):
+ 	Cast the result to FT_Tag.
+@@ -1687,7 +1687,7 @@
+ 	sfnt: Count the size of the memory object by ptrdiff_t.
+ 
+ 	* src/sfnt/ttbdf.c (tt_face_find_bdf_prop): The type of
+-	`peroperty_len' is changed from FT_UInt to FT_Offset,
++	`property_len' is changed from FT_UInt to FT_Offset,
+ 	to match with size_t, which is appropriate type for the
+ 	object in the memory buffer.
+ 
+@@ -2122,7 +2122,7 @@
+ 	Use 16.16 format everywhere (except for large integers followed by a
+ 	`div').
+ 	[CAN_HANDLE_NON_INTEGRAL_T1_OPERANDS]: Remove #ifdef and activate
+-	code uncoditionally.
++	code unconditionally.
+ 	Add support for random numbers and update remaining code
+ 	accordingly; this should work now.
+ 	(t1_operator_seac): Updated.
+@@ -2479,7 +2479,7 @@
+ 	af_latin_script_class struct will have function to init it instead of
+ 	being allocated in the global scope.
+ 	Change af_latin_blue_chars to be PIC-compatible by being a two
+-	dimentional array rather than array of pointers.
++	dimensional array rather than array of pointers.
+ 
+ 
+ 	* src/autofit/aflatin2.h declare af_latin2_script_class
+@@ -2489,11 +2489,11 @@
+ 	af_latin2_script_class struct will have function to init it instead of
+ 	being allocated in the global scope.
+ 	Change af_latin2_blue_chars to be PIC-compatible by being a two
+-	dimentional array rather than array of pointers.
++	dimensional array rather than array of pointers.
+ 
+ 	* src/autofit/afglobal.c when FT_CONFIG_OPTION_PIC is defined
+ 	af_script_classes array initialization was moved to afpic.c and
+-	is later refered using macros defeined in afpic.h.
++	is later referred using macros defined in afpic.h.
+ 
+ 	New Files:
+ 	* src/autofit/afpic.h declare struct to hold PIC globals for autofit
+@@ -2573,7 +2573,7 @@
+ 	Macros will be used from rastpic.h in order to access
+ 	ft_standard_raster from the pic_container (allocated in ftraster.c).
+ 	In ft_raster1_render when PIC is enabled, the last letter of
+-	module_name is used to verfy the renderer class rather than the
++	module_name is used to verify the renderer class rather than the
+ 	class pointer.
+ 
+ 	* src/raster/ftraster.c when FT_CONFIG_OPTION_PIC is defined
+@@ -2755,7 +2755,7 @@
+ 	And macros will be used from ttpic.h in order to access them
+ 	from the pic_container.
+ 	* src/truetype/ttobjs.c change trick_names array to be
+-	PIC-compatible by being a two dimentional array rather than array
++	PIC-compatible by being a two dimensional array rather than array
+ 	of pointers.
+ 
+ 	New Files:
+@@ -2784,14 +2784,14 @@
+ 	Add macros to declare, allocate and initialize drivers
+ 	(FT_Driver_ClassRec).
+ 	* include/freetype/internal/ftpic.h new file to declare the
+-	FT_PIC_Container struct and the functions to allocate and detroy it.
++	FT_PIC_Container struct and the functions to allocate and destroy it.
+ 	* include/freetype/internal/ftserv.h add macros to allocate and
+-	destory arrays of FT_ServiceDescRec.
++	destroy arrays of FT_ServiceDescRec.
+ 	* include/freetype/internal/internal.h define macro to include
+ 	ftpic.h.
+ 
+ 	New Files:
+-	* src/base/ftpic.c implement functions to allocate and destory the
++	* src/base/ftpic.c implement functions to allocate and destroy the
+ 	global pic_container.
+ 	* src/base/basepic.h declare struct to hold PIC globals for base and
+ 	macros to access them.
+@@ -2814,7 +2814,7 @@
+ 	* src/base/ftglyph.c when FT_CONFIG_OPTION_PIC is defined
+ 	ft_bitmap_glyph_class and ft_outline_glyph_class will be allocated
+ 	in the pic_container instead of the global scope and use macros from
+- 	basepic.h to access them.
++	basepic.h to access them.
+ 	* src/base/ftbbox.c allocate bbox_interface stract on the stack
+ 	instead of the global scope when FT_CONFIG_OPTION_PIC is defined.
+ 	* src/base/ftstroke.c access ft_outline_glyph_class allocated in
+@@ -3519,7 +3519,7 @@
+ 2008-12-21  Werner Lemberg  <wl@gnu.org>
+ 
+ 	* src/pfr/pfrdrivr.c, src/winfonts/winfnt.c, src/cache/ftcmanag.c,
+-	src/smooth/ftgrays.c, src/base/ftobjc.s, src/sfobjs.c:
++	src/smooth/ftgrays.c, src/base/ftobjs.c, src/sfobjs.c:
+ 	s/_Err_Bad_Argument/_Err_Invalid_Argument/.  The former is for
+ 	errors in the bytecode interpreter only.
+ 
+@@ -4098,7 +4098,7 @@
+ 2008-09-18  suzuki toshiya  <mpsuzuki@hiroshima-u.ac.jp>
+ 
+ 	* src/cff/cffobjs.c (cff_face_init): Use TTAG_OTTO defined
+-	in ttags.h instead of numerical value 0x4F54544FL.
++	in tttags.h instead of numerical value 0x4F54544FL.
+ 
+ 2008-09-16  Werner Lemberg  <wl@gnu.org>
+ 
+@@ -4248,7 +4248,7 @@
+ 2008-08-29  suzuki toshiya  <mpsuzuki@hiroshima-u.ac.jp>
+ 
+ 	* src/sfnt/sfobjs.c (sfnt_open_font): Use TTAG_OTTO defined in
+-	ttags.h instead of FT_MAKE_TAG( 'O', 'T', 'T', 'O' ).
++	tttags.h instead of FT_MAKE_TAG( 'O', 'T', 'T', 'O' ).
+ 
+ 2008-08-28  Werner Lemberg  <wl@gnu.org>
+ 
+@@ -4258,7 +4258,7 @@
+ 
+ 2008-08-23  Werner Lemberg  <wl@gnu.org>
+ 
+-	* src/type/t1afm.c (compare_kern_pairs), src/pxaux/afmparse.c
++	* src/type/t1afm.c (compare_kern_pairs), src/psaux/afmparse.c
+ 	(afm_compare_kern_pairs): Fix comparison.  This fixes Savannah bug
+ 	#24119.
+ 
+@@ -4387,7 +4387,7 @@
+ 
+ 	* src/cff/cffload.c (cff_font_load): Pass `pure_cff'.
+ 	Invert sids table only if `pure_cff' is set.
+-	* src/cff/cffload.h: Udpated.
++	* src/cff/cffload.h: Updated.
+ 
+ 	* src/cff/cffobjs.c (cff_face_init): Updated.
+ 	Set FT_FACE_FLAG_CID_KEYED only if pure_cff is set.
+@@ -5329,7 +5329,7 @@
+ 
+ 2007-08-18  Werner Lemberg  <wl@gnu.org>
+ 
+-	* src/otvalid/otvcmmn.c (otv_x_y_ux_sy): Skip context glyphs.  Found
++	* src/otvalid/otvcommn.c (otv_x_y_ux_sy): Skip context glyphs.  Found
+ 	by Imran Yousaf.  Fixes Savannah bug #20773.
+ 
+ 	(otv_Lookup_validate): Correct handling of LookupType.  Found by
+@@ -5428,7 +5428,7 @@
+ 	* include/freetype/config/ftheader.h (FT_CID_H): New macro.
+ 	* include/freetype/ftcid.h: New file.
+ 
+-	* include/freetype/internal/ftserv.h (FT_SERVIVE_CID_H): New macro.
++	* include/freetype/internal/ftserv.h (FT_SERVICE_CID_H): New macro.
+ 	* include/freetype/internal/services/svcid.h: New file.
+ 
+ 	* src/base/ftcid.c: New file.
+@@ -5938,7 +5938,7 @@
+ 
+ 	Savannah patch #5929.
+ 
+-	* include/freetype/tttables.h, src/base/ftobjcs.c
++	* include/freetype/tttables.h, src/base/ftobjs.c
+ 	(FT_Get_CMap_Format): New function.
+ 
+ 	* include/freetype/internal/services/svttcmap.c (TT_CMapInfo): Add
+@@ -6005,7 +6005,7 @@
+ 
+ 2007-05-11  David Turner  <david@freetype.org>
+ 
+-	* src/cache/ftbasic.c, include/freetype/ftcache.h
++	* src/cache/ftcbasic.c, include/freetype/ftcache.h
+ 	(FTC_ImageCache_LookupScaler, FTC_SBit_Cache_LookupScaler): Two new
+ 	functions that allow us to look up glyphs using an FTC_Scaler object
+ 	to specify the size, making it possible to use fractional pixel
+@@ -6097,8 +6097,8 @@
+ 
+ 2007-04-06  David Turner  <david@freetype.org>
+ 
+-	* src/base/ftbimap.c (ft_bitmap_assure_buffer): Fix buffer-overwrite bug
+-	(Savannah bug #19536).
++	* src/base/ftbitmap.c (ft_bitmap_assure_buffer): Fix buffer-overwrite
++	bug (Savannah bug #19536).
+ 
+ 2007-04-04  Werner Lemberg  <wl@gnu.org>
+ 
+@@ -6256,7 +6256,7 @@
+ 	case FT_Init_FreeType fails for some reason.  Problem reported by
+ 	Maximilian Schwerin <maximilian.schwerin@buelowssiege.de>.
+ 
+-	* src/truetype/ttobs.c (tt_size_init_bytecode): Clear the `x_ppem'
++	* src/truetype/ttobjs.c (tt_size_init_bytecode): Clear the `x_ppem'
+ 	and `y_ppem' fields of the `TT_Size.metrics' structure, not those of
+ 	`TT_Size.root.metrics'.  Problem reported by Daniel Glöckner
+ 	<daniel-gl@gmx.net>.
+@@ -6335,7 +6335,7 @@
+ 	* src/base/ftutil.c (ft_mem_dup, ft_mem_strdup, ft_mem_strcpyn): New
+ 	functions.
+ 
+-	* src/bfd/bfddrivr.c (bdf_interpret_style, BDF_Face_Init),
++	* src/bdf/bdfdrivr.c (bdf_interpret_style, BDF_Face_Init),
+ 	src/bdf/bdflib.c (_bdf_add_property), src/pcf/pcfread.c
+ 	(pcf_get_properties, pcf_interpret_style, pcf_load_font),
+ 	src/cff/cffdrivr.c (cff_get_glyph_name), src/cff/cffload.c
+@@ -6546,7 +6546,7 @@
+ 2007-01-16  David Turner  <david@freetype.org>
+ 
+ 	* src/autofit/aflatin.c (af_latin_hints_compute_segments),
+-	src/cff/cffdriver.c (cff_ps_get_font_info), src/truetype/ttobjs.c
++	src/cff/cffdrivr.c (cff_ps_get_font_info), src/truetype/ttobjs.c
+ 	(tt_face_init), src/truetype/ttinterp.c (Ins_SHC): Fix compiler
+ 	warnings.
+ 
+@@ -6592,7 +6592,7 @@
+ 	* src/cff/cffload.c: Include FT_TYPE1_TABLES_H.
+ 	(cff_font_done): Free font->font_info if necessary.
+ 
+-	* src/cff/cffdrvr.c (cff_ps_get_font_info): New function.
++	* src/cff/cffdrivr.c (cff_ps_get_font_info): New function.
+ 	(cff_service_ps_info): Register cff_ps_get_font_info.
+ 
+ 2007-01-13  Werner Lemberg  <wl@gnu.org>
+@@ -6734,7 +6734,7 @@
+ 	files are not used.
+ 
+ 	* include/freetype/internal/tttypes.h (TT_FaceRec): Add members
+-	`horz_metrics_offset' and `vert_metrics_ofset'.
++	`horz_metrics_offset' and `vert_metrics_offset'.
+ 	* src/sfnt/ttmtx.c (tt_face_load_hmtx, tt_face_get_metrics):
+ 	Updated.
+ 
+@@ -7517,7 +7517,7 @@
+ 2006-08-15  suzuki toshiya  <mpsuzuki@hiroshima-u.ac.jp>
+ 
+ 	* modules.cfg (BASE_EXTENSIONS): Compile in ftgxval.c by default to
+-	build ftvalid in ft2demos.  This has been inadvertedly changed
++	build ftvalid in ft2demos.  This has been inadvertently changed
+ 	2006-08-13.
+ 
+ 2006-08-15  suzuki toshiya  <mpsuzuki@hiroshima-u.ac.jp>
+@@ -7647,7 +7647,7 @@
+ 	`len_buildchar'.
+ 	Remove `keywords_flags'.
+ 
+-	* src/type1/t1load.h (T1_LoaderRect): New field
++	* src/type1/t1load.h (T1_LoaderRec): New field
+ 	`keywords_encountered'.
+ 	(T1_PRIVATE, T1_FONTDIR_AFTER_PRIVATE): New macros.
+ 
+@@ -7840,7 +7840,7 @@
+ 	* src/base/ftobjs.c (load_face_in_embedded_rfork): Replace
+ 	`FT_Stream_Close' by `FT_Stream_Free' to fix memory leak.
+ 
+-	* src/base/ftrfrk.c (raccess_guess_linux_double_from_file_name):
++	* src/base/ftrfork.c (raccess_guess_linux_double_from_file_name):
+ 	Replace `FT_Stream_Close' by `FT_Stream_Free' to fix memory leak.
+ 
+ 2006-05-19  suzuki toshiya  <mpsuzuki@hiroshima-u.ac.jp>
+@@ -7902,7 +7902,7 @@
+ 	(FT_Stream_OpenGzip): Use it to handle small files directly in
+ 	memory.
+ 
+-	* src/psaux/psconv.c (PS_Conv_ASCIIHexDecode, PS_ConvEexecDecode):
++	* src/psaux/psconv.c (PS_Conv_ASCIIHexDecode, PS_Conv_EexecDecode):
+ 	Improve performance.
+ 
+ 	* src/truetype/ttgload.c (TT_Access_Glyph_Frame): Set `cursor' and
+diff --git a/ChangeLog.24 b/ChangeLog.24
+index 3a4abe2..a1f1576 100644
+--- a/ChangeLog.24
++++ b/ChangeLog.24
+@@ -780,7 +780,7 @@
+ 
+ 	Move font tweaking tables to...
+ 
+-	* src/truetype/ttsubpic.c: This file and decorate them with `static'
++	* src/truetype/ttsubpix.c: This file and decorate them with `static'
+ 	and `const' where appropriate.
+ 
+ 	(X_SCALING_Rules, X_SCALING_RULES_SIZE): Renamed to...
+@@ -978,7 +978,7 @@
+ 
+ 	[base] Clean up trigonometric core.
+ 
+-	* src/base/fttrrigon.c (ft_trig_pseudo_polarize): Align algorithm
++	* src/base/fttrigon.c (ft_trig_pseudo_polarize): Align algorithm
+ 	with `ft_trig_pseudo_rotate'.
+ 
+ 2012-12-18  Infinality  <infinality@infinality.net>
+@@ -990,7 +990,7 @@
+ 
+ 2012-12-17  Infinality  <infinality@infinality.net>
+ 
+-	[truetype] Remove unusued code and variables.
++	[truetype] Remove unused code and variables.
+ 
+ 	* src/truetype/ttinterp.c: Updated.
+ 	(Ins_FDEF): Remove opcode patterns that are not being used.
+@@ -1012,7 +1012,7 @@
+ 
+ 2012-12-16  Infinality  <infinality@infinality.net>
+ 
+-	[truetype] Remove unusued code and variables.  Add minor fixes.
++	[truetype] Remove unused code and variables.  Add minor fixes.
+ 
+ 	* src/truetype/ttsubpix.h: Updated.
+ 	(SKIP_NONPIXEL_Y_MOVES_Rules_Exceptions): Add Trebuchet MS.
+@@ -1037,7 +1037,7 @@
+ 	(Ins_FDEF): Rework code to fix bugs and add more detection.
+ 	(Ins_CALL): Remove unused code.
+ 	(Ins_LOOPCALL): Remove unused code.
+-	(TT_RunIns): Remove unusued code.
++	(TT_RunIns): Remove unused code.
+ 	(Ins_SHPIX): Add logic to handle ttfautohinted fonts.
+ 	(Ins_MIRP): Don't round x in cut-in calculation.  Add logic to handle
+ 	ttfautohinted fonts.
+@@ -1395,7 +1395,7 @@
+ 
+ 	[autofit] Minor optimization.
+ 
+-	* src/autofit/afglobals.c (af_face_globals_compute_script_coverage):
++	* src/autofit/afglobal.c (af_face_globals_compute_script_coverage):
+ 	Add loop condition.
+ 
+ 2012-09-29  Werner Lemberg  <wl@gnu.org>
+@@ -2556,7 +2556,7 @@
+ 	s/t1_init_loader/cid_init_loader/.
+ 	s/t1_done_loader/cid_done_loader/.
+ 
+-	* src/pxaux/t1cmap.c: s/t1_get_glyph_name/psaux_get_glyph_name/.
++	* src/psaux/t1cmap.c: s/t1_get_glyph_name/psaux_get_glyph_name/.
+ 
+ 	* src/truetype/ttdriver.c: s/Load_Glyph/tt_glyph_load/.
+ 
+@@ -2796,9 +2796,9 @@
+ 	[base] Fix a dereference of uninitialized variable in PIC mode.
+ 
+ 	* src/base/ftglyph.c (FT_Glyph_To_Bitmap): `glyph' must be
+-	set before derefering to obtain `library'.  The initialization
++	set before dereferring to obtain `library'.  The initialization
+ 	of `clazz', `glyph', `library' and NULL pointer check are
+-	reordered to minimize PIC conditonals.
++	reordered to minimize PIC conditionals.
+ 
+ 2012-01-14  suzuki toshiya  <mpsuzuki@hiroshima-u.ac.jp>
+ 
+@@ -3261,7 +3261,7 @@
+ 
+ 2011-09-17  Alexei Podtelezhnikov  <apodtele@gmail.com>
+ 
+-	[smooth] Slightly optimize conic and cubic flatterners.
++	[smooth] Slightly optimize conic and cubic flatteners.
+ 
+ 	* src/smooth/ftgrays.c (gray_render_conic, gray_render_cubic): Move
+ 	out some code from the main loop to speed it up.
+@@ -4120,7 +4120,7 @@
+ 	[autofit] Add more Indic scripts with hanging baseline.
+ 
+ 	* src/autofit/afindic.c (af_indic_uniranges): Tibetan, Limbu,
+-	Sundanese, Meetei Mayak, Syloti Nagri and Sharada scripts are
++	Sundanese, Meetei Mayek, Syloti Nagri and Sharada scripts are
+ 	added.
+ 
+ 2011-04-21  Behdad Esfahbod  <behdad@behdad.org>
+@@ -4756,7 +4756,7 @@
+ 	* src/bzip2/*: New files.
+ 
+ 	* src/pcf/pcf.h: s/gzip_/comp_/.
+-	* src/pcf/pcfdrvr.c: Include FT_BZIP2_H.
++	* src/pcf/pcfdrivr.c: Include FT_BZIP2_H.
+ 	s/gzip_/comp_/.
+ 	(PCF_Face_Init): Handle bzip2 compressed files.
+ 
+@@ -4768,7 +4768,7 @@
+ 
+ 	If we encounter a space in a string then the sbit buffer is NULL,
+ 	height and width are 0s.  So the check in ftc_snode_compare will
+-	always pass for spaces (comparision with 255).  Here the comments
++	always pass for spaces (comparison with 255).  Here the comments
+ 	above the condition are proper but the implementation is not.  When
+ 	we create an snode I think it is the proper way to initialize the
+ 	width to 255 and then put a check for being equal to 255 in snode
+@@ -5548,7 +5548,7 @@
+ 	Add reference counters and to FT_Library and FT_Face objects.
+ 
+ 	* include/freetype/freetype.h (FT_Reference_Face): New function.
+-	* include/freetype/ftmodapi.h (FT_Rererence_Library): New function.
++	* include/freetype/ftmodapi.h (FT_Reference_Library): New function.
+ 
+ 	* include/freetype/internal/ftobjs.h (FT_Face_InternalRec,
+ 	FT_LibraryRec): New field `refcount'.
+@@ -6278,8 +6278,8 @@
+ 	Use real types instead of `void' for `pshinter' and `psnames' fields.
+ 
+ 	* src/cff/cffload.c: Don't include PS cmaps service.
+-	(cff_index_get_pointers): Add `pool' parameter which allows to
+-	insert an extra NUL character for each String INDEX entry.
++	(cff_index_get_pointers): Add `pool' parameter which allows inserting
++	an extra NUL character for each String INDEX entry.
+ 	(cff_index_get_name): Make it a local function.
+ 	(cff_index_get_string): New function.
+ 	(cff_subfont_load): Updated.
+diff --git a/ChangeLog.25 b/ChangeLog.25
+index 0766f57..1f5eb3a 100644
+--- a/ChangeLog.25
++++ b/ChangeLog.25
+@@ -245,7 +245,7 @@
+ 	All public FreeType enumeration and flag values are uppercase...
+ 
+ 	* include/tttables.h (FT_Sfnt_Tag): Implement it.  For backwards
+-	compatilibity, retain the old values as macros.
++	compatibility, retain the old values as macros.
+ 
+ 	* src/base/ftfstype.c (FT_Get_FSType_Flags), src/sfnt/sfdriver.c
+ 	(get_sfnt_table): Updated.
+@@ -380,7 +380,7 @@
+ 	elements, use CSS descendants (of class `section') to format the
+ 	data.
+ 
+-	Also remove reduntant <p> and <br> elements, replacing them with
++	Also remove redundant <p> and <br> elements, replacing them with
+ 	proper CSS.
+ 
+ 	Globally reduce page width to 75%.
+@@ -549,7 +549,7 @@
+ 
+ 	* src/base/ftobjs.c (FT_Get_Glyph_Name): Fix compiler warning.
+ 
+-	Introdruced in previous change.  Reported by Alexei.
++	Introduced in previous change.  Reported by Alexei.
+ 
+ 2014-11-26  Werner Lemberg  <wl@gnu.org>
+ 
+@@ -579,7 +579,7 @@
+ 
+ 2014-11-26  suzuki toshiya  <mpsuzuki@hiroshima-u.ac.jp>
+ 
+-	* src/base/ftobj.c (Mac_Read_POST_Resource): Additional
++	* src/base/ftobjs.c (Mac_Read_POST_Resource): Additional
+ 	overflow check in the summation of POST fragment lengths,
+ 	suggested by Mateusz Jurczyk <mjurczyk@google.com>.
+ 
+@@ -945,7 +945,7 @@
+ 
+ 	The scaling between the hypotenuse and its CORDIC approximation is
+ 	based on regression analysis. The smaller padding for `theta' is
+-	justifed by its maximum error of less than 6.
++	justified by its maximum error of less than 6.
+ 
+ 	* src/base/fttrigon.c (ft_trig_downscale): Borrow code from
+ 	./ftcalc.c (ft_multo64), change linear intercept.
+@@ -1430,7 +1430,7 @@
+ 	[base] Avoid undefined FT_MSB in `BBox_Cubic_Check'.
+ 
+ 	* src/base/ftbbox.c (BBox_Cubic_Check): Update.
+-	(update_cubic_max): Repalce with...
++	(update_cubic_max): Replace with...
+ 	(cubic_peak): ... this, which now handles upscaling.
+ 
+ 2014-08-11  Alexei Podtelezhnikov  <apodtele@gmail.com>
+@@ -2444,7 +2444,7 @@
+ 	that the covered ranges are the same: Bengali, Devanagari, Gujarati,
+ 	Gurmukhi, Kannada, Limbu, Malayalam, Oriya, Sinhala, Sundanese,
+ 	Syloti Nagri, Tamil, Telugu, and Tibetan.  At the same time, remove
+-	entries for Meetai Mayak and Sharada – the Unicode ranges were
++	entries for Meetei Mayek and Sharada – the Unicode ranges were
+ 	incorrect (and nobody has complained about that), fonts are scarce
+ 	for those scripts, and the Indic auto-hinter support is rudimentary
+ 	anyways.
+@@ -2697,7 +2697,7 @@
+ 
+ 	[autofit] Introduce `coverages'.
+ 
+-	Coverages are the interface to the HarfBuzz library to acces
++	Coverages are the interface to the HarfBuzz library to access
+ 	OpenType features for handling glyphs not addressable by the cmap.
+ 
+ 	Right now, compilation of HarfBuzz is only added to the development
+@@ -2896,11 +2896,11 @@
+ 	* src/autofit/afdummy.c, src/autofit/afdummy.h: Updated.
+ 	* src/autofit/afindic.c, src/autofit/afindic.h: Updated.
+ 	* src/autofit/aflatin.c, src/autofit/aflatin.h: Updated.
+-	* src/autofit/aflatn2.c, src/autofit/aflatn2.h: Updated.
++	* src/autofit/aflatin2.c, src/autofit/aflatin2.h: Updated.
+ 
+ 	* src/autofit/afpic.c: Updated.
+ 
+-	* src/autofir/autofit.c: Include `afranges.c'.
++	* src/autofit/autofit.c: Include `afranges.c'.
+ 	* src/autofit/rules.mk (AUTOF_DRV_SRC): Add `afranges.c'.
+ 
+ 2013-12-18  Werner Lemberg  <wl@gnu.org>
+@@ -3418,7 +3418,7 @@
+ 	* src/autofit/afblue.c, src/autofit/afblue.h: Regenerated.
+ 
+ 	* src/autofit/aflatin.c, src/autofit/aflatin.h,
+-	src/autofit/atlatin2.c: Updated.
++	src/autofit/aflatin2.c: Updated.
+ 
+ 2013-10-19  Werner Lemberg  <wl@gnu.org>
+ 
+@@ -3999,7 +3999,7 @@
+ 
+ 	* builds/vms/ftconfig.h: Ditto.
+ 	Make the differences to the master `ftconfig.h' file as small as
+-	possible for easier maintainance.
++	possible for easier maintenance.
+ 
+ 2013-08-05  Werner Lemberg  <wl@gnu.org>
+ 
+@@ -4319,7 +4319,7 @@
+ 
+ 	* include/freetype/internal/tttypes.h (TT_SBit_MetricsRec): Widen
+ 	fields to FT_Short and FT_UShort, respectively.
+-	(TT_SBitTableType): New enumeration.
++	(TT_SbitTableType): New enumeration.
+ 	(TT_FaceRec): Add `sbit_table_type' field.
+ 
+ 	* include/freetype/tttags.h (TTAG_sbix): New macro.
+@@ -4332,7 +4332,7 @@
+ 	* src/sfnt/ttsbit.c: Include `ttmtx.h'.
+ 	(tt_face_load_eblc): Renamed to...
+ 	(tt_face_load_sbit): This.
+-	Handlic `sbix' bitmaps.
++	Handle `sbix' bitmaps.
+ 	(tt_face_free_eblc): Renamed to...
+ 	(tt_face_load_sbit): This.
+ 	Updated.
+@@ -4615,7 +4615,7 @@
+ 	Fix Savannah bug #39269.
+ 
+ 	* src/base/ftgloadr.c (FT_GlyphLoader_CheckPoints): Free memory in
+-	case of reacollocation failures.
++	case of reallocation failures.
+ 
+ 2013-06-18  Andrew Church  <achurch+savannah@achurch.org>
+ 
+@@ -5098,7 +5098,7 @@
+ 
+ 	[truetype] Add framework for TrueType properties.
+ 
+-	* src/truetype/ttdrivr.c: Include FT_SERVICE_PROPERTIES_H.
++	* src/truetype/ttdriver.c: Include FT_SERVICE_PROPERTIES_H.
+ 	(tt_property_set, tt_property_get): New functions, still empty.
+ 	Define `tt_service_properties' service.
+ 	Update `tt_services'.
 diff --git a/builds/cmake/iOS.cmake b/builds/cmake/iOS.cmake
 index 9fb20c0..378dbd8 100644
 --- a/builds/cmake/iOS.cmake
@@ -493,6 +1839,19 @@ index 1be10a3..e6fd748 100644
    *)
      GCC_VERSION=`$CC -dumpversion`
      GCC_MAJOR=`echo "$GCC_VERSION" | sed 's/\([[^.]][[^.]]*\).*/\1/'`
+diff --git a/docs/CHANGES b/docs/CHANGES
+index 0803072..14b57cb 100644
+--- a/docs/CHANGES
++++ b/docs/CHANGES
+@@ -3754,7 +3754,7 @@ BETA-8 (RELEASE CANDIDATE) CHANGES
+         automatically when needed.
+ 
+   - Reformatted all  modules source  code in order  to get rid  of the
+-    basic data types redifinitions (i.e. `TT_Int' instead of `FT_Int',
++    basic data types redefinitions (i.e. `TT_Int' instead of `FT_Int',
+     `T1_Fixed'  instead  of  `FT_Fixed').  Hence  the  format-specific
+     prefixes like  `TT_', `T1_',  `T2_' and `CID_'  are only  used for
+     relevant structures.
 diff --git a/docs/VERSION.DLL b/docs/VERSION.DLL
 deleted file mode 100644
 index 804c2f2..0000000
@@ -756,11 +2115,276 @@ index 3d66762..fc03a50 100644
  
  . ChangeLog:   Announce  new  release   (both  in  the  freetype2  and
    freetype2-demos modules).
+diff --git a/include/freetype/freetype.h b/include/freetype/freetype.h
+index 4666d48..250f405 100644
+--- a/include/freetype/freetype.h
++++ b/include/freetype/freetype.h
+@@ -2339,9 +2339,9 @@ FT_BEGIN_HEADER
+   /*      used to determine both scaling values.                           */
+   /*                                                                       */
+   /*    FT_SIZE_REQUEST_TYPE_REAL_DIM ::                                   */
+-  /*      The real dimension.  The sum of the the `ascender' and (minus    */
+-  /*      of) the `descender' fields of @FT_FaceRec are used to determine  */
+-  /*      both scaling values.                                             */
++  /*      The real dimension.  The sum of the `ascender' and (minus of)    */
++  /*      the `descender' fields of @FT_FaceRec are used to determine both */
++  /*      scaling values.                                                  */
+   /*                                                                       */
+   /*    FT_SIZE_REQUEST_TYPE_BBOX ::                                       */
+   /*      The font bounding box.  The width and height of the `bbox' field */
+@@ -2855,7 +2855,7 @@ FT_BEGIN_HEADER
+    *
+    *   If @FT_LOAD_RENDER is also set, the glyph is rendered in the
+    *   corresponding mode (i.e., the mode that matches the used algorithm
+-   *   best).  An exeption is FT_LOAD_TARGET_MONO since it implies
++   *   best).  An exception is FT_LOAD_TARGET_MONO since it implies
+    *   @FT_LOAD_MONOCHROME.
+    *
+    *   You can use a hinting algorithm that doesn't correspond to the same
+@@ -3273,7 +3273,7 @@ FT_BEGIN_HEADER
+   /*    `.notdef').                                                        */
+   /*                                                                       */
+   /*    This function always returns an error if the config macro          */
+-  /*    `FT_CONFIG_OPTION_NO_GLYPH_NAMES' is not defined in `ftoptions.h'. */
++  /*    `FT_CONFIG_OPTION_NO_GLYPH_NAMES' is not defined in `ftoption.h'.  */
+   /*                                                                       */
+   FT_EXPORT( FT_Error )
+   FT_Get_Glyph_Name( FT_Face     face,
+diff --git a/include/freetype/ftautoh.h b/include/freetype/ftautoh.h
+index 8052dd2..40c8003 100644
+--- a/include/freetype/ftautoh.h
++++ b/include/freetype/ftautoh.h
+@@ -219,8 +219,8 @@ FT_BEGIN_HEADER
+    *       U+0F00 - U+0FFF  // Tibetan
+    *       U+1900 - U+194F  // Limbu
+    *       U+1B80 - U+1BBF  // Sundanese
+-   *       U+1C80 - U+1CDF  // Meetei Mayak
+    *       U+A800 - U+A82F  // Syloti Nagri
++   *       U+ABC0 - U+ABFF  // Meetei Mayek
+    *      U+11800 - U+118DF // Sharada
+    *     }
+    *
+diff --git a/include/freetype/ftcffdrv.h b/include/freetype/ftcffdrv.h
+index 9dea980..b0b4299 100644
+--- a/include/freetype/ftcffdrv.h
++++ b/include/freetype/ftcffdrv.h
+@@ -89,7 +89,7 @@ FT_BEGIN_HEADER
+    *   features preserve the design's weight and spacing much better than
+    *   aliased type would.
+    *
+-   *   2) Aligment in the vertical direction: Weights and spacing along the
++   *   2) Alignment in the vertical direction: Weights and spacing along the
+    *   y~axis are less critical; what is much more important is the visual
+    *   alignment of related features (like cap-height and x-height).  The
+    *   sense of alignment for these is enhanced by the sharpness of grid-fit
+diff --git a/include/freetype/ftcid.h b/include/freetype/ftcid.h
+index 140f2f8..e1bc9fe 100644
+--- a/include/freetype/ftcid.h
++++ b/include/freetype/ftcid.h
+@@ -97,8 +97,8 @@ FT_BEGIN_HEADER
+    *
+    * @description:
+    *    Retrieve the type of the input face, CID keyed or not.  In
+-   *    constrast to the @FT_IS_CID_KEYED macro this function returns
+-   *    successfully also for CID-keyed fonts in an SNFT wrapper.
++   *    contrast to the @FT_IS_CID_KEYED macro this function returns
++   *    successfully also for CID-keyed fonts in an SFNT wrapper.
+    *
+    * @input:
+    *    face ::
+diff --git a/include/freetype/ftgzip.h b/include/freetype/ftgzip.h
+index 9e658b0..3932ce6 100644
+--- a/include/freetype/ftgzip.h
++++ b/include/freetype/ftgzip.h
+@@ -117,11 +117,11 @@ FT_BEGIN_HEADER
+   *
+   * @inout:
+   *   output_len ::
+-  *     Before calling the function, this is the the total size of the
+-  *     output buffer, which must be large enough to hold the entire
+-  *     uncompressed data (so the size of the uncompressed data must be
+-  *     known in advance).  After calling the function, `output_len' is the
+-  *     size of the used data in `output'.
++  *     Before calling the function, this is the total size of the output
++  *     buffer, which must be large enough to hold the entire uncompressed
++  *     data (so the size of the uncompressed data must be known in
++  *     advance).  After calling the function, `output_len' is the size of
++  *     the used data in `output'.
+   *
+   * @return:
+   *   FreeType error code.  0~means success.
+diff --git a/include/freetype/internal/ftdriver.h b/include/freetype/internal/ftdriver.h
+index 4b28e6a..3e1e66e 100644
+--- a/include/freetype/internal/ftdriver.h
++++ b/include/freetype/internal/ftdriver.h
+@@ -213,7 +213,7 @@ FT_BEGIN_HEADER
+   /*    And when it is no longer needed a `destroy' function needs to be   */
+   /*    called to release that allocation.                                 */
+   /*                                                                       */
+-  /*    `fcinit.c' (ft_create_default_module_classes) already contains a   */
++  /*    `ftinit.c' (ft_create_default_module_classes) already contains a   */
+   /*    mechanism to call these functions for the default modules          */
+   /*    described in `ftmodule.h'.                                         */
+   /*                                                                       */
+diff --git a/include/freetype/internal/ftobjs.h b/include/freetype/internal/ftobjs.h
+index c37c07e..e3fa320 100644
+--- a/include/freetype/internal/ftobjs.h
++++ b/include/freetype/internal/ftobjs.h
+@@ -833,7 +833,7 @@ FT_BEGIN_HEADER
+   /*                        filtering callback function.                   */
+   /*                                                                       */
+   /*    pic_container    :: Contains global structs and tables, instead    */
+-  /*                        of defining them globallly.                    */
++  /*                        of defining them globally.                     */
+   /*                                                                       */
+   /*    refcount         :: A counter initialized to~1 at the time an      */
+   /*                        @FT_Library structure is created.              */
+@@ -971,8 +971,8 @@ FT_BEGIN_HEADER
+   /*                                                                       */
+   /* <Description>                                                         */
+   /*    Used to initialize an instance of FT_Outline_Funcs struct.         */
+-  /*    When FT_CONFIG_OPTION_PIC is defined an init funtion will need to  */
+-  /*    be called with a pre-allocated structure to be filled.             */
++  /*    When FT_CONFIG_OPTION_PIC is defined an init function will need    */
++  /*    to be called with a pre-allocated structure to be filled.          */
+   /*    When FT_CONFIG_OPTION_PIC is not defined the struct will be        */
+   /*    allocated in the global scope (or the scope where the macro        */
+   /*    is used).                                                          */
+@@ -1030,8 +1030,8 @@ FT_BEGIN_HEADER
+   /*                                                                       */
+   /* <Description>                                                         */
+   /*    Used to initialize an instance of FT_Raster_Funcs struct.          */
+-  /*    When FT_CONFIG_OPTION_PIC is defined an init funtion will need to  */
+-  /*    be called with a pre-allocated structure to be filled.             */
++  /*    When FT_CONFIG_OPTION_PIC is defined an init function will need    */
++  /*    to be called with a pre-allocated structure to be filled.          */
+   /*    When FT_CONFIG_OPTION_PIC is not defined the struct will be        */
+   /*    allocated in the global scope (or the scope where the macro        */
+   /*    is used).                                                          */
+@@ -1090,8 +1090,8 @@ FT_BEGIN_HEADER
+   /*                                                                       */
+   /* <Description>                                                         */
+   /*    Used to initialize an instance of FT_Glyph_Class struct.           */
+-  /*    When FT_CONFIG_OPTION_PIC is defined an init funtion will need to  */
+-  /*    be called with a pre-allocated stcture to be filled.               */
++  /*    When FT_CONFIG_OPTION_PIC is defined an init function will need    */
++  /*    to be called with a pre-allocated structure to be filled.          */
+   /*    When FT_CONFIG_OPTION_PIC is not defined the struct will be        */
+   /*    allocated in the global scope (or the scope where the macro        */
+   /*    is used).                                                          */
+@@ -1164,11 +1164,11 @@ FT_BEGIN_HEADER
+   /* <Description>                                                         */
+   /*    Used to initialize an instance of FT_Renderer_Class struct.        */
+   /*                                                                       */
+-  /*    When FT_CONFIG_OPTION_PIC is defined a `create' funtion will need  */
+-  /*    to be called with a pointer where the allocated structure is       */
++  /*    When FT_CONFIG_OPTION_PIC is defined a `create' function will      */
++  /*    need to be called with a pointer where the allocated structure is  */
+   /*    returned.  And when it is no longer needed a `destroy' function    */
+   /*    needs to be called to release that allocation.                     */
+-  /*    `fcinit.c' (ft_create_default_module_classes) already contains     */
++  /*    `ftinit.c' (ft_create_default_module_classes) already contains     */
+   /*    a mechanism to call these functions for the default modules        */
+   /*    described in `ftmodule.h'.                                         */
+   /*                                                                       */
+@@ -1368,11 +1368,11 @@ FT_BEGIN_HEADER
+   /* <Description>                                                         */
+   /*    Used to initialize an instance of an FT_Module_Class struct.       */
+   /*                                                                       */
+-  /*    When FT_CONFIG_OPTION_PIC is defined a `create' funtion needs to   */
+-  /*    be called with a pointer where the allocated structure is          */
++  /*    When FT_CONFIG_OPTION_PIC is defined a `create' function needs     */
++  /*    to be called with a pointer where the allocated structure is       */
+   /*    returned.  And when it is no longer needed a `destroy' function    */
+   /*    needs to be called to release that allocation.                     */
+-  /*    `fcinit.c' (ft_create_default_module_classes) already contains     */
++  /*    `ftinit.c' (ft_create_default_module_classes) already contains     */
+   /*    a mechanism to call these functions for the default modules        */
+   /*    described in `ftmodule.h'.                                         */
+   /*                                                                       */
+diff --git a/include/freetype/internal/ftrfork.h b/include/freetype/internal/ftrfork.h
+index 13a68fe..b923401 100644
+--- a/include/freetype/internal/ftrfork.h
++++ b/include/freetype/internal/ftrfork.h
+@@ -227,7 +227,7 @@ FT_BEGIN_HEADER
+   /*    sort_by_res_id ::                                                  */
+   /*      A Boolean to sort the fragmented resource by their ids.          */
+   /*      The fragmented resources for `POST' resource should be sorted    */
+-  /*      to restore Type1 font properly.  For `snft' resources, sorting   */
++  /*      to restore Type1 font properly.  For `sfnt' resources, sorting   */
+   /*      may induce a different order of the faces in comparison to that  */
+   /*      by QuickDraw API.                                                */
+   /*                                                                       */
+diff --git a/include/freetype/internal/internal.h b/include/freetype/internal/internal.h
+index 689afa9..8c3c14c 100644
+--- a/include/freetype/internal/internal.h
++++ b/include/freetype/internal/internal.h
+@@ -44,7 +44,6 @@
+ 
+ #define FT_INTERNAL_POSTSCRIPT_AUX_H      <freetype/internal/psaux.h>
+ #define FT_INTERNAL_POSTSCRIPT_HINTS_H    <freetype/internal/pshints.h>
+-#define FT_INTERNAL_POSTSCRIPT_GLOBALS_H  <freetype/internal/psglobal.h>
+ 
+ #define FT_INTERNAL_AUTOHINT_H            <freetype/internal/autohint.h>
+ 
+diff --git a/include/freetype/internal/tttypes.h b/include/freetype/internal/tttypes.h
+index 8643775..8f1a642 100644
+--- a/include/freetype/internal/tttypes.h
++++ b/include/freetype/internal/tttypes.h
+@@ -185,7 +185,7 @@ FT_BEGIN_HEADER
+   /*                                                                       */
+   /*    CompLength :: Compressed table length (in bytes).                  */
+   /*                                                                       */
+-  /*    OrigLength :: Unompressed table length (in bytes).                 */
++  /*    OrigLength :: Uncompressed table length (in bytes).                */
+   /*                                                                       */
+   /*    CheckSum   :: The table checksum.  This value can be ignored.      */
+   /*                                                                       */
+diff --git a/include/freetype/tttables.h b/include/freetype/tttables.h
+index dfe3bcb..1c075dc 100644
+--- a/include/freetype/tttables.h
++++ b/include/freetype/tttables.h
+@@ -587,7 +587,7 @@ FT_BEGIN_HEADER
+   /*                                                                       */
+   /*    FT_SFNT_HHEA :: To access the font's @TT_HoriHeader structure.     */
+   /*                                                                       */
+-  /*    FT_SFNT_VHEA :: To access the font's @TT_VertHeader struture.      */
++  /*    FT_SFNT_VHEA :: To access the font's @TT_VertHeader structure.     */
+   /*                                                                       */
+   /*    FT_SFNT_POST :: To access the font's @TT_Postscript structure.     */
+   /*                                                                       */
 diff --git a/src/autofit/afblue.c b/src/autofit/afblue.c
-index 7d9646c..55704ea 100644
+index 7d9646c..f1699a8 100644
 --- a/src/autofit/afblue.c
 +++ b/src/autofit/afblue.c
-@@ -128,6 +128,10 @@
+@@ -54,6 +54,26 @@
+     '\0',
+     '\xE0', '\xA5', '\x81', ' ', '\xE0', '\xA5', '\x83',  /* ु ृ */
+     '\0',
++    '\xE1', '\x83', '\x92', ' ', '\xE1', '\x83', '\x93', ' ', '\xE1', '\x83', '\x94', ' ', '\xE1', '\x83', '\x95', ' ', '\xE1', '\x83', '\x97', ' ', '\xE1', '\x83', '\x98', ' ', '\xE1', '\x83', '\x9D', ' ', '\xE1', '\x83', '\xA6',  /* გ დ ე ვ თ ი ო ღ */
++    '\0',
++    '\xE1', '\x83', '\x90', ' ', '\xE1', '\x83', '\x96', ' ', '\xE1', '\x83', '\x9B', ' ', '\xE1', '\x83', '\xA1', ' ', '\xE1', '\x83', '\xA8', ' ', '\xE1', '\x83', '\xAB', ' ', '\xE1', '\x83', '\xAE', ' ', '\xE1', '\x83', '\xB0',  /* ა ზ მ ს შ ძ ხ ჰ */
++    '\0',
++    '\xE1', '\x83', '\xA1', ' ', '\xE1', '\x83', '\xAE', ' ', '\xE1', '\x83', '\xA5', ' ', '\xE1', '\x83', '\x96', ' ', '\xE1', '\x83', '\x9B', ' ', '\xE1', '\x83', '\xA8', ' ', '\xE1', '\x83', '\xA9', ' ', '\xE1', '\x83', '\xAC',  /* ს ხ ქ ზ მ შ ჩ წ */
++    '\0',
++    '\xE1', '\x83', '\x94', ' ', '\xE1', '\x83', '\x95', ' ', '\xE1', '\x83', '\x9F', ' ', '\xE1', '\x83', '\xA2', ' ', '\xE1', '\x83', '\xA3', ' ', '\xE1', '\x83', '\xA4', ' ', '\xE1', '\x83', '\xA5', ' ', '\xE1', '\x83', '\xA7',  /* ე ვ ჟ ტ უ ფ ქ ყ */
++    '\0',
++    '\xE1', '\x82', '\xB1', ' ', '\xE1', '\x82', '\xA7', ' ', '\xE1', '\x82', '\xB9', ' ', '\xE1', '\x82', '\xBC', ' ', '\xE1', '\x82', '\xA4', ' ', '\xE1', '\x82', '\xA5', ' ', '\xE1', '\x82', '\xB3', ' ', '\xE1', '\x82', '\xBA',  /* Ⴑ Ⴇ Ⴙ Ⴜ Ⴄ Ⴅ Ⴓ Ⴚ */
++    '\0',
++    '\xE1', '\x82', '\xA4', ' ', '\xE1', '\x82', '\xA5', ' ', '\xE1', '\x82', '\xA7', ' ', '\xE1', '\x82', '\xA8', ' ', '\xE1', '\x82', '\xA6', ' ', '\xE1', '\x82', '\xB1', ' ', '\xE1', '\x82', '\xAA', ' ', '\xE1', '\x82', '\xAB',  /* Ⴄ Ⴅ Ⴇ Ⴈ Ⴆ Ⴑ Ⴊ Ⴋ */
++    '\0',
++    '\xE2', '\xB4', '\x81', ' ', '\xE2', '\xB4', '\x97', ' ', '\xE2', '\xB4', '\x82', ' ', '\xE2', '\xB4', '\x84', ' ', '\xE2', '\xB4', '\x85', ' ', '\xE2', '\xB4', '\x87', ' ', '\xE2', '\xB4', '\x94', ' ', '\xE2', '\xB4', '\x96',  /* ⴁ ⴗ ⴂ ⴄ ⴅ ⴇ ⴔ ⴖ */
++    '\0',
++    '\xE2', '\xB4', '\x88', ' ', '\xE2', '\xB4', '\x8C', ' ', '\xE2', '\xB4', '\x96', ' ', '\xE2', '\xB4', '\x8E', ' ', '\xE2', '\xB4', '\x83', ' ', '\xE2', '\xB4', '\x86', ' ', '\xE2', '\xB4', '\x8B', ' ', '\xE2', '\xB4', '\xA2',  /* ⴈ ⴌ ⴖ ⴎ ⴃ ⴆ ⴋ ⴢ */
++    '\0',
++    '\xE2', '\xB4', '\x90', ' ', '\xE2', '\xB4', '\x91', ' ', '\xE2', '\xB4', '\x93', ' ', '\xE2', '\xB4', '\x95', ' ', '\xE2', '\xB4', '\x99', ' ', '\xE2', '\xB4', '\x9B', ' ', '\xE2', '\xB4', '\xA1', ' ', '\xE2', '\xB4', '\xA3',  /* ⴐ ⴑ ⴓ ⴕ ⴙ ⴛ ⴡ ⴣ */
++    '\0',
++    '\xE2', '\xB4', '\x84', ' ', '\xE2', '\xB4', '\x85', ' ', '\xE2', '\xB4', '\x94', ' ', '\xE2', '\xB4', '\x95', ' ', '\xE2', '\xB4', '\x81', ' ', '\xE2', '\xB4', '\x82', ' ', '\xE2', '\xB4', '\x98', ' ', '\xE2', '\xB4', '\x9D',  /* ⴄ ⴅ ⴔ ⴕ ⴁ ⴂ ⴘ ⴝ */
++    '\0',
+     '\xCE', '\x93', ' ', '\xCE', '\x92', ' ', '\xCE', '\x95', ' ', '\xCE', '\x96', ' ', '\xCE', '\x98', ' ', '\xCE', '\x9F', ' ', '\xCE', '\xA9',  /* Γ Β Ε Ζ Θ Ο Ω */
+     '\0',
+     '\xCE', '\x92', ' ', '\xCE', '\x94', ' ', '\xCE', '\x96', ' ', '\xCE', '\x9E', ' ', '\xCE', '\x98', ' ', '\xCE', '\x9F',  /* Β Δ Ζ Ξ Θ Ο */
+@@ -128,6 +148,10 @@
      '\0',
      '\xE1', '\xB5', '\x96', ' ', '\xCA', '\xB8', ' ', '\xE1', '\xB5', '\x8D',  /* ᵖ ʸ ᵍ */
      '\0',
@@ -771,7 +2395,7 @@ index 7d9646c..55704ea 100644
      '\xE1', '\x80', '\x81', ' ', '\xE1', '\x80', '\x82', ' ', '\xE1', '\x80', '\x84', ' ', '\xE1', '\x80', '\x92', ' ', '\xE1', '\x80', '\x9D', ' ', '\xE1', '\x81', '\xA5', ' ', '\xE1', '\x81', '\x8A', ' ', '\xE1', '\x81', '\x8B',  /* ခ ဂ င ဒ ဝ ၥ ၊ ။ */
      '\0',
      '\xE1', '\x80', '\x84', ' ', '\xE1', '\x80', '\x8E', ' ', '\xE1', '\x80', '\x92', ' ', '\xE1', '\x80', '\x95', ' ', '\xE1', '\x80', '\x97', ' ', '\xE1', '\x80', '\x9D', ' ', '\xE1', '\x81', '\x8A', ' ', '\xE1', '\x81', '\x8B',  /* င ဎ ဒ ပ ဗ ဝ ၊ ။ */
-@@ -136,6 +140,16 @@
+@@ -136,6 +160,16 @@
      '\0',
      '\xE1', '\x80', '\x89', ' ', '\xE1', '\x80', '\x8A', ' ', '\xE1', '\x80', '\xA5', ' ', '\xE1', '\x80', '\xA9', ' ', '\xE1', '\x80', '\xA8', ' ', '\xE1', '\x81', '\x82', ' ', '\xE1', '\x81', '\x85', ' ', '\xE1', '\x81', '\x89',  /* ဉ ည ဥ ဩ ဨ ၂ ၅ ၉ */
      '\0',
@@ -788,7 +2412,28 @@ index 7d9646c..55704ea 100644
      '\xE0', '\xB0', '\x87', ' ', '\xE0', '\xB0', '\x8C', ' ', '\xE0', '\xB0', '\x99', ' ', '\xE0', '\xB0', '\x9E', ' ', '\xE0', '\xB0', '\xA3', ' ', '\xE0', '\xB0', '\xB1', ' ', '\xE0', '\xB1', '\xAF',  /* ఇ ఌ ఙ ఞ ణ ఱ ౯ */
      '\0',
      '\xE0', '\xB0', '\x85', ' ', '\xE0', '\xB0', '\x95', ' ', '\xE0', '\xB0', '\x9A', ' ', '\xE0', '\xB0', '\xB0', ' ', '\xE0', '\xB0', '\xBD', ' ', '\xE0', '\xB1', '\xA8', ' ', '\xE0', '\xB1', '\xAC',  /* అ క చ ర ఽ ౨ ౬ */
-@@ -287,12 +301,22 @@
+@@ -229,6 +263,20 @@
+     { AF_BLUE_STRING_DEVANAGARI_BASE,   0                                 },
+     { AF_BLUE_STRING_DEVANAGARI_BOTTOM, 0                                 },
+     { AF_BLUE_STRING_MAX,               0                                 },
++    { AF_BLUE_STRING_GEORGIAN_MKHEDRULI_TOP,       AF_BLUE_PROPERTY_LATIN_TOP      |
++                                                   AF_BLUE_PROPERTY_LATIN_X_HEIGHT   },
++    { AF_BLUE_STRING_GEORGIAN_MKHEDRULI_BOTTOM,    0                                 },
++    { AF_BLUE_STRING_GEORGIAN_MKHEDRULI_ASCENDER,  AF_BLUE_PROPERTY_LATIN_TOP        },
++    { AF_BLUE_STRING_GEORGIAN_MKHEDRULI_DESCENDER, 0                                 },
++    { AF_BLUE_STRING_MAX,                          0                                 },
++    { AF_BLUE_STRING_GEORGIAN_ASOMTAVRULI_TOP,       AF_BLUE_PROPERTY_LATIN_TOP        },
++    { AF_BLUE_STRING_GEORGIAN_ASOMTAVRULI_BOTTOM,    0                                 },
++    { AF_BLUE_STRING_GEORGIAN_NUSKHURI_TOP,          AF_BLUE_PROPERTY_LATIN_TOP      |
++                                                     AF_BLUE_PROPERTY_LATIN_X_HEIGHT   },
++    { AF_BLUE_STRING_GEORGIAN_NUSKHURI_BOTTOM,       0                                 },
++    { AF_BLUE_STRING_GEORGIAN_NUSKHURI_ASCENDER,     AF_BLUE_PROPERTY_LATIN_TOP        },
++    { AF_BLUE_STRING_GEORGIAN_NUSKHURI_DESCENDER,    0                                 },
++    { AF_BLUE_STRING_MAX,                            0                                 },
+     { AF_BLUE_STRING_GREEK_CAPITAL_TOP,     AF_BLUE_PROPERTY_LATIN_TOP        },
+     { AF_BLUE_STRING_GREEK_CAPITAL_BOTTOM,  0                                 },
+     { AF_BLUE_STRING_GREEK_SMALL_BETA_TOP,  AF_BLUE_PROPERTY_LATIN_TOP        },
+@@ -287,12 +335,23 @@
      { AF_BLUE_STRING_LATIN_SUPS_SMALL,           0                                 },
      { AF_BLUE_STRING_LATIN_SUPS_SMALL_DESCENDER, 0                                 },
      { AF_BLUE_STRING_MAX,                        0                                 },
@@ -801,6 +2446,7 @@ index 7d9646c..55704ea 100644
      { AF_BLUE_STRING_MYANMAR_ASCENDER,  AF_BLUE_PROPERTY_LATIN_TOP        },
      { AF_BLUE_STRING_MYANMAR_DESCENDER, 0                                 },
      { AF_BLUE_STRING_MAX,               0                                 },
++    { AF_BLUE_STRING_MAX, 0 },
 +    { AF_BLUE_STRING_SINHALA_TOP,       AF_BLUE_PROPERTY_LATIN_TOP },
 +    { AF_BLUE_STRING_SINHALA_BOTTOM,    0                          },
 +    { AF_BLUE_STRING_SINHALA_DESCENDER, 0                          },
@@ -812,10 +2458,51 @@ index 7d9646c..55704ea 100644
      { AF_BLUE_STRING_TELUGU_BOTTOM, 0                          },
      { AF_BLUE_STRING_MAX,           0                          },
 diff --git a/src/autofit/afblue.dat b/src/autofit/afblue.dat
-index 9a7757c..9ef2f79 100644
+index 9a7757c..827daef 100644
 --- a/src/autofit/afblue.dat
 +++ b/src/autofit/afblue.dat
-@@ -200,6 +200,11 @@ AF_BLUE_STRING_ENUM AF_BLUE_STRINGS_ARRAY AF_BLUE_STRING_MAX_LEN:
+@@ -65,8 +65,8 @@
+ // values; this essentially means that the maximum values can easily be too
+ // large.  Given that the purpose of those values is to create local
+ // fixed-size arrays at compile time for further processing of the blue zone
+-// data, this isn't a problem.  Note the the final zero byte of a string is
+-// not counted.  Note also that the count holds the number of UTF-8 encoded
++// data, this isn't a problem.  Note the final zero byte of a string is not
++// counted.  Note also that the count holds the number of UTF-8 encoded
+ // characters, not bytes.
+ 
+ 
+@@ -114,6 +114,29 @@ AF_BLUE_STRING_ENUM AF_BLUE_STRINGS_ARRAY AF_BLUE_STRING_MAX_LEN:
+   AF_BLUE_STRING_DEVANAGARI_BOTTOM
+     "ु ृ"
+ 
++  AF_BLUE_STRING_GEORGIAN_MKHEDRULI_TOP
++    "გ დ ე ვ თ ი ო ღ"
++  AF_BLUE_STRING_GEORGIAN_MKHEDRULI_BOTTOM
++    "ა ზ მ ს შ ძ ხ ჰ"
++  AF_BLUE_STRING_GEORGIAN_MKHEDRULI_ASCENDER
++    "ს ხ ქ ზ მ შ ჩ წ"
++  AF_BLUE_STRING_GEORGIAN_MKHEDRULI_DESCENDER
++    "ე ვ ჟ ტ უ ფ ქ ყ"
++
++  AF_BLUE_STRING_GEORGIAN_ASOMTAVRULI_TOP
++    "Ⴑ Ⴇ Ⴙ Ⴜ Ⴄ Ⴅ Ⴓ Ⴚ"
++  AF_BLUE_STRING_GEORGIAN_ASOMTAVRULI_BOTTOM
++    "Ⴄ Ⴅ Ⴇ Ⴈ Ⴆ Ⴑ Ⴊ Ⴋ"
++
++  AF_BLUE_STRING_GEORGIAN_NUSKHURI_TOP
++    "ⴁ ⴗ ⴂ ⴄ ⴅ ⴇ ⴔ ⴖ"
++  AF_BLUE_STRING_GEORGIAN_NUSKHURI_BOTTOM
++    "ⴈ ⴌ ⴖ ⴎ ⴃ ⴆ ⴋ ⴢ"
++  AF_BLUE_STRING_GEORGIAN_NUSKHURI_ASCENDER
++    "ⴐ ⴑ ⴓ ⴕ ⴙ ⴛ ⴡ ⴣ"
++  AF_BLUE_STRING_GEORGIAN_NUSKHURI_DESCENDER
++    "ⴄ ⴅ ⴔ ⴕ ⴁ ⴂ ⴘ ⴝ"
++
+   AF_BLUE_STRING_GREEK_CAPITAL_TOP
+     "Γ Β Ε Ζ Θ Ο Ω"
+   AF_BLUE_STRING_GREEK_CAPITAL_BOTTOM
+@@ -200,6 +223,11 @@ AF_BLUE_STRING_ENUM AF_BLUE_STRINGS_ARRAY AF_BLUE_STRING_MAX_LEN:
    AF_BLUE_STRING_LATIN_SUPS_SMALL_DESCENDER
      "ᵖ ʸ ᵍ"
  
@@ -827,7 +2514,7 @@ index 9a7757c..9ef2f79 100644
    AF_BLUE_STRING_MYANMAR_TOP
      "ခ ဂ င ဒ ဝ ၥ ၊ ။"
    AF_BLUE_STRING_MYANMAR_BOTTOM
-@@ -209,6 +214,18 @@ AF_BLUE_STRING_ENUM AF_BLUE_STRINGS_ARRAY AF_BLUE_STRING_MAX_LEN:
+@@ -209,6 +237,18 @@ AF_BLUE_STRING_ENUM AF_BLUE_STRINGS_ARRAY AF_BLUE_STRING_MAX_LEN:
    AF_BLUE_STRING_MYANMAR_DESCENDER
      "ဉ ည ဥ ဩ ဨ ၂ ၅ ၉"
  
@@ -846,7 +2533,33 @@ index 9a7757c..9ef2f79 100644
    AF_BLUE_STRING_TELUGU_TOP
      "ఇ ఌ ఙ ఞ ణ ఱ ౯"
    AF_BLUE_STRING_TELUGU_BOTTOM
-@@ -504,6 +521,11 @@ AF_BLUE_STRINGSET_ENUM AF_BLUE_STRINGSETS_ARRAY AF_BLUE_STRINGSET_MAX_LEN:
+@@ -428,6 +468,25 @@ AF_BLUE_STRINGSET_ENUM AF_BLUE_STRINGSETS_ARRAY AF_BLUE_STRINGSET_MAX_LEN:
+     { AF_BLUE_STRING_DEVANAGARI_BOTTOM, 0                                 }
+     { AF_BLUE_STRING_MAX,               0                                 }
+ 
++  // blue zones for Mtavruli are missing (not yet defined in Unicode)
++  AF_BLUE_STRINGSET_GEOR
++    { AF_BLUE_STRING_GEORGIAN_MKHEDRULI_TOP,       AF_BLUE_PROPERTY_LATIN_TOP      |
++                                                   AF_BLUE_PROPERTY_LATIN_X_HEIGHT   }
++    { AF_BLUE_STRING_GEORGIAN_MKHEDRULI_BOTTOM,    0                                 }
++    { AF_BLUE_STRING_GEORGIAN_MKHEDRULI_ASCENDER,  AF_BLUE_PROPERTY_LATIN_TOP        }
++    { AF_BLUE_STRING_GEORGIAN_MKHEDRULI_DESCENDER, 0                                 }
++    { AF_BLUE_STRING_MAX,                          0                                 }
++
++  AF_BLUE_STRINGSET_GEOK
++    { AF_BLUE_STRING_GEORGIAN_ASOMTAVRULI_TOP,       AF_BLUE_PROPERTY_LATIN_TOP        }
++    { AF_BLUE_STRING_GEORGIAN_ASOMTAVRULI_BOTTOM,    0                                 }
++    { AF_BLUE_STRING_GEORGIAN_NUSKHURI_TOP,          AF_BLUE_PROPERTY_LATIN_TOP      |
++                                                     AF_BLUE_PROPERTY_LATIN_X_HEIGHT   }
++    { AF_BLUE_STRING_GEORGIAN_NUSKHURI_BOTTOM,       0                                 }
++    { AF_BLUE_STRING_GEORGIAN_NUSKHURI_ASCENDER,     AF_BLUE_PROPERTY_LATIN_TOP        }
++    { AF_BLUE_STRING_GEORGIAN_NUSKHURI_DESCENDER,    0                                 }
++    { AF_BLUE_STRING_MAX,                            0                                 }
++
+   AF_BLUE_STRINGSET_GREK
+     { AF_BLUE_STRING_GREEK_CAPITAL_TOP,     AF_BLUE_PROPERTY_LATIN_TOP        }
+     { AF_BLUE_STRING_GREEK_CAPITAL_BOTTOM,  0                                 }
+@@ -504,6 +563,11 @@ AF_BLUE_STRINGSET_ENUM AF_BLUE_STRINGSETS_ARRAY AF_BLUE_STRINGSET_MAX_LEN:
      { AF_BLUE_STRING_LATIN_SUPS_SMALL_DESCENDER, 0                                 }
      { AF_BLUE_STRING_MAX,                        0                                 }
  
@@ -858,10 +2571,13 @@ index 9a7757c..9ef2f79 100644
    AF_BLUE_STRINGSET_MYMR
      { AF_BLUE_STRING_MYANMAR_TOP,       AF_BLUE_PROPERTY_LATIN_TOP      |
                                          AF_BLUE_PROPERTY_LATIN_X_HEIGHT   }
-@@ -512,6 +534,17 @@ AF_BLUE_STRINGSET_ENUM AF_BLUE_STRINGSETS_ARRAY AF_BLUE_STRINGSET_MAX_LEN:
+@@ -512,6 +576,20 @@ AF_BLUE_STRINGSET_ENUM AF_BLUE_STRINGSETS_ARRAY AF_BLUE_STRINGSET_MAX_LEN:
      { AF_BLUE_STRING_MYANMAR_DESCENDER, 0                                 }
      { AF_BLUE_STRING_MAX,               0                                 }
  
++  AF_BLUE_STRINGSET_NONE
++    { AF_BLUE_STRING_MAX, 0 }
++
 +  AF_BLUE_STRINGSET_SINH
 +    { AF_BLUE_STRING_SINHALA_TOP,       AF_BLUE_PROPERTY_LATIN_TOP }
 +    { AF_BLUE_STRING_SINHALA_BOTTOM,    0                          }
@@ -877,13 +2593,50 @@ index 9a7757c..9ef2f79 100644
      { AF_BLUE_STRING_TELUGU_TOP,    AF_BLUE_PROPERTY_LATIN_TOP }
      { AF_BLUE_STRING_TELUGU_BOTTOM, 0                          }
 diff --git a/src/autofit/afblue.h b/src/autofit/afblue.h
-index 75cd6c3..832b685 100644
+index 75cd6c3..2ec7d82 100644
 --- a/src/autofit/afblue.h
 +++ b/src/autofit/afblue.h
-@@ -128,20 +128,27 @@ FT_BEGIN_HEADER
-     AF_BLUE_STRING_LATIN_SUPS_SMALL_F_TOP = 1146,
-     AF_BLUE_STRING_LATIN_SUPS_SMALL = 1172,
-     AF_BLUE_STRING_LATIN_SUPS_SMALL_DESCENDER = 1197,
+@@ -91,57 +91,74 @@ FT_BEGIN_HEADER
+     AF_BLUE_STRING_DEVANAGARI_TOP = 241,
+     AF_BLUE_STRING_DEVANAGARI_HEAD = 273,
+     AF_BLUE_STRING_DEVANAGARI_BOTTOM = 305,
+-    AF_BLUE_STRING_GREEK_CAPITAL_TOP = 313,
+-    AF_BLUE_STRING_GREEK_CAPITAL_BOTTOM = 334,
+-    AF_BLUE_STRING_GREEK_SMALL_BETA_TOP = 352,
+-    AF_BLUE_STRING_GREEK_SMALL = 370,
+-    AF_BLUE_STRING_GREEK_SMALL_DESCENDER = 394,
+-    AF_BLUE_STRING_HEBREW_TOP = 418,
+-    AF_BLUE_STRING_HEBREW_BOTTOM = 442,
+-    AF_BLUE_STRING_HEBREW_DESCENDER = 460,
+-    AF_BLUE_STRING_KANNADA_TOP = 475,
+-    AF_BLUE_STRING_KANNADA_BOTTOM = 519,
+-    AF_BLUE_STRING_KHMER_TOP = 551,
+-    AF_BLUE_STRING_KHMER_SUBSCRIPT_TOP = 575,
+-    AF_BLUE_STRING_KHMER_BOTTOM = 615,
+-    AF_BLUE_STRING_KHMER_DESCENDER = 647,
+-    AF_BLUE_STRING_KHMER_LARGE_DESCENDER = 681,
+-    AF_BLUE_STRING_KHMER_SYMBOLS_WAXING_TOP = 768,
+-    AF_BLUE_STRING_KHMER_SYMBOLS_WANING_BOTTOM = 776,
+-    AF_BLUE_STRING_LAO_TOP = 784,
+-    AF_BLUE_STRING_LAO_BOTTOM = 816,
+-    AF_BLUE_STRING_LAO_ASCENDER = 848,
+-    AF_BLUE_STRING_LAO_LARGE_ASCENDER = 864,
+-    AF_BLUE_STRING_LAO_DESCENDER = 876,
+-    AF_BLUE_STRING_LATIN_CAPITAL_TOP = 900,
+-    AF_BLUE_STRING_LATIN_CAPITAL_BOTTOM = 916,
+-    AF_BLUE_STRING_LATIN_SMALL_F_TOP = 932,
+-    AF_BLUE_STRING_LATIN_SMALL = 946,
+-    AF_BLUE_STRING_LATIN_SMALL_DESCENDER = 960,
+-    AF_BLUE_STRING_LATIN_SUBS_CAPITAL_TOP = 970,
+-    AF_BLUE_STRING_LATIN_SUBS_CAPITAL_BOTTOM = 990,
+-    AF_BLUE_STRING_LATIN_SUBS_SMALL_F_TOP = 1010,
+-    AF_BLUE_STRING_LATIN_SUBS_SMALL = 1030,
+-    AF_BLUE_STRING_LATIN_SUBS_SMALL_DESCENDER = 1066,
+-    AF_BLUE_STRING_LATIN_SUPS_CAPITAL_TOP = 1086,
+-    AF_BLUE_STRING_LATIN_SUPS_CAPITAL_BOTTOM = 1117,
+-    AF_BLUE_STRING_LATIN_SUPS_SMALL_F_TOP = 1146,
+-    AF_BLUE_STRING_LATIN_SUPS_SMALL = 1172,
+-    AF_BLUE_STRING_LATIN_SUPS_SMALL_DESCENDER = 1197,
 -    AF_BLUE_STRING_MYANMAR_TOP = 1208,
 -    AF_BLUE_STRING_MYANMAR_BOTTOM = 1240,
 -    AF_BLUE_STRING_MYANMAR_ASCENDER = 1272,
@@ -898,45 +2651,113 @@ index 75cd6c3..832b685 100644
 -    AF_BLUE_STRING_THAI_LARGE_DESCENDER = 1480,
 -    AF_BLUE_STRING_THAI_DIGIT_TOP = 1488,
 -    af_blue_1_1 = 1499,
-+    AF_BLUE_STRING_MALAYALAM_TOP = 1208,
-+    AF_BLUE_STRING_MALAYALAM_BOTTOM = 1252,
-+    AF_BLUE_STRING_MYANMAR_TOP = 1284,
-+    AF_BLUE_STRING_MYANMAR_BOTTOM = 1316,
-+    AF_BLUE_STRING_MYANMAR_ASCENDER = 1348,
-+    AF_BLUE_STRING_MYANMAR_DESCENDER = 1376,
-+    AF_BLUE_STRING_SINHALA_TOP = 1408,
-+    AF_BLUE_STRING_SINHALA_BOTTOM = 1440,
-+    AF_BLUE_STRING_SINHALA_DESCENDER = 1472,
-+    AF_BLUE_STRING_TAMIL_TOP = 1516,
-+    AF_BLUE_STRING_TAMIL_BOTTOM = 1548,
-+    AF_BLUE_STRING_TELUGU_TOP = 1580,
-+    AF_BLUE_STRING_TELUGU_BOTTOM = 1608,
-+    AF_BLUE_STRING_THAI_TOP = 1636,
-+    AF_BLUE_STRING_THAI_BOTTOM = 1660,
-+    AF_BLUE_STRING_THAI_ASCENDER = 1688,
-+    AF_BLUE_STRING_THAI_LARGE_ASCENDER = 1700,
-+    AF_BLUE_STRING_THAI_DESCENDER = 1712,
-+    AF_BLUE_STRING_THAI_LARGE_DESCENDER = 1728,
-+    AF_BLUE_STRING_THAI_DIGIT_TOP = 1736,
-+    af_blue_1_1 = 1747,
++    AF_BLUE_STRING_GEORGIAN_MKHEDRULI_TOP = 313,
++    AF_BLUE_STRING_GEORGIAN_MKHEDRULI_BOTTOM = 345,
++    AF_BLUE_STRING_GEORGIAN_MKHEDRULI_ASCENDER = 377,
++    AF_BLUE_STRING_GEORGIAN_MKHEDRULI_DESCENDER = 409,
++    AF_BLUE_STRING_GEORGIAN_ASOMTAVRULI_TOP = 441,
++    AF_BLUE_STRING_GEORGIAN_ASOMTAVRULI_BOTTOM = 473,
++    AF_BLUE_STRING_GEORGIAN_NUSKHURI_TOP = 505,
++    AF_BLUE_STRING_GEORGIAN_NUSKHURI_BOTTOM = 537,
++    AF_BLUE_STRING_GEORGIAN_NUSKHURI_ASCENDER = 569,
++    AF_BLUE_STRING_GEORGIAN_NUSKHURI_DESCENDER = 601,
++    AF_BLUE_STRING_GREEK_CAPITAL_TOP = 633,
++    AF_BLUE_STRING_GREEK_CAPITAL_BOTTOM = 654,
++    AF_BLUE_STRING_GREEK_SMALL_BETA_TOP = 672,
++    AF_BLUE_STRING_GREEK_SMALL = 690,
++    AF_BLUE_STRING_GREEK_SMALL_DESCENDER = 714,
++    AF_BLUE_STRING_HEBREW_TOP = 738,
++    AF_BLUE_STRING_HEBREW_BOTTOM = 762,
++    AF_BLUE_STRING_HEBREW_DESCENDER = 780,
++    AF_BLUE_STRING_KANNADA_TOP = 795,
++    AF_BLUE_STRING_KANNADA_BOTTOM = 839,
++    AF_BLUE_STRING_KHMER_TOP = 871,
++    AF_BLUE_STRING_KHMER_SUBSCRIPT_TOP = 895,
++    AF_BLUE_STRING_KHMER_BOTTOM = 935,
++    AF_BLUE_STRING_KHMER_DESCENDER = 967,
++    AF_BLUE_STRING_KHMER_LARGE_DESCENDER = 1001,
++    AF_BLUE_STRING_KHMER_SYMBOLS_WAXING_TOP = 1088,
++    AF_BLUE_STRING_KHMER_SYMBOLS_WANING_BOTTOM = 1096,
++    AF_BLUE_STRING_LAO_TOP = 1104,
++    AF_BLUE_STRING_LAO_BOTTOM = 1136,
++    AF_BLUE_STRING_LAO_ASCENDER = 1168,
++    AF_BLUE_STRING_LAO_LARGE_ASCENDER = 1184,
++    AF_BLUE_STRING_LAO_DESCENDER = 1196,
++    AF_BLUE_STRING_LATIN_CAPITAL_TOP = 1220,
++    AF_BLUE_STRING_LATIN_CAPITAL_BOTTOM = 1236,
++    AF_BLUE_STRING_LATIN_SMALL_F_TOP = 1252,
++    AF_BLUE_STRING_LATIN_SMALL = 1266,
++    AF_BLUE_STRING_LATIN_SMALL_DESCENDER = 1280,
++    AF_BLUE_STRING_LATIN_SUBS_CAPITAL_TOP = 1290,
++    AF_BLUE_STRING_LATIN_SUBS_CAPITAL_BOTTOM = 1310,
++    AF_BLUE_STRING_LATIN_SUBS_SMALL_F_TOP = 1330,
++    AF_BLUE_STRING_LATIN_SUBS_SMALL = 1350,
++    AF_BLUE_STRING_LATIN_SUBS_SMALL_DESCENDER = 1386,
++    AF_BLUE_STRING_LATIN_SUPS_CAPITAL_TOP = 1406,
++    AF_BLUE_STRING_LATIN_SUPS_CAPITAL_BOTTOM = 1437,
++    AF_BLUE_STRING_LATIN_SUPS_SMALL_F_TOP = 1466,
++    AF_BLUE_STRING_LATIN_SUPS_SMALL = 1492,
++    AF_BLUE_STRING_LATIN_SUPS_SMALL_DESCENDER = 1517,
++    AF_BLUE_STRING_MALAYALAM_TOP = 1528,
++    AF_BLUE_STRING_MALAYALAM_BOTTOM = 1572,
++    AF_BLUE_STRING_MYANMAR_TOP = 1604,
++    AF_BLUE_STRING_MYANMAR_BOTTOM = 1636,
++    AF_BLUE_STRING_MYANMAR_ASCENDER = 1668,
++    AF_BLUE_STRING_MYANMAR_DESCENDER = 1696,
++    AF_BLUE_STRING_SINHALA_TOP = 1728,
++    AF_BLUE_STRING_SINHALA_BOTTOM = 1760,
++    AF_BLUE_STRING_SINHALA_DESCENDER = 1792,
++    AF_BLUE_STRING_TAMIL_TOP = 1836,
++    AF_BLUE_STRING_TAMIL_BOTTOM = 1868,
++    AF_BLUE_STRING_TELUGU_TOP = 1900,
++    AF_BLUE_STRING_TELUGU_BOTTOM = 1928,
++    AF_BLUE_STRING_THAI_TOP = 1956,
++    AF_BLUE_STRING_THAI_BOTTOM = 1980,
++    AF_BLUE_STRING_THAI_ASCENDER = 2008,
++    AF_BLUE_STRING_THAI_LARGE_ASCENDER = 2020,
++    AF_BLUE_STRING_THAI_DESCENDER = 2032,
++    AF_BLUE_STRING_THAI_LARGE_DESCENDER = 2048,
++    AF_BLUE_STRING_THAI_DIGIT_TOP = 2056,
++    af_blue_1_1 = 2067,
  #ifdef AF_CONFIG_OPTION_CJK
      AF_BLUE_STRING_CJK_TOP = af_blue_1_1 + 1,
      AF_BLUE_STRING_CJK_BOTTOM = af_blue_1_1 + 203,
-@@ -213,10 +220,13 @@ FT_BEGIN_HEADER
-     AF_BLUE_STRINGSET_LATN = 50,
-     AF_BLUE_STRINGSET_LATB = 57,
-     AF_BLUE_STRINGSET_LATP = 64,
+@@ -204,19 +221,25 @@ FT_BEGIN_HEADER
+     AF_BLUE_STRINGSET_BENG = 4,
+     AF_BLUE_STRINGSET_CYRL = 9,
+     AF_BLUE_STRINGSET_DEVA = 15,
+-    AF_BLUE_STRINGSET_GREK = 21,
+-    AF_BLUE_STRINGSET_HEBR = 28,
+-    AF_BLUE_STRINGSET_KNDA = 32,
+-    AF_BLUE_STRINGSET_KHMR = 35,
+-    AF_BLUE_STRINGSET_KHMS = 41,
+-    AF_BLUE_STRINGSET_LAO = 44,
+-    AF_BLUE_STRINGSET_LATN = 50,
+-    AF_BLUE_STRINGSET_LATB = 57,
+-    AF_BLUE_STRINGSET_LATP = 64,
 -    AF_BLUE_STRINGSET_MYMR = 71,
 -    AF_BLUE_STRINGSET_TELU = 76,
 -    AF_BLUE_STRINGSET_THAI = 79,
 -    af_blue_2_1 = 87,
-+    AF_BLUE_STRINGSET_MLYM = 71,
-+    AF_BLUE_STRINGSET_MYMR = 74,
-+    AF_BLUE_STRINGSET_SINH = 79,
-+    AF_BLUE_STRINGSET_TAML = 83,
-+    AF_BLUE_STRINGSET_TELU = 86,
-+    AF_BLUE_STRINGSET_THAI = 89,
-+    af_blue_2_1 = 97,
++    AF_BLUE_STRINGSET_GEOR = 21,
++    AF_BLUE_STRINGSET_GEOK = 26,
++    AF_BLUE_STRINGSET_GREK = 33,
++    AF_BLUE_STRINGSET_HEBR = 40,
++    AF_BLUE_STRINGSET_KNDA = 44,
++    AF_BLUE_STRINGSET_KHMR = 47,
++    AF_BLUE_STRINGSET_KHMS = 53,
++    AF_BLUE_STRINGSET_LAO = 56,
++    AF_BLUE_STRINGSET_LATN = 62,
++    AF_BLUE_STRINGSET_LATB = 69,
++    AF_BLUE_STRINGSET_LATP = 76,
++    AF_BLUE_STRINGSET_MLYM = 83,
++    AF_BLUE_STRINGSET_MYMR = 86,
++    AF_BLUE_STRINGSET_NONE = 91,
++    AF_BLUE_STRINGSET_SINH = 92,
++    AF_BLUE_STRINGSET_TAML = 96,
++    AF_BLUE_STRINGSET_TELU = 99,
++    AF_BLUE_STRINGSET_THAI = 102,
++    af_blue_2_1 = 110,
  #ifdef AF_CONFIG_OPTION_CJK
      AF_BLUE_STRINGSET_HANI = af_blue_2_1 + 0,
      af_blue_2_1_1 = af_blue_2_1 + 2,
@@ -1598,10 +3419,47 @@ index c17a6a2..f83f704 100644
  /*                                                                         */
  /*  aflatin2.h                                                             */
 diff --git a/src/autofit/afranges.c b/src/autofit/afranges.c
-index 4e81e78..8340474 100644
+index 4e81e78..e22cb34 100644
 --- a/src/autofit/afranges.c
 +++ b/src/autofit/afranges.c
-@@ -354,6 +354,21 @@
+@@ -158,6 +158,36 @@
+   };
+ 
+ 
++  const AF_Script_UniRangeRec  af_geor_uniranges[] =
++  {
++    AF_UNIRANGE_REC(  0x10D0UL,  0x10FFUL ),  /* Georgian (Mkhedruli) */
++#if 0
++    /* the following range is proposed for inclusion in Unicode */
++    AF_UNIRANGE_REC(  0x1C90UL,  0x1CBFUL ),  /* Georgian (Mtavruli)  */
++#endif
++    AF_UNIRANGE_REC(       0UL,       0UL )
++  };
++
++  const AF_Script_UniRangeRec  af_geor_nonbase_uniranges[] =
++  {
++    AF_UNIRANGE_REC( 0UL, 0UL )
++  };
++
++
++  const AF_Script_UniRangeRec  af_geok_uniranges[] =
++  {
++    /* Khutsuri */
++    AF_UNIRANGE_REC(  0x10A0UL,  0x10CDUL ),  /* Georgian (Asomtavruli) */
++    AF_UNIRANGE_REC(  0x2D00UL,  0x2D2DUL ),  /* Georgian (Nuskhuri)    */
++    AF_UNIRANGE_REC(       0UL,       0UL )
++  };
++
++  const AF_Script_UniRangeRec  af_geok_nonbase_uniranges[] =
++  {
++    AF_UNIRANGE_REC( 0UL, 0UL )
++  };
++
++
+   const AF_Script_UniRangeRec  af_grek_uniranges[] =
+   {
+     AF_UNIRANGE_REC(  0x0370UL,  0x03FFUL ),  /* Greek and Coptic */
+@@ -354,6 +384,21 @@
    };
  
  
@@ -1623,7 +3481,7 @@ index 4e81e78..8340474 100644
    const AF_Script_UniRangeRec  af_mymr_uniranges[] =
    {
      AF_UNIRANGE_REC( 0x1000UL, 0x109FUL ),    /* Myanmar            */
-@@ -391,6 +406,35 @@
+@@ -391,6 +436,35 @@
    };
  
  
@@ -1659,7 +3517,7 @@ index 4e81e78..8340474 100644
    const AF_Script_UniRangeRec  af_telu_uniranges[] =
    {
      AF_UNIRANGE_REC(  0x0C00UL,  0x0C7FUL ),  /* Telugu */
-@@ -473,21 +517,6 @@
+@@ -473,21 +547,6 @@
    };
  
  
@@ -1681,7 +3539,7 @@ index 4e81e78..8340474 100644
    const AF_Script_UniRangeRec  af_orya_uniranges[] =
    {
      AF_UNIRANGE_REC(  0x0B00UL,  0x0B7FUL ),  /* Oriya */
-@@ -506,20 +535,6 @@
+@@ -506,20 +565,6 @@
    };
  
  
@@ -1702,7 +3560,7 @@ index 4e81e78..8340474 100644
    const AF_Script_UniRangeRec  af_sund_uniranges[] =
    {
      AF_UNIRANGE_REC(  0x1B80UL,  0x1BBFUL ),  /* Sundanese            */
-@@ -551,21 +566,6 @@
+@@ -551,21 +596,6 @@
    };
  
  
@@ -1725,10 +3583,29 @@ index 4e81e78..8340474 100644
    {
      AF_UNIRANGE_REC(  0x0F00UL,  0x0FFFUL ),  /* Tibetan */
 diff --git a/src/autofit/afscript.h b/src/autofit/afscript.h
-index 9bbb6f3..84c2a14 100644
+index 9bbb6f3..e19cfcd 100644
 --- a/src/autofit/afscript.h
 +++ b/src/autofit/afscript.h
-@@ -111,6 +111,12 @@
+@@ -55,6 +55,18 @@
+           HINTING_TOP_TO_BOTTOM,
+           "\xE0\xA4\xA0 \xE0\xA4\xB5 \xE0\xA4\x9F" ) /* ठ व ट */
+ 
++  SCRIPT( geor, GEOR,
++          "Georgian (Mkhedruli)",
++          HB_SCRIPT_GEORGIAN,
++          HINTING_BOTTOM_TO_TOP,
++          "\xE1\x83\x98 \xE1\x83\x94 \xE1\x83\x90" ) /* ი ე ა */
++
++  SCRIPT( geok, GEOK,
++          "Georgian (Khutsuri)",
++          HB_SCRIPT_INVALID,
++          HINTING_BOTTOM_TO_TOP,
++          "\xE1\x82\xB6 \xE1\x82\xB1 \xE2\xB4\x99" ) /* Ⴖ Ⴑ ⴙ */
++
+   SCRIPT( grek, GREK,
+           "Greek",
+           HB_SCRIPT_GREEK,
+@@ -111,6 +123,12 @@
            HINTING_BOTTOM_TO_TOP,
            "\xE1\xB5\x92 \xE1\xB4\xBC \xE2\x81\xB0" ) /* ᵒ ᴼ ⁰ */
  
@@ -1741,7 +3618,7 @@ index 9bbb6f3..84c2a14 100644
    SCRIPT( mymr, MYMR,
            "Myanmar",
            HB_SCRIPT_MYANMAR,
-@@ -123,6 +129,19 @@
+@@ -123,6 +141,19 @@
            HINTING_BOTTOM_TO_TOP,
            "" )
  
@@ -1761,7 +3638,7 @@ index 9bbb6f3..84c2a14 100644
    /* there are no simple forms for letters; we thus use two digit shapes */
    SCRIPT( telu, TELU,
            "Telugu",
-@@ -156,24 +175,12 @@
+@@ -156,24 +187,12 @@
            HINTING_BOTTOM_TO_TOP,
            "o" ) /* XXX */
  
@@ -1786,7 +3663,7 @@ index 9bbb6f3..84c2a14 100644
    SCRIPT( sund, SUND,
            "Sundanese",
            HB_SCRIPT_SUNDANESE,
-@@ -186,12 +193,6 @@
+@@ -186,12 +205,6 @@
            HINTING_BOTTOM_TO_TOP,
            "o" ) /* XXX */
  
@@ -1800,10 +3677,44 @@ index 9bbb6f3..84c2a14 100644
            "Tibetan",
            HB_SCRIPT_TIBETAN,
 diff --git a/src/autofit/afstyles.h b/src/autofit/afstyles.h
-index 9c57258..9134aef 100644
+index 9c57258..f85fe87 100644
 --- a/src/autofit/afstyles.h
 +++ b/src/autofit/afstyles.h
-@@ -168,6 +168,13 @@
+@@ -52,10 +52,10 @@
+ #undef  META_STYLE_LATIN
+ #define META_STYLE_LATIN( s, S, ds )                     \
+           STYLE_LATIN( s, S, c2cp, C2CP, ds,             \
+-                       "petite capticals from capitals", \
++                       "petite capitals from capitals", \
+                        PETITE_CAPITALS_FROM_CAPITALS )   \
+           STYLE_LATIN( s, S, c2sc, C2SC, ds,             \
+-                       "small capticals from capitals",  \
++                       "small capitals from capitals",  \
+                        SMALL_CAPITALS_FROM_CAPITALS )    \
+           STYLE_LATIN( s, S, ordn, ORDN, ds,             \
+                        "ordinals",                       \
+@@ -106,6 +106,20 @@
+          AF_BLUE_STRINGSET_DEVA,
+          AF_COVERAGE_DEFAULT )
+ 
++  STYLE( geor_dflt, GEOR_DFLT,
++         "Georgian (Mkhedruli) default style",
++         AF_WRITING_SYSTEM_LATIN,
++         AF_SCRIPT_GEOR,
++         AF_BLUE_STRINGSET_GEOR,
++         AF_COVERAGE_DEFAULT )
++
++  STYLE( geok_dflt, GEOK_DFLT,
++         "Georgian (Khutsuri) default style",
++         AF_WRITING_SYSTEM_LATIN,
++         AF_SCRIPT_GEOK,
++         AF_BLUE_STRINGSET_GEOK,
++         AF_COVERAGE_DEFAULT )
++
+   META_STYLE_LATIN( grek, GREK, "Greek" )
+ 
+   STYLE( hebr_dflt, HEBR_DFLT,
+@@ -168,6 +182,13 @@
           AF_COVERAGE_DEFAULT )
  #endif
  
@@ -1817,10 +3728,14 @@ index 9c57258..9134aef 100644
    STYLE( mymr_dflt, MYMR_DFLT,
           "Myanmar default style",
           AF_WRITING_SYSTEM_LATIN,
-@@ -182,6 +189,20 @@
-          (AF_Blue_Stringset)0,
-          AF_COVERAGE_DEFAULT )
- 
+@@ -179,7 +200,21 @@
+          "no style",
+          AF_WRITING_SYSTEM_DUMMY,
+          AF_SCRIPT_NONE,
+-         (AF_Blue_Stringset)0,
++         AF_BLUE_STRINGSET_NONE,
++         AF_COVERAGE_DEFAULT )
++
 +  STYLE( sinh_dflt, SINH_DFLT,
 +         "Sinhala default style",
 +         AF_WRITING_SYSTEM_LATIN,
@@ -1833,12 +3748,10 @@ index 9c57258..9134aef 100644
 +         AF_WRITING_SYSTEM_LATIN,
 +         AF_SCRIPT_TAML,
 +         AF_BLUE_STRINGSET_TAML,
-+         AF_COVERAGE_DEFAULT )
-+
+          AF_COVERAGE_DEFAULT )
+ 
    STYLE( telu_dflt, TELU_DFLT,
-          "Telugu default style",
-          AF_WRITING_SYSTEM_LATIN,
-@@ -211,12 +232,9 @@
+@@ -211,12 +246,9 @@
    STYLE_DEFAULT_INDIC( gujr, GUJR, "Gujarati" )
    STYLE_DEFAULT_INDIC( guru, GURU, "Gurmukhi" )
    STYLE_DEFAULT_INDIC( limb, LIMB, "Limbu" )
@@ -1851,6 +3764,34 @@ index 9c57258..9134aef 100644
    STYLE_DEFAULT_INDIC( tibt, TIBT, "Tibetan" )
  
  #endif /* AF_CONFIG_OPTION_INDIC */
+diff --git a/src/autofit/aftypes.h b/src/autofit/aftypes.h
+index eae6e11..ef62043 100644
+--- a/src/autofit/aftypes.h
++++ b/src/autofit/aftypes.h
+@@ -22,7 +22,7 @@
+    *  Its main feature is the ability to differentiate between different
+    *  writing systems and scripts in order to apply specific rules.
+    *
+-   *  The code has also been compartmentized into several entities that
++   *  The code has also been compartmentalized into several entities that
+    *  should make algorithmic experimentation easier than with the old
+    *  code.
+    *
+diff --git a/src/base/ftadvanc.c b/src/base/ftadvanc.c
+index 2bfbe8a..9e2ab89 100644
+--- a/src/base/ftadvanc.c
++++ b/src/base/ftadvanc.c
+@@ -159,8 +159,8 @@
+ 
+       /* scale from 26.6 to 16.16 */
+       padvances[nn] = ( flags & FT_LOAD_VERTICAL_LAYOUT )
+-                      ? face->glyph->advance.y << 10
+-                      : face->glyph->advance.x << 10;
++                      ? face->glyph->advance.y * 1024
++                      : face->glyph->advance.x * 1024;
+     }
+ 
+     return error;
 diff --git a/src/base/ftbitmap.c b/src/base/ftbitmap.c
 index 8cc3a17..24fead3 100644
 --- a/src/base/ftbitmap.c
@@ -1889,6 +3830,19 @@ index 5cfa012..e97fdbf 100644
  
      err = FT_GetFileRef_From_Mac_ATS_Name( fontName, &ref, face_index );
      if ( err )
+diff --git a/src/base/ftobjs.c b/src/base/ftobjs.c
+index fa05347..af38d04 100644
+--- a/src/base/ftobjs.c
++++ b/src/base/ftobjs.c
+@@ -1418,7 +1418,7 @@
+ 
+   /* Type 1 and CID-keyed font drivers should recognize sfnt-wrapped */
+   /* format too.  Here, since we can't expect that the TrueType font */
+-  /* driver is loaded unconditially, we must parse the font by       */
++  /* driver is loaded unconditionally, we must parse the font by     */
+   /* ourselves.  We are only interested in the name of the table and */
+   /* the offset.                                                     */
+ 
 diff --git a/src/base/ftrfork.c b/src/base/ftrfork.c
 index 4d3de46..4660c97 100644
 --- a/src/base/ftrfork.c
@@ -1928,6 +3882,32 @@ index ea78a32..ae3c4ce 100644
      }                                                                       \
                                                                              \
      error = FTC_MruList_New( (list), (key), (FTC_MruNode*)(void*)&(node) ); \
+diff --git a/src/cff/cf2error.h b/src/cff/cf2error.h
+index d9f8c66..512edd1 100644
+--- a/src/cff/cf2error.h
++++ b/src/cff/cf2error.h
+@@ -70,7 +70,7 @@ FT_BEGIN_HEADER
+    * Upon a function call if the error code is anything other than
+    * `FT_Err_Ok', which is guaranteed to be zero, we
+    * will return without altering that error.  This will allow the
+-   * error to propogate and be handled at the appropriate location in
++   * error to propagate and be handled at the appropriate location in
+    * the code.
+    *
+    * This allows a style of code where the error code is initialized
+diff --git a/src/cff/cf2hints.h b/src/cff/cf2hints.h
+index 290f570..a898454 100644
+--- a/src/cff/cf2hints.h
++++ b/src/cff/cf2hints.h
+@@ -220,7 +220,7 @@ FT_BEGIN_HEADER
+ 
+     /* character space miter limit threshold */
+     CF2_Fixed  miterLimit;
+-    /* vertical/horzizontal snap distance in character space */
++    /* vertical/horizontal snap distance in character space */
+     CF2_Fixed  snapThreshold;
+ 
+     FT_Vector  offsetStart0;  /* first and second points of first */
 diff --git a/src/cff/cffgload.c b/src/cff/cffgload.c
 index df57d67..752c18e 100644
 --- a/src/cff/cffgload.c
@@ -2195,7 +4175,7 @@ index 2257307..b875fbe 100644
  
    FT_LOCAL( FT_Error )
 diff --git a/src/cff/cffload.c b/src/cff/cffload.c
-index 42cc37e..9d3846c 100644
+index 42cc37e..3d1bda9 100644
 --- a/src/cff/cffload.c
 +++ b/src/cff/cffload.c
 @@ -382,13 +382,15 @@
@@ -2249,6 +4229,17 @@ index 42cc37e..9d3846c 100644
        charset->cids[charset->sids[j]] = (FT_UShort)j;
  
      charset->max_cid    = max_cid;
+@@ -871,8 +876,8 @@
+     FT_UShort  glyph_sid;
+ 
+ 
+-    /* If the the offset is greater than 2, we have to parse the */
+-    /* charset table.                                            */
++    /* If the offset is greater than 2, we have to parse the charset */
++    /* table.                                                        */
+     if ( offset > 2 )
+     {
+       FT_UInt  j;
 @@ -1316,7 +1321,12 @@
      CFF_Private      priv = &font->private_dict;
  
@@ -2761,6 +4752,41 @@ index fc8db0d..20d29bf 100644
      FT_Bytes  wdc_end   = table + GXV_JUST_DATA( wdc_offset_max );
      FT_UInt   i;
  
+diff --git a/src/gxvalid/gxvkern.c b/src/gxvalid/gxvkern.c
+index 97ff3bf..ee1ab36 100644
+--- a/src/gxvalid/gxvkern.c
++++ b/src/gxvalid/gxvkern.c
+@@ -693,7 +693,7 @@
+ 
+     GXV_NAME_ENTER( "validating coverage" );
+ 
+-    GXV_TRACE(( "interprete coverage 0x%04x by Apple style\n", coverage ));
++    GXV_TRACE(( "interpret coverage 0x%04x by Apple style\n", coverage ));
+ 
+     if ( KERN_IS_NEW( gxvalid ) )
+     {
+@@ -728,7 +728,7 @@
+       }
+     }
+ 
+-    GXV_TRACE(( "cannot interprete coverage, broken kern subtable\n" ));
++    GXV_TRACE(( "cannot interpret coverage, broken kern subtable\n" ));
+ 
+   Exit:
+     GXV_EXIT;
+diff --git a/src/gxvalid/gxvlcar.c b/src/gxvalid/gxvlcar.c
+index d600fa3..d31b641 100644
+--- a/src/gxvalid/gxvlcar.c
++++ b/src/gxvalid/gxvlcar.c
+@@ -114,7 +114,7 @@
+     +------ lcar --------------------+
+     |                                |
+     |      +===============+         |
+-    |      | looup header  |         |
++    |      | lookup header |         |
+     |      +===============+         |
+     |      | BinSrchHeader |         |
+     |      +===============+         |
 diff --git a/src/gxvalid/gxvmort1.c b/src/gxvalid/gxvmort1.c
 index 24fed63..fd761d0 100644
 --- a/src/gxvalid/gxvmort1.c
@@ -2796,6 +4822,19 @@ index 8accdfb..0f07c04 100644
        {
           p = table + j * ( 4 + 2 + 2 );
           t = FT_NEXT_LONG( p );
+diff --git a/src/gzip/ftgzip.c b/src/gzip/ftgzip.c
+index 9c1f183..9cab80e 100644
+--- a/src/gzip/ftgzip.c
++++ b/src/gzip/ftgzip.c
+@@ -59,7 +59,7 @@
+  /* original ZLib.                                                   */
+ 
+ #ifndef USE_ZLIB_ZCALLOC
+-#define MY_ZCALLOC /* prevent all zcalloc() & zfree() in zutils.c */
++#define MY_ZCALLOC /* prevent all zcalloc() & zfree() in zutil.c */
+ #endif
+ 
+ #include "zlib.h"
 diff --git a/src/otvalid/otvmath.c b/src/otvalid/otvmath.c
 index 6c46178..6c785b6 100644
 --- a/src/otvalid/otvmath.c
@@ -2844,6 +4883,72 @@ index 1dbbf95..f9cd1f6 100644
      {
        error = pfr_extra_items_skip( &p, limit );
        if ( error )
+diff --git a/src/pfr/pfrload.c b/src/pfr/pfrload.c
+index ca1f37f..e509e70 100644
+--- a/src/pfr/pfrload.c
++++ b/src/pfr/pfrload.c
+@@ -299,9 +299,15 @@
+          FT_READ_USHORT( count )          )
+       goto Exit;
+ 
+-    /* check maximum value and a rough minimum size */
++    /* check maximum value and a rough minimum size:     */
++    /* - no more than 13106 log fonts                    */
++    /* - we need 5 bytes for a log header record         */
++    /* - we need at least 18 bytes for a log font record */
++    /* - the overall size is at least 95 bytes plus the  */
++    /*   log header and log font records                 */
+     if ( count > ( ( 1 << 16 ) - 2 ) / 5                ||
+-         2 + count * 5 >= stream->size - section_offset )
++         2 + count * 5 >= stream->size - section_offset ||
++         95 + count * ( 5 + 18 ) >= stream->size        )
+     {
+       FT_ERROR(( "pfr_log_font_count:"
+                  " invalid number of logical fonts\n" ));
+@@ -377,7 +383,7 @@
+         if ( flags & PFR_LOG_2BYTE_STROKE )
+           local++;
+ 
+-        if ( (flags & PFR_LINE_JOIN_MASK) == PFR_LINE_JOIN_MITER )
++        if ( ( flags & PFR_LINE_JOIN_MASK ) == PFR_LINE_JOIN_MITER )
+           local += 3;
+       }
+       if ( flags & PFR_LOG_BOLD )
+@@ -609,7 +615,7 @@
+ 
+   Too_Short:
+     error = FT_THROW( Invalid_Table );
+-    FT_ERROR(( "pfr_exta_item_load_stem_snaps:"
++    FT_ERROR(( "pfr_extra_item_load_stem_snaps:"
+                " invalid stem snaps table\n" ));
+     goto Exit;
+   }
+@@ -737,12 +743,14 @@
+     FT_UInt     n, ok;
+ 
+ 
++    if ( *astring )
++      FT_FREE( *astring );
++
+     if ( len > 0 && p[len - 1] == 0 )
+       len--;
+ 
+-    /* check that each character is ASCII for making sure not to
+-       load garbage
+-     */
++    /* check that each character is ASCII  */
++    /* for making sure not to load garbage */
+     ok = ( len > 0 );
+     for ( n = 0; n < len; n++ )
+       if ( p[n] < 32 || p[n] > 127 )
+@@ -759,6 +767,7 @@
+       FT_MEM_COPY( result, p, len );
+       result[len] = 0;
+     }
++
+   Exit:
+     *astring = result;
+     return error;
 diff --git a/src/pfr/pfrobjs.c b/src/pfr/pfrobjs.c
 index 81b1312..769a3b6 100644
 --- a/src/pfr/pfrobjs.c
@@ -2860,10 +4965,10 @@ index 81b1312..769a3b6 100644
          FT_UInt32  cpair;
  
 diff --git a/src/pfr/pfrsbit.c b/src/pfr/pfrsbit.c
-index 22f6096..d271593 100644
+index 22f6096..68da033 100644
 --- a/src/pfr/pfrsbit.c
 +++ b/src/pfr/pfrsbit.c
-@@ -277,20 +277,75 @@
+@@ -277,49 +277,99 @@
    pfr_lookup_bitmap_data( FT_Byte*   base,
                            FT_Byte*   limit,
                            FT_UInt    count,
@@ -2873,8 +4978,9 @@ index 22f6096..d271593 100644
                            FT_ULong*  found_offset,
                            FT_ULong*  found_size )
    {
-     FT_UInt   left, right, char_len;
+-    FT_UInt   left, right, char_len;
 -    FT_Bool   two = FT_BOOL( flags & 1 );
++    FT_UInt   min, max, char_len;
 +    FT_Bool   two = FT_BOOL( *flags & PFR_BITMAP_2BYTE_CHARCODE );
      FT_Byte*  buff;
  
@@ -2896,12 +5002,17 @@ index 22f6096..d271593 100644
 +      FT_Byte*  lim;
 +      FT_UInt   code;
 +      FT_Long   prev_code;
-+
-+
+ 
+-    left  = 0;
+-    right = count;
+ 
+-    while ( left < right )
+-    {
+-      FT_UInt  middle, code;
 +      *flags    |= PFR_BITMAP_VALID_CHARCODES;
 +      prev_code  = -1;
 +      lim        = base + count * char_len;
-+
+ 
 +      if ( lim > limit )
 +      {
 +        FT_TRACE0(( "pfr_lookup_bitmap_data:"
@@ -2919,7 +5030,9 @@ index 22f6096..d271593 100644
 +            code = FT_PEEK_USHORT( p );
 +          else
 +            code = *p;
-+
+ 
+-      middle = ( left + right ) >> 1;
+-      buff   = base + middle * char_len;
 +          if ( code <= prev_code )
 +          {
 +            FT_TRACE0(( "pfr_lookup_bitmap_data:"
@@ -2929,7 +5042,11 @@ index 22f6096..d271593 100644
 +            *flags &= ~PFR_BITMAP_VALID_CHARCODES;
 +            break;
 +          }
-+
+ 
+-      /* check that we are not outside of the table -- */
+-      /* this is possible with broken fonts...         */
+-      if ( buff + char_len > limit )
+-        goto Fail;
 +          prev_code = code;
 +        }
 +      }
@@ -2941,21 +5058,39 @@ index 22f6096..d271593 100644
 +    /* (this might be sanitized, but PFR is dead...) */
 +    if ( !( *flags & PFR_BITMAP_VALID_CHARCODES ) )
 +      goto Fail;
++
++    min = 0;
++    max = count;
++
++    /* binary search */
++    while ( min < max )
++    {
++      FT_UInt  mid, code;
++
++
++      mid  = ( min + max ) >> 1;
++      buff = base + mid * char_len;
  
-     left  = 0;
-     right = count;
-@@ -303,11 +358,6 @@
-       middle = ( left + right ) >> 1;
-       buff   = base + middle * char_len;
- 
--      /* check that we are not outside of the table -- */
--      /* this is possible with broken fonts...         */
--      if ( buff + char_len > limit )
--        goto Fail;
--
        if ( two )
          code = PFR_NEXT_USHORT( buff );
        else
+         code = PFR_NEXT_BYTE( buff );
+ 
+-      if ( code == char_code )
+-        goto Found_It;
+-
+-      if ( code < char_code )
+-        left = middle;
++      if ( char_code < code )
++        max = mid;
++      else if ( char_code > code )
++        min = mid + 1;
+       else
+-        right = middle;
++        goto Found_It;
+     }
+ 
+   Fail:
 @@ -329,12 +379,12 @@
      return;
  
@@ -2992,6 +5127,15 @@ index 22f6096..d271593 100644
        break;
  
      case 1:
+@@ -445,7 +494,7 @@
+ 
+     case 1:
+       PFR_CHECK( 1 );
+-      advance = PFR_NEXT_INT8( p ) << 8;
++      advance = PFR_NEXT_INT8( p ) * 256;
+       break;
+ 
+     case 2:
 @@ -571,9 +620,12 @@
  
  
@@ -3062,34 +5206,193 @@ index 22f6096..d271593 100644
      }
  
 diff --git a/src/pfr/pfrtypes.h b/src/pfr/pfrtypes.h
-index 592acbd..24ca4d3 100644
+index 592acbd..bd6c2cd 100644
 --- a/src/pfr/pfrtypes.h
 +++ b/src/pfr/pfrtypes.h
-@@ -121,6 +121,10 @@ FT_BEGIN_HEADER
+@@ -69,12 +69,8 @@ FT_BEGIN_HEADER
  
-   typedef enum  PFR_BitmapFlags_
-   {
-+    /* not part of the specification but used for implementation */
-+    PFR_BITMAP_VALID_CHARCODES     = 0x80,
-+    PFR_BITMAP_CHARCODES_VALIDATED = 0x40,
-+
-     PFR_BITMAP_3BYTE_OFFSET   = 4,
-     PFR_BITMAP_2BYTE_SIZE     = 2,
-     PFR_BITMAP_2BYTE_CHARCODE = 1
-@@ -291,8 +295,11 @@ FT_BEGIN_HEADER
  
-   typedef enum  PFR_GlyphFlags_
-   {
+   /* used in `color_flags' field of the PFR_Header */
+-  typedef enum  PFR_HeaderFlags_
+-  {
+-    PFR_FLAG_BLACK_PIXEL   = 1,
+-    PFR_FLAG_INVERT_BITMAP = 2
+-
+-  } PFR_HeaderFlags;
++#define PFR_FLAG_BLACK_PIXEL    0x01U
++#define PFR_FLAG_INVERT_BITMAP  0x02U
+ 
+ 
+   /************************************************************************/
+@@ -96,36 +92,27 @@ FT_BEGIN_HEADER
+   } PFR_LogFontRec, *PFR_LogFont;
+ 
+ 
+-  typedef enum  PFR_LogFlags_
+-  {
+-    PFR_LOG_EXTRA_ITEMS  = 0x40,
+-    PFR_LOG_2BYTE_BOLD   = 0x20,
+-    PFR_LOG_BOLD         = 0x10,
+-    PFR_LOG_2BYTE_STROKE = 8,
+-    PFR_LOG_STROKE       = 4,
+-    PFR_LINE_JOIN_MASK   = 3
++#define PFR_LINE_JOIN_MITER   0x00U
++#define PFR_LINE_JOIN_ROUND   0x01U
++#define PFR_LINE_JOIN_BEVEL   0x02U
++#define PFR_LINE_JOIN_MASK    ( PFR_LINE_JOIN_ROUND | PFR_LINE_JOIN_BEVEL )
+ 
+-  } PFR_LogFlags;
+-
+-
+-  typedef enum  PFR_LineJoinFlags_
+-  {
+-    PFR_LINE_JOIN_MITER = 0,
+-    PFR_LINE_JOIN_ROUND = 1,
+-    PFR_LINE_JOIN_BEVEL = 2
+-
+-  } PFR_LineJoinFlags;
++#define PFR_LOG_STROKE        0x04U
++#define PFR_LOG_2BYTE_STROKE  0x08U
++#define PFR_LOG_BOLD          0x10U
++#define PFR_LOG_2BYTE_BOLD    0x20U
++#define PFR_LOG_EXTRA_ITEMS   0x40U
+ 
+ 
+   /************************************************************************/
+ 
+-  typedef enum  PFR_BitmapFlags_
+-  {
+-    PFR_BITMAP_3BYTE_OFFSET   = 4,
+-    PFR_BITMAP_2BYTE_SIZE     = 2,
+-    PFR_BITMAP_2BYTE_CHARCODE = 1
++#define PFR_BITMAP_2BYTE_CHARCODE  0x01U
++#define PFR_BITMAP_2BYTE_SIZE      0x02U
++#define PFR_BITMAP_3BYTE_OFFSET    0x04U
+ 
+-  } PFR_BitmapFlags;
++  /*not part of the specification but used for implementation */
++#define PFR_BITMAP_CHARCODES_VALIDATED  0x40U
++#define PFR_BITMAP_VALID_CHARCODES      0x80U
+ 
+ 
+   typedef struct  PFR_BitmapCharRec_
+@@ -137,15 +124,11 @@ FT_BEGIN_HEADER
+   } PFR_BitmapCharRec, *PFR_BitmapChar;
+ 
+ 
+-  typedef enum  PFR_StrikeFlags_
+-  {
+-    PFR_STRIKE_2BYTE_COUNT  = 0x10,
+-    PFR_STRIKE_3BYTE_OFFSET = 0x08,
+-    PFR_STRIKE_3BYTE_SIZE   = 0x04,
+-    PFR_STRIKE_2BYTE_YPPM   = 0x02,
+-    PFR_STRIKE_2BYTE_XPPM   = 0x01
+-
+-  } PFR_StrikeFlags;
++#define PFR_STRIKE_2BYTE_XPPM    0x01U
++#define PFR_STRIKE_2BYTE_YPPM    0x02U
++#define PFR_STRIKE_3BYTE_SIZE    0x04U
++#define PFR_STRIKE_3BYTE_OFFSET  0x08U
++#define PFR_STRIKE_2BYTE_COUNT   0x10U
+ 
+ 
+   typedef struct  PFR_StrikeRec_
+@@ -266,38 +249,29 @@ FT_BEGIN_HEADER
+   } PFR_PhyFontRec, *PFR_PhyFont;
+ 
+ 
+-  typedef enum  PFR_PhyFlags_
+-  {
+-    PFR_PHY_EXTRA_ITEMS      = 0x80,
+-    PFR_PHY_3BYTE_GPS_OFFSET = 0x20,
+-    PFR_PHY_2BYTE_GPS_SIZE   = 0x10,
+-    PFR_PHY_ASCII_CODE       = 0x08,
+-    PFR_PHY_PROPORTIONAL     = 0x04,
+-    PFR_PHY_2BYTE_CHARCODE   = 0x02,
+-    PFR_PHY_VERTICAL         = 0x01
+-
+-  } PFR_PhyFlags;
++#define PFR_PHY_VERTICAL          0x01U
++#define PFR_PHY_2BYTE_CHARCODE    0x02U
++#define PFR_PHY_PROPORTIONAL      0x04U
++#define PFR_PHY_ASCII_CODE        0x08U
++#define PFR_PHY_2BYTE_GPS_SIZE    0x10U
++#define PFR_PHY_3BYTE_GPS_OFFSET  0x20U
++#define PFR_PHY_EXTRA_ITEMS       0x80U
+ 
+ 
+-  typedef enum PFR_KernFlags_
+-  {
+-    PFR_KERN_2BYTE_CHAR  = 0x01,
+-    PFR_KERN_2BYTE_ADJ   = 0x02
+-
+-  } PFR_KernFlags;
++#define PFR_KERN_2BYTE_CHAR  0x01U
++#define PFR_KERN_2BYTE_ADJ   0x02U
+ 
+ 
+   /************************************************************************/
+ 
+-  typedef enum  PFR_GlyphFlags_
+-  {
 -    PFR_GLYPH_IS_COMPOUND   = 0x80,
 -    PFR_GLYPH_EXTRA_ITEMS   = 0x08,
-+    PFR_GLYPH_IS_COMPOUND = 0x80,
+-    PFR_GLYPH_1BYTE_XYCOUNT = 0x04,
+-    PFR_GLYPH_XCOUNT        = 0x02,
+-    PFR_GLYPH_YCOUNT        = 0x01
++#define PFR_GLYPH_YCOUNT         0x01U
++#define PFR_GLYPH_XCOUNT         0x02U
++#define PFR_GLYPH_1BYTE_XYCOUNT  0x04U
 +
-+    PFR_GLYPH_SINGLE_EXTRA_ITEMS   = 0x08,
-+    PFR_GLYPH_COMPOUND_EXTRA_ITEMS = 0x40,
-+
-     PFR_GLYPH_1BYTE_XYCOUNT = 0x04,
-     PFR_GLYPH_XCOUNT        = 0x02,
-     PFR_GLYPH_YCOUNT        = 0x01
++#define PFR_GLYPH_SINGLE_EXTRA_ITEMS    0x08U
++#define PFR_GLYPH_COMPOUND_EXTRA_ITEMS  0x40U
+ 
+-  } PFR_GlyphFlags;
++#define PFR_GLYPH_IS_COMPOUND  0x80U
+ 
+ 
+   /* controlled coordinate */
+@@ -321,14 +295,10 @@ FT_BEGIN_HEADER
+   } PFR_SubGlyphRec, *PFR_SubGlyph;
+ 
+ 
+-  typedef enum  PFR_SubgGlyphFlags_
+-  {
+-    PFR_SUBGLYPH_3BYTE_OFFSET = 0x80,
+-    PFR_SUBGLYPH_2BYTE_SIZE   = 0x40,
+-    PFR_SUBGLYPH_YSCALE       = 0x20,
+-    PFR_SUBGLYPH_XSCALE       = 0x10
+-
+-  } PFR_SubGlyphFlags;
++#define PFR_SUBGLYPH_XSCALE        0x10U
++#define PFR_SUBGLYPH_YSCALE        0x20U
++#define PFR_SUBGLYPH_2BYTE_SIZE    0x40U
++#define PFR_SUBGLYPH_3BYTE_OFFSET  0x80U
+ 
+ 
+   typedef struct  PFR_GlyphRec_
+diff --git a/src/pshinter/pshalgo.c b/src/pshinter/pshalgo.c
+index 86181cd..8f131be 100644
+--- a/src/pshinter/pshalgo.c
++++ b/src/pshinter/pshalgo.c
+@@ -779,7 +779,7 @@
+            * It turns out though that minimizing the total number of lit
+            * pixels is also important, so position C), with one edge
+            * aligned with a pixel boundary is actually preferable
+-           * to A).  There are also more possibile positions for C) than
++           * to A).  There are also more possible positions for C) than
+            * for A) or B), so it involves less distortion of the overall
+            * character shape.
+            */
+@@ -802,7 +802,7 @@
+             }
+ 
+             /* We choose between B) and C) above based on the amount
+-             * of fractinal stem width; for small amounts, choose
++             * of fractional stem width; for small amounts, choose
+              * C) always, for large amounts, B) always, and inbetween,
+              * pick whichever one involves less stem movement.
+              */
 diff --git a/src/raster/ftraster.c b/src/raster/ftraster.c
 index d6c5ded..01ed1c5 100644
 --- a/src/raster/ftraster.c
@@ -3170,7 +5473,7 @@ index 2cf2ee2..2e8c1ec 100644
        if ( num_instances >= ( 1U << 15 ) - 1 )
        {
 diff --git a/src/sfnt/ttcmap.c b/src/sfnt/ttcmap.c
-index 92ec523..8f9e3c1 100644
+index 92ec523..01255a8 100644
 --- a/src/sfnt/ttcmap.c
 +++ b/src/sfnt/ttcmap.c
 @@ -1245,7 +1245,7 @@
@@ -3182,6 +5485,41 @@ index 92ec523..8f9e3c1 100644
            {
              FT_UInt   prev_end;
              FT_Byte*  old_p;
+@@ -3104,7 +3104,7 @@
+ 
+       if ( char_code < start )
+         max = mid;
+-      else if ( char_code > start+cnt )
++      else if ( char_code > start + cnt )
+         min = mid + 1;
+       else
+         return TRUE;
+diff --git a/src/sfnt/ttpost.c b/src/sfnt/ttpost.c
+index f228f62..3277f1e 100644
+--- a/src/sfnt/ttpost.c
++++ b/src/sfnt/ttpost.c
+@@ -2,7 +2,7 @@
+ /*                                                                         */
+ /*  ttpost.c                                                               */
+ /*                                                                         */
+-/*    Postcript name table processing for TrueType and OpenType fonts      */
++/*    PostScript name table processing for TrueType and OpenType fonts     */
+ /*    (body).                                                              */
+ /*                                                                         */
+ /*  Copyright 1996-2016 by                                                 */
+diff --git a/src/sfnt/ttpost.h b/src/sfnt/ttpost.h
+index 93762b0..ede45fd 100644
+--- a/src/sfnt/ttpost.h
++++ b/src/sfnt/ttpost.h
+@@ -2,7 +2,7 @@
+ /*                                                                         */
+ /*  ttpost.h                                                               */
+ /*                                                                         */
+-/*    Postcript name table processing for TrueType and OpenType fonts      */
++/*    PostScript name table processing for TrueType and OpenType fonts     */
+ /*    (specification).                                                     */
+ /*                                                                         */
+ /*  Copyright 1996-2016 by                                                 */
 diff --git a/src/smooth/ftgrays.c b/src/smooth/ftgrays.c
 index dac332d..885b0df 100644
 --- a/src/smooth/ftgrays.c
@@ -3846,7 +6184,7 @@ index 4ab6603..d1cb357 100644
  
  #endif /* TT_USE_BYTECODE_INTERPRETER */
 diff --git a/src/truetype/ttgxvar.c b/src/truetype/ttgxvar.c
-index 5f760a2..ce4c8a0 100644
+index 5f760a2..9a02c5a 100644
 --- a/src/truetype/ttgxvar.c
 +++ b/src/truetype/ttgxvar.c
 @@ -551,7 +551,7 @@
@@ -3858,31 +6196,144 @@ index 5f760a2..ce4c8a0 100644
          {
            blend->tuplecoords[i * gvar_head.axisCount + j] =
              FT_GET_SHORT() * 4;                 /* convert to FT_Fixed */
-@@ -632,8 +632,8 @@
+@@ -613,6 +613,11 @@
+     {
+       FT_TRACE6(( "    axis coordinate %d (%.4f):\n",
+                   i, blend->normalizedcoords[i] / 65536.0 ));
++      if ( !( tupleIndex & GX_TI_INTERMEDIATE_TUPLE ) )
++        FT_TRACE6(( "      intermediate coordinates %d (%.4f, %.4f):\n",
++                    i,
++                    im_start_coords[i] / 65536.0,
++                    im_end_coords[i] / 65536.0 ));
+ 
+       /* It's not clear why (for intermediate tuples) we don't need     */
+       /* to check against start/end -- the documentation says we don't. */
+@@ -625,62 +630,74 @@
+         continue;
+       }
+ 
+-      else if ( blend->normalizedcoords[i] == 0 )
++      if ( blend->normalizedcoords[i] == 0 )
+       {
+         FT_TRACE6(( "      axis coordinate is zero, stop\n" ));
+         apply = 0;
          break;
        }
  
 -      else if ( ( blend->normalizedcoords[i] < 0 && tuple_coords[i] > 0 ) ||
 -                ( blend->normalizedcoords[i] > 0 && tuple_coords[i] < 0 ) )
-+      else if ( ( blend->normalizedcoords[i] < FT_MIN( 0, tuple_coords[i] ) ) ||
-+                ( blend->normalizedcoords[i] > FT_MAX( 0, tuple_coords[i] ) ) )
++      if ( blend->normalizedcoords[i] == tuple_coords[i] )
        {
-         FT_TRACE6(( "      tuple coordinate value %.4f is exceeded, stop\n",
+-        FT_TRACE6(( "      tuple coordinate value %.4f is exceeded, stop\n",
++        FT_TRACE6(( "      tuple coordinate value %.4f fits perfectly\n",
                      tuple_coords[i] / 65536.0 ));
-@@ -646,10 +646,9 @@
-         FT_TRACE6(( "      tuple coordinate value %.4f fits\n",
-                     tuple_coords[i] / 65536.0 ));
+-        apply = 0;
+-        break;
++        /* `apply' does not change */
++        continue;
+       }
+ 
+-      else if ( !( tupleIndex & GX_TI_INTERMEDIATE_TUPLE ) )
++      if ( !( tupleIndex & GX_TI_INTERMEDIATE_TUPLE ) )
+       {
+-        FT_TRACE6(( "      tuple coordinate value %.4f fits\n",
+-                    tuple_coords[i] / 65536.0 ));
          /* not an intermediate tuple */
 -        apply = FT_MulFix( apply,
 -                           blend->normalizedcoords[i] > 0
 -                             ? blend->normalizedcoords[i]
 -                             : -blend->normalizedcoords[i] );
-+        apply = FT_MulDiv( apply,
+-      }
+ 
+-      else if ( blend->normalizedcoords[i] < im_start_coords[i] ||
+-                blend->normalizedcoords[i] > im_end_coords[i]   )
+-      {
+-        FT_TRACE6(( "      intermediate tuple range [%.4f;%.4f] is exceeded,"
+-                    " stop\n",
+-                    im_start_coords[i] / 65536.0,
+-                    im_end_coords[i] / 65536.0 ));
+-        apply = 0;
+-        break;
+-      }
++        if ( blend->normalizedcoords[i] < FT_MIN( 0, tuple_coords[i] ) ||
++             blend->normalizedcoords[i] > FT_MAX( 0, tuple_coords[i] ) )
++        {
++          FT_TRACE6(( "      tuple coordinate value %.4f is exceeded, stop\n",
++                      tuple_coords[i] / 65536.0 ));
++          apply = 0;
++          break;
++        }
+ 
+-      else if ( blend->normalizedcoords[i] < tuple_coords[i] )
+-      {
+-        FT_TRACE6(( "      intermediate tuple range [%.4f;%.4f] fits\n",
+-                    im_start_coords[i] / 65536.0,
+-                    im_end_coords[i] / 65536.0 ));
++        FT_TRACE6(( "      tuple coordinate value %.4f fits\n",
++                    tuple_coords[i] / 65536.0 ));
+         apply = FT_MulDiv( apply,
+-                           blend->normalizedcoords[i] - im_start_coords[i],
+-                           tuple_coords[i] - im_start_coords[i] );
 +                           blend->normalizedcoords[i],
 +                           tuple_coords[i] );
        }
+-
+       else
+       {
+-        FT_TRACE6(( "      intermediate tuple range [%.4f;%.4f] fits\n",
+-                    im_start_coords[i] / 65536.0,
+-                    im_end_coords[i] / 65536.0 ));
+-        apply = FT_MulDiv( apply,
+-                           im_end_coords[i] - blend->normalizedcoords[i],
+-                           im_end_coords[i] - tuple_coords[i] );
++        /* intermediate tuple */
++
++        if ( blend->normalizedcoords[i] < im_start_coords[i] ||
++             blend->normalizedcoords[i] > im_end_coords[i]   )
++        {
++          FT_TRACE6(( "      intermediate tuple range [%.4f;%.4f] is exceeded,"
++                      " stop\n",
++                      im_start_coords[i] / 65536.0,
++                      im_end_coords[i] / 65536.0 ));
++          apply = 0;
++          break;
++        }
++
++        else if ( blend->normalizedcoords[i] < tuple_coords[i] )
++        {
++          FT_TRACE6(( "      intermediate tuple range [%.4f;%.4f] fits\n",
++                      im_start_coords[i] / 65536.0,
++                      im_end_coords[i] / 65536.0 ));
++          apply = FT_MulDiv( apply,
++                             blend->normalizedcoords[i] - im_start_coords[i],
++                             tuple_coords[i] - im_start_coords[i] );
++        }
++
++        else
++        {
++          FT_TRACE6(( "      intermediate tuple range [%.4f;%.4f] fits\n",
++                      im_start_coords[i] / 65536.0,
++                      im_end_coords[i] / 65536.0 ));
++          apply = FT_MulDiv( apply,
++                             im_end_coords[i] - blend->normalizedcoords[i],
++                             im_end_coords[i] - tuple_coords[i] );
++        }
+       }
+     }
  
-       else if ( blend->normalizedcoords[i] < im_start_coords[i] ||
+diff --git a/src/truetype/ttinterp.c b/src/truetype/ttinterp.c
+index ccbb1d7..78c35f2 100644
+--- a/src/truetype/ttinterp.c
++++ b/src/truetype/ttinterp.c
+@@ -1561,7 +1561,7 @@
+   static FT_Short
+   GetShortIns( TT_ExecContext  exc )
+   {
+-    /* Reading a byte stream so there is no endianess (DaveP) */
++    /* Reading a byte stream so there is no endianness (DaveP) */
+     exc->IP += 2;
+     return (FT_Short)( ( exc->code[exc->IP - 2] << 8 ) +
+                          exc->code[exc->IP - 1]      );
 diff --git a/src/truetype/ttobjs.c b/src/truetype/ttobjs.c
 index cd4e294..a05f216 100644
 --- a/src/truetype/ttobjs.c
@@ -3941,3 +6392,23 @@ index f553f86..a009117 100644
    }
  
  
+diff --git a/vms_make.com b/vms_make.com
+index e5a4928..be8c615 100644
+--- a/vms_make.com
++++ b/vms_make.com
+@@ -1090,13 +1090,13 @@ $   type/out=vmslib.dat sys$input
+ !          might look like. They are site specific and the locations of the
+ !          library and include files need almost certainly to be changed.
+ !
+-! Location: All of the libaries can be found at the following addresses
++! Location: All of the libraries can be found at the following addresses
+ !
+ !   ZLIB:     http://zinser.no-ip.info/vms/sw/zlib.htmlx
+ !
+ ZLIB # sys$library:libz.olb # sys$library: # zlib.h # FT_CONFIG_OPTION_SYSTEM_ZLIB
+ $   write sys$output "New driver file vmslib.dat created."
+-$   write sys$output "Please customize libary locations for your site"
++$   write sys$output "Please customize library locations for your site"
+ $   write sys$output "and afterwards re-execute ''myproc'"
+ $   goto err_exit
+ $ endif
