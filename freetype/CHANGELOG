@@ -6,6 +6,11 @@ CHANGELOG
 ---------
 
 
+2016-04-23
+~~~~~~~~~~
+
+* `freetype2` code was updated with recent upstream commits up to rev.2016.04.16.
+
 2016-03-30
 ~~~~~~~~~~
 
