@@ -14,7 +14,7 @@ groups=('infinality-bundle')
 url="http://freetype.sourceforge.net"
 depends=('zlib' 'bzip2' 'sh' 'xorg-xrdb' 'libpng' 'harfbuzz')
 conflicts=('freetype2' 'freetype2-infinality')
-provides=("freetype2=$pkgver" 'freetype2-infinality' 'freetype2-infinality-ultimate' 'libfreetype.so')
+provides=("freetype2=$pkgver" 'freetype2-infinality' 'libfreetype.so')
 install='infinality.install'
 source=(http://downloads.sourceforge.net/sourceforge/freetype/freetype-${pkgver}.tar.bz2
         "01-freetype-${pkgver}-enable-valid.patch"
