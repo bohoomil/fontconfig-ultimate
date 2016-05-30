@@ -3,6 +3,7 @@
 # Contributor: julroy67 <julroy67@gmail.com>
 
 pkgname=ttf-noto-fonts-emoji-ib
+_commit=a964c12
 pkgver=1.30
 pkgrel=1
 epoch=1
@@ -13,24 +14,25 @@ license=(Apache)
 depends=(fontconfig)
 conflicts=(noto-fonts-emoji)
 provides=(noto-fonts-emoji)
-makedepends=(cairo zopfli python2-setuptools python2-fonttools nototools)
-source=("noto-emoji::git+https://github.com/googlei18n/noto-emoji.git")
+makedepends=(cairo optipng python2-fonttools nototools imagemagick zopfli python2-setuptools)
+#source=("noto-emoji::git+https://github.com/googlei18n/noto-emoji.git")
+source=("https://github.com/googlei18n/noto-emoji/archive/$_commit.zip")
 sha256sums=("SKIP")
 
 prepare() {
-  cd noto-emoji
+  cd noto-emoji-*
 
   find -name '*.py' | xargs sed -e 's|/usr/bin/env python|/usr/bin/env python2|' -i
   sed -e 's|python|python2|g' -e 's|ttx "$<"|ttx2 "$<"|g' -i Makefile
 }
 
 build() {
-  cd noto-emoji
+  cd noto-emoji-*
   make -j4
 }
 
 package() {
-  cd noto-emoji
+  cd noto-emoji-*
   install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
   install -m644 NotoColorEmoji.ttf fonts/NotoEmoji-Regular.ttf \
     "$pkgdir"/usr/share/fonts/"${pkgname}"
