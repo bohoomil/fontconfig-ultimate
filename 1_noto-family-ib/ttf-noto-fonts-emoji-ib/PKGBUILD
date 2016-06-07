@@ -17,7 +17,7 @@ provides=(noto-fonts-emoji)
 makedepends=(cairo optipng python2-fonttools nototools imagemagick zopfli python2-setuptools)
 #source=("noto-emoji::git+https://github.com/googlei18n/noto-emoji.git")
 source=("https://github.com/googlei18n/noto-emoji/archive/$_commit.zip")
-sha256sums=("SKIP")
+sha256sums=('5405abdca9037c5c75ea27d1777154f345d41d3a82ef4abe8f258865790716e0')
 
 prepare() {
   cd noto-emoji-*
