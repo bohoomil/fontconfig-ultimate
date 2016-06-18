@@ -3,8 +3,8 @@
 # Contributor: julroy67 <julroy67@gmail.com>
 
 pkgname=ttf-noto-fonts-emoji-ib
-_commit=a964c12
-pkgver=1.30
+_commit=f94b8f3
+pkgver=1.31
 pkgrel=1
 epoch=1
 pkgdesc="Google Noto emoji fonts."
@@ -17,7 +17,7 @@ provides=(noto-fonts-emoji)
 makedepends=(cairo optipng python2-fonttools nototools imagemagick zopfli python2-setuptools)
 #source=("noto-emoji::git+https://github.com/googlei18n/noto-emoji.git")
 source=("https://github.com/googlei18n/noto-emoji/archive/$_commit.zip")
-sha256sums=('5405abdca9037c5c75ea27d1777154f345d41d3a82ef4abe8f258865790716e0')
+sha256sums=('e5f05064cbc0ee1f1edba1dcb6c2ae129829d3151984920daa22f75876798b23')
 
 prepare() {
   cd noto-emoji-*
