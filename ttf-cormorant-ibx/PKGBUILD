@@ -1,0 +1,35 @@
+# Maintainer: bohoomil <@zoho.com>
+# Contributor: julroy67 <julroy67@gmail.com>
+
+pkgname=ttf-cormorant-ibx
+pkgver=3.2
+pkgrel=1
+pkgdesc="The Cormorant Typeface"
+arch=('any')
+conflicts=('ttf-cormorant')
+depends=('fontconfig' 'xorg-fonts-encodings' 'xorg-font-utils')
+url='https://www.behance.net/gallery/28579883/Cormorant-an-open-source-display-font-family'
+source=("https://github.com/CatharsisFonts/Cormorant/releases/download/v${pkgver}/Cormorant_Install_v${pkgver}.zip")
+license=('custom: OFL')
+sha1sums=('a24d7ef3d2ee63cff8555ad5a89a552c3e3b0e3c')
+
+package() {
+	cd "${srcdir}/Cormorant_Install_v${pkgver}"
+	
+	install -m755 -d "${pkgdir}"/usr/share/licenses/"${pkgname}"
+	install -m644 OFL.txt "${pkgdir}"/usr/share/licenses/"${pkgname}"
+	
+	install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+	install -m644 "1. TrueType Font Files/"*.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
+	
+	install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+	install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+	install -m644 ../../45-cormorant.conf \
+		"${pkgdir}"/etc/fonts/conf.avail/45-cormorant.conf
+	install -m644 ../../90-tt-cormorant.conf \
+		"${pkgdir}"/etc/fonts/conf.avail/90-tt-cormorant.conf
+	
+	cd "${pkgdir}"/etc/fonts/conf.d
+	ln -s ../conf.avail/45-cormorant.conf .
+	ln -s ../conf.avail/90-tt-cormorant.conf .
+}
