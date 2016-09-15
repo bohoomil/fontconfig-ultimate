@@ -15,7 +15,6 @@ makedepends=(gcc-multilib)
 conflicts=('lib32-freetype2' 'lib32-freetype2-infinality' 'lib32-freetype2-git-infinality'
            'lib32-freetype2-ubuntu')
 provides=('lib32-freetype2' 'lib32-freetype2-infinality')
-options=('!libtool')
 source=(http://download.savannah.gnu.org/releases/freetype/freetype-${pkgver}.tar.bz2
 	0001-Enable-table-validation-modules.patch
 	0002-Enable-subpixel-rendering.patch
