@@ -3,6 +3,7 @@ post_install() {
   cat << EOF
   If you are using [multilib], please install/upgrade
   lib32-freetype2-infinality-ultimate, too.
+  Subpixel hinting is configured in /etc/profile.d/freetype2.sh
 EOF
 }
 
