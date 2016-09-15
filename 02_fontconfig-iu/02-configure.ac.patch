@@ -1,0 +1,53 @@
+--- a/configure.ac	2016-08-05 07:47:02.000000000 +0200
++++ b/configure.ac	2016-09-15 15:29:04.689622712 +0200
+@@ -543,9 +543,14 @@
+ 
+ AC_ARG_WITH(templatedir,
+ 	[AC_HELP_STRING([--with-templatedir=DIR],
+-			[Use DIR to store the configuration template files [default=DATADIR/fontconfig/conf.avail]])],
++			[Use DIR to store the generic configuration template files [default=DATADIR/fontconfig/conf.avail]])],
+ 	[templatedir="$withval"],
+ 	[templatedir=yes])
++AC_ARG_WITH(templateinfdir,
++	[AC_HELP_STRING([--with-templateinfdir=DIR],
++			[Use DIR to store the Infinality compliant configuration template files [default=DATADIR/fontconfig/conf.avail.infinality]])],
++	[templateinfdir="$withval"],
++	[templateinfdir=yes])
+ AC_ARG_WITH(baseconfigdir,
+ 	[AC_HELP_STRING([--with-baseconfigdir=DIR],
+ 			[Use DIR to store the base configuration files [default=SYSCONFDIR/fonts]])],
+@@ -569,6 +574,13 @@
+ *)
+ 	;;
+ esac
++case "$templateinfdir" in
++no|yes)
++	templateinfdir='${datadir}'/fontconfig/conf.avail.infinality
++	;;
++*)
++	;;
++esac
+ case "$baseconfigdir" in
+ no|yes)
+ 	baseconfigdir='${sysconfdir}'/fonts
+@@ -592,10 +604,12 @@
+ esac
+ 
+ TEMPLATEDIR=${templatedir}
++TEMPLATEINFDIR=${templateinfdir}
+ BASECONFIGDIR=${baseconfigdir}
+ CONFIGDIR=${configdir}
+ XMLDIR=${xmldir}
+ AC_SUBST(TEMPLATEDIR)
++AC_SUBST(TEMPLATEINFDIR)
+ AC_SUBST(BASECONFIGDIR)
+ AC_SUBST(CONFIGDIR)
+ AC_SUBST(XMLDIR)
+@@ -725,6 +739,7 @@
+ fc-case/Makefile
+ src/Makefile
+ conf.d/Makefile
++conf.d.infinality/Makefile
+ fc-cache/Makefile
+ fc-cat/Makefile
+ fc-list/Makefile
