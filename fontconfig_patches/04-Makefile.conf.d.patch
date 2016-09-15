@@ -1,5 +1,5 @@
---- a/conf.d/Makefile.am	2016-04-06 05:22:55.000000000 +0200
-+++ b/conf.d/Makefile.am	2016-04-22 03:07:39.961973095 +0200
+--- a/conf.d/Makefile.am	2016-07-11 04:41:05.000000000 +0200
++++ b/conf.d/Makefile.am	2016-09-15 15:57:36.202233323 +0200
 @@ -21,27 +21,9 @@
  #  TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  #  PERFORMANCE OF THIS SOFTWARE.
@@ -9,7 +9,7 @@
  DOC_FILES = $(DOC_SOURCES:.in=)
  
 -CONF_LINKS = \
--	10-hinting-slight.conf	\
+-	10-hinting-$(PREFERRED_HINTING).conf	\
 -	10-scale-bitmap-fonts.conf \
 -	20-unhint-small-vera.conf \
 -	30-urw-aliases.conf \
@@ -29,7 +29,7 @@
  
  EXTRA_DIST = $(template_DATA) $(DOC_SOURCES)
  CLEANFILES = $(DOC_FILES)
-@@ -85,24 +67,4 @@ template_DATA =				\
+@@ -85,24 +67,4 @@
  	80-delicious.conf		\
  	90-synthetic.conf
  
@@ -55,8 +55,8 @@
 -
  -include $(top_srcdir)/git.mk
 
---- a/conf.d/Makefile.in	2016-04-06 14:07:58.000000000 +0200
-+++ b/conf.d/Makefile.in	2016-04-10 05:03:20.826448802 +0200
+--- a/conf.d/Makefile.in	2016-08-05 07:49:13.000000000 +0200
++++ b/conf.d/Makefile.in	2016-09-15 16:01:13.856554777 +0200
 @@ -173,7 +173,7 @@ am__uninstall_files_from_dir = { \
      || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
           $(am__cd) "$$dir" && rm -f $$files; }; \
@@ -66,7 +66,7 @@
  DATA = $(config_DATA) $(template_DATA)
  am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
  am__DIST_COMMON = $(srcdir)/Makefile.in README
-@@ -344,26 +344,8 @@ target_alias = @target_alias@
+@@ -346,26 +346,8 @@
  top_build_prefix = @top_build_prefix@
  top_builddir = @top_builddir@
  top_srcdir = @top_srcdir@
@@ -74,7 +74,7 @@
 -DOC_SOURCES = README.in
  DOC_FILES = $(DOC_SOURCES:.in=)
 -CONF_LINKS = \
--	10-hinting-slight.conf	\
+-	10-hinting-$(PREFERRED_HINTING).conf	\
 -	10-scale-bitmap-fonts.conf \
 -	20-unhint-small-vera.conf \
 -	30-urw-aliases.conf \
@@ -94,7 +94,7 @@
  
  EXTRA_DIST = $(template_DATA) $(DOC_SOURCES)
  CLEANFILES = $(DOC_FILES)
-@@ -528,7 +510,7 @@ check: $(BUILT_SOURCES)
+@@ -530,7 +512,7 @@
  	$(MAKE) $(AM_MAKEFLAGS) check-am
  all-am: Makefile $(DATA)
  installdirs:
@@ -103,7 +103,7 @@
  	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
  	done
  install: $(BUILT_SOURCES)
-@@ -651,9 +633,6 @@ uninstall-am: uninstall-configDATA unins
+@@ -653,9 +635,6 @@
  .PRECIOUS: Makefile
  
  
