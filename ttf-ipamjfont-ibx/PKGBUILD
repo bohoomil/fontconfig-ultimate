@@ -21,23 +21,25 @@ sha1sums=('6ebc67edcfd34718925657137ad9b39fa70f2c00'
           'b65df8dcbd12c100110f7800f07354959ef61580')
 
 package() {
-	cd "${srcdir}"
+	cd "$srcdir"
 	
 	# Install license
-	install -D -m644 "IPA_Font_License_Agreement_v1.0.txt" \
-		"${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
+	install -Dm644 "IPA_Font_License_Agreement_v1.0.txt" \
+		"${pkgdir}"/usr/share/licenses/"${pkgname}"/LICENSE
+	
 	# Install font
-	install -D -m644 ipamjm.ttf \
+	install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+	install -m644 ipamjm.ttf \
 		"${pkgdir}"/usr/share/fonts/"${pkgname}"
 	
 	# Install infinality conf
-	install -D -m644 40-ipamjfont.conf \
+	install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+	install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+	install -m644 40-ipamjfont.conf \
 		"${pkgdir}"/etc/fonts/conf.avail/40-ipamjfont.conf
-	install -D -m644 90-tt-ipamjfont.conf \
+	install -m644 90-tt-ipamjfont.conf \
 		"${pkgdir}"/etc/fonts/conf.avail/90-tt-ipamjfont.conf
 	
-	
-	install -m755 -d "${pkgdir}"/etc/fonts/conf.d
 	cd "${pkgdir}"/etc/fonts/conf.d
 	ln -s ../conf.avail/40-ipamjfont.conf .
 	ln -s ../conf.avail/90-tt-ipamjfont.conf .
