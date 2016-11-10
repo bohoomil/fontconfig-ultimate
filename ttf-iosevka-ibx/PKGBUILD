@@ -9,6 +9,8 @@ url="https://github.com/be5invis/Iosevka"
 arch=('any')
 groups=('infinality-bundle-fonts-extra')
 license=('custom:OFL')
+conflicts=('ttf-iosevka')
+replaces=('ttf-iosevka')
 source=(https://github.com/be5invis/Iosevka/releases/download/v${pkgver}/01.iosevka-${pkgver}.zip
         45-iosevka.conf
         90-tt-iosevka.conf)
