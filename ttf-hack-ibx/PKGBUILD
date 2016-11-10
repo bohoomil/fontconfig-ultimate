@@ -9,6 +9,8 @@ url="http://sourcefoundry.org/hack/"
 arch=('any')
 groups=('infinality-bundle-fonts')
 license=('custom:OFL,custom:Other')
+conflicts=('ttf-hack')
+replaces=('ttf-hack')
 source=("https://github.com/chrissimpkins/Hack/releases/download/v${pkgver}/Hack-v${pkgver//./_}-ttf.zip"
         45-hack.conf
         90-tt-hack.conf)
