@@ -3,8 +3,8 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=ttf-dejavu-ib
-pkgver=2.35
-pkgrel=2
+pkgver=2.37
+pkgrel=1
 pkgdesc="Font family based on the Bitstream Vera Fonts with a wider range of characters. Re-packed for infinality-bundle-fonts. TrueType version."
 url="http://dejavu-fonts.org/wiki/Main_Page"
 arch=('any')
@@ -17,7 +17,7 @@ license=('custom')
 source=(http://downloads.sourceforge.net/project/dejavu/dejavu/${pkgver}/dejavu-fonts-ttf-${pkgver}.tar.bz2
         45-dejavu.conf
         90-tt-dejavu.conf)
-sha1sums=('7912a0f3ef2b380276c46eb6bfb0d87b8e4b3fe8'
+sha1sums=('7fa15e7b9676fc3915338c41e76ad454c344fff5'
           '4072385eb6d18754f932bda5634da259ab875a1b'
           'a6332f56d9d95636e9ac99643b3a241ba08f3499')
 
