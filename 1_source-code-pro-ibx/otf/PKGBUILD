@@ -1,10 +1,10 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=otf-source-code-pro-ibx
-pkgver=2.010ro+1.030it
-_relver=2.010R-ro/1.030R-it
+pkgver=2.030ro+1.050it
+_relver=2.030R-ro/1.050R-it
 _tarver=${_relver//\//-}
-pkgrel=2
+pkgrel=1
 depends=('fontconfig')
 pkgdesc="A set of OpenType fonts designed for user interfaces. OpenType version."
 url="http://adobe-fonts.github.io/source-code-pro/"
@@ -15,7 +15,7 @@ groups=('infinality-bundle-fonts-extra')
 source=("${_tarver}.tar.gz::https://github.com/adobe-fonts/source-code-pro/archive/${_relver}.tar.gz"
         45-source-code-pro.conf
         90-non-tt-source-code-pro.conf)
-sha1sums=('d266fb8cc558a85d76432ee0731144fade7b4be1'
+sha1sums=('fb8601043ec55da1b1cfd27a0843ea5eb14c6cad'
           'd20feb494116f95e4a35ad40f625a94f9a3bbcb2'
           '287ef2255289182912eb2daa16810bd87d7100b1')
 
