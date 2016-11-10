@@ -3,7 +3,7 @@
 
 pkgname=otf-cantarell-ib
 _basename=cantarell-fonts
-pkgver=0.0.24
+pkgver=0.0.25
 pkgrel=2
 epoch=1
 pkgdesc="Cantarell font family."
@@ -17,7 +17,7 @@ provides=('cantarell-fonts')
 source=(https://download.gnome.org/sources/${_basename}/${pkgver:0:3}/${_basename}-${pkgver}.tar.xz
         45-cantarell.conf
         90-non-tt-cantarell.conf)
-sha1sums=('35aa45ab5a86d5f08cbb49dffb61d048910f6954'
+sha1sums=('b893687a68efa3139b8b429560705b48ba118396'
           'c2fc52ab73d8b543bdf0d5b178e9e1b0fbdf3503'
           'f77dcf036ee0d1a46eb4dcc46cdbd4f350c875f0')
 
