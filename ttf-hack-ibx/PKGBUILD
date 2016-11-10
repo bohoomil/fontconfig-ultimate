@@ -1,7 +1,7 @@
 # Maintainer: bohoomil <@zoho.com>
 
 pkgname=ttf-hack-ibx
-pkgver=2.019
+pkgver=2.020
 pkgrel=1
 depends=('fontconfig')
 pkgdesc="A typeface designed for source code."
@@ -12,7 +12,7 @@ license=('custom:OFL,custom:Other')
 source=("https://github.com/chrissimpkins/Hack/releases/download/v${pkgver}/Hack-v${pkgver//./_}-ttf.zip"
         45-hack.conf
         90-tt-hack.conf)
-sha1sums=('39a6cd9e472960504d5e16a8d940a22e61ed5aae'
+sha1sums=('50abac4777af3d98592dadcaf3433beb3ea14a83'
           'efaba6960874a0a051130eb863a4149c7c7ff12a'
           'ef1c177571149cee83c2065975d744478e6cb7fe')
 
