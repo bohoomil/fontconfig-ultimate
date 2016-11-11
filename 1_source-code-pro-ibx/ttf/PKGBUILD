@@ -10,7 +10,7 @@ pkgdesc="A set of OpenType fonts designed for user interfaces. TrueType version.
 url="http://www.adobe.com/"
 arch=('any')
 license=('custom:OFL')
-conflicts=('adobe-source-sans-pro-fonts' 'otf-source-sans-pro' 'ttf-source-sans-pro' 't1-source-code-pro-ibx' 'otf-source-code-pro-ibx')
+conflicts=('adobe-source-code-pro-fonts' 'otf-source-code-pro' 'ttf-source-code-pro' 't1-source-code-pro-ibx' 'otf-source-code-pro-ibx')
 groups=('infinality-bundle-fonts-extra')
 source=("${_tarver}.tar.gz::https://github.com/adobe-fonts/source-code-pro/archive/${_relver}.tar.gz"
         45-source-code-pro.conf
