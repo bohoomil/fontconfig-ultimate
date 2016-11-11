@@ -1,10 +1,10 @@
-# Maintainer: ponsfoot <cabezon dot hashimoto at gmail dot com>
+# Maintainer: Julien Humbert <julroy67@gmail.com>
 # Contributor: bohoomil <@zoho.com>
 
 pkgname=ttf-ipamjfont-ibx
-pkgver=003.01
+pkgver=004.01
 _pkgver=${pkgver/./}
-pkgrel=2
+pkgrel=1
 pkgdesc="Japanese outline Mincho fonts including the unified characters of the Basic Resident Registers Network and the Family Register of Japan (based on IPAex Mincho fonts)"
 arch=('any')
 url="http://ossipedia.ipa.go.jp/ipamjfont/"
@@ -13,30 +13,34 @@ depends=('fontconfig')
 groups=('infinality-bundle-fonts-extra')
 conflicts=('otf-ipamjfont')
 replaces=('otf-ipamjfont')
-source=(http://download.forest.impress.co.jp/pub/library/i/ipamjfont/10750/ipamjm${_pkgver}.zip
-        40-ipamjfont.conf
-        90-tt-ipamjfont.conf)
-sha1sums=('62098c7963dff6ceb45965bfdb791f4324142448'
+source=(http://dl.mojikiban.ipa.go.jp/IPAmjMincho/ipamjm${_pkgver}.zip
+	40-ipamjfont.conf
+	90-tt-ipamjfont.conf)
+sha1sums=('6ebc67edcfd34718925657137ad9b39fa70f2c00'
           '57e4bb8164d546f066c715cc0aa886059af0c901'
           'b65df8dcbd12c100110f7800f07354959ef61580')
 
 package() {
-  cd "ipamjm${_pkgver}"
-
-  install -D -m644 "IPA_Font_License_Agreement_v1.0.txt" \
-    "${pkgdir}"/usr/share/licenses/"${pkgname}"/COPYING
-
-  install -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
-  install -m644 *.ttf "${pkgdir}"/usr/share/fonts/"${pkgname}"
-
-  cd "${srcdir}"
-  install -D -m644 40-ipamjfont.conf \
-    "${pkgdir}"/etc/fonts/conf.avail/40-ipamjfont.conf
-  install -D -m644 90-tt-ipamjfont.conf \
-    "${pkgdir}"/etc/fonts/conf.avail/90-tt-ipamjfont.conf
-
-  install -m755 -d "${pkgdir}"/etc/fonts/conf.d
-  cd "${pkgdir}"/etc/fonts/conf.d
-  ln -s ../conf.avail/40-ipamjfont.conf .
-  ln -s ../conf.avail/90-tt-ipamjfont.conf .
+	cd "$srcdir"
+	
+	# Install license
+	install -Dm644 "IPA_Font_License_Agreement_v1.0.txt" \
+		"${pkgdir}"/usr/share/licenses/"${pkgname}"/LICENSE
+	
+	# Install font
+	install -m755 -d "${pkgdir}"/usr/share/fonts/"${pkgname}"
+	install -m644 ipamjm.ttf \
+		"${pkgdir}"/usr/share/fonts/"${pkgname}"
+	
+	# Install infinality conf
+	install -m755 -d "${pkgdir}"/etc/fonts/conf.d
+	install -m755 -d "${pkgdir}"/etc/fonts/conf.avail
+	install -m644 40-ipamjfont.conf \
+		"${pkgdir}"/etc/fonts/conf.avail/40-ipamjfont.conf
+	install -m644 90-tt-ipamjfont.conf \
+		"${pkgdir}"/etc/fonts/conf.avail/90-tt-ipamjfont.conf
+	
+	cd "${pkgdir}"/etc/fonts/conf.d
+	ln -s ../conf.avail/40-ipamjfont.conf .
+	ln -s ../conf.avail/90-tt-ipamjfont.conf .
 }

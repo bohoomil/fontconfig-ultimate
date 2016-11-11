@@ -2,7 +2,7 @@
 
 pkgname=ibfonts-meta-extended-lt
 pkgver=1
-pkgrel=17
+pkgrel=18
 arch=('any')
 url="https://github.com/bohoomil/fontconfig-ultimate"
 license=('GPL')
@@ -21,7 +21,6 @@ depends=('ibfonts-meta-base'
          'ttf-caladea-ib'
          'ttf-cantoraone-ib'
          'ttf-carlito-ib'
-         'ttf-droid-ib'
          'ttf-gelasio-ib'
          'ttf-merriweather-ib'
          'ttf-merriweather-sans-ib'
