@@ -4,7 +4,7 @@
 #
 # These environment variables require that their respective patches
 # from http://www.infinality.net have been applied to the Freetype
-# installation you are using.  They will do abolutely
+# installation you are using.  They will do absolutely
 # nothing otherwise!
 #
 #
